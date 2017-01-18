@@ -1,0 +1,34 @@
+{% extends "dataserver/layout.html" %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <div>
+        <p>当前值:</p>
+        <p id="device_pv">0.0</p>
+        <button type="button" id="btn_get_data" class="btn btn-primary btn-lg">读取</button>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Bind Ajax GET data
+            $("#btn_get_data").click(function () {
+                $.ajax({
+                    url: "api/",
+                    data: {
+                        key: 1,
+                        token: "abc"
+                    },
+                    success: function (result) {
+                        $("#device_pv").html("<strong>" + result.data + "</strong> degC");
+                    }
+                });
+
+            });
+        });
+
+    </script>
+{% endblock %}
