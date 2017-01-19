@@ -6,7 +6,7 @@ A Modbus RTU via RS-485 driver is implemented.
 
 __author__ = 'Yun Hua'
 __email__ = 'huayunflys@126.com'
-__url__ = 'https://github.com/huayunfly/repo'
+__url__ = 'https://github.com/huayunfly/goiot'
 __license__ = 'Apache License, Version 2.0'
 __version__ = '0.1'
 __status__ = 'Beta'
@@ -25,14 +25,14 @@ class DriverBase(object):
         Open the driver object
         Returns: the driver handler executing read / write
         """
-        raise NotImplementedError('close method')
+        raise NotImplementedError
 
     @classmethod
     def close(cls):
         """
         Close the driver object and release the resources
         """
-        raise NotImplementedError('close method')
+        raise NotImplementedError
 
     def read_tags(self, size, tag_list):
         """
@@ -43,7 +43,7 @@ class DriverBase(object):
         Returns: Read tags operation 's values, qualities, results and timestamps
 
         """
-        raise NotImplementedError('read_tags method')
+        raise NotImplementedError
 
     def write_tags(self, size, tag_list, values):
         """
@@ -55,6 +55,6 @@ class DriverBase(object):
 
         Returns: Write tags operation 's results
         """
-        raise NotImplementedError('write_tags method')
+        raise NotImplementedError
 
 
