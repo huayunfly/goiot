@@ -27,8 +27,10 @@ __status__ = 'Beta'
 GO_QUALITY_NORMAL = 0x00
 GO_RESULT_OK = 0x00
 GO_RESULT_ERROR = 0x01
-GO_READABLE = 0x00
-GO_WRITEABLE = 0x00
+GO_RESULT_NULL_NAME = 0x02
+GO_READABLE = 0x01
+GO_WRITEABLE = 0x10
+GO_EU_TYPE_ANALOG = 0x1
 
 
 class TagState(object):
@@ -71,21 +73,56 @@ class TagValue(object):
             self.tag_state = tag_state
 
 
-class TagAttr(object):
+class EUnit(object):
+    """
+    Engineering unit definition.
+    """
+    def __init__(self, range_max=None, range_min=None, deadband=None):
+        """
+
+        Args:
+            range_max: ANALOG variable's range max value. NO analog value is None.
+            range_min: ANALOG variable's range min value. NO analog value is None.
+            deadband: Deadband. NO analog value is None.
+        """
+        self.range_max = range_max
+        self.range_min = range_min
+        self.deadband = deadband
+
+
+class TagAttr(EUnit):
     """
     Tag attribute definition.
     """
-    def __init__(self, name='', tag_id=0, rights=GO_READABLE):
+    def __init__(self, name=None, tag_id=0, rights=GO_READABLE,
+                 range_max=None, range_min=None, deadband=None):
         """
 
         Args:
             name: tag name
             tag_id: tag id in integer.
-            right: indicate read or write rights
+            rights: indicate read or write rights
         """
         self.name = name
         self.tag_id = tag_id
         self.rights = rights
+        super(TagAttr, self).__init__(range_max=range_max, range_min=range_min, deadband=deadband)
+
+
+class TagEntry(TagAttr, TagState):
+    """
+    Tag entry definition.
+    """
+    def __init__(self, prim_value, active=True):
+        """
+
+        Args:
+            prim_value: primary value.
+            active: whether the entry is active.
+        """
+        super(TagEntry, self).__init__()
+        self.prim_value = prim_value
+        self.active = active
 
 
 class FixedLenHashTable(object):
@@ -94,4 +131,33 @@ class FixedLenHashTable(object):
     Every insert manipulation will return the table slot index.
     """
     def __init__(self, size):
-        pass
+        assert(isinstance(size, int))
+        self.total = size + (size >> 1)
+        if self.total & 0x1:
+            self.total += 1
+        self.slots = [None] * self.total
+
+    def add_item(self, name, value):
+        """
+        Add a new item.
+        Args:
+            name: item name
+            value: item value
+        Raises:
+            ValueError
+
+        Returns: operation result, slot id in integer
+
+        """
+        assert(name is not None)
+        if name is None:
+            raise ValueError
+        perturb = hash(name)
+        j = perturb
+        # collison resolution
+        if j < self.total and self.slots[j] is None:
+            entry = TagEntry(value)
+            entry.name = name
+            self.slots[j] = entry
+
+
