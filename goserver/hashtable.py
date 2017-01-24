@@ -94,17 +94,16 @@ class TagAttr(EUnit):
     """
     Tag attribute definition.
     """
-    def __init__(self, name=None, tag_id=0, rights=GO_READABLE,
+    def __init__(self, name=None, rights=GO_READABLE,
                  range_max=None, range_min=None, deadband=None):
         """
 
         Args:
             name: tag name
-            tag_id: tag id in integer.
             rights: indicate read or write rights
         """
         self.name = name
-        self.tag_id = tag_id
+        self.tag_hash = 0
         self.rights = rights
         super(TagAttr, self).__init__(range_max=range_max, range_min=range_min, deadband=deadband)
 
@@ -113,14 +112,16 @@ class TagEntry(TagAttr, TagState):
     """
     Tag entry definition.
     """
-    def __init__(self, prim_value, active=True):
+    def __init__(self, tag_id=0, prim_value=None, active=True):
         """
 
         Args:
+            tag_id: unique id in integer
             prim_value: primary value.
             active: whether the entry is active.
         """
         super(TagEntry, self).__init__()
+        self.tag_id = tag_id
         self.prim_value = prim_value
         self.active = active
 
@@ -132,32 +133,57 @@ class FixedLenHashTable(object):
     """
     def __init__(self, size):
         assert(isinstance(size, int))
+        if size < 1:
+            raise ValueError
         self.total = size + (size >> 1)
         if self.total & 0x1:
             self.total += 1
-        self.slots = [None] * self.total
+        self.mask = self.total - 1
+        # self.filled >= self.used
+        self.filled = 0
+        self.used = 0
+        self.PERTURB_SHIFT = 5
+        self.slots = [TagEntry(tag_id=i) for i in range(self.total)]
 
-    def add_item(self, name, value):
+    def lookup_item(self, key, hash_code):
         """
         Add a new item.
         Args:
-            name: item name
-            value: item value
+            key: item key.
+            hash_code: item hash value.
         Raises:
             ValueError
 
-        Returns: operation result, slot id in integer
+        Returns: found item and slot id in integer, -1 means failed.
 
         """
-        assert(name is not None)
-        if name is None:
+        assert(key is not None)
+        if key is None:
             raise ValueError
-        perturb = hash(name)
-        j = perturb
+        i = hash_code & self.mask
+        if self.slots[i].name is None:
+            return i
+        elif self.slots[i].name == '<dummy-key>':
+            free_index = i
+        elif self.slot[i].tag_hash == hash and self.slots[i].name == key:
+            return i
+        else:
+            free_index = -1
+
         # collison resolution
-        if j < self.total and self.slots[j] is None:
-            entry = TagEntry(value)
-            entry.name = name
-            self.slots[j] = entry
+        while True:
+            perturb = hash
+            i = (i << 2) + i + perturb + 1
+            j = i & self.mask
+            if self.slots[j] is None:
+                if free_index < 0:
+                    return j
+                else:
+                    return free_index
+            if self.slot[j].tag_hash == hash and self.slots[j].name == key:
+                return j
+
+
+
 
 
