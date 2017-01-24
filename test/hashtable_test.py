@@ -28,7 +28,7 @@ class HashTableTest(unittest.TestCase):
         """
         Test tag construction and inheritance.
         """
-        entry = hashtable.TagEntry(100.0)
+        entry = hashtable.TagEntry(prim_value=100.0)
         self.assertIn('name', entry.__dict__)
         self.assertIn('range_min', entry.__dict__)
         self.assertIn('range_max', entry.__dict__)
@@ -44,7 +44,7 @@ class HashTableTest(unittest.TestCase):
         """
         fixed_table = hashtable.FixedLenHashTable(101)
         self.assertEqual(fixed_table.total, 152)
-        fixed_table.add_item('', 100.0)
+        self.assertIsNone(fixed_table.slots[fixed_table.total - 1].name)
 
 if __name__ == '__main__':
     unittest.main()
