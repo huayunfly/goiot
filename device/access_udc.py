@@ -6,7 +6,7 @@
 @date: 2017.01.04
 """
 
-import minimalmodbus
+from device import minimalmodbus
 import RPi.GPIO as GPIO
 import time
 
