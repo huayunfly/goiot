@@ -38,13 +38,25 @@ class HashTableTest(unittest.TestCase):
         self.assertIn('prim_value', entry.__dict__)
         self.assertIn('deadband', entry.__dict__)
 
-    def test_fixed_hashtable(self):
+    def test_fixed_dict(self):
         """
         Test hash table construction and operation.
         """
-        fixed_table = hashtable.FixedLenHashTable(101)
-        self.assertEqual(fixed_table.total, 152)
-        self.assertIsNone(fixed_table.slots[fixed_table.total - 1].name)
+        fixed_table = hashtable.FixedDict(101)
+        self.assertEqual(fixed_table.reserved_size, 256)
+        self.assertIsNone(fixed_table.slots[fixed_table.reserved_size - 1].name)
+        # Lookup with type error.
+        with self.assertRaises(TypeError):
+            _ = fixed_table.lookup_by_string(1, hash(1))
+        # Lookup
+        tag_entry = fixed_table.lookup_by_string('PV1', hash('PV1'))
+        self.assertIsNone(tag_entry.name)
+        self.assertEqual(tag_entry.tag_id, hash('PV1') & fixed_table.mask)
+        # Add items
+        for i in range(101):
+            tag_entry = fixed_table.add_item('{0}.UDC3300'.format(i))
+            print(tag_entry)
+
 
 if __name__ == '__main__':
     unittest.main()

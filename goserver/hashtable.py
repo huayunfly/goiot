@@ -14,6 +14,7 @@ the index.
 """
 
 import time
+import sys
 
 
 __author__ = 'Yun Hua'
@@ -31,6 +32,8 @@ GO_RESULT_NULL_NAME = 0x02
 GO_READABLE = 0x01
 GO_WRITEABLE = 0x10
 GO_EU_TYPE_ANALOG = 0x1
+
+GO_DUMMY_KEY = '<dummy_key>'
 
 
 class TagState(object):
@@ -125,63 +128,141 @@ class TagEntry(TagAttr, TagState):
         self.prim_value = prim_value
         self.active = active
 
+    def __str__(self):
+        return str(self.name) + '.id_' + str(self.tag_id)
 
-class FixedLenHashTable(object):
+
+class OutRangeError(LookupError):
     """
-    The hash table implementation for the fixed length and non-sizable.
+    Operation out of range.
+    """
+    pass
+
+
+class RepetitionKeyError(LookupError):
+    """
+    Repetition key error.
+    """
+    pass
+
+
+class FixedDict(object):
+    """
+    The hash table implementation for the fixed length and non-sizable dictionary.
     Every insert manipulation will return the table slot index.
     """
     def __init__(self, size):
+        """
+        Use a fixed size to initialize the hash table.
+        However, the table allocates (3 / 2) * size slots for better hash collision
+        resolution performance.
+        Args:
+            size: fixed hash table size.
+        """
         assert(isinstance(size, int))
         if size < 1:
             raise ValueError
-        self.total = size + (size >> 1)
-        if self.total & 0x1:
-            self.total += 1
-        self.mask = self.total - 1
-        # self.filled >= self.used
+        self.size = size
+        # Reserved size is at least larger than 3/2 size
+        reserved = size + (size >> 1)
+        self.reserved_size = 1
+        # Force reserved size equal 2**x
+        while reserved:
+            self.reserved_size <<= 1
+            reserved >>= 1
+        self.mask = self.reserved_size - 1
+        # self.filled (including dummy item) >= self.used
         self.filled = 0
         self.used = 0
         self.PERTURB_SHIFT = 5
-        self.slots = [TagEntry(tag_id=i) for i in range(self.total)]
+        self.slots = [TagEntry(tag_id=i) for i in range(self.reserved_size)]
 
-    def lookup_item(self, key, hash_code):
+    def lookup_by_string(self, key, hash_code):
         """
-        Add a new item.
+        Lookup an item with a string type key.
         Args:
-            key: item key.
+            key: item's key which is a string.
             hash_code: item hash value.
         Raises:
             ValueError
+            TypeError
+            LookupError
 
-        Returns: found item and slot id in integer, -1 means failed.
+        Returns: found item with id attribute in integer.
 
         """
         assert(key is not None)
         if key is None:
-            raise ValueError
+            raise ValueError('Key can not be None.')
+        if not isinstance(key, str):
+            raise TypeError('Key shall be a string')
         i = hash_code & self.mask
         if self.slots[i].name is None:
-            return i
-        elif self.slots[i].name == '<dummy-key>':
-            free_index = i
-        elif self.slot[i].tag_hash == hash and self.slots[i].name == key:
-            return i
+            return self.slots[i]
+        elif self.slots[i].name == GO_DUMMY_KEY:
+            freeslot = self.slots[i]
+        elif self.slots[i].tag_hash == hash and self.slots[i].name == key:
+            return self.slots[i]
         else:
-            free_index = -1
+            freeslot = None
 
         # collison resolution
+        perturb = hash_code & sys.maxsize
         while True:
-            perturb = hash
-            i = (i << 2) + i + perturb + 1
-            j = i & self.mask
-            if self.slots[j] is None:
-                if free_index < 0:
-                    return j
+            i = (i << 2) + i + 1 + perturb
+            pos = i & self.mask
+            if self.slots[pos].name is None:
+                if freeslot is None:
+                    return self.slots[pos]
                 else:
-                    return free_index
-            if self.slot[j].tag_hash == hash and self.slots[j].name == key:
-                return j
+                    return freeslot
+            if (self.slots[pos].tag_hash == hash_code) and \
+                    (self.slots[pos].name == key) and (self.slots[pos].name != GO_DUMMY_KEY):
+                return self.slot[pos]
+            if (self.slots[pos].name == GO_DUMMY_KEY) and (freeslot is None):
+                return self.slots[pos]
+            perturb >>= self.PERTURB_SHIFT
+
+        assert False
+        raise LookupError('Unexpected lookup result.')
+
+    def add_item(self, key):
+        """
+        Add a new item.
+        Args:
+            key: item key.
+
+        Raises:
+            LookupError.
+            OutRangeError.
+            ValueError.
+        Returns: item
+
+        """
+        assert(key is not None)
+        if key is None:
+            raise ValueError('Key can not be None.')
+        if self.used > self.size:
+            raise OutRangeError('No free slots available.')
+
+        hash_code = hash(key)
+        item = self.lookup_by_string(key, hash_code)
+        if item.name is None:
+            item.name = key
+            item.tag_hash = hash_code
+            return item
+        elif GO_DUMMY_KEY == item.name:
+            item.name = key
+            item.tag_hash = hash_code
+            return item
+        elif key == item.name and hash_code == item.tag_hash:
+            raise RepetitionKeyError('Entry with the same key and hash value found')
+
+        raise LookupError('Unexpected: NO dummy entry, No empty entry and No same entry')
+
+
+
+
 
 
 
