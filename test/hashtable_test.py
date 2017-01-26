@@ -48,14 +48,21 @@ class HashTableTest(unittest.TestCase):
         # Lookup with type error.
         with self.assertRaises(TypeError):
             _ = fixed_table.lookup_by_string(1, hash(1))
-        # Lookup
+        # Lookup an empty item
         tag_entry = fixed_table.lookup_by_string('PV1', hash('PV1'))
         self.assertIsNone(tag_entry.name)
         self.assertEqual(tag_entry.tag_id, hash('PV1') & fixed_table.mask)
         # Add items
         for i in range(101):
             tag_entry = fixed_table.add_item('{0}.UDC3300'.format(i))
-            print(tag_entry)
+        # Out of range
+        with self.assertRaises(hashtable.OutRangeError):
+            fixed_table.add_item('{0}.UDC3300'.format(101))
+        # Lookup an item
+        for i in range(101):
+            tag_entry = fixed_table.lookup_by_string('{0}.UDC3300'.format(i),
+                                                     hash('{0}.UDC3300'.format(i)))
+            self.assertEqual(tag_entry.name, '{0}.UDC3300'.format(i))
 
 
 if __name__ == '__main__':
