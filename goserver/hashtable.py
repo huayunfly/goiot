@@ -201,7 +201,7 @@ class FixedDict(object):
             return self.slots[i]
         elif self.slots[i].name == GO_DUMMY_KEY:
             freeslot = self.slots[i]
-        elif self.slots[i].tag_hash == hash and self.slots[i].name == key:
+        elif self.slots[i].tag_hash == hash_code and self.slots[i].name == key:
             return self.slots[i]
         else:
             freeslot = None
@@ -218,7 +218,7 @@ class FixedDict(object):
                     return freeslot
             if (self.slots[pos].tag_hash == hash_code) and \
                     (self.slots[pos].name == key) and (self.slots[pos].name != GO_DUMMY_KEY):
-                return self.slot[pos]
+                return self.slots[pos]
             if (self.slots[pos].name == GO_DUMMY_KEY) and (freeslot is None):
                 return self.slots[pos]
             perturb >>= self.PERTURB_SHIFT
@@ -242,7 +242,7 @@ class FixedDict(object):
         assert(key is not None)
         if key is None:
             raise ValueError('Key can not be None.')
-        if self.used > self.size:
+        if self.used >= self.size:
             raise OutRangeError('No free slots available.')
 
         hash_code = hash(key)
@@ -250,15 +250,18 @@ class FixedDict(object):
         if item.name is None:
             item.name = key
             item.tag_hash = hash_code
+            self.used += 1
+            self.filled += 1
             return item
         elif GO_DUMMY_KEY == item.name:
             item.name = key
             item.tag_hash = hash_code
+            self.used += 1
             return item
         elif key == item.name and hash_code == item.tag_hash:
             raise RepetitionKeyError('Entry with the same key and hash value found')
 
-        raise LookupError('Unexpected: NO dummy entry, No empty entry and No same entry')
+        raise LookupError('Unexpected: No dummy entry, No empty entry and No same entry')
 
 
 
