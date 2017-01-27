@@ -58,11 +58,19 @@ class HashTableTest(unittest.TestCase):
         # Out of range
         with self.assertRaises(hashtable.OutRangeError):
             fixed_table.add_item('{0}.UDC3300'.format(101))
-        # Lookup an item
+        # Lookup items
         for i in range(101):
             tag_entry = fixed_table.lookup_by_string('{0}.UDC3300'.format(i),
                                                      hash('{0}.UDC3300'.format(i)))
             self.assertEqual(tag_entry.name, '{0}.UDC3300'.format(i))
+        # Remove an item
+        with self.assertRaises(ValueError):
+            fixed_table.remove_item('102.UDC3300')
+        # Remove items
+        for i in range(101):
+            fixed_table.remove_item('{0}.UDC3300'.format(i))
+        self.assertEqual(fixed_table.used, 0)
+        self.assertEqual(fixed_table.filled, 101)
 
 
 if __name__ == '__main__':

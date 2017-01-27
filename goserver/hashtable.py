@@ -263,6 +263,38 @@ class FixedDict(object):
 
         raise LookupError('Unexpected: No dummy entry, No empty entry and No same entry')
 
+    def remove_item(self, key):
+        """
+        Remove an item.
+        Args:
+            key: item key.
+        Raises:
+            ValueError.
+            LookupError.
+
+        """
+        assert(key is not None)
+        if key is None:
+            raise ValueError('Key can not be None')
+        if 0 == self.used:
+            raise ValueError('The dict is empty')
+
+        hash_code = hash(key)
+        item = self.lookup_by_string(key, hash_code)
+        if item.name is None:
+            raise ValueError('{0} not in the dict'.format(str(key)))
+        if (key == item.name) and (hash_code == item.tag_hash) and (GO_DUMMY_KEY != item.name):
+            self.used -= 1
+            item.name = GO_DUMMY_KEY
+            return
+        if GO_DUMMY_KEY == item.name:
+            raise ValueError('{0} not in the dict'.format(str(key)))
+
+        assert False
+        raise LookupError('Unexpected operation routine')
+
+
+
 
 
 
