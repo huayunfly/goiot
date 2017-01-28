@@ -4,6 +4,7 @@ Hash table test cases.
 """
 
 import unittest
+import math
 from goserver import hashtable
 
 __author__ = 'Yun Hua'
@@ -71,6 +72,16 @@ class HashTableTest(unittest.TestCase):
             fixed_table.remove_item('{0}.UDC3300'.format(i))
         self.assertEqual(fixed_table.used, 0)
         self.assertEqual(fixed_table.filled, 101)
+        # Update items value
+        with self.assertRaises(ValueError):
+            fixed_table.update_item('102.UDC3300', 1.0)
+        for i in range(101):
+            _ = fixed_table.add_item('{0}.UDC3300'.format(i))
+        for i in range(101):
+            fixed_table.update_item('{0}.UDC3300'.format(i), float(i) * math.pi)
+            tag_entry = fixed_table.lookup_by_string('{0}.UDC3300'.format(i),
+                                                     hash('{0}.UDC3300'.format(i)))
+            self.assertAlmostEqual(tag_entry.prim_value, float(i) * math.pi, delta=1e-9)
 
 
 if __name__ == '__main__':

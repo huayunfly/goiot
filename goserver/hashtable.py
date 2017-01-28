@@ -293,6 +293,39 @@ class FixedDict(object):
         assert False
         raise LookupError('Unexpected operation routine')
 
+    def update_item(self, key, value):
+        """
+        Update an item's value.
+        Args:
+            key: item key.
+            value: item value.
+
+        Raises:
+            ValueError
+            LookupError
+
+        """
+        assert(key is not None)
+        if key is None:
+            raise ValueError('Key can not be none')
+
+        hash_code = hash(key)
+        item = self.lookup_by_string(key, hash_code)
+        if (key == item.name) and (hash_code == item.tag_hash) and (item.name != GO_DUMMY_KEY):
+            item.prim_value = value
+            return
+        if item.name is None:
+            raise ValueError('{0} not in the dict'.format(str(key)))
+        if item.name == GO_DUMMY_KEY:
+            raise ValueError('{0} not in the dict'.format(str(key)))
+
+        assert False
+        raise LookupError('Unexpected operation routine')
+
+
+
+
+
 
 
 
