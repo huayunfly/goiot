@@ -55,7 +55,8 @@ class HashTableTest(unittest.TestCase):
         self.assertEqual(tag_entry.tag_id, hash('PV1') & fixed_table.mask)
         # Add items
         for i in range(101):
-            tag_entry = fixed_table.add_item('{0}.UDC3300'.format(i))
+            _ = fixed_table.add_item('{0}.UDC3300'.format(i))
+        self.assertTrue(fixed_table.full())
         # Out of range
         with self.assertRaises(hashtable.OutRangeError):
             fixed_table.add_item('{0}.UDC3300'.format(101))
