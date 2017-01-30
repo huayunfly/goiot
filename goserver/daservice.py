@@ -34,12 +34,17 @@ class DAService(object):
         assert entry_size > 0
         if entry_size <= 0:
             raise ValueError('entry_size less than or equal to 0')
+        # Size and caches
         self.entry_size = entry_size
-        self.update_threads = []
-        self.update_interval = 0.5
-        self.keep_updating = True
         self.main = hashtable.FixedDict(entry_size)
         self.secondary = [hashtable.TagValue(tag_id=i) for i in range(self.main.reserved_size)]
+        # Threads
+        self.update_threads = []
+        self.update_interval = 0.1
+        self.keep_updating = True
+        self.status_lock = threading.Lock()
+        # Drivers
+        self.devices = []
 
     def update_main_from_secondary(self):
         """
@@ -49,13 +54,96 @@ class DAService(object):
 
         """
         while self.keep_updating:
+            if __debug__:
+                print('update...')
             for i in range(self.entry_size):
                 if (self.main.slots[i].name is not None) or \
                         (self.main.slots[i].name != hashtable.GO_DUMMY_KEY):
                     self.main.slots[i].prim_value = self.secondary[i].value
                     self.main.slots[i].time = time.time()
             time.sleep(self.update_interval)
-            print('update...')
+
+    def full(self):
+        """
+        Whether the cache is full.
+        Returns:
+            True or False.
+
+        """
+        return self.main.full()
+
+    def register_device(self, device):
+        """
+        Register a driver.
+        Args:
+            device: Device or virtual driver
+
+        Raises:
+            ValueError
+
+        """
+        assert device is not None
+        if device is None:
+            raise ValueError('None driver object')
+        if device in self.devices:
+            raise ValueError('Driver existed')
+        with self.status_lock:
+            self.devices.append(device)
+
+    def unregister_device(self, device_name):
+        """
+        Un-register a device
+        Args:
+            device_name: Name of the device
+
+        Raises:
+            AttributeError
+
+        """
+        assert device_name is not None
+        if device_name is None:
+            raise ValueError('Driver name is None.')
+        with self.status_lock:
+            for device in self.devices:
+                if device_name == device.name:
+                    self.devices.remove(device)
+                    # device.stop()
+                    break
+
+    def add_tag(self, name):
+        """
+        Add a tag by name.
+        Args:
+            name: Tag name in string.
+
+        Raises:
+            ValueError.
+
+        """
+        assert name is not None
+        # TODO: thread safe
+        try:
+            tag_entry = self.main.add_item(name)
+        except ValueError as e:
+            raise ValueError('Name error') from e
+        except hashtable.RepetitionKeyError as e:
+            raise ValueError('Name existed') from e
+        except hashtable.OutRangeError as e:
+            raise ValueError('Out of range') from e
+        else:
+            return tag_entry
+
+    def refresh(self, tag_id, value):
+        """
+        Refresh the value of the secondary cache.
+        Args:
+            tag_id: Tag id.
+            value: Tag value.
+
+        """
+        assert tag_id is not None
+        # Todo: thread safe
+        self.secondary[tag_id].value = value
 
     def run(self):
         """
@@ -66,9 +154,12 @@ class DAService(object):
         thread = threading.Thread(target=self.update_main_from_secondary)
         self.update_threads.append(thread)
         thread.start()
-        # TODO: do something here
-        for thread in self.update_threads:
-            thread.join()
+        # devices
+        with self.status_lock:
+            for device in self.devices:
+                device.start()
+        if __debug__:
+            print('Service running...')
 
     def stop(self):
         """
@@ -76,3 +167,11 @@ class DAService(object):
 
         """
         self.keep_updating = False
+        for thread in self.update_threads:
+            thread.join()
+        # devices
+        with self.status_lock:
+            for device in self.devices:
+                device.stop()
+        if __debug__:
+            print('Service stopped')

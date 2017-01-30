@@ -6,6 +6,7 @@ Data access service test.
 import unittest
 import time
 from goserver import daservice
+from device import deviceobj
 
 __author__ = 'Yun Hua'
 __email__ = 'huayunflys@126.com'
@@ -39,12 +40,42 @@ class DAServiceTest(unittest.TestCase):
         """
         pass
 
+    def test_service_add_tag(self):
+        """
+        Test adding a tag.
+
+        """
+        self.service.add_tag('0.UDC3300')
+        with self.assertRaises(ValueError):
+            self.service.add_tag('0.UDC3300')
+
+    def test_service_refresh(self):
+        """
+        Test refresh method.
+
+        """
+        self.service.refresh(0, 100.0)
+
+    def test_register_driver(self):
+        """
+        Test register/unregister driver.
+
+        """
+        device = deviceobj.DeviceBase('UDC3300', self.service)
+        self.service.register_device(device)
+        self.service.unregister_device('UDC3300')
+
     def test_service_run(self):
         """
         Test the service running.
 
         """
+        device = deviceobj.DeviceBase('UDC3300', self.service)
+        self.service.register_device(device)
         self.service.run()
+        time.sleep(1)
+        self.service.stop()
+        self.service.unregister_device('UDC3300')
 
 
 if __name__ == '__main__':
