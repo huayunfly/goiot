@@ -322,6 +322,20 @@ class FixedDict(object):
         assert False
         raise LookupError('Unexpected operation routine')
 
+    def full(self):
+        """
+        Indicates whether the table is full.
+        Returns:
+            True if the table is full.
+
+        """
+        if self.used >= self.size:
+            return True
+        else:
+            return False
+
+
+
 
 
 
