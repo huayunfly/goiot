@@ -15,7 +15,7 @@ the index.
 
 import time
 import sys
-
+from goserver.constants import GoStatus, GoQuality, GoPrivilege
 
 __author__ = 'Yun Hua'
 __email__ = 'huayunflys@126.com'
@@ -24,15 +24,6 @@ __license__ = 'Apache License, Version 2.0'
 __version__ = '0.1'
 __status__ = 'Beta'
 
-
-GO_QUALITY_NORMAL = 0x00
-GO_RESULT_OK = 0x00
-GO_RESULT_ERROR = 0x01
-GO_RESULT_NULL_NAME = 0x02
-GO_READABLE = 0x01
-GO_WRITEABLE = 0x10
-GO_EU_TYPE_ANALOG = 0x1
-
 GO_DUMMY_KEY = '<dummy_key>'
 
 
@@ -40,7 +31,8 @@ class TagState(object):
     """
     Tag state definition.
     """
-    def __init__(self, timestamp=None, error_result=GO_RESULT_OK, quality=GO_QUALITY_NORMAL):
+    def __init__(self, timestamp=None, error_result=GoStatus.S_OK,
+                 quality=GoQuality.Q_NORMAL):
         """
 
         Args:
@@ -97,7 +89,7 @@ class TagAttr(EUnit):
     """
     Tag attribute definition.
     """
-    def __init__(self, name=None, rights=GO_READABLE,
+    def __init__(self, name=None, rights=GoPrivilege.READABLE,
                  range_max=None, range_min=None, deadband=None):
         """
 
