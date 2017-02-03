@@ -118,6 +118,8 @@ class DAService(object):
 
         Raises:
             ValueError.
+        Returns:
+            tag id
 
         """
         assert name is not None
@@ -131,19 +133,35 @@ class DAService(object):
         except hashtable.OutRangeError as e:
             raise ValueError('Out of range') from e
         else:
-            return tag_entry
+            return tag_entry.tag_id
 
-    def refresh(self, tag_id, value):
+    def remove_tag(self, name):
+        """
+        Remove tag.
+        Args:
+            name: Tag name
+
+        """
+        assert name is not None
+        self.main.remove_item(name)
+
+    def refresh(self, tag_ids, values, op_results):
         """
         Refresh the value of the secondary cache.
         Args:
-            tag_id: Tag id.
-            value: Tag value.
+            tag_ids: Tag id list.
+            values: Tag value list.
+            op_results: Operation result in list.
 
         """
-        assert tag_id is not None
+        assert isinstance(tag_ids, list)
+        assert isinstance(values, list)
+        assert isinstance(op_results, list)
         # Todo: thread safe
-        self.secondary[tag_id].value = value
+        for tag_id, value in zip(tag_ids, values):
+            self.secondary[tag_id].value = value
+        if __debug__:
+            print('Service refreshing... tag_ids={0}, values={1}'.format(tag_ids, values))
 
     def run(self):
         """
