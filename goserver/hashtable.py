@@ -171,7 +171,8 @@ class FixedDict(object):
 
     def lookup_by_string(self, key, hash_code):
         """
-        Lookup an item with a string type key.
+        Lookup an item with a string type key in the slots.
+        An empty or a dummy can be returned.
         Args:
             key: item's key which is a string.
             hash_code: item hash value.
@@ -313,6 +314,26 @@ class FixedDict(object):
 
         assert False
         raise LookupError('Unexpected operation routine')
+
+    def find_item(self, key):
+        """
+        Find an existed item other than an empty or a dummy one.
+        Args:
+            key: item key.
+
+        Raises:
+            ValueError.
+
+        Returns:
+            Existed item.
+
+        """
+        hash_code = hash(key)
+        item = self.lookup_by_string(key, hash_code)
+        if (key == item.name) and (hash_code == item.tag_hash) and (item.name != GO_DUMMY_KEY):
+            return item
+        else:
+            raise ValueError('Item does not exist.')
 
     def full(self):
         """
