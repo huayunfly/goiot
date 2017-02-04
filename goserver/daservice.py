@@ -6,12 +6,19 @@ fixed hash table. The secondary cache' data is refreshed by the drivers. A
 separated thread synchronize the 2nd and the main cache.
 
 While the clients visit the service. The requests are queued and update the
-main cache or 'write' to the driver.
+main cache or 'write' to the driver. The replies are also queued and dispatched.
+
+The async flow data includes a transaction id. For the refresh data, a name-callback
+function pair may be used. So its transaction id can be hash(name). For the async
+read / write flow data, a transaction id is provided by the caller(?)
 """
 
 import time
 import threading
 from goserver import hashtable
+from goserver import dataqueue
+from goserver.constants import GoOperation, GoStatus
+from goserver.common import FlowVar
 
 __author__ = 'Yun Hua'
 __email__ = 'huayunflys@126.com'
@@ -19,6 +26,36 @@ __url__ = 'https://github.com/huayunfly/goiot'
 __license__ = 'Apache License, Version 2.0'
 __version__ = '0.1'
 __status__ = 'Beta'
+
+
+class CallerInfo(object):
+    """
+    Caller information struct including the key(identification) and target tag ids.
+    """
+    def __init__(self, key, callback_func, tag_ids):
+        """
+        Init
+        Args:
+            key: Unique key, which can be a name string or a transaction number.
+            callback_func: Call back function
+            tag_ids: Tag id list.
+        """
+        if key is None:
+            raise ValueError('key is None.')
+        if callback_func is None:
+            raise ValueError('callback_func is None')
+        if not isinstance(tag_ids, list):
+            raise ValueError('tag id list is needed')
+        self.key = key
+        self.callback = callback_func
+        self.tag_ids = tag_ids
+        self.hash_code = hash(self.key)
+
+    def __hash__(self):
+        return self.hash_code
+
+    def __str__(self):
+        return 'Caller_' + str(self.key)
 
 
 class DAService(object):
@@ -39,12 +76,16 @@ class DAService(object):
         self.main = hashtable.FixedDict(entry_size)
         self.secondary = [hashtable.TagValue(tag_id=i) for i in range(self.main.reserved_size)]
         # Threads
-        self.update_threads = []
+        self.threads = []
         self.update_interval = 0.1
         self.keep_updating = True
         self.status_lock = threading.Lock()
+        self.request_queue = dataqueue.ClosableQueue(maxsize=100)
+        self.reply_queue = dataqueue.ClosableQueue(maxsize=100)
         # Drivers
         self.devices = []
+        # Clients
+        self.callers = []
 
     def update_main_from_secondary(self):
         """
@@ -170,8 +211,13 @@ class DAService(object):
         """
         self.keep_updating = True
         thread = threading.Thread(target=self.update_main_from_secondary)
-        self.update_threads.append(thread)
-        thread.start()
+        self.threads.append(thread)
+        thread = threading.Thread(target=self.request_dispatch_worker)
+        self.threads.append(thread)
+        thread = threading.Thread(target=self.reply_dispatch_worker)
+        self.threads.append(thread)
+        for thread in self.threads:
+            thread.start()
         # devices
         with self.status_lock:
             for device in self.devices:
@@ -185,7 +231,9 @@ class DAService(object):
 
         """
         self.keep_updating = False
-        for thread in self.update_threads:
+        self.request_queue.close()
+        self.reply_queue.close()
+        for thread in self.threads:
             thread.join()
         # devices
         with self.status_lock:
@@ -193,3 +241,88 @@ class DAService(object):
                 device.stop()
         if __debug__:
             print('Service stopped')
+
+    def subscribe(self, caller_key, callback_func, tag_names):
+        """
+        Subscribe the service to get refreshing data.
+
+        Args:
+            caller_key: Unique caller key for identity.
+            callback_func: Function with ([tag_id], [value], [op_result]) signature.
+            tag_names: Tag name list subscribed. The names shall contained in
+                            the service, or exceptions will be throw.
+
+        Raises:
+            ValueError.
+
+        """
+        if caller_key is None:
+            raise ValueError('key is None')
+        if callback_func is None:
+            raise ValueError('Call function is None')
+        if not isinstance(tag_names, list):
+            raise ValueError('tag_names shall be list')
+
+        for caller_info in self.callers:
+            if caller_info.key == caller_key:
+                raise ValueError('Caller subscribed')
+
+        tag_ids = []
+        for name in tag_names:
+            try:
+                item = self.main.find_item(name)
+            except ValueError as e:
+                raise ValueError('Item does not exist.') from e
+            else:
+                tag_ids.append(item.tag_id)
+        with self.status_lock:
+            self.callers.append(CallerInfo(caller_key, callback_func, tag_ids))
+
+    def unsubscribe(self, caller_key):
+        """
+        Unsubscribe a client from the service.
+        Args:
+            caller_key: Caller key.
+
+        """
+        with self.status_lock:
+            for caller_info in self.callers:
+                if caller_info.key == caller_key:
+                    self.callers.remove(caller_info)
+
+    def reply_dispatch_worker(self):
+        """
+        Reply queue dispatch worker.
+
+        """
+        for flow_var in self.reply_queue:
+            for caller_info in self.callers:
+                if hash(caller_info) == flow_var.trans_id:
+                    if flow_var.op_mode == GoOperation.OP_REFRESH:
+                        caller_info.call_back(flow_var.tag_ids,
+                                              flow_var.values, flow_var.op_results)
+                    elif flow_var.op_mode == GoOperation.OP_ASYNC_WRITE:
+                        caller_info.call_back(flow_var.tag_ids,
+                                              flow_var.op_results, flow_var.trans_id)
+                    elif flow_var.op_mode == GoOperation.OP_ASYNC_READ:
+                        caller_info.call_back(flow_var.tag_ids,
+                                              flow_var.values, flow_var.op_results, flow_var.trans_id)
+                    else:
+                        raise ValueError('Invalid operation type.')
+
+    def request_dispatch_worker(self):
+        """
+        Request queue dispatch worker.
+
+        """
+        for flow_var in self.request_queue:
+            raise NotImplementedError
+
+
+
+
+
+
+
+
+
