@@ -6,6 +6,8 @@ Data access service test.
 import unittest
 import time
 from goserver import daservice
+from goserver.constants import GoStatus
+from goserver import serviceclient
 from device import deviceobj
 
 __author__ = 'Yun Hua'
@@ -16,12 +18,20 @@ __version__ = '0.1'
 __status__ = 'Beta'
 
 
+def data_changed(tag_ids, values, op_results):
+    print('data_changed() called... tag_id:{0}, value:{1}, result:{2}'.format(tag_ids, values, op_results))
+
+
 class DAServiceTest(unittest.TestCase):
     """
     Data access service test cases.
     """
+    TEST_TAG_1 = 'TestTag_1'
+
     def setUp(self):
         self.service = daservice.DAService(1001)
+        self.service.add_tag(self.TEST_TAG_1)
+        self.client = serviceclient.ServiceClient('TestClient')
 
     def tearDown(self):
         pass
@@ -54,7 +64,7 @@ class DAServiceTest(unittest.TestCase):
         Test refresh method.
 
         """
-        self.service.refresh(0, 100.0)
+        self.service.refresh([0], [100.0], [GoStatus.S_OK])
 
     def test_register_driver(self):
         """
@@ -76,6 +86,20 @@ class DAServiceTest(unittest.TestCase):
         time.sleep(1)
         self.service.stop()
         self.service.unregister_device('UDC3300')
+
+    def test_subscribe(self):
+        """
+        Test subscribing/un-subscribing client.
+
+        """
+        with self.assertRaises(ValueError):
+            self.service.subscribe('client1', self.client.data_changed, ['1.UDC3300'])
+        self.service.subscribe('client1', self.client.data_changed, [self.TEST_TAG_1])
+        self.service.subscribe('client2', data_changed, [self.TEST_TAG_1])
+
+        self.service.unsubscribe('client1')
+        self.service.unsubscribe('client2')
+        self.assertEqual(len(self.service.callers), 0)
 
 
 if __name__ == '__main__':

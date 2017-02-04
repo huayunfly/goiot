@@ -57,6 +57,12 @@ class HashTableTest(unittest.TestCase):
         for i in range(101):
             _ = fixed_table.add_item('{0}.UDC3300'.format(i))
         self.assertTrue(fixed_table.full())
+        # Find item
+        item = fixed_table.find_item('1.UDC3300')
+        self.assertEqual(item.name, '1.UDC3300')
+        with self.assertRaises(ValueError):
+            fixed_table.find_item('8888.UDC3300')
+
         # Out of range
         with self.assertRaises(hashtable.OutRangeError):
             fixed_table.add_item('{0}.UDC3300'.format(101))
