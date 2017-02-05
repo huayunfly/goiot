@@ -62,6 +62,8 @@ class DAService(object):
     """
     Data access service definition.
     """
+    QUEUE_SIZE = 100
+
     def __init__(self, entry_size):
         """
 
@@ -80,11 +82,13 @@ class DAService(object):
         self.update_interval = 0.1
         self.keep_updating = True
         self.status_lock = threading.Lock()
-        self.request_queue = dataqueue.ClosableQueue(maxsize=100)
-        self.reply_queue = dataqueue.ClosableQueue(maxsize=100)
-        # Drivers
+        self.request_queue = dataqueue.ClosableQueue(maxsize=self.QUEUE_SIZE)
+        self.reply_queue = dataqueue.ClosableQueue(maxsize=self.QUEUE_SIZE)
+        # Devices
         self.devices = []
-        # Clients
+        # Subscribers
+        self.subscribers = []
+        # Async read/write callers
         self.callers = []
 
     def update_main_from_secondary(self):
@@ -96,12 +100,24 @@ class DAService(object):
         """
         while self.keep_updating:
             if __debug__:
-                print('update...')
+                print('update secondary -> main...')
             for i in range(self.entry_size):
                 if (self.main.slots[i].name is not None) or \
                         (self.main.slots[i].name != hashtable.GO_DUMMY_KEY):
                     self.main.slots[i].prim_value = self.secondary[i].value
                     self.main.slots[i].time = time.time()
+            for caller_info in self.subscribers:
+                values = []
+                op_results = []
+                indexes = caller_info.tag_ids[:]
+                for index in indexes:
+                    values.append(self.main.slots[index].prim_value)
+                    op_results.append(self.main.slots[index].error)
+
+                flow_var = FlowVar(names=None, indexes=indexes, values=values,
+                                   op_mode=GoOperation.OP_REFRESH, op_results=op_results,
+                                   trans_id=hash(caller_info))
+                self.reply_queue.put_nowait(flow_var)
             time.sleep(self.update_interval)
 
     def full(self):
@@ -263,7 +279,7 @@ class DAService(object):
         if not isinstance(tag_names, list):
             raise ValueError('tag_names shall be list')
 
-        for caller_info in self.callers:
+        for caller_info in self.subscribers:
             if caller_info.key == caller_key:
                 raise ValueError('Caller subscribed')
 
@@ -276,7 +292,7 @@ class DAService(object):
             else:
                 tag_ids.append(item.tag_id)
         with self.status_lock:
-            self.callers.append(CallerInfo(caller_key, callback_func, tag_ids))
+            self.subscribers.append(CallerInfo(caller_key, callback_func, tag_ids))
 
     def unsubscribe(self, caller_key):
         """
@@ -286,9 +302,9 @@ class DAService(object):
 
         """
         with self.status_lock:
-            for caller_info in self.callers:
+            for caller_info in self.subscribers:
                 if caller_info.key == caller_key:
-                    self.callers.remove(caller_info)
+                    self.subscribers.remove(caller_info)
 
     def reply_dispatch_worker(self):
         """
@@ -296,19 +312,23 @@ class DAService(object):
 
         """
         for flow_var in self.reply_queue:
-            for caller_info in self.callers:
-                if hash(caller_info) == flow_var.trans_id:
-                    if flow_var.op_mode == GoOperation.OP_REFRESH:
-                        caller_info.call_back(flow_var.tag_ids,
-                                              flow_var.values, flow_var.op_results)
-                    elif flow_var.op_mode == GoOperation.OP_ASYNC_WRITE:
-                        caller_info.call_back(flow_var.tag_ids,
-                                              flow_var.op_results, flow_var.trans_id)
-                    elif flow_var.op_mode == GoOperation.OP_ASYNC_READ:
-                        caller_info.call_back(flow_var.tag_ids,
-                                              flow_var.values, flow_var.op_results, flow_var.trans_id)
-                    else:
-                        raise ValueError('Invalid operation type.')
+            if flow_var.op_mode == GoOperation.OP_REFRESH:
+                for caller_info in self.subscribers:
+                    if hash(caller_info) == flow_var.trans_id:
+                        caller_info.callback(flow_var.indexes,
+                                             flow_var.values, flow_var.op_results)
+            elif flow_var.op_mode == GoOperation.OP_ASYNC_WRITE:
+                for caller_info in self.callers:
+                    if hash(caller_info) == flow_var.trans_id:
+                        caller_info.callback(flow_var.indexes,
+                                             flow_var.op_results, caller_info.key)
+            elif flow_var.op_mode == GoOperation.OP_ASYNC_READ:
+                for caller_info in self.callers:
+                    if hash(caller_info) == flow_var.trans_id:
+                        caller_info.callback(flow_var.indexes,
+                                             flow_var.values, flow_var.op_results, caller_info.key)
+            else:
+                raise ValueError('Invalid operation type.')
 
     def request_dispatch_worker(self):
         """
