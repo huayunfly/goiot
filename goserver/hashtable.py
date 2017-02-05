@@ -115,7 +115,9 @@ class TagEntry(TagAttr, TagState):
             prim_value: primary value.
             active: whether the entry is active.
         """
-        super(TagEntry, self).__init__()
+        TagAttr.__init__(self)
+        TagState.__init__(self)
+        # super(TagEntry, self).__init__()
         self.tag_id = tag_id
         self.prim_value = prim_value
         self.active = active
