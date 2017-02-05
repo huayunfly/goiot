@@ -38,6 +38,9 @@ class HashTableTest(unittest.TestCase):
         self.assertIn('active', entry.__dict__)
         self.assertIn('prim_value', entry.__dict__)
         self.assertIn('deadband', entry.__dict__)
+        self.assertIn('error', entry.__dict__)
+        self.assertIn('time', entry.__dict__)
+        self.assertIn('quality', entry.__dict__)
 
     def test_fixed_dict(self):
         """
