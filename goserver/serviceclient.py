@@ -35,7 +35,8 @@ class ServiceClient(object):
 
         """
         if __debug__:
-            print('data changed... tag_id:{0}, value:{1}'.format(tag_ids, values))
+            print('data changed... tag_id:{0}, value:{1}, '
+                  'result:{2}'.format(tag_ids, values, op_results))
 
     def read_completed(self, tag_ids, values, op_results, trans_id):
         """
@@ -50,7 +51,8 @@ class ServiceClient(object):
 
         """
         if __debug__:
-            print('read completed... tag_id:{0}, value:{1}'.format(tag_ids, values))
+            print('read completed... tag_id:{0}, value:{1}, '
+                  'result:{2}, trans_id:{3}'.format(tag_ids, values, op_results, trans_id))
 
     def write_completed(self, tag_ids, op_results, trans_id):
         """
@@ -63,4 +65,5 @@ class ServiceClient(object):
 
         """
         if __debug__:
-            print('write completed... tag_id:{0}, value:{1}'.format(tag_ids, op_results))
+            print('write completed... tag_id:{0}, value:{1}, '
+                  'trans_id:{2}'.format(tag_ids, op_results, trans_id))
