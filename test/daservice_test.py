@@ -80,6 +80,7 @@ class DAServiceTest(unittest.TestCase):
         Test the service running.
 
         """
+        print('test_service_run() -------------------------')
         device = deviceobj.DeviceBase('UDC3300', self.service)
         self.service.register_device(device)
         self.service.run()
@@ -92,14 +93,37 @@ class DAServiceTest(unittest.TestCase):
         Test subscribing/un-subscribing client.
 
         """
+        print('test_subscribe() -----------------------')
         with self.assertRaises(ValueError):
             self.service.subscribe('client1', self.client.data_changed, ['1.UDC3300'])
         self.service.subscribe('client1', self.client.data_changed, [self.TEST_TAG_1])
         self.service.subscribe('client2', data_changed, [self.TEST_TAG_1])
 
+        self.service.run()
+        time.sleep(1)
+        self.service.stop()
+
         self.service.unsubscribe('client1')
         self.service.unsubscribe('client2')
-        self.assertEqual(len(self.service.callers), 0)
+        self.assertEqual(len(self.service.subscribers), 0)
+
+    def test_mockdevice_subscribe(self):
+        """
+        Test subscribe data refreshed from the mock device.
+
+        """
+        print('test_mockdevice_subscribe() ------------------')
+        device = deviceobj.MockupDevice('Simulation', self.service)
+        self.service.register_device(device)
+
+        self.service.run()
+        tag_names = ['Sim_' + str(i) for i in range(5)]
+        self.service.subscribe('client3', data_changed, tag_names)
+        time.sleep(1)
+        self.service.stop()
+
+        self.service.unsubscribe('client3')
+        self.service.unregister_device('Simulation')
 
 
 if __name__ == '__main__':
