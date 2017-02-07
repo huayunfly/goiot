@@ -19,7 +19,18 @@ __status__ = 'Beta'
 
 
 def data_changed(tag_ids, values, op_results):
-    print('data_changed() called... tag_id:{0}, value:{1}, result:{2}'.format(tag_ids, values, op_results))
+    print('data_changed() called... '
+          'tag_id:{0}, value:{1}, result:{2}'.format(tag_ids, values, op_results))
+
+
+def read_completed(tag_ids, values, op_results, trans_id):
+    print('read_completed() called... '
+          'tag_id:{0}, value:{1}, result:{2}, trans_id:{3}'.format(tag_ids, values, op_results, trans_id))
+
+
+def write_completed(tag_ids, op_results, trans_id):
+    print('read_completed() called... '
+          'tag_id:{0}, result:{1}, trans_id:{2}'.format(tag_ids, op_results, trans_id))
 
 
 class DAServiceTest(unittest.TestCase):
@@ -27,10 +38,14 @@ class DAServiceTest(unittest.TestCase):
     Data access service test cases.
     """
     TEST_TAG_1 = 'TestTag_1'
+    TEST_TAG_2 = 'TestTag_2'
+    TEST_TAG_3 = 'TestTag_3'
 
     def setUp(self):
         self.service = daservice.DAService(1001)
         self.service.add_tag(self.TEST_TAG_1)
+        self.service.add_tag(self.TEST_TAG_2)
+        self.service.add_tag(self.TEST_TAG_3)
         self.client = serviceclient.ServiceClient('TestClient')
 
     def tearDown(self):
@@ -124,6 +139,26 @@ class DAServiceTest(unittest.TestCase):
 
         self.service.unsubscribe('client3')
         self.service.unregister_device('Simulation')
+
+    def test_async_read(self):
+        """
+        Test async read.
+
+        """
+        print('test_async_read() ------------------')
+        self.service.run()
+        with self.assertRaises(ValueError) as e:
+            self.service.async_read(tag_names=['haha'], trans_id=-1, callback_func=read_completed)
+        print(e.exception)
+
+        self.service.async_read(tag_names=[self.TEST_TAG_1, self.TEST_TAG_2, self.TEST_TAG_3],
+                                trans_id=1, callback_func=read_completed)
+        with self.assertRaises(ValueError) as e:
+            self.service.async_read(tag_names=[self.TEST_TAG_1, self.TEST_TAG_2, self.TEST_TAG_3],
+                                    trans_id=1, callback_func=read_completed)
+        print(e.exception)
+        time.sleep(0.01) # Error, if no wait, async_read() is not called.
+        self.service.stop()
 
 
 if __name__ == '__main__':
