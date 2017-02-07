@@ -82,6 +82,7 @@ class DAService(object):
         self.update_interval = 0.1
         self.keep_updating = True
         self.status_lock = threading.Lock()
+        self.caller_lock = threading.Lock()
         self.request_queue = dataqueue.ClosableQueue(maxsize=self.QUEUE_SIZE)
         self.reply_queue = dataqueue.ClosableQueue(maxsize=self.QUEUE_SIZE)
         # Devices
@@ -101,7 +102,7 @@ class DAService(object):
         while self.keep_updating:
             if __debug__:
                 print('update secondary -> main...')
-            for i in range(self.entry_size):
+            for i in range(self.main.reserved_size):
                 if (self.main.slots[i].name is not None) or \
                         (self.main.slots[i].name != hashtable.GO_DUMMY_KEY):
                     self.main.slots[i].prim_value = self.secondary[i].value
@@ -199,6 +200,7 @@ class DAService(object):
             name: Tag name
 
         """
+        # TODO: thread safe
         assert name is not None
         self.main.remove_item(name)
 
@@ -266,7 +268,8 @@ class DAService(object):
             caller_key: Unique caller key for identity.
             callback_func: Function with ([tag_id], [value], [op_result]) signature.
             tag_names: Tag name list subscribed. The names shall contained in
-                            the service, or exceptions will be throw.
+                            the service, or exceptions will be throw. If the list len
+                            is zero, nothing done.
 
         Raises:
             ValueError.
@@ -279,6 +282,8 @@ class DAService(object):
         if not isinstance(tag_names, list):
             raise ValueError('tag_names shall be list')
 
+        if 0 == len(tag_names):
+            return
         for caller_info in self.subscribers:
             if caller_info.key == caller_key:
                 raise ValueError('Caller subscribed')
@@ -327,6 +332,9 @@ class DAService(object):
                     if hash(caller_info) == flow_var.trans_id:
                         caller_info.callback(flow_var.indexes,
                                              flow_var.values, flow_var.op_results, caller_info.key)
+                        # Remove async caller
+                        with self.caller_lock:
+                            self.callers.remove(caller_info)
             else:
                 raise ValueError('Invalid operation type.')
 
@@ -336,7 +344,85 @@ class DAService(object):
 
         """
         for flow_var in self.request_queue:
-            raise NotImplementedError
+            if GoOperation.OP_ASYNC_READ == flow_var.op_mode:
+                values = []
+                op_results = []
+                for tag_id in flow_var.indexes:
+                    values.append(self.main.slots[tag_id].prim_value)
+                    op_results.append(self.main.slots[tag_id].error)
+                flow_var.values = values
+                flow_var.op_results = op_results
+                self.reply_queue.put(flow_var)
+            elif GoOperation.OP_ASYNC_WRITE == flow_var.op_mode:
+                raise NotImplementedError
+            else:
+                raise ValueError('Unexpected operation mode')
+
+    def async_read_by_id(self, tag_ids, trans_id, callback_func):
+        """
+        Async read date by the tag id.
+
+        Args:
+            tag_ids: Tag id list. If the list is empty, nothing done.
+            trans_id: Unique transaction id.
+            callback_func: Call back function.
+
+        Raises:
+            ValueError.
+
+        """
+        if not isinstance(tag_ids, list):
+            raise ValueError('tag_id is not list.')
+        if (trans_id is None) or (callback_func is None):
+            raise ValueError('trans_id or callback is None.')
+
+        if 0 == len(tag_ids):
+            return
+        for caller_info in self.callers:
+            if caller_info.key == trans_id:
+                raise ValueError('Caller existed.')
+
+        caller_info = CallerInfo(key=trans_id, callback_func=callback_func, tag_ids=tag_ids)
+        with self.caller_lock:
+            self.callers.append(caller_info)
+        tag_ids_copy = tag_ids[:]
+        flow_var = FlowVar(names=None, indexes=tag_ids_copy, values=None,
+                           op_mode=GoOperation.OP_ASYNC_READ, op_results=None, trans_id=hash(caller_info))
+        self.request_queue.put(flow_var)
+
+    def async_read(self, tag_names, trans_id, callback_func):
+        """
+        Async read data by the tag name. It lookups tag id by the tag name and
+        call async_read_by_id()
+        Args:
+            tag_names: Tag name list. If the list len is zero, nothing done.
+            trans_id: Transaction id. None or repetitive value will throw ValueError.
+            callback_func: Callback function. None value will throw ValueError.
+
+        Raises:
+            ValueError.
+
+        """
+        if not isinstance(tag_names, list):
+            raise ValueError('tag_names is not list.')
+        if (trans_id is None) or (callback_func is None):
+            raise ValueError('trans_id or callback is None.')
+        if 0 == len(tag_names):
+            return
+
+        tag_ids = []
+        for name in tag_names:
+            try:
+                item = self.main.find_item(name)
+            except ValueError as e:
+                raise ValueError('Item does not exist.') from e
+            else:
+                tag_ids.append(item.tag_id)
+        self.async_read_by_id(tag_ids, trans_id, callback_func)
+
+
+
+
 
 
 
