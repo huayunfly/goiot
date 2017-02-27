@@ -67,7 +67,7 @@ class DeviceBase(object):
 
         """
         for var in self.vars:
-            tag_id = self.service.add_tag(var.name)
+            tag_id = self.service.add_tag(var.name, self)
             var.tag_id = tag_id
 
         self.refreshing = True
@@ -117,10 +117,11 @@ class DeviceBase(object):
                 self.service.refresh(tag_ids, flow_var.values, flow_var.op_results)
 
             elif GoOperation.OP_ASYNC_READ == flow_var.op_mode:
-                self.service.read_completed(tag_ids, flow_var.values, flow_var.op_results)
+                self.service.read_completed(tag_ids, flow_var.values,
+                                            flow_var.op_results, flow_var.trans_id)
 
             elif GoOperation.OP_ASYNC_WRITE == flow_var.op_mode:
-                self.service.write_completed(tag_ids, flow_var.op_results)
+                self.service.write_completed(tag_ids, flow_var.op_results, flow_var.trans_id)
 
             else:
                 raise ValueError('GoOperation is not supported.')
@@ -174,6 +175,8 @@ class DeviceBase(object):
                 if item.tag_id == var_id:
                     indexes.append(index)
                     break
+        if not indexes:
+            return
         flow_var = FlowVar(names=var_names, indexes=indexes, values=None,
                            op_mode=GoOperation.OP_ASYNC_READ, op_results=[], trans_id=trans_id)
         self.in_queue.put(flow_var)
@@ -215,6 +218,8 @@ class DeviceBase(object):
                 if item.tag_id == var_id:
                     indexes.append(index)
                     break
+        if not indexes:
+            return
         flow_var = FlowVar(names=var_names, indexes=indexes, values=values,
                            op_mode=GoOperation.OP_ASYNC_WRITE, op_results=[], trans_id=trans_id)
         self.in_queue.put(flow_var)
@@ -241,6 +246,24 @@ class DeviceBase(object):
         """
         raise NotImplementedError
 
+    def query_registered_var_ids(self, var_ids):
+        """
+        Query the registered variable ids.
+        Args:
+            var_ids: Variable id list query
+
+        Returns:
+            Registered variable id list.
+
+        """
+        registered_var_ids = []
+        for var_id in var_ids:
+            for var in self.vars:
+                if var_id == var.tag_id:
+                    registered_var_ids.append(var_id)
+                    break
+        return registered_var_ids
+
 
 class MockupDevice(DeviceBase):
     """
@@ -249,10 +272,12 @@ class MockupDevice(DeviceBase):
     def __init__(self, name, service):
         super().__init__(name, service)
 
-        for i in range(5):
+        for i in range(6):
             name = 'Sim_' + str(i)
             var = DeviceVar(name=name)
             self.vars.append(var)
+
+        self.sim_5 = 1.11
 
     def refresh_worker(self):
         """
@@ -278,9 +303,25 @@ class MockupDevice(DeviceBase):
             values.append(inc * 1.0)
             values.append(inc / 2.0)
             values.append(None)
+            values.append(self.sim_5)
 
             flow_var = FlowVar(names, indexes, values,
                                GoOperation.OP_REFRESH, op_results, -1)
             self.out_queue.put(flow_var)
             inc += 1
             time.sleep(0.1)
+
+    def internal_write(self, flow_var):
+        results = []
+        for index, value in zip(flow_var.indexes, flow_var.values):
+            if 5 == index:
+                self.sim_5 = value
+                results.append(GoStatus.S_OK)
+            else:
+                results.apppend(GoStatus.S_NO_IMPLEMENTED)
+        flow_var.values = None
+        flow_var.op_results = results
+        flow_var.op_mode = GoOperation.OP_ASYNC_WRITE
+        self.out_queue.put(flow_var)
+
+
