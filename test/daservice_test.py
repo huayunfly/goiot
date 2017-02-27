@@ -29,7 +29,7 @@ def read_completed(tag_ids, values, op_results, trans_id):
 
 
 def write_completed(tag_ids, op_results, trans_id):
-    print('read_completed() called... '
+    print('write_completed() called... '
           'tag_id:{0}, result:{1}, trans_id:{2}'.format(tag_ids, op_results, trans_id))
 
 
@@ -156,9 +156,33 @@ class DAServiceTest(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             self.service.async_read(tag_names=[self.TEST_TAG_1, self.TEST_TAG_2, self.TEST_TAG_3],
                                     trans_id=1, callback_func=read_completed)
-        print(e.exception)
-        time.sleep(0.01) # Error, if no wait, async_read() is not called.
+        print('Test Repetitive transaction id: {0}'.format(e.exception))
+        time.sleep(0.01)  # Error, if no wait, async_read() is not called.
         self.service.stop()
+
+    def test_async_write(self):
+        """
+        Test async write.
+
+        """
+        print('test_async_write() ----------------')
+
+        device = deviceobj.MockupDevice('Simulation', self.service)
+        self.service.register_device(device)
+
+        self.service.run()
+        with self.assertRaises(ValueError) as e:
+            self.service.async_write(tag_names=['baba'], tag_values=[1.0], trans_id=-1,
+                                     callback_func=write_completed)
+        print(e.exception)
+
+        self.service.async_write(tag_names=[self.TEST_TAG_1, 'Sim_5'],
+                                 tag_values=[1.0, 8.88], trans_id=1, callback_func=write_completed)
+        print(e.exception)
+        time.sleep(0.1)
+        self.service.stop()
+
+        self.service.unregister_device('Simulation')
 
 
 if __name__ == '__main__':
