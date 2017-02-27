@@ -41,6 +41,7 @@ class HashTableTest(unittest.TestCase):
         self.assertIn('error', entry.__dict__)
         self.assertIn('time', entry.__dict__)
         self.assertIn('quality', entry.__dict__)
+        self.assertIn('provider', entry.__dict__)
 
     def test_fixed_dict(self):
         """
