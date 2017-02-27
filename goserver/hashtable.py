@@ -107,13 +107,15 @@ class TagEntry(TagAttr, TagState):
     """
     Tag entry definition.
     """
-    def __init__(self, tag_id=0, prim_value=None, active=True):
+    def __init__(self, tag_id=0, prim_value=None, active=True, provider=None):
         """
 
         Args:
             tag_id: unique id in integer
             prim_value: primary value.
             active: whether the entry is active.
+            provider: Tag provider which deals with read/write operation. If it
+                        is None, the related operation will be omitted.
         """
         TagAttr.__init__(self)
         TagState.__init__(self)
@@ -121,6 +123,7 @@ class TagEntry(TagAttr, TagState):
         self.tag_id = tag_id
         self.prim_value = prim_value
         self.active = active
+        self.provider = provider
 
     def __str__(self):
         return str(self.name) + '.id_' + str(self.tag_id)
@@ -281,6 +284,7 @@ class FixedDict(object):
         if (key == item.name) and (hash_code == item.tag_hash) and (GO_DUMMY_KEY != item.name):
             self.used -= 1
             item.name = GO_DUMMY_KEY
+            item.provider = None
             return
         if GO_DUMMY_KEY == item.name:
             raise ValueError('{0} not in the dict'.format(str(key)))
