@@ -21,7 +21,9 @@ class GoStatus(Enum):
     S_ERROR = 1
     S_INVALID_NAME = 2
     S_INVALID_ID = 3
-    S_UNKNOWN = 4
+    S_INVALID_PROVIDER = 4
+    S_NO_IMPLEMENTED = 5
+    S_UNKNOWN = 6
 
 
 class GoQuality(Enum):
