@@ -11,6 +11,10 @@ main cache or 'write' to the driver. The replies are also queued and dispatched.
 The async flow data includes a transaction id. For the refresh data, a name-callback
 function pair may be used. So its transaction id can be hash(name). For the async
 read / write flow data, a transaction id is provided by the caller(?)
+
+Service run routine: s.register_device() -> s.run() -> s.run() calls device.run() ->
+s.stop() -> s.stop() calls device.stop() -> s.unregister_device(). Thus, hot add/remove
+a device is not supported now.
 """
 
 import time
@@ -168,11 +172,13 @@ class DAService(object):
                     # device.stop()
                     break
 
-    def add_tag(self, name):
+    def add_tag(self, name, provider=None):
         """
         Add a tag by name.
         Args:
             name: Tag name in string.
+            provider: Tag provider dealing with read/write operation.
+                        None is permitted.
 
         Raises:
             ValueError.
@@ -191,6 +197,7 @@ class DAService(object):
         except hashtable.OutRangeError as e:
             raise ValueError('Out of range') from e
         else:
+            tag_entry.provider = provider
             return tag_entry.tag_id
 
     def remove_tag(self, name):
@@ -325,16 +332,25 @@ class DAService(object):
             elif flow_var.op_mode == GoOperation.OP_ASYNC_WRITE:
                 for caller_info in self.callers:
                     if hash(caller_info) == flow_var.trans_id:
+                        for tag_id in flow_var.indexes:
+                            caller_info.tag_ids.remove(tag_id)
                         caller_info.callback(flow_var.indexes,
                                              flow_var.op_results, caller_info.key)
+                        # Remove async write caller after all data results return
+                        if not caller_info.tag_ids:
+                            with self.caller_lock:
+                                self.callers.remove(caller_info)
             elif flow_var.op_mode == GoOperation.OP_ASYNC_READ:
                 for caller_info in self.callers:
                     if hash(caller_info) == flow_var.trans_id:
+                        for tag_id in flow_var.indexes:
+                            caller_info.tag_ids.remove(tag_id)
                         caller_info.callback(flow_var.indexes,
                                              flow_var.values, flow_var.op_results, caller_info.key)
                         # Remove async caller
-                        with self.caller_lock:
-                            self.callers.remove(caller_info)
+                        if not caller_info.tag_ids:
+                            with self.caller_lock:
+                                self.callers.remove(caller_info)
             else:
                 raise ValueError('Invalid operation type.')
 
@@ -354,7 +370,26 @@ class DAService(object):
                 flow_var.op_results = op_results
                 self.reply_queue.put(flow_var)
             elif GoOperation.OP_ASYNC_WRITE == flow_var.op_mode:
-                raise NotImplementedError
+                var_grp = {}
+                none_provider_indexes = []
+                for var_index, value in zip(flow_var.indexes, flow_var.values):
+                    provider = self.main.slots[var_index].provider
+                    if provider is None:
+                        none_provider_indexes.append(var_index)
+                        continue
+                    if provider in var_grp:
+                        var_grp[provider][0].append(var_index)
+                        var_grp[provider][1].append(value)
+                    else:
+                        var_grp[provider] = ([var_index], [value])
+                if none_provider_indexes:
+                    op_results = [GoStatus.S_INVALID_PROVIDER] * len(none_provider_indexes)
+                    none_flow_var = FlowVar(names=None, indexes=none_provider_indexes,
+                                            values=None, op_mode=GoOperation.OP_ASYNC_WRITE,
+                                            op_results=op_results, trans_id=flow_var.trans_id)
+                    self.reply_queue.put(none_flow_var)
+                for key, content in var_grp.items():
+                    key.async_write([], content[0], content[1], flow_var.trans_id)
             else:
                 raise ValueError('Unexpected operation mode')
 
@@ -376,7 +411,7 @@ class DAService(object):
         if (trans_id is None) or (callback_func is None):
             raise ValueError('trans_id or callback is None.')
 
-        if 0 == len(tag_ids):
+        if not tag_ids:
             return
         for caller_info in self.callers:
             if caller_info.key == trans_id:
@@ -407,7 +442,7 @@ class DAService(object):
             raise ValueError('tag_names is not list.')
         if (trans_id is None) or (callback_func is None):
             raise ValueError('trans_id or callback is None.')
-        if 0 == len(tag_names):
+        if not tag_names:
             return
 
         tag_ids = []
@@ -420,15 +455,94 @@ class DAService(object):
                 tag_ids.append(item.tag_id)
         self.async_read_by_id(tag_ids, trans_id, callback_func)
 
+    def async_write(self, tag_names, tag_values, trans_id, callback_func):
+        """
+        Async write data by the tag name. It lookup tag id by the tag name and
+         puts the tags into the request queue.
 
+        Args:
+            tag_names: Tag name list. If the list len is zero, nothing done.
+            tag_values: Tag values list matching names.
+            trans_id: Transaction id. None or repetitive value will throw ValueError.
+            callback_func: Callback function. None value will throw ValueError.
 
+        Returns:
+            ValueError.
 
+        """
+        if not isinstance(tag_names, list):
+            raise ValueError('tag_names is not list')
+        if not isinstance(tag_values, list):
+            raise ValueError('tag_values is not list')
+        if (trans_id is None) or (callback_func is None):
+            raise ValueError('trans_id or callback_func is None')
+        if not tag_names:
+            return
 
+        tag_ids = []
+        for name in tag_names:
+            try:
+                item = self.main.find_item(name)
+            except ValueError as e:
+                raise ValueError('Item does not exits.') from e
+            else:
+                tag_ids.append(item.tag_id)
+        self.async_write_by_id(tag_ids, tag_values, trans_id, callback_func)
 
+    def async_write_by_id(self, tag_ids, tag_values, trans_id, callback_func):
+        """
+        Async write tags by the tag id.
 
+        Args:
+            tag_ids: Tag id in list. If it is empty, nothing done.
+            tag_values: Tag value in list.
+            trans_id: Unique transaction id.
+            callback_func: Callback function.
 
+        Raises:
+            ValueError
 
+        Returns:
 
+        """
+        if not isinstance(tag_ids, list):
+            raise ValueError('tag_ids is not list')
+        if not isinstance(tag_values, list):
+            raise ValueError('tag_values is not list')
+        if trans_id is None or callback_func is None:
+            raise ValueError('trans_id or callback_func is None')
+        if not tag_ids:
+            return
 
+        for caller_info in self.callers:
+            if caller_info.key == trans_id:
+                raise ValueError('Caller existed.')
 
+        caller_info = CallerInfo(key=trans_id, callback_func=callback_func, tag_ids=tag_ids)
+        with self.caller_lock:
+            self.callers.append(caller_info)
+        tag_ids_copy = tag_ids[:]
+        flow_var = FlowVar(names=None, indexes=tag_ids_copy, values=tag_values,
+                           op_mode=GoOperation.OP_ASYNC_WRITE, op_results=None, trans_id=hash(caller_info))
+        self.request_queue.put(flow_var)
 
+    def write_completed(self, tag_ids, op_results, trans_id):
+        """
+        Notify the service by devices putting the tag data back.
+        Push the tag results into the reply queue.
+
+        Args:
+            tag_ids: Tag id list.
+            op_results: Tag operation result list.
+            trans_id: Transaction id.
+
+        """
+
+        if not isinstance(tag_ids, list):
+            raise ValueError('tag_ids is not a list.')
+        if not isinstance(op_results, list):
+            raise ValueError('op_results is not a list.')
+
+        flow_var = FlowVar(names=None, indexes=tag_ids, values=None,
+                           op_mode=GoOperation.OP_ASYNC_WRITE, op_results=op_results, trans_id=trans_id)
+        self.reply_queue.put(flow_var)
