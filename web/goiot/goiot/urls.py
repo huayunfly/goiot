@@ -21,5 +21,8 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='start'),
-    url(r'^da/api', views.da_api, name='da_api'),
+    url(r'^da/api/tags', views.tags_rw, name='tags_rw'),
+    url(r'^da/api/tag/(?P<tag_id>[0-9]{3})', views.tag_rw, name='tag_rw'),
+    url(r'^report/', views.report, name='report'),
+    url(r'^about/', views.about, name='about'),
 ]
