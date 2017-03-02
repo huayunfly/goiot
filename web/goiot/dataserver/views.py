@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.http import HttpResponseBadRequest
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from dataserver.models import DataSource
 
@@ -59,6 +60,7 @@ def about(request):
     )
 
 
+@csrf_exempt
 def tags_rw(request):
     """Tags access API handler."""
     assert isinstance(request, HttpRequest)
