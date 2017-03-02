@@ -1,34 +1,206 @@
 {% extends "dataserver/layout.html" %}
 
+{% csrf_token %}
+
 {% block content %}
     <h2>{{ title }}</h2>
 
-    <div>
-        <p>当前值:</p>
-        <p id="device_pv">0.0</p>
-        <button type="button" id="btn_get_data" class="btn btn-primary btn-lg">读取</button>
+    <div class="row">
+        <div class="col-sm-9">
+            <table class="table table-striped" id="result_list">
+                <thead>
+                <tr>
+                    <th scope="col" class="sortable column-project_id">
+                        <div class="text">ID</div>
+                    </th>
+
+                    <th scope="col" class="sortable column-summary">
+                        <div class="text">名称</div>
+                    </th>
+
+                    <th scope="col" class="sortable column-doclink">
+                        <div class="text">变量值</div>
+                    </th>
+
+                    <th scope="col" class="sortable column-doclink">
+                        <div class="text">类型</div>
+                    </th>
+
+                    <th scope="col" class="sortable column-doclink">
+                        <div class="text">方向</div>
+                    </th>
+
+                    <th scope="col" class="sortable column-doclink">
+                        <div class="text">设备</div>
+                    </th>
+
+                    <th scope="col" class="sortable column-doclink">
+                        <div class="text">设备号</div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for data in dataset %}
+                    <tr>
+                        <td>{{ data.id }}</td>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.dvalue }}</td>
+                        <td>{{ data.dtype }}</td>
+                        <td>{{ data.direction }}</td>
+                        <td>{{ data.device }}</td>
+                        <td>{{ data.device_no }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <p>当前值:</p>
+            <p id="device_pv">0.0</p>
+            <button type="button" id="btn_get_data" class="btn btn-primary btn-lg">读取</button>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <div class="col-sm-4">
+                    <p>变量ID:</p>
+                </div>
+                <div class="col-sm-4">
+                    <p>设定值:</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <input class="form-control" id="tag_id_box" type="text" name="tagIdBox" value=""/>
+                </div>
+                <div class="col-sm-4">
+                    <input class="form-control" id="device_sp_box" type="text" name="deviceSpBox" value=""/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <button type="button" id="btn_set_data" class="btn btn-primary btn-lg">写入</button>
+                </div>
+                <div class="col-sm-4">
+                    <span id="validate_msg" style="color:red;"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock %}
 
 {% block scripts %}
     <script type="text/javascript">
+        function isInteger(str) {
+            return /^-?\d+$/.test(str);
+        }
+
+        function isFloat(str) {
+            return /^(-?\d+)(\.\d+)?$/.test(str);
+        }
+
+        function padLeft(str, length) {
+            if (str.length >= length)
+                return str;
+            else
+                return padLeft("0" + str, length);
+        }
+
         $(document).ready(function () {
+            // Get ready
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    }
+                }
+            });
+
+
             // Bind Ajax GET data
             $("#btn_get_data").click(function () {
                 $.ajax({
-                    url: "api/",
+                    method: "GET",
+                    url: "/da/api/tags/",
+                    {% comment %}
+                        The data option can contain either a query string of the form
+                        key1=value1&key2=value2, or an object of the form {key1: 'value1', key2: 'value2'}.
+                    {% endcomment %}
                     data: {
-                        key: 1,
                         token: "abc"
                     },
                     success: function (result) {
-                        $("#device_pv").html("<strong>" + result.data + "</strong> degC");
+                        $("#device_pv").html("<strong>" + result.data[0].value + "</strong> degC");
+
+                        var content = "";
+                        for (var i in result.data) {
+                            content += "<tr>";
+                            content += "<td>" + result.data[i].key + "</td>";
+                            content += "<td>" + result.data[i].name + "</td>";
+                            content += "<td>" + result.data[i].value + "</td>";
+                            content += "<td>" + result.data[i].type + "</td>";
+                            content += "<td>" + result.data[i].direction + "</td>";
+                            content += "<td>" + result.data[i].device + "</td>";
+                            content += "<td>" + result.data[i].device_no + "</td>";
+                            content += "</tr>";
+                        }
+                        $("#result_list tbody").html(content);
                     }
                 });
 
             });
+
+            // Bind Ajax POST data
+            $("#btn_set_data").click(function () {
+                var tag_id = $("#tag_id_box").val();
+                var sp = $("#device_sp_box").val();
+                if (null == tag_id || 0 == tag_id.length || !isInteger(tag_id)) {
+                    $("#validate_msg").text("输入整数变量ID.").show().fadeOut(5000);
+                    return;
+                }
+                if (null == sp || 0 == sp.length || !isFloat(sp)) {
+                    $("#validate_msg").text("输入浮点设置值.").show().fadeOut(5000);
+                    return;
+                }
+
+                var raw_data = '{"data": [{"key": ' + tag_id + ',' +
+                        '"value": ' + sp + '}]}';
+                $.ajax({
+                    method: "POST",
+                    url: "/da/api/tag/" + padLeft(tag_id, 3) + "/",
+                    processData: true,
+                    data: {
+                        token: "abc",
+                        data: raw_data
+                    },
+                    success: function (result) {
+                        alert(result.op_result)
+                    }
+                });
+            });
         });
+
 
     </script>
 {% endblock %}
