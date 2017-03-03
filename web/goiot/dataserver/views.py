@@ -113,7 +113,7 @@ def tags_rw(request):
                     key = item['key']
                     value = item['value']
                     data_item = DataSource.objects.filter(id=key)[0]
-                    if 'INOUT' == data_item.direction:
+                    if True:  # 'INOUT' == data_item.direction:
                         f_val = float(value)
                         if f_val < data_item.hlimit:
                             data_item.dvalue = f_val
