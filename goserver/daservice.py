@@ -267,6 +267,28 @@ class DAService(object):
         if __debug__:
             print('Service stopped')
 
+    def browse_tag_id(self, tag_names):
+        """
+        Get the tag id matching the tag name.
+        Args:
+            tag_names: tag name list.
+
+        Raises:
+            ValueError.
+        Returns:
+            Tag id list
+
+        """
+        tag_ids = []
+        for name in tag_names:
+            try:
+                item = self.main.find_item(name)
+            except ValueError as e:
+                raise ValueError('Item does not exist.') from e
+            else:
+                tag_ids.append(item.tag_id)
+        return tag_ids
+
     def subscribe(self, caller_key, callback_func, tag_names):
         """
         Subscribe the service to get refreshing data.
@@ -518,7 +540,7 @@ class DAService(object):
             if caller_info.key == trans_id:
                 raise ValueError('Caller existed.')
 
-        caller_info = CallerInfo(key=trans_id, callback_func=callback_func, tag_ids=tag_ids)
+        caller_info = CallerInfo(key=trans_id, callback_func=callback_func, tag_ids=tag_ids[:])
         with self.caller_lock:
             self.callers.append(caller_info)
         tag_ids_copy = tag_ids[:]
