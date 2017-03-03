@@ -23,7 +23,8 @@ class GoStatus(Enum):
     S_INVALID_ID = 3
     S_INVALID_PROVIDER = 4
     S_NO_IMPLEMENTED = 5
-    S_UNKNOWN = 6
+    S_COMM_ERROR = 6
+    S_UNKNOWN = 7
 
 
 class GoQuality(Enum):
@@ -50,6 +51,14 @@ class GoPrivilege(Enum):
     """
     READABLE = 1 << 0
     WRITEABLE = 1 << 1
+
+
+class GoTransactionId(Enum):
+    """
+    Transaction Id
+    """
+    ID_EMPTY = -1
+
 
 
 GO_EU_TYPE_ANALOG = 0x1
