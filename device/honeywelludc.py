@@ -6,6 +6,7 @@ Honeywell UDC 3x00 device communicating through Modbus RTU via RS-485
 
 import time
 import minimalmodbus
+from serial.serialutil import SerialException
 from goserver.constants import GoStatus, GoOperation, GoTransactionId
 from goserver.common import FlowVar
 from .deviceobj import DeviceBase, DeviceVar
@@ -24,7 +25,7 @@ class HoneywellUDC(DeviceBase):
     Honeywell UDC 3200, 3300 device.
     """
 
-    def __init__(self, name, service, port, address):
+    def __init__(self, name, service, port='/dev/tty.usbserial-DN00N126', address=2):
         super().__init__(name, service)
         var = DeviceVar(name='udc_pv1')
         self.vars.append(var)
@@ -35,13 +36,20 @@ class HoneywellUDC(DeviceBase):
         self.address = address
         self.registers_r = [0x40]
         self.registers_w = [0x78]
-        self.instrument = minimalmodbus.Instrument(self.port, self.address)
-        self.instrument.handle_local_echo = False
-        self.instrument.debug = False
         self.invalid_value = -27648.0
+        try:
+            self.instrument = minimalmodbus.Instrument(self.port, self.address)
+        except SerialException:
+            self.instrument = None
+        else:
+            self.instrument.handle_local_echo = False
+            self.instrument.debug = False
 
     def refresh_worker(self):
         while self.refreshing:
+            if self.instrument is None:
+                time.sleep(1)
+                continue
             names = []
             indexes = []
             op_results = []
