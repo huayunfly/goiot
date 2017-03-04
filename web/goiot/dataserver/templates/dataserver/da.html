@@ -110,6 +110,39 @@
                 return padLeft("0" + str, length);
         }
 
+        // Get data and refresh the UI
+        function refresh_data() {
+            $.ajax({
+                method: "GET",
+                url: "/da/api/tags/",
+                {% comment %}
+                    The data option can contain either a query string of the form
+                    key1=value1&key2=value2, or an object of the form {key1: 'value1', key2: 'value2'}.
+                {% endcomment %}
+                data: {
+                    token: "abc"
+                },
+                success: function (result) {
+                    $("#device_pv").html("<strong>" + result.data[0].value + "</strong> degC");
+
+                    var content = "";
+                    for (var i in result.data) {
+                        content += "<tr>";
+                        content += "<td>" + result.data[i].key + "</td>";
+                        content += "<td>" + result.data[i].name + "</td>";
+                        content += "<td>" + result.data[i].value + "</td>";
+                        content += "<td>" + result.data[i].type + "</td>";
+                        content += "<td>" + result.data[i].direction + "</td>";
+                        content += "<td>" + result.data[i].device + "</td>";
+                        content += "<td>" + result.data[i].device_no + "</td>";
+                        content += "</tr>";
+                    }
+                    $("#result_list tbody").html(content);
+                }
+            });
+
+        }
+
         $(document).ready(function () {
             // Get ready
             $.ajaxSetup({
@@ -139,37 +172,7 @@
 
 
             // Bind Ajax GET data
-            $("#btn_get_data").click(function () {
-                $.ajax({
-                    method: "GET",
-                    url: "/da/api/tags/",
-                    {% comment %}
-                        The data option can contain either a query string of the form
-                        key1=value1&key2=value2, or an object of the form {key1: 'value1', key2: 'value2'}.
-                    {% endcomment %}
-                    data: {
-                        token: "abc"
-                    },
-                    success: function (result) {
-                        $("#device_pv").html("<strong>" + result.data[0].value + "</strong> degC");
-
-                        var content = "";
-                        for (var i in result.data) {
-                            content += "<tr>";
-                            content += "<td>" + result.data[i].key + "</td>";
-                            content += "<td>" + result.data[i].name + "</td>";
-                            content += "<td>" + result.data[i].value + "</td>";
-                            content += "<td>" + result.data[i].type + "</td>";
-                            content += "<td>" + result.data[i].direction + "</td>";
-                            content += "<td>" + result.data[i].device + "</td>";
-                            content += "<td>" + result.data[i].device_no + "</td>";
-                            content += "</tr>";
-                        }
-                        $("#result_list tbody").html(content);
-                    }
-                });
-
-            });
+            $("#btn_get_data").click(refresh_data);
 
             // Bind Ajax POST data
             $("#btn_set_data").click(function () {
@@ -195,10 +198,12 @@
                         data: raw_data
                     },
                     success: function (result) {
-                        alert(result.op_result)
+                        ;
                     }
                 });
             });
+
+            setInterval(refresh_data, 1000);
         });
 
 
