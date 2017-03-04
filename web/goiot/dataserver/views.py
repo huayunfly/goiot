@@ -128,7 +128,7 @@ def tags_rw(request):
                 # Float conversion error.
                 return HttpResponseBadRequest()
             else:
-                return JsonResponse({'result': [0]})
+                return JsonResponse({'op_result': [0]})
         else:
             return HttpResponseBadRequest('No data.')
     else:
