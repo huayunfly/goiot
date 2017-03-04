@@ -80,7 +80,11 @@ class WebApiClient(serviceclient.ServiceClient):
             key = self.keys[self.tag_ids.index(tag_id)]
             data['data'].append(dict(key=key, value=value))
         payload = dict(token=self.token, data=json.dumps(data))
-        r = requests.post(self.tags_rw_url, data=payload)
+        try:
+            r = requests.post(self.tags_rw_url, data=payload)
+        except requests.exceptions.ConnectionError:
+            print('data_change(): connection failed.')
+            return
         assert 200 == r.status_code
 
     def read_completed(self, tag_ids, values, op_results, trans_id):
@@ -95,7 +99,12 @@ class WebApiClient(serviceclient.ServiceClient):
             for key in self.request_keys:
                 data['data'].append(dict(key=key))
             payload = dict(token=self.token, key=json.dumps(data))
-            r = requests.get(self.tags_rw_url, params=payload)
+            try:
+                r = requests.get(self.tags_rw_url, params=payload)
+            except requests.exceptions.ConnectionError:
+                print('write_worker(): connection failed.')
+                time.sleep(WRITE_RATE)
+                continue
             if 200 != r.status_code:
                 assert False
                 return
@@ -139,6 +148,7 @@ class ServerIntegrateTest(unittest.TestCase):
         self.service.stop()
         self.service.unregister_device('Simulation')
         self.service.unregister_device('UDC3300')
+        self.client.stop()
 
     def test_data_exchange(self):
         """
@@ -151,7 +161,7 @@ class ServerIntegrateTest(unittest.TestCase):
         self.service.register_device(device)
         self.service.run()
         self.client.start()
-        time.sleep(20)
+        time.sleep(30)
 
 if __name__ == '__main__':
     unittest.main()
