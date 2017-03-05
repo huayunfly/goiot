@@ -309,6 +309,8 @@ class MockupDevice(DeviceBase):
                                GoOperation.OP_REFRESH, op_results, -1)
             self.out_queue.put(flow_var)
             inc += 1
+            if inc > 10000:
+                inc = 1
             time.sleep(0.1)
 
     def internal_write(self, flow_var):
