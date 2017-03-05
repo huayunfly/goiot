@@ -19,6 +19,7 @@ a device is not supported now.
 
 import time
 import threading
+from queue import Full as QueueFull
 from goserver import hashtable
 from goserver import dataqueue
 from goserver.constants import GoOperation, GoStatus
@@ -83,7 +84,7 @@ class DAService(object):
         self.secondary = [hashtable.TagValue(tag_id=i) for i in range(self.main.reserved_size)]
         # Threads
         self.threads = []
-        self.update_interval = 0.1
+        self.update_interval = 0.5
         self.keep_updating = True
         self.status_lock = threading.Lock()
         self.caller_lock = threading.Lock()
@@ -122,7 +123,10 @@ class DAService(object):
                 flow_var = FlowVar(names=None, indexes=indexes, values=values,
                                    op_mode=GoOperation.OP_REFRESH, op_results=op_results,
                                    trans_id=hash(caller_info))
-                self.reply_queue.put_nowait(flow_var)
+                try:
+                    self.reply_queue.put_nowait(flow_var)
+                except QueueFull:
+                    print('update_main_from_secondary(): OP_REFRESH - reply_queue full.')
             time.sleep(self.update_interval)
 
     def full(self):
