@@ -1,8 +1,9 @@
 # Unit test for modbus RTU via RS-485, using FDTI USB convertor
-__author__ = "Yun Hua"
+
 import unittest
 import minimalmodbus
 
+__author__ = "Yun Hua"
 
 class ModbusUSB4UDCTest(unittest.TestCase):
     """
@@ -16,6 +17,7 @@ class ModbusUSB4UDCTest(unittest.TestCase):
         self.instrument = minimalmodbus.Instrument(self.port, self.address)
         self.instrument.handle_local_echo = False
         self.instrument.debug = False
+        self.close_port_after_each_call = False
 
     def tearDown(self):
         self.instrument.serial.close()
