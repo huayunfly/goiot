@@ -78,13 +78,14 @@ class DAService(object):
         assert entry_size > 0
         if entry_size <= 0:
             raise ValueError('entry_size less than or equal to 0')
+        self.debug = False
         # Size and caches
         self.entry_size = entry_size
         self.main = hashtable.FixedDict(entry_size)
         self.secondary = [hashtable.TagValue(tag_id=i) for i in range(self.main.reserved_size)]
         # Threads
         self.threads = []
-        self.update_interval = 0.5
+        self.update_interval = 0.25
         self.keep_updating = True
         self.status_lock = threading.Lock()
         self.caller_lock = threading.Lock()
@@ -105,7 +106,7 @@ class DAService(object):
 
         """
         while self.keep_updating:
-            if __debug__:
+            if self.debug:
                 print('update secondary -> main...')
             for i in range(self.main.reserved_size):
                 if (self.main.slots[i].name is not None) or \
@@ -126,7 +127,8 @@ class DAService(object):
                 try:
                     self.reply_queue.put_nowait(flow_var)
                 except QueueFull:
-                    print('update_main_from_secondary(): OP_REFRESH - reply_queue full.')
+                    if self.debug:
+                        print('update_main_from_secondary(): OP_REFRESH - reply_queue full.')
             time.sleep(self.update_interval)
 
     def full(self):
@@ -230,7 +232,7 @@ class DAService(object):
         # Todo: thread safe
         for tag_id, value in zip(tag_ids, values):
             self.secondary[tag_id].value = value
-        if __debug__:
+        if self.debug:
             print('Service refreshing... tag_ids={0}, values={1}'.format(tag_ids, values))
 
     def run(self):
@@ -251,8 +253,7 @@ class DAService(object):
         with self.status_lock:
             for device in self.devices:
                 device.start()
-        if __debug__:
-            print('Service running...')
+        print('Service running...')
 
     def stop(self):
         """
@@ -268,8 +269,7 @@ class DAService(object):
         with self.status_lock:
             for device in self.devices:
                 device.stop()
-        if __debug__:
-            print('Service stopped')
+        print('Service stopped')
 
     def browse_tag_id(self, tag_names):
         """
