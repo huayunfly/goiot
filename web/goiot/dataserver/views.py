@@ -143,6 +143,7 @@ def tags_rw(request):
         )
 
 
+@csrf_exempt
 def tag_rw(request, tag_id):
     """Tag read or write API handler"""
     assert isinstance(request, HttpRequest)
