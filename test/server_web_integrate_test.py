@@ -109,7 +109,8 @@ class WebApiClient(serviceclient.ServiceClient):
                 r = requests.post(self.tags_rw_url, data=payload)
             except requests.exceptions.ConnectionError:
                 print('data_change(): connection failed.')
-            assert 200 == r.status_code
+            else:
+                assert 200 == r.status_code
             time.sleep(REFRESH_RATE)
 
     def write_worker(self):
