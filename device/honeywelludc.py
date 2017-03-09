@@ -93,24 +93,28 @@ class HoneywellUDC(DeviceBase):
 
     def internal_write(self, flow_var):
         results = []
-        for i, value in zip(flow_var.indexes, flow_var.values):
-            with self.rw_lock:
-                try:
-                    index_w = i - len(self.registers_r)
-                    self.instrument.write_float(self.registers_w[index_w], value)
-                except ValueError:
-                    if __debug__:
-                        print('UDC write float value error')
-                    results.append(GoStatus.S_COMM_ERROR)
-                    time.sleep(self.minimal_interval_after_setvalue)
-                except OSError:
-                    if __debug__:
-                        print('UDC write float os error')
-                    results.append(GoStatus.S_COMM_ERROR)
-                    time.sleep(self.minimal_interval_after_setvalue)
-                else:
-                    results.append(GoStatus.S_OK)
-                    time.sleep(self.minimal_interval_after_setvalue)
+        if self.instrument is None:
+            for _ in flow_var.indexes:
+                results.append(GoStatus.S_PORT_CLOSED)
+        else:
+            for i, value in zip(flow_var.indexes, flow_var.values):
+                with self.rw_lock:
+                    try:
+                        index_w = i - len(self.registers_r)
+                        self.instrument.write_float(self.registers_w[index_w], value)
+                    except ValueError:
+                        if __debug__:
+                            print('UDC write float value error')
+                        results.append(GoStatus.S_COMM_ERROR)
+                    except OSError:
+                        if __debug__:
+                            print('UDC write float os error')
+                        results.append(GoStatus.S_COMM_ERROR)
+                    else:
+                        results.append(GoStatus.S_OK)
+                    finally:
+                        time.sleep(self.minimal_interval_after_setvalue)
+
         flow_var.values = None
         flow_var.op_results = results
         flow_var.op_mode = GoOperation.OP_ASYNC_WRITE
