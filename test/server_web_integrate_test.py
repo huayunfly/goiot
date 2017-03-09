@@ -37,12 +37,16 @@ class WebApiClient(serviceclient.ServiceClient):
         self.tick = time.time()
         self.keep_working = False
         self.threads = []
-        self.rw_lock = threading.Lock()
+        self.refresh_lock = threading.Lock()
         self.trans_id = 101
         # self.key = {'data': [{'key': 1}, {'key': 2}, {'key': 3}, {'key': 4}]}
         self.post_tag_ids = []
         self.post_values = []
         self.post_results = []
+        # HTTP session
+        self.refresh_s = requests.Session()
+        self.update_s = requests.Session()
+        self.http_timeout = 3
 
     def start(self):
         self.tag_ids = self.service.browse_tag_id(self.tag_names)
@@ -66,7 +70,7 @@ class WebApiClient(serviceclient.ServiceClient):
         Call back function for the service subscribe.
 
         """
-        with self.rw_lock:
+        with self.refresh_lock:
             self.post_tag_ids = tag_ids[:]
             self.post_values = values[:]
             self.post_results = op_results[:]
@@ -84,7 +88,7 @@ class WebApiClient(serviceclient.ServiceClient):
         """
         while self.keep_working:
             data = {'data': []}
-            with self.rw_lock:
+            with self.refresh_lock:
                 for tag_id, raw_value, op_result in zip(self.post_tag_ids,
                                                         self.post_values, self.post_results):
                     if GoStatus.S_OK != op_result:
@@ -106,9 +110,12 @@ class WebApiClient(serviceclient.ServiceClient):
                     data['data'].append(dict(key=key, value=value))
             payload = dict(token=self.token, data=json.dumps(data))
             try:
-                r = requests.post(self.tags_rw_url, data=payload)
+                r = self.refresh_s.post(self.tags_rw_url,
+                                        data=payload, timeout=self.http_timeout)
             except requests.exceptions.ConnectionError:
                 print('data_change(): connection failed.')
+            except requests.exceptions.Timeout:
+                print('refresh(): HTTP post timeout')
             else:
                 assert 200 == r.status_code
             time.sleep(REFRESH_RATE)
@@ -119,27 +126,33 @@ class WebApiClient(serviceclient.ServiceClient):
 
         """
         while self.keep_working:
+            time.sleep(WRITE_RATE)
+
             data = {'data': []}
             for key in self.request_keys:
                 data['data'].append(dict(key=key))
             payload = dict(token=self.token, key=json.dumps(data))
             try:
-                r = requests.get(self.tags_rw_url, params=payload)
+                r = self.update_s.get(self.tags_rw_url,
+                                             params=payload, timeout=self.http_timeout)
             except requests.exceptions.ConnectionError:
                 print('write_worker(): connection failed.')
                 time.sleep(WRITE_RATE)
                 continue
-            if 200 != r.status_code:
-                assert False
-                return
+            except requests.exceptions.Timeout:
+                print('write_worker(): HTTP get timeout.')
+            else:
+                if 200 != r.status_code:
+                    print('write_worker(): HTTP response: {0}'.format(str(r.status_code)))
+                    continue
             try:
                 data = r.json()
             except TypeError:
-                assert False
-                return
+                print('write_worker(): JSON data TypeError.')
+                continue
             except json.decoder.JSONDecodeError:
-                assert False
-                return
+                print('write_worker(): JSON data DecodeError.')
+                continue
             try:
                 data_items = data['data']
                 tag_ids = []
@@ -150,13 +163,15 @@ class WebApiClient(serviceclient.ServiceClient):
                     tag_ids.append(self.tag_ids[self.keys.index(key)])
                     tag_values.append(value)
             except KeyError:
-                return
+                print('write_worker(): JSON data KeyError.')
             except IndexError:
-                return
+                print('write_worker(): JSON data IndexError.')
             else:
                 self.service.async_write_by_id(tag_ids, tag_values, self.trans_id, self.write_completed)
-                self.trans_id += 1
-            time.sleep(WRITE_RATE)
+                if self.trans_id > 100000:
+                    self.trans_id = 101
+                else:
+                    self.trans_id += 1
 
 
 class ServerIntegrateTest(unittest.TestCase):
