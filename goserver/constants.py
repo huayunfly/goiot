@@ -24,7 +24,8 @@ class GoStatus(Enum):
     S_INVALID_PROVIDER = 4
     S_NO_IMPLEMENTED = 5
     S_COMM_ERROR = 6
-    S_UNKNOWN = 7
+    S_PORT_ERROR = 7
+    S_UNKNOWN = 8
 
 
 class GoQuality(Enum):
