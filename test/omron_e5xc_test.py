@@ -27,7 +27,11 @@ class OmronE5XCTest(unittest.TestCase):
         self.port = "/dev/tty.usbserial-DN00N126"
         self.address = 2
         self.register_pv = 0x0000
+        self.register_pv_2bytes_mode = 0x2000
+        self.register_sp_read = 0x0004
+        self.register_sp_read_2bytes_mode = 0x2002
         self.register_sp = 0x0106
+        self.register_sp_2bytes_mode = 0x2103
         self.instrument = minimalmodbus.Instrument(self.port, self.address)
         self.instrument.handle_local_echo = False
         self.instrument.debug = False
@@ -46,6 +50,11 @@ class OmronE5XCTest(unittest.TestCase):
                 self.register_pv, numberOfRegisters=2, functioncode=3)
             print('Current temperature: {}'.format(temperature))
 
+        for i in range(5):
+            temperature = self.instrument.read_registers(
+                self.register_pv_2bytes_mode, numberOfRegisters=1, functioncode=3)
+            print('Current temperature: {}'.format(temperature))
+
     def test_write_sp(self):
         """
         Test write SP, write_register() send an int list, e.g. [0, 105] means 10.5 degC
@@ -55,6 +64,13 @@ class OmronE5XCTest(unittest.TestCase):
         """
         for i in range(10):
             self.instrument.write_registers(self.register_sp, [0, 105 + i])
+            # After set SP, a minimal interval must be waited
+            # before the next command send (Read PV or Write SP),
+            # for the instrument needs time to handle setting SP.
+            time.sleep(self.minimal_interval_after_write_sp)
+
+        for i in range(10):
+            self.instrument.write_registers(self.register_sp_2bytes_mode, [105 + i])
             # After set SP, a minimal interval must be waited
             # before the next command send (Read PV or Write SP),
             # for the instrument needs time to handle setting SP.
