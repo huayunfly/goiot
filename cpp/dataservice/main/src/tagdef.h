@@ -1,5 +1,5 @@
 /**
- * Tag definiton and manipulation uitilty
+ * Tag definiton and manipulation utility.
  * 
  * @author Yun Hua
  * @version 0.1 2018.06.05
@@ -9,32 +9,64 @@
 #include <string>
 #include <ctime>
 
+#include "constants.h"
+
 namespace goiot
 {
 
-typedef double GO_TYPE_REAL;
-typedef float GO_TYPE_FLOAT;
-typedef int GO_TYPE_INT;
-typedef long GO_TYPE_LONG;
-typedef std::wstring GO_TYPE_WSTRING;
+typedef double GO_REAL;
+typedef float GO_FLOAT;
+typedef int GO_INT;
+typedef long GO_LONG;
+typedef std::wstring GO_WSTRING;
+typedef std::variant<bool, GO_INT, GO_LONG,
+                     GO_FLOAT, GO_REAL, GO_WSTRING>
+    GO_VARIANT;
 
-typedef std::time_t GO_TYPE_TIMEPOINT;
+typedef std::time_t GO_TIME;
 typedef long HRESULT;
 
-struct goTagState
+struct TagState
 {
-    GO_TYPE_TIMEPOINT clock;
-    HRESULT error;
-    int quality;
+    TagState()
+        : time(std::time(nullptr)), status(GoStatus::S_OK), quality(GoQuality::Q_NORMAL)
+    {
+    }
+
+    GO_TIME time;
+    GoStatus status;
+    GoQuality quality;
 };
 
-struct goTagValue
+struct TagValue
 {
-    std::variant<bool, GO_TYPE_INT, GO_TYPE_LONG,
-                 GO_TYPE_FLOAT, GO_TYPE_REAL, GO_TYPE_WSTRING>
-        value;
+    GO_VARIANT value;
     unsigned int tagid;
-    goTagState state;
+    TagState state;
+};
+
+struct EUnit
+{
+    double rangeMax;
+    double rangeMin;
+    double deadband;
+};
+
+struct TagAttr
+{
+    std::wstring name;
+    int hashcode;
+    GoPrivilege rights;
+    EUnit units;
+};
+
+struct TagEntry
+{
+    unsigned int tagid;
+    bool isActive;
+    TagValue primValue;
+    TagState state;
+    TagAttr attr;
 };
 
 } // namespace goiot
