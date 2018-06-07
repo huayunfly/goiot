@@ -11,7 +11,7 @@ BIN_TARGET = $(DIR_BIN)/$(TARGET)
 
 CC = g++
 INCLUDE = -I/home/hy/Work/cpp/3rd/boost_1_67_0
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -std=c++17
 
 
 all: $(BIN_TARGET)
