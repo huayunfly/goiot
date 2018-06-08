@@ -40,6 +40,9 @@ struct TagState
 
 struct TagValue
 {
+    TagValue() : value(), tagid(0), state()
+    {
+    }
     GO_VARIANT value;
     unsigned int tagid;
     TagState state;
@@ -47,6 +50,9 @@ struct TagValue
 
 struct EUnit
 {
+    EUnit() : rangeMax(1000.0f), rangeMin(-1000.0f), deadband(0.0f)
+    {
+    }
     double rangeMax;
     double rangeMin;
     double deadband;
@@ -54,6 +60,9 @@ struct EUnit
 
 struct TagAttr
 {
+    TagAttr() : name(), hashcode(-1), rights(GoPrivilege::READABLE), units()
+    {
+    }
     std::wstring name;
     int hashcode;
     GoPrivilege rights;
@@ -62,6 +71,9 @@ struct TagAttr
 
 struct TagEntry
 {
+    TagEntry() : tagid(0), isActive(true), primValue(), state(), attr()
+    {
+    }
     unsigned int tagid;
     bool isActive;
     TagValue primValue;

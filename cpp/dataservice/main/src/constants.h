@@ -33,7 +33,8 @@ enum class GoOperation
 enum class GoPrivilege
 {
     READABLE,
-    WRITEABLE
+    WRITABLE,
+    READWRITABLE
 };
 
 enum class GoTransactionId

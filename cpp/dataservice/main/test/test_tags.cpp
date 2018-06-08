@@ -17,8 +17,9 @@ BOOST_AUTO_TEST_SUITE(testtags)
 
 BOOST_AUTO_TEST_CASE(test_tag_def)
 {
-    TagState state;
-    BOOST_CHECK(1 == 1);
+    TagEntry entry;
+    BOOST_CHECK(entry.primValue.tagid == 0);
+    BOOST_CHECK(entry.primValue.state.quality == GoQuality::Q_NORMAL);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
