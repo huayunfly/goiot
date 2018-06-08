@@ -10,7 +10,8 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "testsuit build",
@@ -30,6 +31,5 @@
                 "isDefault": true
             }
         }
-
     ]
 }

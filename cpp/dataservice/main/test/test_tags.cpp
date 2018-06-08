@@ -9,7 +9,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <ctime>
-#include "../src/tagdef.h"
+#include <stdexcept>
+#include "../src/hashtable.h"
 
 using namespace goiot;
 
@@ -20,6 +21,11 @@ BOOST_AUTO_TEST_CASE(test_tag_def)
     TagEntry entry;
     BOOST_CHECK(entry.primValue.tagid == 0);
     BOOST_CHECK(entry.primValue.state.quality == GoQuality::Q_NORMAL);
+}
+
+BOOST_AUTO_TEST_CASE(test_hashtable)
+{
+    BOOST_CHECK_THROW(FixedDict(0), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

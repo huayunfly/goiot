@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "variant": "cpp"
+        "variant": "cpp",
+        "*.tcc": "cpp",
+        "stdexcept": "cpp",
+        "system_error": "cpp"
     }
 }

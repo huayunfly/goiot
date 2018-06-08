@@ -16,10 +16,10 @@ CFLAGS = -g -Wall -std=c++17
 
 all: $(BIN_TARGET)
 
-$(BIN_TARGET): $(OBJ)
+$(BIN_TARGET): $(DIR_OBJ)/main.o
 	$(CC) $< -o $@
 
-$(OBJ): $(SRC)
+$(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
 	$(CC) $(CFLAGS) -c $(INCLUDE) $< -o $@
 
 clean:
