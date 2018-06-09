@@ -3,8 +3,9 @@ DIR_OBJ = ./obj
 DIR_SRC = ./src
 DIR_TEST = ./test
 
-SRC = $(wildcard $(DIR_SRC)/*.cpp)
-OBJ = $(patsubst %.cpp, $(DIR_OBJ)/%.o, $(notdir $(SRC)))
+#SRC = $(wildcard $(DIR_SRC)/*.cpp)
+#OBJ = $(patsubst %.cpp, $(DIR_OBJ)/%.o, $(notdir $(SRC)))
+OBJS = $(DIR_OBJ)/main.o
 
 TARGET = main
 BIN_TARGET = $(DIR_BIN)/$(TARGET)
@@ -16,15 +17,15 @@ CFLAGS = -g -Wall -std=c++17
 
 all: $(BIN_TARGET)
 
-$(BIN_TARGET): $(DIR_OBJ)/main.o
-	$(CC) $< -o $@
+$(BIN_TARGET): $(OBJS)
+	$(CC) $(OBJS) -o $@
 
 $(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
-	$(CC) $(CFLAGS) -c $(INCLUDE) $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 clean:
-	rm -rf $(DIR_BIN)/*.*
+	rm -rf $(DIR_BIN)/*
 	rm -rf $(DIR_OBJ)/*.o
 
-subsystem:
-	cd $(DIR_TEST) && make
+test:
+	(cd $(DIR_TEST);$(MAKE))
