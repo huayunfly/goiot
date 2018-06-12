@@ -32,6 +32,7 @@ class FixedDict
         std::size_t reserved_size;
         std::size_t used;
         std::size_t filled;
+        std::size_t mask;
 };
 
 } // namespace goiot

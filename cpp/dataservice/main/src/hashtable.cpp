@@ -14,17 +14,32 @@
  */
 
 #include <stdexcept>
+#include <functional>
 #include "hashtable.h"
 
 namespace goiot
 {
+    const static int PERTURB_SHIFT = 5;
+    const static std::size_t DICT_MIN_VALUE = 1;
+    const static std::size_t DICT_MAX_VALUE = 1 << 16;
+
 FixedDict::FixedDict(std::size_t size)
 {
-    if (size < 1) 
+    if (size < DICT_MIN_VALUE) 
     {
-        throw std::invalid_argument("size is less than 1.");
+        throw std::invalid_argument("size is less than DICT_MIN_VALUE.");
     }
-    
+    if (size > DICT_MAX_VALUE)
+    {
+        throw std::invalid_argument("size is larger than DICT_MAX_VALUE.");
+    }
+    std::size_t shift_bits = 0;
+    while ((1 << shift_bits) < size)
+    {
+        shift_bits += 1;
+    }
+    mask = 1 << (shift_bits + 1) + 1 << shift_bits;
+    reserved_size = mask + 1;
 }
 
 FixedDict::~FixedDict()
