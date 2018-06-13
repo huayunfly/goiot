@@ -1,6 +1,11 @@
 /**
  * Hash table for the key, value pair storage.
- * The hash() and position probing algorithms came from Python dict's C implementation.
+ * 
+ * The initial probe index is computed as hash mod the table size.
+ * Subsequent probing algorithms came from Python dict's C implementation.
+ * j = (5*j) + 1 + perturb; 
+ * perturb >>= PERTURB_SHIFT; 
+ * use j % 2**i as the next table index;
  * Refer to "http://svn.python.org/projects/python/trunk/Objects/dictobject.c"
  *
  * However, Python dict insert manipulation does not return the slot index. The dict is
@@ -15,36 +20,42 @@
 
 #include <stdexcept>
 #include <functional>
+#include <iostream>
 #include "hashtable.h"
 
 namespace goiot
 {
-    const static int PERTURB_SHIFT = 5;
-    const static std::size_t DICT_MIN_VALUE = 1;
-    const static std::size_t DICT_MAX_VALUE = 1 << 16;
 
 FixedDict::FixedDict(std::size_t size)
 {
-    if (size < DICT_MIN_VALUE) 
+    if (size < 1)
     {
-        throw std::invalid_argument("size is less than DICT_MIN_VALUE.");
+        std::cout << "FixedDict::FixedDict() throws: size is less than 1."
+                  << std::endl;
+        throw std::invalid_argument("Size is less than 1.");
     }
-    if (size > DICT_MAX_VALUE)
+    if (size > DICT_MAXSIZE)
     {
-        throw std::invalid_argument("size is larger than DICT_MAX_VALUE.");
+        std::cout << "FixedDict::FixedDict() throws: size is too large." << std::endl;
+        throw std::invalid_argument("Size is larger than FixedDict::DICT_MAXSIZE");
     }
-    std::size_t shift_bits = 0;
-    while ((1 << shift_bits) < size)
+
+    std::size_t newsize = FixedDict::DICT_MINSIZE;
+    for (; newsize < size; newsize <<= 1)
+        ;
+    if (newsize == 0 || newsize == 1UL << 31)
     {
-        shift_bits += 1;
+        throw std::invalid_argument("Size exceeds unsigned long limit.");
     }
-    mask = 1 << (shift_bits + 1) + 1 << shift_bits;
-    reserved_size = mask + 1;
+    mask = newsize - 1;
+    mysize = size;
+    std::size_t reserved_size = size / 2 * 3;
+    slots.resize((reserved_size < DICT_MINSIZE) ? DICT_MINSIZE : reserved_size);
 }
+
 
 FixedDict::~FixedDict()
 {
-
 }
 
 } // namespace goiot

@@ -23,9 +23,12 @@ BOOST_AUTO_TEST_CASE(test_tag_def)
     BOOST_CHECK(entry.primValue.state.quality == GoQuality::Q_NORMAL);
 }
 
-BOOST_AUTO_TEST_CASE(test_hashtable)
+BOOST_AUTO_TEST_CASE(test_hashtable_init)
 {
     BOOST_CHECK_THROW(FixedDict(0), std::invalid_argument);
+    BOOST_CHECK_THROW(FixedDict(FixedDict::DICT_MAXSIZE + 1), std::invalid_argument);
+    BOOST_CHECK(FixedDict(FixedDict::DICT_MAXSIZE).Size() == FixedDict::DICT_MAXSIZE);
+    BOOST_CHECK(FixedDict(FixedDict::DICT_MAXSIZE).ReservedSize() == (FixedDict::DICT_MAXSIZE / 2 * 3));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
