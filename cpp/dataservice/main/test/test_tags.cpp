@@ -28,7 +28,17 @@ BOOST_AUTO_TEST_CASE(test_hashtable_init)
     BOOST_CHECK_THROW(FixedDict(0), std::invalid_argument);
     BOOST_CHECK_THROW(FixedDict(FixedDict::DICT_MAXSIZE + 1), std::invalid_argument);
     BOOST_CHECK(FixedDict(FixedDict::DICT_MAXSIZE).Size() == FixedDict::DICT_MAXSIZE);
-    BOOST_CHECK(FixedDict(FixedDict::DICT_MAXSIZE).ReservedSize() == (FixedDict::DICT_MAXSIZE / 2 * 3));
+
+    // Test slots allocation size algorithm
+    std::size_t newsize = 8;
+    for(; newsize < (FixedDict::DICT_MAXSIZE / 2 * 3); newsize <<= 1);
+    BOOST_CHECK(FixedDict(FixedDict::DICT_MAXSIZE).ReservedSize() == newsize);
+}
+
+BOOST_AUTO_TEST_CASE(test_hashtable)
+{
+    auto dict = FixedDict(16);
+    BOOST_CHECK(dict.AddItem(L"hello0") != nullptr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

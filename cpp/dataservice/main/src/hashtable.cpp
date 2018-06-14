@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <functional>
 #include <iostream>
+#include <cassert>
 #include "hashtable.h"
 
 namespace goiot
@@ -40,22 +41,36 @@ FixedDict::FixedDict(std::size_t size)
         throw std::invalid_argument("Size is larger than FixedDict::DICT_MAXSIZE");
     }
 
-    std::size_t newsize = FixedDict::DICT_MINSIZE;
-    for (; newsize < size; newsize <<= 1)
-        ;
-    if (newsize == 0 || newsize == 1UL << 31)
-    {
-        throw std::invalid_argument("Size exceeds unsigned long limit.");
-    }
-    mask = newsize - 1;
     mysize = size;
-    std::size_t reserved_size = size / 2 * 3;
-    slots.resize((reserved_size < DICT_MINSIZE) ? DICT_MINSIZE : reserved_size);
+    std::size_t moresize = size / 2 * 3;
+    std::size_t newsize = FixedDict::DICT_MINSIZE;
+    for (; newsize < moresize; newsize <<= 1)
+        ;
+    mask = newsize - 1;
+    slots.resize(newsize);
 }
-
 
 FixedDict::~FixedDict()
 {
+}
+
+ std::shared_ptr<TagEntry> FixedDict::AddItem(const std::wstring& key)
+ {
+     if (key.empty())
+     {
+         throw std::invalid_argument("Key is empty.");
+     }
+     auto entry = Lookup(key, std::hash<std::wstring>()(key));
+     if (!entry)
+     {
+         assert(false);
+     }
+     return entry;
+ }
+
+std::shared_ptr<TagEntry> FixedDict::Lookup(const std::wstring& key, std::size_t hash)
+{
+    return nullptr;
 }
 
 } // namespace goiot

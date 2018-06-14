@@ -17,6 +17,9 @@ CFLAGS = -g -Wall -std=c++17
 
 all: $(BIN_TARGET)
 
+debug: $(CFLAGS) += -DDEBUG
+debug: $(BIN_TARGET)
+
 $(BIN_TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $@
 
