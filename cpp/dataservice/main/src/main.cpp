@@ -6,9 +6,13 @@
  */
 
 #include <iostream>
+#include <memory>
+#include "hashtable.h"
 
 int main(int argc, char* argv[])
 {
+    using namespace goiot;
+    std::shared_ptr<FixedDict> dict(new FixedDict(16));
     std::cout << "dataserver runs." << std::endl;
     return 0;
 }
