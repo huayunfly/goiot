@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <memory> // for shared_ptr
+#include <string>
 #include "tagdef.h"
 
 namespace goiot
@@ -22,6 +23,7 @@ public:
   const static std::size_t PERTURB_SHIFT = 5;
   const static std::size_t DICT_MINSIZE = 8;
   const static std::size_t DICT_MAXSIZE = (1 << 16) - 1;
+  const static std::wstring DUMMY_KEY;
 
 public:
   /**
@@ -82,6 +84,21 @@ private:
    */
   std::shared_ptr<TagEntry> Lookup(const std::wstring &key, std::size_t hash);
 
+  /**
+   * Lookup the slots by wstring key and hashcode.
+   * If the given key is not found, an empty slot, with empty value 
+   * will be returned. If the key is existed, it returns nullptr and sets
+   * existed parameter. 
+   * 
+   * @param key Wide string key
+   * @param hash Key's hash code
+   * @param existed Return a existed tagentry if a key is existed
+   * @throw std::out_of_range
+   * @ruturn an empty tag entry if a new tagentry is added, otherwise nullptr
+   */
+  std::shared_ptr<TagEntry> AddItemRaw(const std::wstring &key, std::size_t hash,
+                                       std::shared_ptr<TagEntry> &existed);
+
 private:
   FixedDict(const FixedDict &);
   const FixedDict &operator=(const FixedDict &);
@@ -90,6 +107,7 @@ private:
   std::vector<std::shared_ptr<TagEntry>> slots;
   std::size_t mysize;
   std::size_t mask;
+  std::size_t used;
 };
 
 } // namespace goiot

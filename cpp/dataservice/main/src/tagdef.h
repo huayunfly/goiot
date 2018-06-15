@@ -64,7 +64,7 @@ struct TagAttr
     {
     }
     std::wstring name;
-    int hashcode;
+    std::size_t hashcode;
     GoPrivilege rights;
     EUnit units;
 };

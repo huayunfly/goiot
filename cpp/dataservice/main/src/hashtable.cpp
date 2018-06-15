@@ -27,6 +27,8 @@
 namespace goiot
 {
 
+const std::wstring FixedDict::DUMMY_KEY = L"Dummy_Key";
+
 FixedDict::FixedDict(std::size_t size)
 {
     if (size < 1)
@@ -41,6 +43,7 @@ FixedDict::FixedDict(std::size_t size)
         throw std::invalid_argument("Size is larger than FixedDict::DICT_MAXSIZE");
     }
 
+    used = 0;
     mysize = size;
     std::size_t moresize = size / 2 * 3;
     std::size_t newsize = FixedDict::DICT_MINSIZE;
@@ -54,22 +57,86 @@ FixedDict::~FixedDict()
 {
 }
 
- std::shared_ptr<TagEntry> FixedDict::AddItem(const std::wstring& key)
- {
-     if (key.empty())
-     {
-         throw std::invalid_argument("Key is empty.");
-     }
-     auto entry = Lookup(key, std::hash<std::wstring>()(key));
-     if (!entry)
-     {
-         assert(false);
-     }
-     return entry;
- }
-
-std::shared_ptr<TagEntry> FixedDict::Lookup(const std::wstring& key, std::size_t hash)
+std::shared_ptr<TagEntry> FixedDict::AddItem(const std::wstring &key)
 {
+    if (key.empty())
+    {
+        throw std::invalid_argument("Key is empty.");
+    }
+    std::shared_ptr<TagEntry> existed;
+    auto entry = AddItemRaw(key, std::hash<std::wstring>()(key), existed);
+    return entry;
+}
+
+std::shared_ptr<TagEntry> FixedDict::Lookup(const std::wstring &key, std::size_t hash)
+{
+    return nullptr;
+}
+
+std::shared_ptr<TagEntry> FixedDict::AddItemRaw(const std::wstring &key, std::size_t hash,
+                                                std::shared_ptr<TagEntry> &existed)
+{
+    existed = nullptr;
+    std::size_t i = hash & mask;
+    std::shared_ptr<TagEntry> freeslot;
+    auto ptr = slots.at(i);
+    if (!ptr)
+    {
+        if (used >= mysize)
+        {
+            throw std::out_of_range("Dictionary is full.");
+        }
+        ptr.reset(new TagEntry);
+        ptr->attr.name = key;
+        ptr->attr.hashcode = hash;
+        ptr->tagid = i;
+        used++;
+        return ptr;
+    }
+    if (ptr->attr.name == key && ptr->attr.hashcode == hash)
+    {
+        existed = ptr;
+        return nullptr;
+    }
+    if (ptr->attr.name == DUMMY_KEY)
+    {
+        freeslot = ptr;
+    }
+    for (std::size_t perturb = hash;; perturb >>= PERTURB_SHIFT)
+    {
+        i = (i << 2) + i + perturb;
+        ptr = slots[i & mask];
+        if (!ptr)
+        {
+            if (freeslot)
+            {
+                freeslot->attr.name = key;
+                freeslot->attr.hashcode = hash;
+                freeslot->tagid = i & mask;
+                used++;
+                return freeslot;
+            }
+            else
+            {
+                ptr.reset(new TagEntry);
+                ptr->attr.name = key;
+                ptr->attr.hashcode = hash;
+                ptr->tagid = i & mask;
+                used++;
+                return ptr;
+            }
+        }
+        if (ptr->attr.name == key && ptr->attr.hashcode == hash)
+        {
+            existed = ptr;
+            return nullptr;
+        }
+        if (ptr->attr.name == DUMMY_KEY && freeslot == NULL)
+        {
+            freeslot = ptr;
+        }
+    }
+    assert(0);
     return nullptr;
 }
 
