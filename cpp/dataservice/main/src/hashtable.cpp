@@ -64,8 +64,20 @@ std::shared_ptr<TagEntry> FixedDict::AddItem(const std::wstring &key)
         throw std::invalid_argument("Key is empty.");
     }
     std::shared_ptr<TagEntry> existed;
-    auto entry = AddItemRaw(key, std::hash<std::wstring>()(key), existed);
-    return entry;
+    try
+    {
+        return AddItemRaw(key, std::hash<std::wstring>()(key), existed);
+    }
+    catch (const std::out_of_range &e)
+    {
+        std::cout << e.what() << std::endl;
+        return nullptr;
+    }
+}
+
+std::shared_ptr<TagEntry> FixedDict::GetItem(std::size_t pos)
+{
+    return slots.at(pos);
 }
 
 std::shared_ptr<TagEntry> FixedDict::Lookup(const std::wstring &key, std::size_t hash)
@@ -73,24 +85,35 @@ std::shared_ptr<TagEntry> FixedDict::Lookup(const std::wstring &key, std::size_t
     return nullptr;
 }
 
-std::shared_ptr<TagEntry> FixedDict::AddItemRaw(const std::wstring &key, std::size_t hash,
+void FixedDict::ResetTagAttrIncCount(std::shared_ptr<TagEntry> entry,
+                                     const std::wstring &name,
+                                     std::size_t hash,
+                                     std::size_t tagid)
+{
+    entry->attr.name = name;
+    entry->attr.hashcode = hash;
+    entry->tagid = tagid;
+    used++;
+}
+
+std::shared_ptr<TagEntry> FixedDict::AddItemRaw(const std::wstring &key,
+                                                std::size_t hash,
                                                 std::shared_ptr<TagEntry> &existed)
 {
     existed = nullptr;
     std::size_t i = hash & mask;
     std::shared_ptr<TagEntry> freeslot;
     auto ptr = slots.at(i);
-    if (!ptr)
+
+    if (used >= mysize)
     {
-        if (used >= mysize)
-        {
-            throw std::out_of_range("Dictionary is full.");
-        }
+        throw std::out_of_range("Dictionary is full.");
+    }
+    if (ptr == NULL)
+    {
+
         ptr.reset(new TagEntry);
-        ptr->attr.name = key;
-        ptr->attr.hashcode = hash;
-        ptr->tagid = i;
-        used++;
+        ResetTagAttrIncCount(ptr, key, hash, i);
         return ptr;
     }
     if (ptr->attr.name == key && ptr->attr.hashcode == hash)
@@ -102,27 +125,23 @@ std::shared_ptr<TagEntry> FixedDict::AddItemRaw(const std::wstring &key, std::si
     {
         freeslot = ptr;
     }
+
+    // No name matched, no free slot, a dummy_key slot, continues.
     for (std::size_t perturb = hash;; perturb >>= PERTURB_SHIFT)
     {
-        i = (i << 2) + i + perturb;
+        i = (i << 2) + i + perturb + 1;
         ptr = slots[i & mask];
-        if (!ptr)
+        if (ptr == NULL)
         {
             if (freeslot)
             {
-                freeslot->attr.name = key;
-                freeslot->attr.hashcode = hash;
-                freeslot->tagid = i & mask;
-                used++;
+                ResetTagAttrIncCount(freeslot, key, hash, i & mask);
                 return freeslot;
             }
             else
             {
                 ptr.reset(new TagEntry);
-                ptr->attr.name = key;
-                ptr->attr.hashcode = hash;
-                ptr->tagid = i & mask;
-                used++;
+                ResetTagAttrIncCount(ptr, key, hash, i & mask);
                 return ptr;
             }
         }

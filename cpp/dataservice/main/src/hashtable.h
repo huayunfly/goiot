@@ -58,6 +58,11 @@ public:
     return mysize;
   }
 
+  std::size_t Used() const
+  {
+    return used;
+  }
+
   std::size_t ReservedSize() const
   {
     return slots.size();
@@ -68,9 +73,20 @@ public:
    * 
    * @param key a new item's key, which can not be empty.
    * @throw invalid_argument key is empty.
-   * @throw 
+   * @return new added item, nullptr if the item's name is repeated 
+   * or the dictionary is full. 
    */
   std::shared_ptr<TagEntry> AddItem(const std::wstring &key);
+
+
+  /**
+   * Get item by the position.
+   * 
+   * @param the item position in the dictionary.
+   * @throw std::out_of_range, if the positon out of dictionary's ReservedSize.
+   * @return an item, nullptr is possible. 
+   */
+  std::shared_ptr<TagEntry> GetItem(std::size_t pos);
 
 private:
   /**
@@ -98,6 +114,17 @@ private:
    */
   std::shared_ptr<TagEntry> AddItemRaw(const std::wstring &key, std::size_t hash,
                                        std::shared_ptr<TagEntry> &existed);
+
+  /**
+   * Helper function setting the tag entry and increading count.
+   * 
+   * @param entry the tag entry
+   * @param hash the hash code
+   * @param name the tag name
+   * @param tagid the tag id
+   */
+  void ResetTagAttrIncCount(std::shared_ptr<TagEntry> entry,
+                            const std::wstring &name, std::size_t hash, std::size_t tagid);
 
 private:
   FixedDict(const FixedDict &);
