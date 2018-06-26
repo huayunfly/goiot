@@ -18,9 +18,9 @@ typedef double GO_REAL;
 typedef float GO_FLOAT;
 typedef int GO_INT;
 typedef long GO_LONG;
-typedef std::wstring GO_WSTRING;
+typedef std::string GO_STRING;
 typedef std::variant<bool, GO_INT, GO_LONG,
-                     GO_FLOAT, GO_REAL, GO_WSTRING>
+                     GO_FLOAT, GO_REAL, GO_STRING>
     GO_VARIANT;
 
 typedef std::time_t GO_TIME;
@@ -63,7 +63,7 @@ struct TagAttr
     TagAttr() : name(), hashcode(-1), rights(GoPrivilege::READABLE), units()
     {
     }
-    std::wstring name;
+    std::string name;
     std::size_t hashcode;
     GoPrivilege rights;
     EUnit units;

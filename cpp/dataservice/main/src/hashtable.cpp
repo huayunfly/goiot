@@ -27,7 +27,7 @@
 namespace goiot
 {
 
-const std::wstring FixedDict::DUMMY_KEY = L"Dummy_Key";
+const std::string FixedDict::DUMMY_KEY = u8"Dummy_Key";
 
 FixedDict::FixedDict(std::size_t size)
 {
@@ -57,7 +57,7 @@ FixedDict::~FixedDict()
 {
 }
 
-std::shared_ptr<TagEntry> FixedDict::AddItem(const std::wstring &key)
+std::shared_ptr<TagEntry> FixedDict::AddItem(const std::string &key)
 {
     if (key.empty())
     {
@@ -66,7 +66,7 @@ std::shared_ptr<TagEntry> FixedDict::AddItem(const std::wstring &key)
     std::shared_ptr<TagEntry> existed;
     try
     {
-        return AddItemRaw(key, std::hash<std::wstring>()(key), existed);
+        return AddItemRaw(key, std::hash<std::string>()(key), existed);
     }
     catch (const std::out_of_range &e)
     {
@@ -80,13 +80,55 @@ std::shared_ptr<TagEntry> FixedDict::GetItem(std::size_t pos)
     return slots.at(pos);
 }
 
-std::shared_ptr<TagEntry> FixedDict::Lookup(const std::wstring &key, std::size_t hash)
+std::size_t FixedDict::InterSearch(const std::string &key, std::size_t hash)
 {
-    return nullptr;
+    std::size_t i = hash & mask;
+    std::size_t j = i;  // start position
+    auto ptr = slots.at(i);
+    std::shared_ptr<TagEntry> freeslot;
+
+    if (ptr == NULL)
+    {
+        return i;
+    }
+    if (key == ptr->attr.name && hash == ptr->attr.hashcode)
+    {
+        return i;
+    }
+    if (DUMMY_KEY == ptr->attr.name)
+    {
+        freeslot = ptr;
+    }
+
+    for (std::size_t perturb = hash; j != (i & mask); perturb >>= PERTURB_SHIFT)
+    {
+        i =  (i << 2) + i + perturb + 1;
+        ptr = slots.at(i & mask);
+        if (ptr == NULL)
+        {
+            if (freeslot != NULL)
+            {
+                return freeslot->tagid;
+            }
+            else
+            {
+                return i & mask;
+            }
+        }
+        if (key == ptr->attr.name && hash == ptr->attr.hashcode)
+        {
+            return i & mask;
+        }
+        if (DUMMY_KEY == ptr->attr.name && NULL == freeslot)
+        {
+            freeslot = ptr;
+        }
+    }
+    return j;   // slots full
 }
 
 void FixedDict::ResetTagAttrIncCount(std::shared_ptr<TagEntry> entry,
-                                     const std::wstring &name,
+                                     const std::string &name,
                                      std::size_t hash,
                                      std::size_t tagid)
 {
@@ -96,7 +138,7 @@ void FixedDict::ResetTagAttrIncCount(std::shared_ptr<TagEntry> entry,
     used++;
 }
 
-std::shared_ptr<TagEntry> FixedDict::AddItemRaw(const std::wstring &key,
+std::shared_ptr<TagEntry> FixedDict::AddItemRaw(const std::string &key,
                                                 std::size_t hash,
                                                 std::shared_ptr<TagEntry> &existed)
 {

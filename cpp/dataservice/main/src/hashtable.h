@@ -23,7 +23,7 @@ public:
   const static std::size_t PERTURB_SHIFT = 5;
   const static std::size_t DICT_MINSIZE = 8;
   const static std::size_t DICT_MAXSIZE = (1 << 16) - 1;
-  const static std::wstring DUMMY_KEY;
+  const static std::string DUMMY_KEY;
 
 public:
   /**
@@ -34,7 +34,7 @@ public:
   public:
     virtual const char *what() const throw()
     {
-      return "container key repeats.";
+      return "Key repeats.";
     }
   };
 
@@ -76,7 +76,7 @@ public:
    * @return new added item, nullptr if the item's name is repeated 
    * or the dictionary is full. 
    */
-  std::shared_ptr<TagEntry> AddItem(const std::wstring &key);
+  std::shared_ptr<TagEntry> AddItem(const std::string &key);
 
 
   /**
@@ -88,17 +88,26 @@ public:
    */
   std::shared_ptr<TagEntry> GetItem(std::size_t pos);
 
+
+  /**
+   * Search and put the matched entry back.
+   * 
+   * @param key: the entry key in utf8.
+   * @param entry: the mateched key entry.
+   * @return true if succeeded, otherwise false.
+   */
+  bool Search(const std::string& key, std::shared_ptr<TagEntry>& entry);
+
 private:
   /**
-   * Lookup the slots by wstring key and hash.
-   * If the given key is not found, an empty slot, with empty value 
-   * will be returned.
+   * Internal search the slots by wstring key and hash.
+   * A slot id will be given.
    * 
-   * @param key wide string key
-   * @param hash key's hash code
-   * @ruturn a tag entry with value or empty value
+   * @param key: utf8 string key
+   * @param hash: key's hash code
+   * @ruturn a slot id which can be an empty slot, a repetition (slots full)
    */
-  std::shared_ptr<TagEntry> Lookup(const std::wstring &key, std::size_t hash);
+  std::size_t InterSearch(const std::string &key, std::size_t hash);
 
   /**
    * Lookup the slots by wstring key and hashcode.
@@ -112,7 +121,7 @@ private:
    * @throw std::out_of_range
    * @ruturn an empty tag entry if a new tagentry is added, otherwise nullptr
    */
-  std::shared_ptr<TagEntry> AddItemRaw(const std::wstring &key, std::size_t hash,
+  std::shared_ptr<TagEntry> AddItemRaw(const std::string &key, std::size_t hash,
                                        std::shared_ptr<TagEntry> &existed);
 
   /**
@@ -124,7 +133,7 @@ private:
    * @param tagid the tag id
    */
   void ResetTagAttrIncCount(std::shared_ptr<TagEntry> entry,
-                            const std::wstring &name, std::size_t hash, std::size_t tagid);
+                            const std::string &name, std::size_t hash, std::size_t tagid);
 
 private:
   FixedDict(const FixedDict &);
