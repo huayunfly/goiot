@@ -29,13 +29,20 @@ public:
   /**
    * Exception class for AddItem() with key repetition.
    */
-  class KeyRepetition : public std::logic_error
+  class KeyRepetition : public std::exception
   {
   public:
+    KeyRepetition(const std::string& keyname) : key(keyname)
+    {
+
+    }
     virtual const char *what() const throw()
     {
-      return "Key repeats.";
+      return std::string("Key: ").append(key).append(" repeated.").c_str();
     }
+  
+  private:
+    std::string key;
   };
 
 public:
@@ -96,18 +103,36 @@ public:
    * @param entry: the mateched key entry.
    * @return true if succeeded, otherwise false.
    */
-  bool Search(const std::string& key, std::shared_ptr<TagEntry>& entry);
+  bool Find(const std::string& key, std::shared_ptr<TagEntry>& entry) const;
+
+
+  /**
+   * Insert a new key.
+   * 
+   * @param key: the entry key in utf8.
+   * @throw Fixed::KeyRepetition, std::out_of_range 
+   * @return the inserted entry.
+   */
+  std::shared_ptr<TagEntry> Insert(const std::string& key);
+
+  /**
+   * Erase an entry at the given position.
+   * 
+   * @param pos: the entry position;
+   * @throw std::out_of_range
+   */
+  void Erase(std::size_t pos);
 
 private:
   /**
-   * Internal search the slots by wstring key and hash.
+   * Internal search the position of entries by key and hash.
    * A slot id will be given.
    * 
    * @param key: utf8 string key
    * @param hash: key's hash code
    * @ruturn a slot id which can be an empty slot, a repetition (slots full)
    */
-  std::size_t InterSearch(const std::string &key, std::size_t hash);
+  std::size_t InterFind(const std::string &key, std::size_t hash) const;
 
   /**
    * Lookup the slots by wstring key and hashcode.

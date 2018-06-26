@@ -80,7 +80,7 @@ std::shared_ptr<TagEntry> FixedDict::GetItem(std::size_t pos)
     return slots.at(pos);
 }
 
-std::size_t FixedDict::InterSearch(const std::string &key, std::size_t hash)
+std::size_t FixedDict::InterFind(const std::string &key, std::size_t hash) const
 {
     std::size_t i = hash & mask;
     std::size_t j = i;  // start position
@@ -100,7 +100,7 @@ std::size_t FixedDict::InterSearch(const std::string &key, std::size_t hash)
         freeslot = ptr;
     }
 
-    for (std::size_t perturb = hash; j != (i & mask); perturb >>= PERTURB_SHIFT)
+    for (std::size_t perturb = hash; ; perturb >>= PERTURB_SHIFT)
     {
         i =  (i << 2) + i + perturb + 1;
         ptr = slots.at(i & mask);
@@ -123,8 +123,63 @@ std::size_t FixedDict::InterSearch(const std::string &key, std::size_t hash)
         {
             freeslot = ptr;
         }
+        if (j == (i & mask))
+        {
+            break;
+        }
     }
     return j;   // slots full
+}
+
+bool FixedDict::Find(const std::string& key, std::shared_ptr<TagEntry>& entry) const
+{
+    entry = nullptr;
+    std::size_t i = InterFind(key, std::hash<std::string>()(key));
+    if (slots.at(i) == NULL || slots.at(i)->attr.name != key)
+    {
+        return false;
+    }
+    entry = slots.at(i);
+    return true;
+}
+
+std::shared_ptr<TagEntry> FixedDict::Insert(const std::string& key)
+{
+    std::size_t hash = std::hash<std::string>()(key);
+    std::size_t i = InterFind(key, hash);
+    if (slots.at(i) == NULL)
+    {
+        slots.at(i).reset(new TagEntry());
+        slots.at(i)->tagid = i;
+        slots.at(i)->attr.name = key;
+        slots.at(i)->attr.hashcode = hash;
+        return slots.at(i);
+    }
+    if (slots.at(i)->attr.name == key)
+    {
+        throw KeyRepetition("Key repeated.");
+    }
+    if (slots.at(i)->attr.name == DUMMY_KEY)
+    {
+        slots.at(i)->tagid = i;
+        slots.at(i)->attr.name = key;
+        slots.at(i)->attr.hashcode = hash;
+        return slots.at(i);  
+    }
+    throw std::out_of_range("Dictionary is full.");
+}
+
+void FixedDict::Erase(std::size_t pos)
+{
+    if (pos >= slots.size())
+    {
+        throw std::out_of_range("Erase position is out of range.");
+    }
+    if (slots.at(pos))
+    {
+        slots.at(pos)->attr.name = DUMMY_KEY;
+        slots.at(pos)->attr.hashcode = 0;
+    }
 }
 
 void FixedDict::ResetTagAttrIncCount(std::shared_ptr<TagEntry> entry,
