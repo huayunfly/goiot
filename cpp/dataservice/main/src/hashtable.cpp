@@ -145,6 +145,10 @@ bool FixedDict::Find(const std::string& key, std::shared_ptr<TagEntry>& entry) c
 
 std::shared_ptr<TagEntry> FixedDict::Insert(const std::string& key)
 {
+    if (used >= mysize)
+    {
+        throw std::out_of_range("Dictionary fixed size exceeded.");
+    }
     std::size_t hash = std::hash<std::string>()(key);
     std::size_t i = InterFind(key, hash);
     if (slots.at(i) == NULL)
@@ -153,6 +157,7 @@ std::shared_ptr<TagEntry> FixedDict::Insert(const std::string& key)
         slots.at(i)->tagid = i;
         slots.at(i)->attr.name = key;
         slots.at(i)->attr.hashcode = hash;
+        used++;
         return slots.at(i);
     }
     if (slots.at(i)->attr.name == key)
@@ -164,8 +169,10 @@ std::shared_ptr<TagEntry> FixedDict::Insert(const std::string& key)
         slots.at(i)->tagid = i;
         slots.at(i)->attr.name = key;
         slots.at(i)->attr.hashcode = hash;
+        used++;
         return slots.at(i);  
     }
+    // Throws only when it returns to the initial slot.
     throw std::out_of_range("Dictionary is full.");
 }
 
@@ -175,10 +182,11 @@ void FixedDict::Erase(std::size_t pos)
     {
         throw std::out_of_range("Erase position is out of range.");
     }
-    if (slots.at(pos))
+    if (slots.at(pos) && (slots.at(pos)->attr.name != DUMMY_KEY))
     {
         slots.at(pos)->attr.name = DUMMY_KEY;
         slots.at(pos)->attr.hashcode = 0;
+        used--;
     }
 }
 

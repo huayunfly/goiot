@@ -58,32 +58,35 @@ BOOST_AUTO_TEST_CASE(test_hashtable)
         BOOST_CHECK(ptr1->tagid == ptr2->tagid);
     }
 
-    
     auto dict3 = FixedDict(1 << 7);
     // Add, erase and add
     std::vector<std::string> add_rm_names;
-    std::vector<std::size_t> old_positons;
-    for (std::size_t i = 0; i < 100; i++)
+    std::vector<std::size_t> old_positions;
+    for (std::size_t i = 0; i < (1 << 7); i++)
     {
         add_rm_names.push_back(std::string("And&Remove") + std::to_string(i));
     }
     for (auto name : add_rm_names)
     {
         auto ptr = dict3.Insert(name);
-        old_positons.push_back(ptr->tagid);
+        old_positions.push_back(ptr->tagid);
     }
-    for (auto pos : old_positons)
+    for (auto pos : old_positions)
     {
         dict3.Erase(pos);
     }
-    for (std::size_t i =0; i < add_rm_names.size(); ++i)
+    for (std::size_t i = 0; i < add_rm_names.size(); ++i)
     {
         auto ptr = dict3.Insert(add_rm_names.at(i));
-        BOOST_CHECK(ptr->tagid == old_positons.at(i));
+        BOOST_CHECK(ptr->tagid == old_positions.at(i));
     }
     // Key repeat error
+    dict3.Erase(old_positions.at(1));   // Erase "And&Remove1"
     BOOST_CHECK_THROW(dict3.Insert("And&Remove0"), FixedDict::KeyRepetition);
 
+    // Fixed size exceeded
+    dict3.Insert("And&Remove1");
+    BOOST_CHECK_THROW(dict3.Insert("Another1"), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
