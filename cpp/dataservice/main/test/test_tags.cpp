@@ -58,6 +58,7 @@ BOOST_AUTO_TEST_CASE(test_hashtable)
         BOOST_CHECK(ptr1->tagid == ptr2->tagid);
     }
 
+    
     auto dict3 = FixedDict(1 << 7);
     // Add, erase and add
     std::vector<std::string> add_rm_names;
@@ -80,6 +81,9 @@ BOOST_AUTO_TEST_CASE(test_hashtable)
         auto ptr = dict3.Insert(add_rm_names.at(i));
         BOOST_CHECK(ptr->tagid == old_positons.at(i));
     }
+    // Key repeat error
+    BOOST_CHECK_THROW(dict3.Insert("And&Remove0"), FixedDict::KeyRepetition);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()
