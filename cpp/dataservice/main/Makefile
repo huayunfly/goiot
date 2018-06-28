@@ -5,7 +5,7 @@ DIR_TEST = ./test
 
 #SRC = $(wildcard $(DIR_SRC)/*.cpp)
 #OBJ = $(patsubst %.cpp, $(DIR_OBJ)/%.o, $(notdir $(SRC)))
-OBJS = $(DIR_OBJ)/main.o $(DIR_OBJ)/hashtable.o 
+OBJS = $(DIR_OBJ)/main.o $(DIR_OBJ)/hashtable.o $(DIR_OBJ)/buffer.o 
 
 TARGET = main
 BIN_TARGET = $(DIR_BIN)/$(TARGET)
