@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_hashtable)
 
     // Fixed size exceeded
     dict3.Insert("And&Remove1");
-    BOOST_CHECK_THROW(dict3.Insert("Another1"), std::out_of_range);
+    BOOST_CHECK_THROW(dict3.Insert("Another1"), std::out_of_range);  
 }
 
 BOOST_AUTO_TEST_SUITE_END()
