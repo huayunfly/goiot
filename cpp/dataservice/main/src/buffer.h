@@ -108,7 +108,7 @@ public:
 
 private:
   CircularBuffer(const CircularBuffer &);
-  const CircularBuffer &operator=(const CircularBuffer &);
+  CircularBuffer &operator=(const CircularBuffer &);
 
 private:
   std::size_t mysize;
