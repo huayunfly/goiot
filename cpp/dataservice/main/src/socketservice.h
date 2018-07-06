@@ -20,7 +20,7 @@ class SocketService
   static const int MAXBACKLOG = 5;
 
 public:
-  SocketService() : sock(-1)
+  SocketService() : hostsock(-1)
   {
   }
 
@@ -41,22 +41,31 @@ public:
    * Waits for connection request on fd. accept()
    * On return the hostname will be sent back.
    * 
-   * @param fd: the file descriptor.
-   * @param hostn: returned hostname buffer
+   * @param fd: the file descriptor previously bound to listening port
+   * @param hostn: a hostname buffer
    * @param hostnsize: hostname buffer size
-   * @return a communication file descriptor.
+   * @return: a communication file descriptor.
+   *           -1 on error and set errno
    */
-  int Accept(int fd, char* hostn, int hostnsize);
+  int Accept(int fd, char *hostn, int hostnsize);
 
   /**
-   * Initiates a connnection to server on port and host.
+   * Initiates a connnection to remote server on port and host.
    * The implementation should never return because of interrupted by a signal.
    * @param port: communication port.
    * @hostname: communication hostname.
    * 
-   * @return a communication file descriptor. 
+   * @return: a communication file descriptor if successful. 
+   *          -1 on error
    */
-  int Connect(port_t port, const std::string &hostname);
+  int Connect(port_t port, const char *hostname);
+
+  /**
+   * Close a communication.
+   * @param sock: socket file descriptor.
+   * 
+   */
+  void Close(int sock);
 
 private:
   SocketService(const SocketService &);
@@ -81,7 +90,7 @@ private:
    * 
    * @return: 0 if it succeeded, otherwise -1.
    */
-  int name2addr(char *name, in_addr_t *addrp);
+  int name2addr(const char *name, in_addr_t *addrp);
 
   /**
    * An implementation using getnameinfo() - MT safe env local.
@@ -93,7 +102,7 @@ private:
   void addr2name(struct in_addr addr, char *name, int namelen);
 
 private:
-  int sock;
+  int hostsock;
 };
 
 } // namespace goiot
