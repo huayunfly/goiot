@@ -67,6 +67,29 @@ public:
    */
   void Close(int sock);
 
+/**
+ * Like read(2) but make sure 'count' is read before to return
+ * (unless error or EOF condition is encountered)
+ * 
+ * @param fd: file descriptor
+ * @param buffer: data buffer.
+ * @param count: buffer size.
+ * 
+ * @return: the total character number read. -1 if it failed.
+ */
+int Read(int fd, char *buf, int count);
+
+/** Like write(2) but make sure 'count' is written before to return
+ * (unless error is encountered) 
+ * 
+ * @param fd: file descriptor
+ * @param buffer: data buffer.
+ * @param count: buffer size.
+ * 
+ * @return: the total character number written. -1 if it failed.
+ */
+int Write(int fd, const char *buf, int count);
+
 private:
   SocketService(const SocketService &);
   SocketService &operator=(const SocketService &);
