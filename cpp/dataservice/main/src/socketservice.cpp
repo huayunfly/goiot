@@ -15,39 +15,25 @@
 
 namespace goiot
 {
-int SocketService::Open(port_t port)
+int SocketService::Open(const char *hostname, port_t port, int af)
 {
-    // int s = -1, rv;
-    // char _port[6];  /* strlen("65535") */
-    // struct addrinfo hints, *servinfo, *p;
-
-    // snprintf(_port,6,"%d",port);
-    // memset(&hints,0,sizeof(hints));
-    // hints.ai_family = af;
-    // hints.ai_socktype = SOCK_STREAM;
-    // hints.ai_flags = AI_PASSIVE;    /* No effect if bindaddr != NULL */
-
-    // if ((rv = getaddrinfo(bindaddr,_port,&hints,&servinfo)) != 0) {
-    //     anetSetError(err, "%s", gai_strerror(rv));
-    //     return ANET_ERR;
-    // }
-    // for (p = servinfo; p != NULL; p = p->ai_next) {
-    //     if ((s = socket(p->ai_family,p->ai_socktype,p->ai_protocol)) == -1)
-    //         continue;
-
-    //     if (af == AF_INET6 && anetV6Only(err,s) == ANET_ERR) goto error;
-    //     if (anetSetReuseAddr(err,s) == ANET_ERR) goto error;
-    //     if (anetListen(err,s,p->ai_addr,p->ai_addrlen,backlog) == ANET_ERR) s = ANET_ERR;
-    //     goto end;
-    // }
-    // if (p == NULL) {
-    //     anetSetError(err, "unable to bind socket, errno: %d", errno);
-    //     goto error;
-    // }
-
-    int error, s;
+    int error, s = -1;
     int sock;
     struct sockaddr_in server;
+    char _port[6]; /* strlen("65535") */
+    struct addrinfo hints, *servinfo, *p;
+
+    snprintf(_port, 6, "%d", port);
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = af;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE; /* No effect if bindaddr != NULL */
+
+    if (getaddrinfo(hostname, _port, &hints, &servinfo) != 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
 
     /* AF_INET for IPV4 
             socket() call does not return an EINTR error, implying that it 
@@ -56,43 +42,48 @@ int SocketService::Open(port_t port)
             socket that no process has open for reading, write generate SIGPIPE
             signal.
             */
-    if ((IgnoreSigPipe() == -1) ||
-        ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1))
+    for (p = servinfo; p != NULL; p = p->ai_next)
     {
-        return -1;
-    }
+        if ((IgnoreSigPipe() == -1) ||
+            ((sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1))
+        {
+            continue;
+        }
 
-    int yes = 1;
-    /* 1. Socket is reusable in TIME_WAIT after called close() 
+        int yes = 1;
+        /* 1. Socket is reusable in TIME_WAIT after called close() 
             2. Set the send() recv() delay
             3. Set the send() recv() buffer size
             4. No buffer in the send/recv process.
             5. Delay close socket after send() completed.
             */
-    s = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-    if (s == -1)
-    {
-        error = errno;
-        while (!(close(sock) == -1) && (errno == EINTR))
-            ;
-        errno = error;
-        return -1;
-    }
+        s = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+        if (s == -1)
+        {
+            error = errno;
+            while (!(close(sock) == -1) && (errno == EINTR))
+                ;
+            errno = error;
+            return -1;
+        }
 
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
-    server.sin_port = htons((short)port);
-    if ((bind(sock, (struct sockaddr *)&server, sizeof(server)) == -1) ||
-        (listen(sock, MAXBACKLOG) == -1))
-    {
-        error = errno;
-        while (!(close(sock) == -1) && (errno == EINTR))
-            ;
-        errno = error;
-        return -1;
-    }
+        server.sin_family = AF_INET;
+        server.sin_addr.s_addr = htonl(INADDR_ANY);
+        server.sin_port = htons((short)port);
+        if ((bind(sock, (struct sockaddr *)&server, sizeof(server)) == -1) ||
+            (listen(sock, MAXBACKLOG) == -1))
+        {
+            error = errno;
+            while (!(close(sock) == -1) && (errno == EINTR))
+                ;
+            errno = error;
+            return -1;
+        }
 
-    return sock;
+        return sock;
+    }
+    
+    return -1;
 }
 
 int SocketService::Accept(int fd, char *hostn, int hostnsize)

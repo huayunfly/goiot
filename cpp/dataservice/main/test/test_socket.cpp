@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(testsock)
 BOOST_AUTO_TEST_CASE(test_open)
 {
     SocketService s;
-    int sock = s.Open(8080);
+    int sock = s.Open("localhost", 8080, AF_INET);
     if (sock > 0)
     {
         s.Close(sock);
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(test_connect)
         s.Write(sock, "hello", 6);
         std::string msg;
         msg.reserve(128);
-        s.Read(sock, &msg[0], 128);
+        s.Read(sock, &msg[0], 0);
 
         s.Close(sock);
     }

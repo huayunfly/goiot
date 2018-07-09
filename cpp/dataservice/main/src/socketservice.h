@@ -31,11 +31,13 @@ public:
   /**
    * Create a TCP socket bound to port and sets the socket to be passive.
    * combining socket(), bind() and listen().
+   * @param hostname: host name.
    * @param port: communication port.
+   * @param af: ai_family, AF_INEF or AF_INET6 etc.
    * 
    * @return 0 if it succeeded. otherwise the error code.
    */
-  int Open(port_t port);
+  int Open(const char *hostname, port_t port, int af);
 
   /**
    * Waits for connection request on fd. accept()
