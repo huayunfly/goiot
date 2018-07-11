@@ -44,7 +44,7 @@ public:
    * On return the hostname will be sent back.
    * 
    * @param fd: the file descriptor previously bound to listening port
-   * @param hostn: a hostname buffer
+   * @param hostn: a hostname buffer for a 4-dotted address string 
    * @param hostnsize: hostname buffer size
    * @return: a communication file descriptor.
    *           -1 on error and set errno
@@ -69,28 +69,37 @@ public:
    */
   void Close(int sock);
 
-/**
+  /**
  * Like read(2) but make sure 'count' is read before to return
  * (unless error or EOF condition is encountered)
  * 
- * @param fd: file descriptor
+ * @param sockfd: file descriptor
  * @param buffer: data buffer.
  * @param count: buffer size.
  * 
  * @return: the total character number read. -1 if it failed.
  */
-int Read(int fd, char *buf, int count);
+  int Read(int sockfd, char *buf, int count);
 
-/** Like write(2) but make sure 'count' is written before to return
+  /** Like write(2) but make sure 'count' is written before to return
  * (unless error is encountered) 
  * 
- * @param fd: file descriptor
+ * @param sockfd: file descriptor
  * @param buffer: data buffer.
  * @param count: buffer size.
  * 
  * @return: the total character number written. -1 if it failed.
  */
-int Write(int fd, const char *buf, int count);
+  int Write(int sockfd, const char *buf, int count);
+
+  /**
+ * Work using blocked select().
+ * @param server_sockfd: server socket file descriptor.
+ * 
+ * @return: 0 if succeed. 
+ *          -1 on error.
+ */
+  int Work(int server_sockfd);
 
 private:
   SocketService(const SocketService &);
@@ -125,6 +134,13 @@ private:
    * 
    */
   void addr2name(struct in_addr addr, char *name, int namelen);
+
+  /**
+   * Worker executing the specified work.
+   * @param client_sockfd: client socket file descriptor.
+   * 
+   */
+  void Worker(int client_sockfd);
 
 private:
   int hostsock;

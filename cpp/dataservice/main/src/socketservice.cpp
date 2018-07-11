@@ -19,7 +19,6 @@ int SocketService::Open(const char *hostname, port_t port, int af)
 {
     int error, s = -1;
     int sock;
-    struct sockaddr_in server;
     char _port[6]; /* strlen("65535") */
     struct addrinfo hints, *servinfo, *p;
 
@@ -61,28 +60,27 @@ int SocketService::Open(const char *hostname, port_t port, int af)
         if (s == -1)
         {
             error = errno;
-            while (!(close(sock) == -1) && (errno == EINTR))
-                ;
+            Close(sock);
             errno = error;
+            freeaddrinfo(servinfo);
             return -1;
         }
 
-        server.sin_family = AF_INET;
-        server.sin_addr.s_addr = htonl(INADDR_ANY);
-        server.sin_port = htons((short)port);
-        if ((bind(sock, (struct sockaddr *)&server, sizeof(server)) == -1) ||
+        if ((bind(sock, p->ai_addr, p->ai_addrlen) == -1) ||
             (listen(sock, MAXBACKLOG) == -1))
         {
             error = errno;
-            while (!(close(sock) == -1) && (errno == EINTR))
-                ;
+            Close(sock);
             errno = error;
+            freeaddrinfo(servinfo);
             return -1;
         }
 
+        freeaddrinfo(servinfo);
         return sock;
     }
-    
+
+    freeaddrinfo(servinfo);
     return -1;
 }
 
@@ -92,17 +90,17 @@ int SocketService::Accept(int fd, char *hostn, int hostnsize)
     socklen_t len = sizeof(struct sockaddr);
     struct sockaddr_in netclient;
     memset(&netclient, 0, sizeof(struct sockaddr_in));
-    int retval;
+    int clientsock;
 
-    while (((retval = accept(fd, (struct sockaddr *)&netclient, &len)) != -1) &&
+    while (((clientsock = accept(fd, (struct sockaddr *)&netclient, &len)) != -1) &&
            (errno != EINTR))
         ;
-    if (retval == -1)
+    if (clientsock == -1)
     {
-        return retval;
+        return clientsock;
     }
     addr2name(netclient.sin_addr, hostn, hostnsize);
-    return retval;
+    return clientsock;
 }
 
 int SocketService::Connect(port_t port, const char *hostname)
@@ -141,8 +139,7 @@ int SocketService::Connect(port_t port, const char *hostname)
     if (retval == -1)
     {
         error = errno;
-        while ((close(sock) == -1) && (errno == EINTR))
-            ;
+        Close(sock);
         errno = error;
         return -1;
     }
@@ -158,12 +155,12 @@ void SocketService::Close(int sock)
 
 /* Like read(2) but make sure 'count' is read before to return
  * (unless error or EOF condition is encountered) */
-int SocketService::Read(int fd, char *buf, int count)
+int SocketService::Read(int sockfd, char *buf, int count)
 {
     ssize_t nread, totlen = 0;
     while (totlen != count)
     {
-        nread = read(fd, buf, count - totlen);
+        nread = read(sockfd, buf, count - totlen);
         if (nread == 0)
             return totlen;
         if (nread == -1)
@@ -176,12 +173,12 @@ int SocketService::Read(int fd, char *buf, int count)
 
 /* Like write(2) but make sure 'count' is written before to return
  * (unless error is encountered) */
-int SocketService::Write(int fd, const char *buf, int count)
+int SocketService::Write(int sockfd, const char *buf, int count)
 {
     ssize_t nwritten, totlen = 0;
     while (totlen != count)
     {
-        nwritten = write(fd, buf, count - totlen);
+        nwritten = write(sockfd, buf, count - totlen);
         if (nwritten == 0)
             return totlen;
         if (nwritten == -1)
@@ -190,6 +187,33 @@ int SocketService::Write(int fd, const char *buf, int count)
         buf += nwritten;
     }
     return totlen;
+}
+
+int SocketService::Work(int server_sockfd)
+{
+    int retval = -1;
+    int error;
+    fd_set readfds;
+    FD_ZERO(&readfds);
+    FD_SET(server_sockfd, &readfds);
+
+    while (true)
+    {
+        while (
+            ((retval = select(server_sockfd + 1, &readfds, NULL, NULL, NULL)) == -1) &&
+            (errno == EINTR))
+        {
+            FD_ZERO(&readfds);
+            FD_SET(server_sockfd, &readfds);
+        }
+        if (retval == -1)
+        {
+            error = errno;
+            Close(server_sockfd);
+            errno = error;
+            return -1;
+        }
+    }
 }
 
 int SocketService::IgnoreSigPipe()
