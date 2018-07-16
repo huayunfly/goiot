@@ -6,18 +6,19 @@ DIR_SRC_EXT = ../src
 OBJS = $(DIR_OBJ)/test_tags.o $(DIR_OBJ)/hashtable.o
 OBJS2 = $(DIR_OBJ)/test_buffer.o
 OBJS3 = $(DIR_OBJ)/test_socket.o $(DIR_OBJ)/socketservice.o
-
+OBJS4 = $(DIR_OBJ)/test_sockclient.o $(DIR_OBJ)/socketservice.o
 
 BIN_TARGET = $(DIR_BIN)/test_tags
 BIN_TARGET2 = $(DIR_BIN)/test_buffer
 BIN_TARGET3 = $(DIR_BIN)/test_socket
+BIN_TARGET4 = $(DIR_BIN)/test_sockclient
 
 CC = g++
 INCLUDE = -I/home/hy/Work/cpp/3rd/boost_1_67_0
 CFLAGS = -g -Wall -std=c++17
 LIBS = -lpthread
 
-all: $(BIN_TARGET) $(BIN_TARGET2) $(BIN_TARGET3)
+all: $(BIN_TARGET) $(BIN_TARGET2) $(BIN_TARGET3) $(BIN_TARGET4)
 
 # TARGET
 $(BIN_TARGET): $(OBJS) 
@@ -41,7 +42,17 @@ $(DIR_OBJ)/%.o: $(DIR_SRC_EXT)/%.cpp
 
 # TARGET3
 $(BIN_TARGET3): $(OBJS3) 
-	$(CC) $(OBJS3) $(LIBS) -o $@ 
+	$(CC) $(OBJS3) -o $@ 
+
+$(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+$(DIR_OBJ)/%.o: $(DIR_SRC_EXT)/%.cpp
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+# TARGET4
+$(BIN_TARGET4): $(OBJS4) 
+	$(CC) $(OBJS4) -o $@ 
 
 $(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@

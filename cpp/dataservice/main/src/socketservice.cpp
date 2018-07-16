@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h> // accept()
+#include <sys/ioctl.h>
 #include "socketservice.h"
 
 namespace goiot
@@ -93,7 +94,7 @@ int SocketService::Accept(int fd, char *hostn, int hostnsize)
     int clientsock;
 
     while (((clientsock = accept(fd, (struct sockaddr *)&netclient, &len)) != -1) &&
-           (errno != EINTR))
+           (errno == EINTR))
         ;
     if (clientsock == -1)
     {
@@ -193,24 +194,22 @@ int SocketService::Work(int server_sockfd)
 {
     int retval = -1;
     int error;
-    fd_set readfds;
+    fd_set readfds, testfds;
     FD_ZERO(&readfds);
     FD_SET(server_sockfd, &readfds);
     const int HOSTN_SIZE = 128;
     char hostn[HOSTN_SIZE];
     int client_sockfd;
+    int maxfd = server_sockfd + 1;
 
     while (true)
     {
         char ch;
-        int fd;
         int nread;
-        fd_set testfds;
-
         memcpy(&testfds, &readfds, sizeof(fd_set));
 
         while (
-            ((retval = select(server_sockfd + 1, &testfds, NULL, NULL, NULL)) == -1) &&
+            ((retval = select(maxfd, &testfds, NULL, NULL, NULL)) == -1) &&
             (errno == EINTR))
         {
             FD_ZERO(&testfds);
@@ -223,24 +222,40 @@ int SocketService::Work(int server_sockfd)
             errno = error;
             return -1;
         }
-        for (fd = 0; fd < server_sockfd + 1; fd++)
+        for (int fd = 0; fd < maxfd; fd++)
         {
-            if (fd == server_sockfd)
+            if (FD_ISSET(fd, &testfds))
             {
-                 client_sockfd = Accept(server_sockfd, hostn, HOSTN_SIZE);
-                 if (client_sockfd == -1)
-                 {
-                     FD_SET(client_sockfd, &readfds);
-                 }
+                if (fd == server_sockfd)
+                {
+                    client_sockfd = Accept(server_sockfd, hostn, HOSTN_SIZE);
+                    if (client_sockfd > 0)
+                    {
+                        FD_SET(client_sockfd, &readfds);
+                        if (client_sockfd >= maxfd)
+                        {
+                            maxfd = client_sockfd + 1;
+                        }
+                    }
+                }
+                else
+                {
+                    ioctl(fd, FIONREAD, &nread);
+                    if (nread == 0)
+                    {
+                        Close(fd);
+                        FD_CLR(fd, &readfds);
+                    }
+                    else
+                    {
+                        /* Working routine: a simple read write */
+                        Read(fd, &ch, 1);
+                        sleep(1);
+                        ch++;
+                        Write(fd, &ch, 1);
+                    }
+                }
             }
-            else
-            {
-                /* Working routine: a simple read write */
-                Read(fd, &ch, 1);
-                sleep(1);
-                ch++;
-                Write(fd, &ch, 1);
-            } 
         }
     }
 }
