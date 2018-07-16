@@ -196,15 +196,25 @@ int SocketService::Work(int server_sockfd)
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(server_sockfd, &readfds);
+    const int HOSTN_SIZE = 128;
+    char hostn[HOSTN_SIZE];
+    int client_sockfd;
 
     while (true)
     {
+        char ch;
+        int fd;
+        int nread;
+        fd_set testfds;
+
+        memcpy(&testfds, &readfds, sizeof(fd_set));
+
         while (
-            ((retval = select(server_sockfd + 1, &readfds, NULL, NULL, NULL)) == -1) &&
+            ((retval = select(server_sockfd + 1, &testfds, NULL, NULL, NULL)) == -1) &&
             (errno == EINTR))
         {
-            FD_ZERO(&readfds);
-            FD_SET(server_sockfd, &readfds);
+            FD_ZERO(&testfds);
+            FD_SET(server_sockfd, &testfds);
         }
         if (retval == -1)
         {
@@ -212,6 +222,25 @@ int SocketService::Work(int server_sockfd)
             Close(server_sockfd);
             errno = error;
             return -1;
+        }
+        for (fd = 0; fd < server_sockfd + 1; fd++)
+        {
+            if (fd == server_sockfd)
+            {
+                 client_sockfd = Accept(server_sockfd, hostn, HOSTN_SIZE);
+                 if (client_sockfd == -1)
+                 {
+                     FD_SET(client_sockfd, &readfds);
+                 }
+            }
+            else
+            {
+                /* Working routine: a simple read write */
+                Read(fd, &ch, 1);
+                sleep(1);
+                ch++;
+                Write(fd, &ch, 1);
+            } 
         }
     }
 }

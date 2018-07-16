@@ -23,23 +23,30 @@ BOOST_AUTO_TEST_CASE(test_open)
     {
         s.Close(sock);
     }
-    BOOST_CHECK_GT(sock, 0);
+    BOOST_CHECK(sock > 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_connect)
 {
     SocketService s;
-    int sock = s.Connect(80, "www.baidu.com");
-    if (sock > 0)
+    int client_sockfd = s.Connect(80, "www.baidu.com");
+    if (client_sockfd > 0)
     {
-        s.Write(sock, "hello", 6);
-        std::string msg;
-        msg.reserve(128);
-        s.Read(sock, &msg[0], 0);
-
-        s.Close(sock);
+        s.Close(client_sockfd);
     }
-    BOOST_CHECK_GT(sock, 0);
+    BOOST_CHECK(client_sockfd > 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_server)
+{
+    SocketService s;
+    int server_sockfd = s.Open("localhost", 8080, AF_INET);
+    if (server_sockfd == -1)
+    {
+        BOOST_CHECK(false);
+    }
+    s.Work(server_sockfd);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

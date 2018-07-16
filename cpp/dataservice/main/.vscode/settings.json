@@ -3,6 +3,7 @@
         "variant": "cpp",
         "*.tcc": "cpp",
         "stdexcept": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "*.ipp": "cpp"
     }
 }
