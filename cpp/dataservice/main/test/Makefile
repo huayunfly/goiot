@@ -5,8 +5,8 @@ DIR_SRC_EXT = ../src
 
 OBJS = $(DIR_OBJ)/test_tags.o $(DIR_OBJ)/hashtable.o
 OBJS2 = $(DIR_OBJ)/test_buffer.o
-OBJS3 = $(DIR_OBJ)/test_socket.o $(DIR_OBJ)/socketservice.o
-OBJS4 = $(DIR_OBJ)/test_sockclient.o $(DIR_OBJ)/socketservice.o
+OBJS3 = $(DIR_OBJ)/test_socket.o $(DIR_OBJ)/socketservice.o $(DIR_OBJ)/aenet.o
+OBJS4 = $(DIR_OBJ)/test_sockclient.o $(DIR_OBJ)/socketservice.o $(DIR_OBJ)/aenet.o
 
 BIN_TARGET = $(DIR_BIN)/test_tags
 BIN_TARGET2 = $(DIR_BIN)/test_buffer
