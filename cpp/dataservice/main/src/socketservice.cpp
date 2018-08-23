@@ -124,9 +124,16 @@ int SocketService::Connect(port_t port, const char *hostname)
     {
         return -1;
     }
-    retval = connect(sock, (struct sockaddr *)&server, sizeof(server));
+    retval = connect(sock, (struct sockaddr *)&server, sizeof(server)); /* asynchronous */
     if ((retval == -1) && ((errno == EINTR) || (errno == EALREADY)))
     {
+        /* Unlike otherr library functions that set errno to EINTR,
+            connect() should not be restarted, because the network has
+            initiated the TCP 3-way handshake. In this case, the connection
+            request complete asynchronously to program execution. The application
+            must call select() or poll() to detect the descriptor is read for
+            writing.
+        */
         FD_ZERO(&sockset);
         FD_SET(sock, &sockset);
         while (
