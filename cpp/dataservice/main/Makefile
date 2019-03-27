@@ -20,10 +20,10 @@ all: $(BIN_TARGET)
 debug: $(CFLAGS) += -DDEBUG
 debug: $(BIN_TARGET)
 
-$(BIN_TARGET): $(OBJS)
+$(BIN_TARGET): $(OBJS) # Target name:Dependency name
 	$(CC) $(OBJS) -o $@
 
-$(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
+$(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp # $< dependency name; $@ target name
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 clean:
@@ -32,3 +32,6 @@ clean:
 
 test:
 	(cd $(DIR_TEST);$(MAKE))
+
+test_clean:
+	(cd $(DIR_TEST);$(MAKE) clean)
