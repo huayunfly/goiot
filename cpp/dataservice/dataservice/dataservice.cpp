@@ -7,7 +7,14 @@
 #include <stdexcept>
 #include <exception>
 #include <Windows.h>
-#include "../include/driver_base.h"
+
+#if defined(_MSC_VER)
+// Used to install a report hook that prevent dialog on assertion and error.
+#include <crtdbg.h>
+#endif // if defined(_MSC_VER)
+
+#include "driver_base.h"
+#include "driver_service.h"
 
 // Load the objects from the plugin folder.
 //
@@ -19,22 +26,15 @@
 // Returns a list of Base*, contained in a smart pointer
 // to ease memory deallocation and help prevent memory
 // leaks.
-std::vector<std::unique_ptr<goiot::DriverBase>> GetPlugins(std::vector<HINSTANCE>& modules) {
+std::vector<std::unique_ptr<goiot::DriverBase>> GetPlugins(std::vector<HINSTANCE>& modules, 
+    const std::wstring& module_path) {
     // A temporary structure to return.
     std::vector<std::unique_ptr<goiot::DriverBase>> ret;
     // empty the modules list passed
     modules.clear();
-
-    // Find the files contained in the 'plugins' folder
-    wchar_t exeFullPath[MAX_PATH]; // Full path   
-    GetModuleFileName(NULL, exeFullPath, MAX_PATH);
-    std::wstring exePath(exeFullPath);
-    std::size_t pos = exePath.find_last_of(L"\\");
-    std::wstring exeDir = exePath.substr(0, pos);
     // Get full path of the file  
-
     WIN32_FIND_DATA fileData;
-    HANDLE fileHandle = FindFirstFile((exeDir + L"\\drivers\\*.dll").c_str(), &fileData);
+    HANDLE fileHandle = FindFirstFile((module_path + L"drivers\\*.dll").c_str(), &fileData);
 
     if (fileHandle == (void*)ERROR_INVALID_HANDLE ||
         fileHandle == (void*)ERROR_FILE_NOT_FOUND) {
@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<goiot::DriverBase>> GetPlugins(std::vector<HINSTANCE
         typedef std::string(__cdecl* NameProc)(void);
 
         // Load the library
-        HINSTANCE mod = LoadLibrary((exeDir + L".\\drivers\\" + std::wstring(fileData.cFileName)).c_str());
+        HINSTANCE mod = LoadLibrary((module_path + L"drivers\\" + std::wstring(fileData.cFileName)).c_str());
 
         if (!mod) {
             // Couldn't load the library, cleaning module list and quitting.
@@ -89,6 +89,16 @@ std::vector<std::unique_ptr<goiot::DriverBase>> GetPlugins(std::vector<HINSTANCE
 
 int main()
 {
+    // Module path
+    wchar_t exeFullPath[MAX_PATH]; // Full path   
+    GetModuleFileName(NULL, exeFullPath, MAX_PATH);
+    std::wstring exePath(exeFullPath);
+    std::size_t pos = exePath.find_last_of(L"\\");
+    std::wstring module_path = exePath.substr(0, pos + 1);
+    // Create a driver manager
+    std::unique_ptr<goiot::DriverMgrService> driver_manager(new goiot::DriverMgrService(module_path));
+    driver_manager->LoadJsonConfig();
+
     // Our list of modules. We need this to properly free the module
 // after the program has finished.
     std::vector<HINSTANCE> modules;
@@ -103,7 +113,7 @@ int main()
         // Load the plugins using our function
         try
         {
-            objs = GetPlugins(modules);
+            objs = GetPlugins(modules, module_path);
         }
         catch (const std::exception & e) 
         {

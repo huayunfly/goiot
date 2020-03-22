@@ -1,0 +1,5 @@
+.vs
+x64
+dataservice/x64
+demo_driver/x64
+*.vcxproj.*
