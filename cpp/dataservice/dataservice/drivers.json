@@ -1,3 +1,26 @@
+// modbus_rtu:nodes:data:type: 1 store bits, 2 input bits, 3 registers and 4 inputs registers
+// data_type: 
 {
-  "name": "goiot"
+  "name": "goiot",
+  "drivers": [
+    {
+      "id": "driver1",
+      "name": "modbus1",
+      "type": "modbus_rtu",
+      "channel": "COM1,9600,N,8,1",
+      "nodes": [
+        {
+          "address": "1",
+          "data": [
+            {
+              "id": "A1",
+              "name": "A1data",
+              "address": "14",
+              "type": "1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
