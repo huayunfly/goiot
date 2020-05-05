@@ -1,5 +1,12 @@
-// modbus_rtu:nodes:data:type: 1 store bits, 2 input bits, 3 registers and 4 inputs registers
-// data_type: 
+// modbus_rtu protocol
+// data type: [1 zone] input coils ÊäÈë¼ÌµçÆ÷, [0 zone] output coils Êä³ö¼ÌµçÆ÷, [3 zone] input registers ÊäÈë¼Ä´æÆ÷ and [4 zone] output registers Êä³ö¼Ä´æÆ÷
+// wdec: word_decode, µ¥×Ö½âÂëË³Ğò, with value 0, 1
+// dwdec: dword_decode, Ë«×Ö½âÂëË³Ğò, with value 0, 1, 2, 3
+// fdec: float_decode, ¸¡µã½âÂëË³Ğò, with value 0, 1, 2, 3
+// address: driver-specified, RR (readonly, Ö»¶Á), WW(writeonly, Ö»Ğ´), RW (readwrite, ¶ÁĞ´)
+// address: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
+// function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
+//                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
 {
   "name": "goiot",
   "drivers": [
@@ -7,16 +14,23 @@
       "id": "driver1",
       "name": "modbus1",
       "type": "modbus_rtu",
-      "channel": "COM1,9600,N,8,1",
+      "port": "COM1,9600,N,8,1",
       "nodes": [
         {
-          "address": "1",
+          "address": 1,
+          "wdec": 0,
+          "dwdec": 0,
+          "fdec": 0,
           "data": [
             {
-              "id": "A1",
-              "name": "A1data",
-              "address": "14",
-              "type": "1"
+              "id": "C1",
+              "name": "µçÑ¹1",
+              "address": "RR4WUB0001"
+            },
+            {
+              "id": "C1",
+              "name": "µçÑ¹1",
+              "address": "RR4WUB0001"
             }
           ]
         }
