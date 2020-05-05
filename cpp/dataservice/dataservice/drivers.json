@@ -17,10 +17,10 @@
       "port": "COM1,9600,N,8,1",
       "nodes": [
         {
-          "address": 1,
-          "wdec": 0,
-          "dwdec": 0,
-          "fdec": 0,
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
           "data": [
             {
               "id": "C1",
@@ -28,9 +28,9 @@
               "address": "RR4WUB0001"
             },
             {
-              "id": "C1",
-              "name": "µÁ—π1",
-              "address": "RR4WUB0001"
+              "id": "C2",
+              "name": "µÁ—π2",
+              "address": "RR4WUB0002"
             }
           ]
         }
