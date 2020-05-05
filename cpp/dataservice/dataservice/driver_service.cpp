@@ -11,6 +11,7 @@
 #include <system_error>
 #include "json/json.h"
 #include "driver_service.h"
+#include <cassert>
 
 
 const std::wstring goiot::DriverMgrService::CONFIG_FILE = L"drivers.json";
@@ -50,6 +51,22 @@ namespace goiot {
         }
         const std::string name = root["name"].asString();
         std::cout << name << std::endl;
+        // driver descriptions
+		assert(root["drivers"].isArray());
+        driver_descriptions_.clear();
+		for (auto driver : root["drivers"])
+		{
+            auto description = std::make_tuple(driver["type"].asString(), driver["port"].asString());
+			if (std::find_if(driver_descriptions_.begin(), driver_descriptions_.end(),
+				[&driver](std::shared_ptr<std::tuple<std::string, std::string>> pos) {
+					return std::get<0>(*pos) == driver["type"].asString() && std::get<1>(*pos) == driver["port"].asString(); }) == driver_descriptions_.end())
+			{
+				driver_descriptions_.push_back(
+					std::make_shared<std::tuple<std::string, std::string>>(description));
+			}
+
+		}
+
         return 0;
     }
 

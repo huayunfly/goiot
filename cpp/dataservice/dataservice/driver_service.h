@@ -16,7 +16,7 @@ namespace goiot {
 	class DriverMgrService
 	{
 	public:
-		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), drivers_()
+		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), drivers_(), driver_descriptions_()
 		{
 
 		}
@@ -42,6 +42,7 @@ namespace goiot {
 		const static std::wstring CONFIG_FILE;
 		const static std::wstring DRIVER_DIR;
 		std::wstring module_path_; // Not include the suffix "/"
+		std::vector<std::shared_ptr<std::tuple<std::string, std::string>>> driver_descriptions_;
 		std::vector<std::unique_ptr<DriverBase>> drivers_;
 	};
 }
