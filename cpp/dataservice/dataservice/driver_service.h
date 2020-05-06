@@ -42,7 +42,7 @@ namespace goiot {
 		const static std::wstring CONFIG_FILE;
 		const static std::wstring DRIVER_DIR;
 		std::wstring module_path_; // Not include the suffix "/"
-		std::vector<std::shared_ptr<std::tuple<std::string, std::string>>> driver_descriptions_;
+		std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>> driver_descriptions_;
 		std::vector<std::unique_ptr<DriverBase>> drivers_;
 	};
 }
