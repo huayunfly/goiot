@@ -56,7 +56,7 @@ namespace goiot {
         driver_descriptions_.clear();
 		for (auto driver : root["drivers"])
 		{
-            auto description = std::make_tuple(driver["type"].asString(), driver["port"].asString(), "");
+            auto description = std::make_tuple(driver["type"].asString(), driver["port"].asString(), driver.toStyledString());
 			if (std::find_if(driver_descriptions_.begin(), driver_descriptions_.end(),
 				[&driver](std::shared_ptr<std::tuple<std::string, std::string, std::string>> pos) {
 					return std::get<0>(*pos) == driver["type"].asString() && std::get<1>(*pos) == driver["port"].asString(); }) == driver_descriptions_.end())
