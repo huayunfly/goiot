@@ -33,7 +33,7 @@ std::unique_ptr<goiot::DriverBase> GetObj(void) {
 }
 
 std::string GetName(void) {
-    return "DemoDriver";
+    return "demo";
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,

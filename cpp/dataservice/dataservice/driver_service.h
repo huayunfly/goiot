@@ -39,6 +39,12 @@ namespace goiot {
 		int GetPlugins();
 
 	private:
+		// Get the plugins internally
+		std::vector<std::unique_ptr<goiot::DriverBase>> GetPlugins(std::vector<HINSTANCE>& modules,
+			const std::wstring& module_path,
+			const std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>>& driver_descriptions);
+
+	private:
 		const static std::wstring CONFIG_FILE;
 		const static std::wstring DRIVER_DIR;
 		std::wstring module_path_; // Not include the suffix "/"

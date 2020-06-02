@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include <exception>
+#include <iostream>
 #include <Windows.h>
 
 #if defined(_MSC_VER)
@@ -87,18 +88,8 @@ std::vector<std::unique_ptr<goiot::DriverBase>> GetPlugins(std::vector<HINSTANCE
     return ret;
 }
 
-int main()
+int TestObjs(const std::wstring& module_path)
 {
-    // Module path
-    wchar_t exeFullPath[MAX_PATH]; // Full path   
-    GetModuleFileName(NULL, exeFullPath, MAX_PATH);
-    std::wstring exePath(exeFullPath);
-    std::size_t pos = exePath.find_last_of(L"\\");
-    std::wstring module_path = exePath.substr(0, pos + 1);
-    // Create a driver manager
-    std::unique_ptr<goiot::DriverMgrService> driver_manager(new goiot::DriverMgrService(module_path));
-    driver_manager->LoadJsonConfig();
-
     // Our list of modules. We need this to properly free the module
 // after the program has finished.
     std::vector<HINSTANCE> modules;
@@ -115,7 +106,7 @@ int main()
         {
             objs = GetPlugins(modules, module_path);
         }
-        catch (const std::exception & e) 
+        catch (const std::exception& e)
         {
             std::cerr << "Exception caught: " << e.what() << std::endl;
             return 1;
@@ -124,7 +115,7 @@ int main()
         // Call the 'print' function for out classes.
         // This is normally where you would implement
         // the code for using the plugins.
-        for (auto& x : objs) 
+        for (auto& x : objs)
         {
             std::string description;
             std::cout << x->GetDescription(description) << std::endl;
@@ -134,8 +125,31 @@ int main()
     }
 
     // Program finishing, time to clean up
-    for (HINSTANCE hInst : modules) 
+    for (HINSTANCE hInst : modules)
     {
         FreeLibrary(hInst);
+    }
+}
+
+int main()
+{
+    // Module path
+    wchar_t exeFullPath[MAX_PATH]; // Full path   
+    GetModuleFileName(NULL, exeFullPath, MAX_PATH);
+    std::wstring exePath(exeFullPath);
+    std::size_t pos = exePath.find_last_of(L"\\");
+    std::wstring module_path = exePath.substr(0, pos + 1);
+    // Create a driver manager
+    std::unique_ptr<goiot::DriverMgrService> driver_manager(new goiot::DriverMgrService(module_path));
+    driver_manager->LoadJsonConfig();
+    driver_manager->GetPlugins();
+    std::cout << "driver manager is running...";
+    char c;
+    while (std::cin >> c)
+    {
+        if (c == 'q')
+        {
+            return 0;
+        }
     }
 }
