@@ -19,7 +19,7 @@ namespace goiot
 	{
 	public:
 		DriverWorker(const ConnectionInfo& connection_details, std::map<std::string, DataInfo>&& data_map) : 
-			connection_details_(connection_details), data_map_(data_map)
+			connection_details_(connection_details), data_map_(data_map), connection_manager_()
 		{
 
 		}
@@ -30,6 +30,7 @@ namespace goiot
 		void DoWork();
 
 	private:
+		std::once_flag connection_init_flag_;
 		ConnectionInfo connection_details_;
 		std::map<std::string, DataInfo> data_map_;
 		std::shared_ptr<modbus_t> connection_manager_;

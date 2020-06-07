@@ -97,7 +97,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\libmodbus\v3_1_6\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>modbus_vc142_v_3_1_6D.lib;jsoncppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>modbus_vc142_x64_v_3_1_6D.lib;jsoncppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)drivers\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -154,16 +155,19 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>modbus_vc142_v_3_1_6.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\libmodbus\v3_1_6\lib</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)drivers\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DriverWorker.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ModbusRtuDriver.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DriverWorker.cpp" />
+    <ClCompile Include="ModbusRtuDriver.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

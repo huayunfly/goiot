@@ -66,9 +66,10 @@ namespace goiot
 
 	struct ConnectionInfo
 	{
-		ConnectionInfo() : baud(9600), parity('N'), data_bit(8), stop_bit(1)
+		ConnectionInfo() : port("COM1"), baud(9600), parity('N'), data_bit(8), stop_bit(1)
 		{
 		}
+		std::string port;
 		int baud;
 		char parity; // 'N', 'O', 'E'
 		int data_bit;

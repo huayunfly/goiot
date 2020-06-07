@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClCompile Include="dataservice.cpp" />
     <ClCompile Include="driver_service.cpp" />
+    <ClCompile Include="ThreadSafeQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="driver_base.h" />
     <ClInclude Include="driver_service.h" />
+    <ClInclude Include="ThreadSafeQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="drivers.json">
@@ -169,6 +171,9 @@
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)/jsoncpp/lib/</AdditionalLibraryDirectories>
       <AdditionalDependencies>jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /e /r /y $(ProjectDir)drivers.json $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

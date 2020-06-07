@@ -4,7 +4,7 @@
 // wdec: word_decode, µ¥×Ö½âÂëË³Ðò, with value 0, 1
 // dwdec: dword_decode, Ë«×Ö½âÂëË³Ðò, with value 0, 1, 2, 3
 // fdec: float_decode, ¸¡µã½âÂëË³Ðò, with value 0, 1, 2, 3
-// register: driver-specified, RR (readonly, Ö»¶Á), WW(writeonly, Ö»Ð´), RW (readwrite, ¶ÁÐ´)
+// register: driver-specified, R (readonly, Ö»¶Á), W(writeonly, Ö»Ð´), RW (readwrite, ¶ÁÐ´)
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
 //                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
@@ -15,7 +15,7 @@
       "id": "driver1",
       "name": "modbus1",
       "type": "modbus_rtu",
-      "port": "COM1,9600,N,8,1",
+      "port": "COM1,19200,N,8,1",
       "nodes": [
         {
           "address": "1",
@@ -26,12 +26,12 @@
             {
               "id": "C1",
               "name": "µçÑ¹1",
-              "register": "RR4WUB0001"
+              "register": "R4WUB0001"
             },
             {
               "id": "C2",
               "name": "µçÑ¹2",
-              "register": "RR4WUB0002"
+              "register": "R4WUB0002"
             }
           ]
         }
@@ -41,7 +41,7 @@
       "id": "driver2",
       "name": "modbus2",
       "type": "modbus_rtu",
-      "port": "COM2,9600,N,8,1",
+      "port": "COM2,19200,N,8,1",
       "nodes": [
         {
           "address": "1",
@@ -52,12 +52,12 @@
             {
               "id": "C1",
               "name": "µçÑ¹1",
-              "register": "RR4WUB0001"
+              "register": "RW4WUB0001"
             },
             {
               "id": "C2",
               "name": "µçÑ¹2",
-              "register": "RR4WUB0002"
+              "register": "W4WUB0002"
             }
           ]
         }
