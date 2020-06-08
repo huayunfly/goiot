@@ -11,9 +11,10 @@ namespace goiot
         int parse_code = ParseConfig(config, connection_details, data_map);
         if (parse_code != 0)
         {
-            std::clog << "ModbusRtuDriver::InitDriver() parse config failed.";
+            std::clog << "ModbusRtuDriver::InitDriver() parse config failed." << std::endl;
         }
         driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map)));
+        int return_code = driver_worker_->OpenConnection();
         std::cout << "ModbusRtuDriver::InitDriver() done." + config << std::endl;
         return 0;
     }
@@ -72,7 +73,7 @@ namespace goiot
         if (count > 1)
         {
             assert(false);
-            std::clog << "ModbusRtuDriver::ParseConfig() connection information parsing failed.";
+            std::clog << "ModbusRtuDriver::ParseConfig() connection information parsing failed." << std::endl;
             return EINVAL;
         }
         std::istringstream iss(port.substr(start_pos, split_pos - start_pos));
@@ -95,7 +96,7 @@ namespace goiot
                 assert(channel.length() > 6);
                 if (channel.length() <= 6)
                 {
-                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid.";
+                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                     continue;
                 }
                 if (0 == channel.find("RW"))
@@ -117,7 +118,7 @@ namespace goiot
                 else
                 {
                     assert(false);
-                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid.";
+                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                     continue;
                 }
                 std::istringstream iss_data_zone(channel.substr(start_pos, 1));
@@ -139,7 +140,7 @@ namespace goiot
                     break;
                 default:
                     assert(false);
-                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid.";
+                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                     break;
                 }
                 start_pos++;
@@ -174,7 +175,7 @@ namespace goiot
                     else
                     {
                         assert(false);
-                        std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid.";
+                        std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                         continue;
                     }
                 }

@@ -25,7 +25,7 @@ namespace goiot
 		}
 		DriverWorker(const DriverWorker&) = delete;
 		DriverWorker& operator=(const DriverWorker&) = delete;
-		void OpenConnection();
+		int OpenConnection();
 		void CloseConnection();
 		void DoWork();
 

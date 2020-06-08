@@ -1,6 +1,6 @@
 // modbus_rtu protocol
 // address: 1~128
-// data type: [1 zone] input coils ÊäÈë¼ÌµçÆ÷, [0 zone] output coils Êä³ö¼ÌµçÆ÷, [3 zone] input registers ÊäÈë¼Ä´æÆ÷ and [4 zone] output registers Êä³ö¼Ä´æÆ÷
+// data type: [1 zone] input(DISCRETE) coils ÊäÈë¼ÌµçÆ÷, [0 zone] output coils Êä³ö¼ÌµçÆ÷, [3 zone] input registers ÊäÈë¼Ä´æÆ÷ and [4 zone] output(holding) registers Êä³ö¼Ä´æÆ÷
 // wdec: word_decode, µ¥×Ö½âÂëË³Ğò, with value 0, 1
 // dwdec: dword_decode, Ë«×Ö½âÂëË³Ğò, with value 0, 1, 2, 3
 // fdec: float_decode, ¸¡µã½âÂëË³Ğò, with value 0, 1, 2, 3
