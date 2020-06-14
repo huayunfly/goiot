@@ -15,7 +15,7 @@ namespace goiot
         }
         driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map)));
         int return_code = driver_worker_->OpenConnection();
-        std::cout << "ModbusRtuDriver::InitDriver() done." + config << std::endl;
+        std::cout << "ModbusRtuDriver::InitDriver() returns " << return_code << std::endl;
         return 0;
     }
 
@@ -78,6 +78,7 @@ namespace goiot
         }
         std::istringstream iss(port.substr(start_pos, split_pos - start_pos));
         iss >> connection_info.stop_bit;
+        connection_info.response_to_msec = root["response_to_msec"].asInt();
 
         // nodes
         assert(root["nodes"].isArray());

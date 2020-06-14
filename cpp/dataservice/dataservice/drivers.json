@@ -8,6 +8,7 @@
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
 //                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
+// response_to_sec: response wait time in micro-second
 {
   "name": "goiot",
   "drivers": [
@@ -16,6 +17,7 @@
       "name": "modbus1",
       "type": "modbus_rtu",
       "port": "COM1,19200,N,8,1",
+      "response_to_msec": 500,
       "nodes": [
         {
           "address": "1",
@@ -42,6 +44,7 @@
       "name": "modbus2",
       "type": "modbus_rtu",
       "port": "COM2,19200,N,8,1",
+      "response_to_msec": 500,
       "nodes": [
         {
           "address": "1",

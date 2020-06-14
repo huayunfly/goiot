@@ -10,82 +10,253 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+#include <stdexcept>
 
 namespace goiot
 {
+	class Full : std::runtime_error
+	{
+	public:
+		virtual const char* what() const noexcept
+		{
+			return "Queue full.";
+		}
+	};
+
+	class Empty : std::runtime_error
+	{
+	public:
+		virtual const char* what() const noexcept
+		{
+			return "Queue empty.";
+		}
+	};
+
 	template<typename T>
 	class ThreadSafeQueue
 	{
 	public:
-		ThreadSafeQueue()
+		static const long long MAX_MILLSECONDES = 10000000;
+		// Create a queue object with a given maximum size.
+		// If maxsize is <= 0, the queue size is infinite.
+		ThreadSafeQueue(std::size_t maxsize = 0) : maxsize_(maxsize), unfinished_tasks_(0)
 		{
 
 		}
 
 		ThreadSafeQueue(const ThreadSafeQueue& other)
 		{
-			std::lock_guard<std::mutex> lk(other.mut);
-			data_queue = other.data_queue;
+			std::lock_guard<std::mutex> lk(other.mut_);		
+			data_queue_ = other.data_queue_;
+			maxsize_ = other.maxsize_;
 		}
 
  		ThreadSafeQueue& operator=(const ThreadSafeQueue&) = delete;
 
-		void Push(T new_value)
+		// Put an item into the queue.
+		void Put(T new_value, bool block = true, std::chrono::microseconds timeout = MAX_MILLSECONDES)
 		{
-			std::lock_guard<std::mutex> lk(mut);
-			data_queue.push(new_value);
-			data_cond.notify_one();
+			std::unique_lock<std::mutex> lk(mut_);
+			if (maxsize_ > 0)
+			{
+				if (!block) // not block
+				{
+					if (QSize_() >= maxsize_)
+					{
+						throw Full();
+					}
+				}
+				else if (timeout == MAX_MILLSECONDES) // block with infinite timeout
+				{
+					not_full_.wait(lk, [this] { return QSize_() < maxsize_; });
+				}
+				else if (timeout < std::chrono::microseconds(0))
+				{
+					throw std::invalid_argument("'timeout' must be a non-negative number");
+				}
+				else
+				{
+					bool not_full = not_full_.wait_for(lk, [this] { return QSize_() < maxsize_; }, timeout); // the return value of the predict when woken
+					if (!not_full)
+					{
+						throw Full();
+					}
+				}
+			}
+			data_queue_.push(new_value);
+			unfinished_tasks_ += 1;
+			not_empty_.notify_one();
 		}
-		bool TryPop(T& value)
+
+		void Close()
 		{
-			std::lock_guard<std::mutex> lk(mut);
-			if (data_queue.empty())
+			T value("SENTINEL");
+			//Put(value);
+		}
+
+		// Put an item into the queue without blocking.
+		void PutNoWait(T new_value)
+		{
+			Put(new_value, false);
+		}
+
+		// Get an item into the queue without blocking.
+		bool GetNoWait(T& value)
+		{
+			return WaitAndGet(value, false);
+		}
+
+		// Get an item into the queue without blocking.
+		std::shared_ptr<T> GetNoWait()
+		{
+			return WaitAndGet(false);
+		}
+
+		bool TryGet(T& value)
+		{
+			std::lock_guard<std::mutex> lk(mut_);
+			if (data_queue_.empty())
 			{
 				return false;
 			}
-			value = data_queue.front();
-			data_queue.pop();
+			value = data_queue_.front();
+			data_queue_.pop();
 			return true;
 		}
 
-		std::shared_ptr<T> TryPop()
+		std::shared_ptr<T> TryGet()
 		{
-			std::lock_guard<std::mutex> lk(mut);
-			if (data_queue.empty())
+			std::lock_guard<std::mutex> lk(mut_);
+			if (data_queue_.empty())
 			{
-				return false;
+				return std::shared_ptr<T>();
 			}
-			std::shared_ptr<T> res(std::make_shared<T>(data_queue.front()));
-			data_queue.pop();
+			std::shared_ptr<T> res(std::make_shared<T>(data_queue_.front()));
+			data_queue_.pop();
 			return res;
 		}
 
-		void WaitAndPop(T& value)
+		// Remove and return an item from the queue.
+		void WaitAndGet(T& value, bool block = true, std::chrono::milliseconds timeout = MAX_MILLSECONDES)
 		{
-			std::unique_lock<std::mutex> lk(mut);
-			data_cond.wait(lk, [this] { return !data_queue.empty(); });
-			value = data_queue.front();
-			data_queue.pop();
+			std::unique_lock<std::mutex> lk(mut_);
+			if (!block) // no block
+			{
+				if (QSize_() == 0)
+				{
+					throw Empty();
+				}
+			}
+			else if (timeout == MAX_MILLSECONDES) // block but with infinite timeout
+			{
+				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
+			}
+			else if (timeout < std::chrono::milliseconds(0))
+			{
+				throw std::invalid_argument("'timeout' must be a non-negative number");
+			}
+			else
+			{
+				bool not_empty = not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
+				if (!not_empty)
+				{
+					throw Empty();
+				}
+			}
+			value = data_queue_.front();
+			data_queue_.pop();
+			not_full_.notify_one();
 		}
 
-		std::shared_ptr<T> WaitAndPop()
+		// Remove and return an item from the queue.
+		std::shared_ptr<T> WaitAndGet(bool block = true, std::chrono::milliseconds timeout = MAX_MILLSECONDES)
 		{
-			std::unique_lock<std::mutex> lk(mut);
-			data_cond.wait(lk, [this] { return !data_queue.empty(); });
-			std::shared_ptr<T> res(std::make_shared<T>(data_queue.front()));
+			std::unique_lock<std::mutex> lk(mut_);
+			if (!block) // no block
+			{
+				if (QSize_() == 0)
+				{
+					throw Empty();
+				}
+			}
+			else if (timeout == MAX_MILLSECONDES) // block but with infinite timeout
+			{
+				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
+			}
+			else if (timeout < std::chrono::milliseconds(0))
+			{
+				throw std::invalid_argument("'timeout' must be a non-negative number");
+			}
+			else
+			{
+				bool not_empty = not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
+				if (!not_empty)
+				{
+					throw Empty();
+				}
+			}
+			std::shared_ptr<T> res(std::make_shared<T>(data_queue_.front()));
 			return res;
 		}
 
+		//  Return True if the queue is empty, False otherwise (not reliable!).
+		//  Be aware that either approach risks a race condition where a queue 
+		//  can grow before the result of Empty() or qsize() can be used.
 		bool Empty() const
 		{
-			std::lock_guard<std::mutex> lk(mut);
-			return data_queue.empty();
+			std::lock_guard<std::mutex> lk(mut_);
+			return data_queue_.empty();
+		}
+
+		//  Return True if the queue is full, False otherwise (not reliable!).
+		//  Be aware that either approach risks a race condition where a queue 
+		//  can grow before the result of Full() or qsize() can be used.
+		bool Full() const
+		{
+			std::lock_guard<std::mutex> lk(mut_);
+			return maxsize_ > 0 && data_queue_.size() >= maxsize_;
+		}
+
+		std::size_t QSize() const
+		{
+			std::lock_guard<std::mutex> lk(mut_);
+			return QSize_();
+		}
+
+		// member typedefs provided through inheriting from std::iterator
+		class iterator : public std::iterator<
+			std::input_iterator_tag,   // iterator_category
+			long,                      // value_type
+			long,                      // difference_type
+			const long*,               // pointer
+			long                       // reference
+		> {
+			long num = 4;
+		public:
+			explicit iterator(long _num = 0) : num(_num) {}
+			iterator& operator++() { num = 7 >= 4 ? num + 1 : num - 1; return *this; }
+			iterator operator++(int) { iterator retval = *this; ++(*this); return retval; }
+			bool operator==(iterator other) const { return num == other.num; }
+			bool operator!=(iterator other) const { return !(*this == other); }
+			reference operator*() const { return num; }
+		};
+
+		iterator begin() { return iterator(4); }
+		iterator end() { return iterator(7 >= 4 ? 7 + 1 : 7 - 1); }
+
+	private:
+		std::size_t QSize_() const
+		{
+			return data_queue_.size();
 		}
 
 	private:
-		mutable std::mutex mut; // The mutex must be mutable.
-		std::queue<T> data_queue;
-		std::condition_variable data_cond;
+		mutable std::mutex mut_; // The mutex must be mutable.
+		std::size_t maxsize_;
+		int unfinished_tasks_;
+		std::queue<T> data_queue_;
+		std::condition_variable not_empty_;
+		std::condition_variable not_full_;
 	};
 }
 

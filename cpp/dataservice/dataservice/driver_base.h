@@ -66,7 +66,7 @@ namespace goiot
 
 	struct ConnectionInfo
 	{
-		ConnectionInfo() : port("COM1"), baud(9600), parity('N'), data_bit(8), stop_bit(1)
+		ConnectionInfo() : port("COM1"), baud(9600), parity('N'), data_bit(8), stop_bit(1), response_to_msec(500)
 		{
 		}
 		std::string port;
@@ -74,16 +74,25 @@ namespace goiot
 		char parity; // 'N', 'O', 'E'
 		int data_bit;
 		int stop_bit;
+		uint32_t response_to_msec; // in micro second
 	};
 
 	struct DataInfo
 	{
 		DataInfo() : id(""), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
-			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_value(0), char_value(""), 
+			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), int_value(0), float_value(0), char_value(""), 
 			timestamp(std::chrono::system_clock().now().time_since_epoch().count())
 		{
 
 		}
+
+		DataInfo(const std::string& new_id) : id(new_id), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
+			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), int_value(0), float_value(0), char_value(""),
+			timestamp(std::chrono::system_clock().now().time_since_epoch().count())
+		{
+
+		}
+
 		std::string id;
 		std::string name;
 		int address;
@@ -93,6 +102,7 @@ namespace goiot
 		DataType data_type;
 		DataZone data_zone;
 		double float_value;
+		int int_value;
 		std::string char_value;
 		double timestamp; // in microsecond -> std::chrono::system_clock::now().time_since_epoch().count();
 	};

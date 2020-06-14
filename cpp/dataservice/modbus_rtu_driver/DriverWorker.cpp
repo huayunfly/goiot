@@ -10,6 +10,7 @@
 
 #include "pch.h"
 #include <mutex>
+#include <iostream>
 #include "DriverWorker.h"
 
 namespace goiot
@@ -18,7 +19,7 @@ namespace goiot
 	{
 		connection_manager_.reset(modbus_new_rtu(connection_details_.port.c_str(),
 			connection_details_.baud, connection_details_.parity, connection_details_.data_bit, connection_details_.stop_bit),
-			[](modbus_t* p) { modbus_free(p); }
+			[](modbus_t* p) { modbus_close(p);  modbus_free(p); std::cout << "free modbus ptr."; }
 		);
 		modbus_set_debug(connection_manager_.get(), TRUE);
 
@@ -35,7 +36,9 @@ namespace goiot
 		uint32_t old_response_to_sec;
 		uint32_t old_response_to_usec;
 		modbus_get_response_timeout(connection_manager_.get(), &old_response_to_sec, &old_response_to_usec);
-		modbus_set_response_timeout(connection_manager_.get(), 0, 600000);
+		int response_to_sec = connection_details_.response_to_msec / 1000;
+		int response_to_micro_sec = connection_details_.response_to_msec % 1000;
+		modbus_set_response_timeout(connection_manager_.get(), response_to_sec, response_to_micro_sec * 1000);
 		if (modbus_connect(connection_manager_.get()) == -1) {
 			std::clog << "Connection failed: " << modbus_strerror(errno) << std::endl;
 			return ENOTCONN;
@@ -46,20 +49,48 @@ namespace goiot
 		
 		const int SERVER_ID = 1;
 		modbus_set_slave(connection_manager_.get(), SERVER_ID);
-
-
-
-
 	}
 
 	void DriverWorker::CloseConnection()
 	{
+		connection_manager_ = nullptr;
+	}
+
+	void DriverWorker::Start()
+	{
+		std::call_once(connection_init_flag_, &DriverWorker::OpenConnection, this);
+		refresh_ = true;
+		threads_.emplace_back(&DriverWorker::Refresh, this);
+		threads_.emplace_back(&DriverWorker::Request_Dispatch, this);
+		threads_.emplace_back(&DriverWorker::Response_Dispatch, this);
+	}
+
+	void DriverWorker::Stop()
+	{
+		refresh_ = false;
+		in_queue_.Close();
+		out_queue_.Close();
+		for (auto& entry : threads_)
+		{
+			entry.join();
+		}
+	}
+
+	void DriverWorker::Refresh()
+	{
+		while (refresh_)
+		{
+			std::this_thread::sleep_for(std::chrono::microseconds(10));
+		}
+	}
+
+	void DriverWorker::Request_Dispatch()
+	{
 
 	}
 
-	void DriverWorker::DoWork()
+	void DriverWorker::Response_Dispatch()
 	{
-		std::call_once(connection_init_flag_, &DriverWorker::OpenConnection, this);
 
 	}
 }
