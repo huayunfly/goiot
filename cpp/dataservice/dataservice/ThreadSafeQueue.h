@@ -54,7 +54,7 @@ namespace goiot
  		ThreadSafeQueue& operator=(const ThreadSafeQueue&) = delete;
 
 		// Put an item into the queue.
-		void Put(T new_value, bool block = true, std::chrono::microseconds timeout = MAX_MILLSECONDES)
+		void Put(T new_value, bool block = true, std::chrono::microseconds timeout = std::chrono::microseconds(MAX_MILLSECONDES))
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (maxsize_ > 0)
@@ -66,7 +66,7 @@ namespace goiot
 						throw Full();
 					}
 				}
-				else if (timeout == MAX_MILLSECONDES) // block with infinite timeout
+				else if (timeout >= std::chrono::microseconds(MAX_MILLSECONDES)) // block with infinite timeout
 				{
 					not_full_.wait(lk, [this] { return QSize_() < maxsize_; });
 				}
@@ -76,7 +76,7 @@ namespace goiot
 				}
 				else
 				{
-					bool not_full = not_full_.wait_for(lk, [this] { return QSize_() < maxsize_; }, timeout); // the return value of the predict when woken
+					bool not_full = not_full_.wait_for(lk, timeout, [this] { return QSize_() < maxsize_; }); // the return value of the predict when woken
 					if (!not_full)
 					{
 						throw Full();
@@ -90,8 +90,8 @@ namespace goiot
 
 		void Close()
 		{
-			T value("SENTINEL");
-			//Put(value);
+			T value(nullptr);
+			Put(value);
 		}
 
 		// Put an item into the queue without blocking.
@@ -103,13 +103,13 @@ namespace goiot
 		// Get an item into the queue without blocking.
 		bool GetNoWait(T& value)
 		{
-			return WaitAndGet(value, false);
+			return Get(value, false);
 		}
 
 		// Get an item into the queue without blocking.
 		std::shared_ptr<T> GetNoWait()
 		{
-			return WaitAndGet(false);
+			return Get(false);
 		}
 
 		bool TryGet(T& value)
@@ -137,7 +137,7 @@ namespace goiot
 		}
 
 		// Remove and return an item from the queue.
-		void WaitAndGet(T& value, bool block = true, std::chrono::milliseconds timeout = MAX_MILLSECONDES)
+		void Get(T& value, bool block = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(MAX_MILLSECONDES))
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (!block) // no block
@@ -147,7 +147,7 @@ namespace goiot
 					throw Empty();
 				}
 			}
-			else if (timeout == MAX_MILLSECONDES) // block but with infinite timeout
+			else if (timeout >= std::chrono::milliseconds(MAX_MILLSECONDES)) // block but with infinite timeout
 			{
 				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
 			}
@@ -157,7 +157,7 @@ namespace goiot
 			}
 			else
 			{
-				bool not_empty = not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
+				bool not_empty = not_empty_.wait_for(lk, timeout, [this] { return !data_queue_.empty(); });
 				if (!not_empty)
 				{
 					throw Empty();
@@ -169,7 +169,7 @@ namespace goiot
 		}
 
 		// Remove and return an item from the queue.
-		std::shared_ptr<T> WaitAndGet(bool block = true, std::chrono::milliseconds timeout = MAX_MILLSECONDES)
+		std::shared_ptr<T> Get(bool block = true, std::chrono::milliseconds timeout = MAX_MILLSECONDES)
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (!block) // no block
@@ -179,17 +179,17 @@ namespace goiot
 					throw Empty();
 				}
 			}
-			else if (timeout == MAX_MILLSECONDES) // block but with infinite timeout
+			else if (timeout >= MAX_MILLSECONDES) // block but with infinite timeout
 			{
 				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
 			}
-			else if (timeout < std::chrono::milliseconds(0))
+			else if (timeout < std::chrono::microseconds(0))
 			{
 				throw std::invalid_argument("'timeout' must be a non-negative number");
 			}
 			else
 			{
-				bool not_empty = not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
+				bool not_empty = not_empty_.wait_for(lk, timeout, [this] { return !data_queue_.empty(); });
 				if (!not_empty)
 				{
 					throw Empty();

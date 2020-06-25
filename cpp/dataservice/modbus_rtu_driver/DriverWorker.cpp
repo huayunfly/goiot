@@ -80,17 +80,137 @@ namespace goiot
 	{
 		while (refresh_)
 		{
-			std::this_thread::sleep_for(std::chrono::microseconds(10));
+			try
+			{ 
+				std::vector<DataInfo> data_info_vec;
+				for (auto data_info : data_map_)
+				{
+					data_info_vec.emplace_back(data_info.second.id,
+						data_info.second.name, data_info.second.address, data_info.second.register_address,
+						data_info.second.read_write_priviledge, DataFlowType::REFRESH, data_info.second.data_type,
+						data_info.second.data_zone, data_info.second.int_value, data_info.second.float_value,
+						data_info.second.char_value, std::chrono::system_clock::now().time_since_epoch().count());
+				}
+				if (data_info_vec.size() > 0)
+				{
+					in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+				}
+			}
+			catch (const Full& e)
+			{
+				std::cerr << "In-queue is full" << std::endl;
+			}
+			catch (const std::exception& e) {
+				std::cerr << "EXCEPTION: " << e.what() << std::endl;
+			}
+			catch (...) {
+				std::cerr << "EXCEPTION (unknown)" << std::endl;
+			}
+			std::this_thread::sleep_for(std::chrono::microseconds(1000));
 		}
 	}
 
 	void DriverWorker::Request_Dispatch()
 	{
-
+		while (true)
+		{
+			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+			in_queue_.Get(data_info_vec);
+			if (data_info_vec == nullptr)
+			{
+				break; // Exit
+			}
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				switch (data_info_vec->at(i).data_flow_type)
+				{
+				case DataFlowType::REFRESH:
+					ReadData(data_info_vec->at(i));
+					break;
+				default:
+					break;
+				}
+			}
+		}
 	}
 
 	void DriverWorker::Response_Dispatch()
 	{
 
+	}
+
+	// Read modbus device data
+	// 读取线圈（01h）
+	// 读取寄存器（03h）
+	// 写入线圈（05h）
+	// 写入寄存器（06h）
+	// 通信判断（08h）
+	// 复数线圈的写入（0Fh）
+	// 复数寄存器的写入（10h）
+	std::shared_ptr<DataInfo> DriverWorker::ReadData(const DataInfo& data_info)
+	{
+		int rc;
+		modbus_set_slave(connection_manager_.get(), data_info.address);
+		int num_registers = GetNumberOfRegister(data_info.data_type);
+		std::shared_ptr<uint16_t> rp_registers;
+		std::shared_ptr<DataInfo> rd(std::make_shared<DataInfo>(data_info));
+		switch (data_info.data_zone)
+		{
+		case DataZone::OUTPUT_RELAY:
+			break;
+		case DataZone::INPUT_RELAY:
+			break;
+		case DataZone::OUTPUT_REGISTER:
+			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+			memset(rp_registers.get(), 0, num_registers * sizeof(uint16_t));
+			rc = modbus_read_registers(connection_manager_.get(), data_info.register_address,
+				num_registers, rp_registers.get());
+			if (rc != num_registers)
+			{
+				std::cerr << "Read registers " << std::hex << data_info.register_address << " failed.";
+			}
+			AssignRegisterValue(rd, rp_registers);
+			break;
+		case DataZone::INPUT_REGISTER:
+			break;
+		default:
+			throw std::invalid_argument("Unsupported data zone.");
+		}
+		return rd;
+	}
+
+	int DriverWorker::GetNumberOfRegister(DataType datatype)
+	{
+		switch (datatype)
+		{
+		case DataType::DB:
+			return 2;
+		case DataType::DF:
+			return 2;
+		case DataType::DUB:
+			return 2;
+		default:
+			return 1;
+		}
+	}
+
+	void DriverWorker::AssignRegisterValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint16_t> registers)
+	{
+		switch (data_info->data_type)
+		{
+		case DataType::DB:
+		case DataType::DUB:
+			data_info->int_value = registers.get()[0] + registers.get()[1] << 16;
+			break;
+		case DataType::DF:
+			data_info->float_value = modbus_get_float_abcd(registers.get());
+			break;
+		case DataType::WB:
+		case DataType::WUB:
+			data_info->int_value = registers.get()[0];
+			break;
+		default:
+			throw std::invalid_argument("Unsupported data type.");
+		}
 	}
 }

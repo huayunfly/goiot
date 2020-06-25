@@ -29,22 +29,48 @@ namespace goiot
 		DriverWorker& operator=(const DriverWorker&) = delete;
 		int OpenConnection();
 		void CloseConnection();
+		// Spawns working threads.
 		void Start();
+		// Stops and waits the working threads completed.
 		void Stop();
+		// Refreshs the data reading or writing requests into in_queue.
 		void Refresh();
+		// Dispatch worker deals with the in_queue request, which may read/write message to hardware.
+		// The return data are put into the out_queue.
 		void Request_Dispatch();
+		// Dispatch worker deals with the out_queue request, which may trasnfer data to the DataService.
 		void Response_Dispatch();
+		// Puts asynchronous read request to the in_queue.
 		void AsyncRead(const std::vector<std::string> var_names, 
 			const std::vector<std::string> var_ids, int trans_id);
+		// Puts asynchronous write request to the out_queue.
 		void AsyncWrite(const std::vector<DataInfo>& data_info, int trans_id);
+
+	private:
+		std::shared_ptr<DataInfo> ReadData(const DataInfo& data_info);
+		std::shared_ptr<DataInfo> WriteData(const DataInfo& data_info);
+
+		/// <summary>
+		/// Gets the number of registers, such as DWORD, float etc.
+		/// </summary>
+		/// <param name="datatype">DataType</param>
+		/// <returns>The number</returns>
+		int GetNumberOfRegister(DataType datatype);
+
+		/// <summary>
+		/// Assigns the modbus register value to the data value according to the date type.
+		/// </summary>
+		/// <param name="data_info">DataInfo object</param>
+		/// <param name="registers">Modbus registers</param>
+		void AssignRegisterValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint16_t> registers);
 
 	private:
 		std::once_flag connection_init_flag_;
 		ConnectionInfo connection_details_;
 		std::map<std::string, DataInfo> data_map_;
 		std::shared_ptr<modbus_t> connection_manager_;
-		ThreadSafeQueue<DataInfo> in_queue_;
-		ThreadSafeQueue<DataInfo> out_queue_;
+		ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>> in_queue_;
+		ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>> out_queue_;
 		std::vector<std::thread> threads_;
 		bool refresh_;
 	};
