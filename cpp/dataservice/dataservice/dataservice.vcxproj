@@ -120,13 +120,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)/jsoncpp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)/hiredis/v0_13_3/include/;$(YASHEN3RDLIB_HOME)/jsoncpp/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)/jsoncpp/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jsoncppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)/hiredis/v0_13_3/lib/;$(YASHEN3RDLIB_HOME)/jsoncpp/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jsoncppD.lib;hiredis_vc142_v_0_13_3_D.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /e /r /y $(ProjectDir)drivers.json $(OutDir)</Command>
@@ -160,15 +160,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)/jsoncpp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)/hiredis/v0_13_3/include/;$(YASHEN3RDLIB_HOME)/jsoncpp/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)/jsoncpp/lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)/hiredis/v0_13_3/lib/;$(YASHEN3RDLIB_HOME)/jsoncpp/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jsoncpp.lib;hiredis_vc142_v_0_13_3.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /e /r /y $(ProjectDir)drivers.json $(OutDir)</Command>

@@ -171,6 +171,23 @@ namespace goiot {
 
 	void DriverMgrService::Start()
 	{
+		// For redis
+		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
+		redis_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout), 
+			[](redisContext* p) { redisFree(p); });
+		if (redis_ != nullptr && redis_->err) 
+		{
+			std::cerr << "Redis connection error: " << redis_->errstr << std::endl;
+			// handle error
+		}
+		else if (redis_ == nullptr)
+		{
+			std::cerr << "Redis connection error: can't allocate redis context" << std::endl;
+		}
+		else
+		{
+			std::cout << "Redis connection OK." << std::endl;
+		}
 		threads_.emplace_back(std::thread(&DriverMgrService::Response_Dispatch, this));
 	}
 
@@ -181,6 +198,7 @@ namespace goiot {
 		{
 			entry.join();
 		}
+		redis_.reset();
 	}
 
 	void DriverMgrService::Response_Dispatch()

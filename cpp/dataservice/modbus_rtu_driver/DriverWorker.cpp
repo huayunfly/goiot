@@ -53,7 +53,7 @@ namespace goiot
 
 	void DriverWorker::CloseConnection()
 	{
-		connection_manager_ = nullptr;
+		connection_manager_.reset();
 	}
 
 	void DriverWorker::Start()

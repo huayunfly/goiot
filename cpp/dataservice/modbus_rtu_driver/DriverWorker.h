@@ -13,7 +13,6 @@
 #include "modbus.h"
 #include "../dataservice/driver_base.h"
 #include "../dataservice/ThreadSafeQueue.h"
-#include "../dataservice/driver_service.h"
 
 namespace goiot
 {

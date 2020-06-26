@@ -37,7 +37,6 @@ namespace goiot
 
 	private:
 		std::unique_ptr<DriverWorker> driver_worker_;
-		std::shared_ptr<DriverMgrService> driver_manager_;
 	};
 }
 

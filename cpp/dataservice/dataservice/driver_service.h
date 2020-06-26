@@ -12,6 +12,7 @@
 #include <memory>
 #include "driver_base.h"
 #include "ThreadSafeQueue.h"
+#include "hiredis.h"
 
 namespace goiot {
 	class DriverMgrService
@@ -76,6 +77,7 @@ namespace goiot {
 		std::vector<std::unique_ptr<DriverBase>> drivers_;
 		std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
 		std::vector<std::thread> threads_;
+		std::shared_ptr<redisContext> redis_;
 	};
 }
 
