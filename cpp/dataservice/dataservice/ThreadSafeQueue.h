@@ -54,7 +54,7 @@ namespace goiot
  		ThreadSafeQueue& operator=(const ThreadSafeQueue&) = delete;
 
 		// Put an item into the queue.
-		void Put(T new_value, bool block = true, std::chrono::microseconds timeout = std::chrono::microseconds(MAX_MILLSECONDES))
+		void Put(T new_value, bool block = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(MAX_MILLSECONDES))
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (maxsize_ > 0)
@@ -66,11 +66,11 @@ namespace goiot
 						throw Full();
 					}
 				}
-				else if (timeout >= std::chrono::microseconds(MAX_MILLSECONDES)) // block with infinite timeout
+				else if (timeout >= std::chrono::milliseconds(MAX_MILLSECONDES)) // block with infinite timeout
 				{
 					not_full_.wait(lk, [this] { return QSize_() < maxsize_; });
 				}
-				else if (timeout < std::chrono::microseconds(0))
+				else if (timeout < std::chrono::milliseconds(0))
 				{
 					throw std::invalid_argument("'timeout' must be a non-negative number");
 				}
@@ -183,7 +183,7 @@ namespace goiot
 			{
 				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
 			}
-			else if (timeout < std::chrono::microseconds(0))
+			else if (timeout < std::chrono::milliseconds(0))
 			{
 				throw std::invalid_argument("'timeout' must be a non-negative number");
 			}

@@ -146,7 +146,7 @@ namespace goiot {
 				if (!std::get<0>(*description).compare(driver_name))
 				{
 					auto obj = objFunc();
-					obj->InitDriver(std::get<2>(*description));
+					obj->InitDriver(std::get<2>(*description), response_queue_);
 					driver_objs.push_back(std::move(obj));
 					std::clog << driver_name << "|" << std::get<1>(*description) << " loaded!\n";
 				}
@@ -159,5 +159,41 @@ namespace goiot {
 		// Close the file when we are done
 		FindClose(fileHandle);
 		return driver_objs;
+	}
+
+	void DriverMgrService::PutResponseData(std::shared_ptr<std::vector<DataInfo>> data_info_vec)
+	{
+		if (data_info_vec == nullptr)
+		{
+			throw std::invalid_argument("Parameter data_info_vec is null.");
+		}
+	}
+
+	void DriverMgrService::Start()
+	{
+		threads_.emplace_back(std::thread(&DriverMgrService::Response_Dispatch, this));
+	}
+
+	void DriverMgrService::Stop()
+	{
+		response_queue_->Close();
+		for (auto& entry : threads_)
+		{
+			entry.join();
+		}
+	}
+
+	void DriverMgrService::Response_Dispatch()
+	{
+		while (true)
+		{
+			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+			response_queue_->Get(data_info_vec);
+			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+			{
+				break; // Exit
+			}
+			std::cout << "Response from devices..." << std::endl;
+		}
 	}
 }

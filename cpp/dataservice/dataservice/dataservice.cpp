@@ -119,7 +119,7 @@ int TestObjs(const std::wstring& module_path)
         {
             std::string description;
             std::cout << x->GetDescription(description) << std::endl;
-            x->InitDriver(R"({"addr":"1"})");
+            x->InitDriver(R"({"addr":"1"})", nullptr/* DriverMgrService only */);
             x->UnitDriver();
         }
     }
@@ -143,12 +143,14 @@ int main()
     std::unique_ptr<goiot::DriverMgrService> driver_manager(new goiot::DriverMgrService(module_path));
     driver_manager->LoadJsonConfig();
     driver_manager->GetPlugins();
+    driver_manager->Start();
     std::cout << "driver manager is running...";
     char c;
     while (std::cin >> c)
     {
         if (c == 'q')
         {
+            driver_manager->Stop();
             return 0;
         }
     }

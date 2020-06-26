@@ -11,12 +11,16 @@
 #include <vector>
 #include <memory>
 #include "driver_base.h"
+#include "ThreadSafeQueue.h"
 
 namespace goiot {
 	class DriverMgrService
 	{
 	public:
-		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), drivers_(), driver_descriptions_()
+		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), 
+			drivers_(), driver_descriptions_(), 
+			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(1000)),
+			threads_()
 		{
 
 		}
@@ -37,6 +41,26 @@ namespace goiot {
 		// Get driver plugins according to the json config.
 		// @return <error_code>
 		int GetPlugins();
+		/// <summary>
+		/// Start collecting data from devices and dispatching data.
+		/// </summary>
+		void Start();
+		/// <summary>
+		/// Stop dispatching data.
+		/// </summary>
+		void Stop();
+
+		/// <summary>
+		/// Put data in a response queue.
+		/// </summary>
+		/// <param name="data_info_vec">A DataInfo vector</param>
+		void PutResponseData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
+
+	private:
+		/// <summary>
+		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the DataService.
+		/// </summary>
+		void Response_Dispatch();
 
 	private:
 		// Get the plugins internally
@@ -50,6 +74,8 @@ namespace goiot {
 		std::wstring module_path_; // Not include the suffix "/"
 		std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>> driver_descriptions_;
 		std::vector<std::unique_ptr<DriverBase>> drivers_;
+		std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
+		std::vector<std::thread> threads_;
 	};
 }
 

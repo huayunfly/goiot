@@ -4,8 +4,13 @@
 namespace goiot
 {
     // Interface methods
-    RESULT_DSAPI ModbusRtuDriver::InitDriver(const std::string& config)
+    RESULT_DSAPI ModbusRtuDriver::InitDriver(const std::string& config, 
+        std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue)
     {
+        if (response_queue == nullptr)
+        {
+            throw std::invalid_argument("Parameter response_queue is null.");
+        }
         ConnectionInfo connection_details;
         std::map<std::string, DataInfo> data_map;
         int parse_code = ParseConfig(config, connection_details, data_map);
@@ -13,21 +18,24 @@ namespace goiot
         {
             std::clog << "ModbusRtuDriver::InitDriver() parse config failed." << std::endl;
         }
-        driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map)));
+        driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map), response_queue));
         int return_code = driver_worker_->OpenConnection();
         std::cout << "ModbusRtuDriver::InitDriver() returns " << return_code << std::endl;
+        driver_worker_->Start();
         return 0;
     }
 
     RESULT_DSAPI ModbusRtuDriver::UnitDriver()
     {
+        driver_worker_->Stop();
+        driver_worker_ = nullptr;
         std::cout << "ModbusRtuDriver::UnitDriver() done." << std::endl;
         return 0;
     }
 
     // Private methods
     int ModbusRtuDriver::ParseConfig(const std::string& config,
-        ConnectionInfo connection_info, std::map<std::string, DataInfo> data_map)
+        ConnectionInfo& connection_info, std::map<std::string, DataInfo>& data_map)
     {
         // Json parse
         const auto rawjson_length = static_cast<int>(config.length());

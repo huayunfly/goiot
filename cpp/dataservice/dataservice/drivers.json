@@ -16,7 +16,7 @@
       "id": "driver1",
       "name": "modbus1",
       "type": "modbus_rtu",
-      "port": "COM1,19200,N,8,1",
+      "port": "COM2,19200,N,8,1",
       "response_to_msec": 500,
       "nodes": [
         {
@@ -43,7 +43,7 @@
       "id": "driver2",
       "name": "modbus2",
       "type": "modbus_rtu",
-      "port": "COM2,19200,N,8,1",
+      "port": "COM3,19200,N,8,1",
       "response_to_msec": 500,
       "nodes": [
         {

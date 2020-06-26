@@ -1,8 +1,7 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "pch.h"
-#include "../dataservice/driver_base.h"
-
 #include <iostream>
+#include "../dataservice/driver_base.h"
 
 namespace goiot
 {
@@ -14,7 +13,8 @@ namespace goiot
             return 0;
         }
 
-        RESULT_DSAPI InitDriver(const std::string& config)
+        RESULT_DSAPI InitDriver(const std::string& config, 
+            std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue)
         {
             std::cout << "DemoDriver::InitDriver() " + config << std::endl;
             return 0;

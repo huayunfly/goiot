@@ -12,6 +12,7 @@
 #include <sstream>
 #include <chrono>
 #include <system_error>
+#include "ThreadSafeQueue.h"
 
 // Test to see if we are building a DLL.
 // If we are, specify that we are exporting
@@ -117,7 +118,7 @@ namespace goiot
 		int int_value;
 		std::string char_value;
 		double timestamp; // in microsecond -> std::chrono::system_clock::now().time_since_epoch().count();
-		int result;
+		int result; // Complies with std::error_code
 	};
 
     // This is the base class for the class retrieved from the DLL.
@@ -127,7 +128,7 @@ namespace goiot
 
         virtual RESULT_DSAPI GetDescription(std::string& description) = 0;
 
-        virtual RESULT_DSAPI InitDriver(const std::string& config) = 0;
+        virtual RESULT_DSAPI InitDriver(const std::string& config, std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue) = 0;
 
         virtual RESULT_DSAPI UnitDriver() = 0;
     };

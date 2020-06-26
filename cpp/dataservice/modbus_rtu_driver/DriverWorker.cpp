@@ -21,7 +21,7 @@ namespace goiot
 			connection_details_.baud, connection_details_.parity, connection_details_.data_bit, connection_details_.stop_bit),
 			[](modbus_t* p) { modbus_close(p);  modbus_free(p); std::cout << "free modbus ptr."; }
 		);
-		modbus_set_debug(connection_manager_.get(), TRUE);
+		modbus_set_debug(connection_manager_.get(), FALSE);
 
 		// For test
 		//const uint16_t UT_BITS_NB = 0x25;
@@ -106,7 +106,7 @@ namespace goiot
 			catch (...) {
 				std::cerr << "EXCEPTION (unknown)" << std::endl;
 			}
-			std::this_thread::sleep_for(std::chrono::microseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 	}
 
@@ -116,27 +116,45 @@ namespace goiot
 		{
 			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
 			in_queue_.Get(data_info_vec);
-			if (data_info_vec == nullptr)
+			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
 			{
 				break; // Exit
 			}
+			auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
 			for (std::size_t i = 0; i < data_info_vec->size(); i++)
 			{
+				std::shared_ptr<DataInfo> data_info;
 				switch (data_info_vec->at(i).data_flow_type)
 				{
 				case DataFlowType::REFRESH:
-					ReadData(data_info_vec->at(i));
+					data_info = ReadData(data_info_vec->at(i));
+					// Copy data, may be improved.
+					rp_data_info_vec->emplace_back(data_info->id,
+						data_info->name, data_info->address, data_info->register_address,
+						data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
+						data_info->data_zone, data_info->int_value, data_info->float_value,
+						data_info->char_value, std::chrono::system_clock::now().time_since_epoch().count());
 					break;
 				default:
 					break;
 				}
 			}
+			out_queue_.Put(rp_data_info_vec);
 		}
 	}
 
 	void DriverWorker::Response_Dispatch()
 	{
-
+		while (true)
+		{
+			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+			out_queue_.Get(data_info_vec);
+			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+			{
+				break; // Exit
+			}
+			driver_manager_reponse_queue_->PutNoWait(data_info_vec);
+		}
 	}
 
 	// Read modbus device data
@@ -154,6 +172,8 @@ namespace goiot
 		int num_registers = GetNumberOfRegister(data_info.data_type);
 		std::shared_ptr<uint16_t> rp_registers;
 		std::shared_ptr<DataInfo> rd(std::make_shared<DataInfo>(data_info));
+		rd->data_flow_type = DataFlowType::READ_RETURN; // Init to read_return
+		rd->result = ENODATA; // Init to no_message_available
 		switch (data_info.data_zone)
 		{
 		case DataZone::OUTPUT_RELAY:
@@ -167,11 +187,22 @@ namespace goiot
 				num_registers, rp_registers.get());
 			if (rc != num_registers)
 			{
-				std::cerr << "Read registers " << std::hex << data_info.register_address << " failed.";
+				std::cerr << "Read output registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 			}
 			AssignRegisterValue(rd, rp_registers);
+			rd->result = 0;
 			break;
 		case DataZone::INPUT_REGISTER:
+			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+			memset(rp_registers.get(), 0, num_registers * sizeof(uint16_t));
+			rc = modbus_read_input_registers(connection_manager_.get(), data_info.register_address,
+				num_registers, rp_registers.get());
+			if (rc != num_registers)
+			{
+				std::cerr << "Read input registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+			}
+			AssignRegisterValue(rd, rp_registers);
+			rd->result = 0;
 			break;
 		default:
 			throw std::invalid_argument("Unsupported data zone.");

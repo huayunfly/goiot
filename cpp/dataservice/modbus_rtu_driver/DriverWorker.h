@@ -13,17 +13,19 @@
 #include "modbus.h"
 #include "../dataservice/driver_base.h"
 #include "../dataservice/ThreadSafeQueue.h"
+#include "../dataservice/driver_service.h"
 
 namespace goiot
 {
 	class DriverWorker
 	{
 	public:
-		DriverWorker(const ConnectionInfo& connection_details, std::map<std::string, DataInfo>&& data_map) :
-			connection_details_(connection_details), data_map_(data_map), connection_manager_(), 
-			in_queue_(10), out_queue_(10), refresh_(false)
+		DriverWorker(const ConnectionInfo& connection_details, std::map<std::string, DataInfo>&& data_map,
+			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> reponse_queue) :
+			connection_details_(connection_details), driver_manager_reponse_queue_(reponse_queue), data_map_(data_map),
+			connection_manager_(), in_queue_(10), out_queue_(10), refresh_(false)
 		{
-
+			
 		}
 		DriverWorker(const DriverWorker&) = delete;
 		DriverWorker& operator=(const DriverWorker&) = delete;
@@ -69,6 +71,7 @@ namespace goiot
 		ConnectionInfo connection_details_;
 		std::map<std::string, DataInfo> data_map_;
 		std::shared_ptr<modbus_t> connection_manager_;
+		std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> driver_manager_reponse_queue_;
 		ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>> in_queue_;
 		ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>> out_queue_;
 		std::vector<std::thread> threads_;
