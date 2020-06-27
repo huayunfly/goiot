@@ -177,15 +177,18 @@ namespace goiot {
 			[](redisContext* p) { redisFree(p); });
 		if (redis_ != nullptr && redis_->err) 
 		{
+			redis_ready_ = false;
 			std::cerr << "Redis connection error: " << redis_->errstr << std::endl;
 			// handle error
 		}
 		else if (redis_ == nullptr)
 		{
+			redis_ready_ = false;
 			std::cerr << "Redis connection error: can't allocate redis context" << std::endl;
 		}
 		else
 		{
+			redis_ready_ = true;
 			std::cout << "Redis connection OK." << std::endl;
 		}
 		threads_.emplace_back(std::thread(&DriverMgrService::Response_Dispatch, this));
@@ -203,6 +206,7 @@ namespace goiot {
 			entry.join();
 		}
 		redis_.reset();
+		redis_ready_ = false;
 	}
 
 	void DriverMgrService::Response_Dispatch()
@@ -215,7 +219,52 @@ namespace goiot {
 			{
 				break; // Exit
 			}
+#ifdef _DEBUG
 			std::cout << "Response from device " << data_info_vec->at(0).id << std::endl;
+#endif // _DEBUG
+			if (redis_ready_)
+			{
+				const std::string HSET_STRING_FORMAT = "HSET %s %s %s";
+				const std::string HSET_INTEGER_FORMAT = "HSET %s %s %d";
+				const std::string HSET_FLOAT_FORMAT = "HSET %s %s %f";
+				const std::string HKEY = "goiot";
+				for (auto& data_info : *data_info_vec)
+				{
+					if (data_info.data_type == DataType::STR)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_.get(), HSET_STRING_FORMAT.c_str(),
+								HKEY.c_str(), data_info.id.c_str(), data_info.char_value.c_str())
+							), [](redisReply* p) { freeReplyObject(p); });
+					}
+					else if (data_info.data_type == DataType::DF)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_.get(), HSET_FLOAT_FORMAT.c_str(),
+								HKEY.c_str(), data_info.id.c_str(), data_info.float_value)
+							), [](redisReply* p) { freeReplyObject(p); });
+					}
+					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
+						data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB ||
+						data_info.data_type == DataType::BT)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_.get(), HSET_INTEGER_FORMAT.c_str(),
+								HKEY.c_str(), data_info.id.c_str(), data_info.int_value)
+							), [](redisReply* p) { freeReplyObject(p); });
+#ifdef _DEBUG
+						if (reply->str)
+						{
+							std::cout << "HSET reply: " << reply->str << std::endl;
+						}
+#endif // _DEBUG
+					}
+					else
+					{
+						throw std::invalid_argument("Unsupported data type.");
+					}
+				}
+			}
 		}
 	}
 }

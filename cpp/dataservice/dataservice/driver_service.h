@@ -21,7 +21,7 @@ namespace goiot {
 		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), 
 			drivers_(), driver_descriptions_(), 
 			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(1000)),
-			threads_(), redis_()
+			threads_(), redis_(), redis_ready_(false)
 		{
 
 		}
@@ -79,6 +79,7 @@ namespace goiot {
 		std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
 		std::vector<std::thread> threads_;
 		std::shared_ptr<redisContext> redis_;
+		bool redis_ready_;
 	};
 }
 

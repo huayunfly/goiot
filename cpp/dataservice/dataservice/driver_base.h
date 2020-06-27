@@ -47,13 +47,16 @@ namespace goiot
 	};
 
 	// register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
+	// BT (bit), STR(string)
 	enum class DataType
 	{
 		DF = 0,
 		WUB,
 		WB,
 		DUB,
-		DB
+		DB,
+		BT,
+		STR
 	};
 
 	// modbus register zone
