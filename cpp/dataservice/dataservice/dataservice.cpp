@@ -129,6 +129,7 @@ int TestObjs(const std::wstring& module_path)
     {
         FreeLibrary(hInst);
     }
+    return 0;
 }
 
 int main()

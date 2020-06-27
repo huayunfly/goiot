@@ -2,7 +2,7 @@
  * driver_service.h: A driver manager service, dealing with load configuration,
  * load drivers, read/write/refresh data.
  *
- * @author Yun Hua
+ * @author: Yun Hua (huayunfly@126.com)
  * @version 0.1 2020.03.22
  */
 
@@ -21,7 +21,7 @@ namespace goiot {
 		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), 
 			drivers_(), driver_descriptions_(), 
 			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(1000)),
-			threads_()
+			threads_(), redis_()
 		{
 
 		}
@@ -44,6 +44,7 @@ namespace goiot {
 		int GetPlugins();
 		/// <summary>
 		/// Start collecting data from devices and dispatching data.
+		/// Start reading and writing redis.
 		/// </summary>
 		void Start();
 		/// <summary>

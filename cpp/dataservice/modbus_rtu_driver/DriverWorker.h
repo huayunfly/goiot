@@ -61,9 +61,17 @@ namespace goiot
 		/// <summary>
 		/// Assigns the modbus register value to the data value according to the date type.
 		/// </summary>
-		/// <param name="data_info">DataInfo object</param>
+		/// <param name="data_info">A DataInfo object</param>
 		/// <param name="registers">Modbus registers</param>
 		void AssignRegisterValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint16_t> registers);
+
+		/// <summary>
+		/// Assigns the modbus bit value to the data value.
+		/// </summary>
+		/// <param name="data_info">A DataInfo object</param>
+		/// <param name="bits">Modbus bits (1 bit in 1 unit8_t converted by libmodbus)</param>
+		void AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits);
+
 
 	private:
 		std::once_flag connection_init_flag_;

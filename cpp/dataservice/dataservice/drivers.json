@@ -3,7 +3,7 @@
 // data type: [1 zone] input(DISCRETE) coils ÊäÈë¼ÌµçÆ÷, [0 zone] output coils Êä³ö¼ÌµçÆ÷, [3 zone] input registers ÊäÈë¼Ä´æÆ÷ and [4 zone] output(holding) registers Êä³ö¼Ä´æÆ÷
 // wdec: word_decode, µ¥×Ö½âÂëË³Ğò, with value 0, 1
 // dwdec: dword_decode, Ë«×Ö½âÂëË³Ğò, with value 0, 1, 2, 3
-// fdec: float_decode, ¸¡µã½âÂëË³Ğò, with value 0, 1, 2, 3
+// fdec: float_decode, ¸¡µã½âÂëË³Ğò, with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
 // register: driver-specified, R (readonly, Ö»¶Á), W(writeonly, Ö»Ğ´), RW (readwrite, ¶ÁĞ´)
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)

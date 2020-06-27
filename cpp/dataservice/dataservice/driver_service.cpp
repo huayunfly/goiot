@@ -193,6 +193,10 @@ namespace goiot {
 
 	void DriverMgrService::Stop()
 	{
+		for (auto& driver : drivers_)
+		{
+			driver->UnitDriver();
+		}
 		response_queue_->Close();
 		for (auto& entry : threads_)
 		{
@@ -211,7 +215,7 @@ namespace goiot {
 			{
 				break; // Exit
 			}
-			std::cout << "Response from devices..." << std::endl;
+			std::cout << "Response from device " << data_info_vec->at(0).id << std::endl;
 		}
 	}
 }

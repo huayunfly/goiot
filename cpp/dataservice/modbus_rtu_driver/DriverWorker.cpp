@@ -1,4 +1,7 @@
 // DriverWorker implementation.
+// @author: Yun Hua (huayunfly@126.com)
+// @version: 0.1 2020.06.27
+// 
 // Modbus is working on master to multiple slaves mode.
 // Sending command (master -> slave)
 // 1byte slave address, 1 byte function code, 0~252 byte data, 2 byte CRC
@@ -6,7 +9,27 @@
 //
 // Write coil ON/OFF, ON: 1, OFF: 0
 //
-// MODBUS RTU explanation: https://blog.csdn.net/hejinjing_tom_com/article/details/49738209
+// 读取线圈（01h）
+// 仅返回由线圈起始地址中设置的地址开始的线圈数对应的线圈信息。
+// 关于数据字节数（N），用线圈数除以 8，没有余数时，直接返回商，有余数时，返回“商 + 1”。
+// 有余数时，在最后的数据中指定的线圈数的范围外为「0」。
+//
+// 读取寄存器（03h）
+//
+// 写入线圈（05h）
+// ON / OFF 指定地址的线圈。
+// ON ：変更数据 高位 FFh、低位 00h
+// OFF ：変更数据 高位 00h、低位 00h
+//
+// 写入寄存器（06h）
+// 通信判断（08h）
+//
+// 复数线圈的写入（0Fh）
+// 向起始地址中指定的线圈开始的指定数量的线圈中写入数据。
+// 关于数据字节数（N），用线圈数除以 8，没有余数时，直接设定为商，有余数时，设定为“商 + 1”。
+// 变更数据从开始地址中指定的线圈开始，分别用 1bit 数据（1 / 0）依次设定各线圈的 ON / OFF。
+//
+// 复数寄存器的写入（10h）
 
 #include "pch.h"
 #include <mutex>
@@ -40,15 +63,13 @@ namespace goiot
 		int response_to_micro_sec = connection_details_.response_to_msec % 1000;
 		modbus_set_response_timeout(connection_manager_.get(), response_to_sec, response_to_micro_sec * 1000);
 		if (modbus_connect(connection_manager_.get()) == -1) {
-			std::clog << "Connection failed: " << modbus_strerror(errno) << std::endl;
+			std::cout << "Connection failed: " << modbus_strerror(errno) << std::endl;
 			return ENOTCONN;
 		}
 		uint32_t new_response_to_sec;
 		uint32_t new_response_to_usec;
 		modbus_get_response_timeout(connection_manager_.get(), &new_response_to_sec, &new_response_to_usec);
-		
-		const int SERVER_ID = 1;
-		modbus_set_slave(connection_manager_.get(), SERVER_ID);
+		return 0;
 	}
 
 	void DriverWorker::CloseConnection()
@@ -88,15 +109,15 @@ namespace goiot
 					data_info_vec.emplace_back(data_info.second.id,
 						data_info.second.name, data_info.second.address, data_info.second.register_address,
 						data_info.second.read_write_priviledge, DataFlowType::REFRESH, data_info.second.data_type,
-						data_info.second.data_zone, data_info.second.int_value, data_info.second.float_value,
-						data_info.second.char_value, std::chrono::system_clock::now().time_since_epoch().count());
+						data_info.second.data_zone, data_info.second.float_decode, data_info.second.int_value, data_info.second.float_value,
+						data_info.second.char_value, std::chrono::system_clock().now().time_since_epoch().count());
 				}
 				if (data_info_vec.size() > 0)
 				{
 					in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
 				}
 			}
-			catch (const Full& e)
+			catch (const Full&)
 			{
 				std::cerr << "In-queue is full" << std::endl;
 			}
@@ -132,7 +153,7 @@ namespace goiot
 					rp_data_info_vec->emplace_back(data_info->id,
 						data_info->name, data_info->address, data_info->register_address,
 						data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
-						data_info->data_zone, data_info->int_value, data_info->float_value,
+						data_info->data_zone, data_info->float_decode, data_info->int_value, data_info->float_value,
 						data_info->char_value, std::chrono::system_clock::now().time_since_epoch().count());
 					break;
 				default:
@@ -158,36 +179,57 @@ namespace goiot
 	}
 
 	// Read modbus device data
-	// 读取线圈（01h）
-	// 读取寄存器（03h）
-	// 写入线圈（05h）
-	// 写入寄存器（06h）
-	// 通信判断（08h）
-	// 复数线圈的写入（0Fh）
-	// 复数寄存器的写入（10h）
 	std::shared_ptr<DataInfo> DriverWorker::ReadData(const DataInfo& data_info)
 	{
 		int rc;
 		modbus_set_slave(connection_manager_.get(), data_info.address);
 		int num_registers = GetNumberOfRegister(data_info.data_type);
+		int num_bits = 1;
 		std::shared_ptr<uint16_t> rp_registers;
+		std::shared_ptr<uint8_t> rp_bits;
 		std::shared_ptr<DataInfo> rd(std::make_shared<DataInfo>(data_info));
 		rd->data_flow_type = DataFlowType::READ_RETURN; // Init to read_return
 		rd->result = ENODATA; // Init to no_message_available
 		switch (data_info.data_zone)
 		{
 		case DataZone::OUTPUT_RELAY:
+			rp_bits.reset(new uint8_t[num_bits], std::default_delete<uint8_t[]>());
+			memset(rp_bits.get(), 0, num_bits * sizeof(uint8_t));
+			rc = modbus_read_bits(connection_manager_.get(), data_info.register_address,
+				num_bits, rp_bits.get());
+			if (rc != num_bits) 
+			{
+#ifdef _DEBUG
+				std::cerr << "Read output bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+#endif // DEBUG
+			}
+			AssignBitValue(rd, rp_bits);
+			rd->result = 0;
 			break;
 		case DataZone::INPUT_RELAY:
+			rp_bits.reset(new uint8_t[num_bits], std::default_delete<uint8_t[]>());
+			memset(rp_bits.get(), 0, num_bits * sizeof(uint8_t));
+			rc = modbus_read_input_bits(connection_manager_.get(), data_info.register_address,
+				num_bits, rp_bits.get());
+			if (rc != num_bits)
+			{
+#ifdef _DEBUG
+				std::cerr << "Read input bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+#endif // DEBUG
+			}
+			AssignBitValue(rd, rp_bits);
+			rd->result = 0;
 			break;
 		case DataZone::OUTPUT_REGISTER:
 			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
 			memset(rp_registers.get(), 0, num_registers * sizeof(uint16_t));
 			rc = modbus_read_registers(connection_manager_.get(), data_info.register_address,
 				num_registers, rp_registers.get());
-			if (rc != num_registers)
+			if (rc != num_registers) 
 			{
+#ifdef _DEBUG
 				std::cerr << "Read output registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+#endif // DEBUG
 			}
 			AssignRegisterValue(rd, rp_registers);
 			rd->result = 0;
@@ -199,13 +241,15 @@ namespace goiot
 				num_registers, rp_registers.get());
 			if (rc != num_registers)
 			{
+#ifdef _DEBUG
 				std::cerr << "Read input registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+#endif // DEBUG			
 			}
 			AssignRegisterValue(rd, rp_registers);
 			rd->result = 0;
 			break;
 		default:
-			throw std::invalid_argument("Unsupported data zone.");
+			throw std::invalid_argument("DriverWorker::ReadData() -> Unsupported data zone.");
 		}
 		return rd;
 	}
@@ -231,10 +275,26 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			data_info->int_value = registers.get()[0] + registers.get()[1] << 16;
+			data_info->int_value = registers.get()[0] + (registers.get()[1] << 16);
 			break;
 		case DataType::DF:
-			data_info->float_value = modbus_get_float_abcd(registers.get());
+			switch (data_info->float_decode)
+			{
+			case FloatDecode::ABCD:
+				data_info->float_value = modbus_get_float_abcd(registers.get());
+				break;
+			case FloatDecode::DCBA:
+				data_info->float_value = modbus_get_float_dcba(registers.get());
+				break;
+			case FloatDecode::BADC:
+				data_info->float_value = modbus_get_float_badc(registers.get());
+				break;
+			case FloatDecode::CDAB:
+				data_info->float_value = modbus_get_float_cdab(registers.get());
+				break;
+			default:
+				throw std::invalid_argument("Unsupported float decode.");
+			}
 			break;
 		case DataType::WB:
 		case DataType::WUB:
@@ -244,4 +304,10 @@ namespace goiot
 			throw std::invalid_argument("Unsupported data type.");
 		}
 	}
+
+	void DriverWorker::AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits)
+	{
+		data_info->int_value = bits.get()[0];
+	}
+
 }

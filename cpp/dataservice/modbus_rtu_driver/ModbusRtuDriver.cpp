@@ -1,3 +1,6 @@
+// @author: Yun Hua (huayunfly@126.com)
+// @version: 0.1 2020.06.27
+
 #include "pch.h"
 #include "ModbusRtuDriver.h"
 
@@ -16,7 +19,7 @@ namespace goiot
         int parse_code = ParseConfig(config, connection_details, data_map);
         if (parse_code != 0)
         {
-            std::clog << "ModbusRtuDriver::InitDriver() parse config failed." << std::endl;
+            std::cout << "ModbusRtuDriver::InitDriver() parse config failed." << std::endl;
         }
         driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map), response_queue));
         int return_code = driver_worker_->OpenConnection();
@@ -28,7 +31,7 @@ namespace goiot
     RESULT_DSAPI ModbusRtuDriver::UnitDriver()
     {
         driver_worker_->Stop();
-        driver_worker_ = nullptr;
+        driver_worker_.reset();
         std::cout << "ModbusRtuDriver::UnitDriver() done." << std::endl;
         return 0;
     }
@@ -81,7 +84,7 @@ namespace goiot
         if (count > 1)
         {
             assert(false);
-            std::clog << "ModbusRtuDriver::ParseConfig() connection information parsing failed." << std::endl;
+            std::cout << "ModbusRtuDriver::ParseConfig() connection information parsing failed." << std::endl;
             return EINVAL;
         }
         std::istringstream iss(port.substr(start_pos, split_pos - start_pos));
@@ -92,20 +95,45 @@ namespace goiot
         assert(root["nodes"].isArray());
         for (auto node : root["nodes"])
         {
+            // Address
+            std::istringstream iss_address(node["address"].asString());
+            // Float decode
+            std::istringstream iss_float_decode(node["fdec"].asString());
+            int float_decode_int = 0;
+            iss_float_decode >> float_decode_int;
+            FloatDecode float_decode;
+            switch (float_decode_int)
+            {
+            case 0:
+                float_decode = FloatDecode::ABCD;
+                break;
+            case 1:
+                float_decode = FloatDecode::DCBA;
+                break;
+            case 2:
+                float_decode = FloatDecode::BADC;
+                break;
+            case 3:
+                float_decode = FloatDecode::CDAB;
+                break;
+            default:
+                throw std::invalid_argument("Invalid float decode.");
+            }
+            // Nodes
             assert(node["data"].isArray());
             for (auto data_node : node["data"])
             {
                 DataInfo data_info;
                 data_info.id = root["id"].asString() + "." + node["address"].asString() + "." + data_node["id"].asString();
                 data_info.name = data_node["name"].asString();
-                std::istringstream iss_address(node["address"].asString());
                 iss_address >> data_info.address;
-                data_info.timestamp = std::chrono::system_clock::now().time_since_epoch().count();
+                data_info.float_decode = float_decode;
+                data_info.timestamp = static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count());
                 std::string channel = data_node["register"].asString();
                 assert(channel.length() > 6);
                 if (channel.length() <= 6)
                 {
-                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                    std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                     continue;
                 }
                 if (0 == channel.find("RW"))
@@ -127,7 +155,7 @@ namespace goiot
                 else
                 {
                     assert(false);
-                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                    std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                     continue;
                 }
                 std::istringstream iss_data_zone(channel.substr(start_pos, 1));
@@ -149,7 +177,7 @@ namespace goiot
                     break;
                 default:
                     assert(false);
-                    std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                    std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                     break;
                 }
                 start_pos++;
@@ -184,7 +212,7 @@ namespace goiot
                     else
                     {
                         assert(false);
-                        std::clog << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                        std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                         continue;
                     }
                 }
