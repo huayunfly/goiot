@@ -203,8 +203,11 @@ namespace goiot
 				std::cerr << "Read output bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG
 			}
-			AssignBitValue(rd, rp_bits);
-			rd->result = 0;
+			else
+			{
+				AssignBitValue(rd, rp_bits);
+				rd->result = 0;
+			}
 			break;
 		case DataZone::INPUT_RELAY:
 			rp_bits.reset(new uint8_t[num_bits], std::default_delete<uint8_t[]>());
@@ -217,8 +220,11 @@ namespace goiot
 				std::cerr << "Read input bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG
 			}
-			AssignBitValue(rd, rp_bits);
-			rd->result = 0;
+			else
+			{
+				AssignBitValue(rd, rp_bits);
+				rd->result = 0;
+			}
 			break;
 		case DataZone::OUTPUT_REGISTER:
 			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
@@ -231,8 +237,11 @@ namespace goiot
 				std::cerr << "Read output registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG
 			}
-			AssignRegisterValue(rd, rp_registers);
-			rd->result = 0;
+			else
+			{
+				AssignRegisterValue(rd, rp_registers);
+				rd->result = 0;
+			}
 			break;
 		case DataZone::INPUT_REGISTER:
 			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
@@ -245,8 +254,11 @@ namespace goiot
 				std::cerr << "Read input registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG			
 			}
-			AssignRegisterValue(rd, rp_registers);
-			rd->result = 0;
+			else
+			{
+				AssignRegisterValue(rd, rp_registers);
+				rd->result = 0;
+			}
 			break;
 		default:
 			throw std::invalid_argument("DriverWorker::ReadData() -> Unsupported data zone.");

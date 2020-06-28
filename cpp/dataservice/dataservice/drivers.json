@@ -40,27 +40,27 @@
       ]
     },
     {
-      "id": "driver2",
-      "name": "modbus2",
+      "id": "mfcpfc",
+      "name": "modbus3",
       "type": "modbus_rtu",
       "port": "COM3,19200,N,8,1",
       "response_to_msec": 500,
       "nodes": [
         {
-          "address": "1",
+          "address": "4",
           "wdec": "0",
           "dwdec": "0",
           "fdec": "0",
           "data": [
             {
-              "id": "C1",
-              "name": "µÁ—π1",
-              "register": "RW4WUB0001"
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032"
             },
             {
-              "id": "C2",
-              "name": "µÁ—π2",
-              "register": "W4DF0002"
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033"
             }
           ]
         }

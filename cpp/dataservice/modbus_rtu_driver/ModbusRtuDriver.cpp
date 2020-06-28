@@ -191,7 +191,7 @@ namespace goiot
                         start_pos += 2;
                     }
                     else if (data_type.find_first_of("WUB") == 0)
-                    {
+                    { 
                         data_info.data_type = DataType::WUB;
                         start_pos += 3;
                     }
