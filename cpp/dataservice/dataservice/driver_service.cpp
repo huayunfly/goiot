@@ -15,11 +15,17 @@
 #include "json/json.h"
 #include "driver_service.h"
 
-
-const std::wstring goiot::DriverMgrService::CONFIG_FILE = L"drivers.json";
-const std::wstring goiot::DriverMgrService::DRIVER_DIR = L"drivers";
-
 namespace goiot {
+
+	std::unordered_map<std::string, DataInfo> goiot::DriverMgrService::data_info_hash_;
+
+	const std::wstring goiot::DriverMgrService::CONFIG_FILE = L"drivers.json";
+	const std::wstring goiot::DriverMgrService::DRIVER_DIR = L"drivers";
+	const std::string goiot::DriverMgrService::HSET_STRING_FORMAT = "HSET %s %s %s";
+	const std::string goiot::DriverMgrService::HSET_INTEGER_FORMAT = "HSET %s %s %d";
+	const std::string goiot::DriverMgrService::HSET_FLOAT_FORMAT = "HSET %s %s %f";
+	const std::string goiot::DriverMgrService::HKEY_REFRESH = "goiot_r";
+	const std::string goiot::DriverMgrService::HKEY_POLL = "goiot_p";
 
 	int DriverMgrService::LoadJsonConfig()
 	{
@@ -146,7 +152,7 @@ namespace goiot {
 				if (!std::get<0>(*description).compare(driver_name))
 				{
 					auto obj = objFunc();
-					obj->InitDriver(std::get<2>(*description), response_queue_);
+					obj->InitDriver(std::get<2>(*description), response_queue_, &DriverMgrService::SetDataInfo);
 					driver_objs.push_back(std::move(obj));
 					std::clog << driver_name << "|" << std::get<1>(*description) << " loaded!\n";
 				}
@@ -173,25 +179,47 @@ namespace goiot {
 	{
 		// For redis
 		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
-		redis_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout), 
+		redis_push_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout), 
 			[](redisContext* p) { redisFree(p); });
-		if (redis_ != nullptr && redis_->err) 
+		if (redis_push_ != nullptr && redis_push_->err) 
 		{
-			redis_ready_ = false;
-			std::cerr << "Redis connection error: " << redis_->errstr << std::endl;
+			redis_push_ready_ = false;
+			std::cerr << "Redis refresh connection error: " << redis_push_->errstr << std::endl;
 			// handle error
 		}
-		else if (redis_ == nullptr)
+		else if (redis_push_ == nullptr)
 		{
-			redis_ready_ = false;
-			std::cerr << "Redis connection error: can't allocate redis context" << std::endl;
+			redis_push_ready_ = false;
+			std::cerr << "Redis refresh connection error: can't allocate redis context" << std::endl;
 		}
 		else
 		{
-			redis_ready_ = true;
-			std::cout << "Redis connection OK." << std::endl;
+			redis_push_ready_ = true;
+			std::cout << "Redis refresh connection OK." << std::endl;
 		}
-		threads_.emplace_back(std::thread(&DriverMgrService::Response_Dispatch, this));
+		// Poll
+		redis_poll_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
+			[](redisContext* p) { redisFree(p); });
+		if (redis_poll_ != nullptr && redis_poll_->err)
+		{
+			redis_poll_ready_ = false;
+			std::cerr << "Redis poll connection error: " << redis_push_->errstr << std::endl;
+			// handle error
+		}
+		else if (redis_poll_ == nullptr)
+		{
+			redis_poll_ready_ = false;
+			std::cerr << "Redis poll connection error: can't allocate redis context" << std::endl;
+		}
+		else
+		{
+			redis_poll_ready_ = true;
+			std::cout << "Redis poll connection OK." << std::endl;
+		}
+		threads_.emplace_back(std::thread(&DriverMgrService::ResponseDispatch, this));
+		threads_.emplace_back(std::thread(&DriverMgrService::PollDispatch, this));
+		// Poll thread exit sign
+		keep_poll_ = true;
 	}
 
 	void DriverMgrService::Stop()
@@ -200,16 +228,20 @@ namespace goiot {
 		{
 			driver->UnitDriver();
 		}
+		// Stop the response dispatch thread.
 		response_queue_->Close();
+		// Stop the polling thread.
+		keep_poll_ = false;
 		for (auto& entry : threads_)
 		{
 			entry.join();
 		}
-		redis_.reset();
-		redis_ready_ = false;
+		redis_push_.reset();
+		redis_push_ready_ = false;
+		redis_poll_ready_ = false;
 	}
 
-	void DriverMgrService::Response_Dispatch()
+	void DriverMgrService::ResponseDispatch()
 	{
 		while (true)
 		{
@@ -220,28 +252,24 @@ namespace goiot {
 				break; // Exit
 			}
 #ifdef _DEBUG
-			std::cout << "Response from device " << data_info_vec->at(0).id << std::endl;
+			//std::cout << "Response from device " << data_info_vec->at(0).id << std::endl;
 #endif // _DEBUG
-			if (redis_ready_)
+			if (redis_push_ready_)
 			{
-				const std::string HSET_STRING_FORMAT = "HSET %s %s %s";
-				const std::string HSET_INTEGER_FORMAT = "HSET %s %s %d";
-				const std::string HSET_FLOAT_FORMAT = "HSET %s %s %f";
-				const std::string HKEY = "goiot";
 				for (auto& data_info : *data_info_vec)
 				{
 					if (data_info.data_type == DataType::STR)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_.get(), HSET_STRING_FORMAT.c_str(),
-								HKEY.c_str(), data_info.id.c_str(), data_info.char_value.c_str())
+							redisCommand(redis_push_.get(), HSET_STRING_FORMAT.c_str(),
+								HKEY_REFRESH.c_str(), data_info.id.c_str(), data_info.char_value.c_str())
 							), [](redisReply* p) { freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DF)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_.get(), HSET_FLOAT_FORMAT.c_str(),
-								HKEY.c_str(), data_info.id.c_str(), data_info.float_value)
+							redisCommand(redis_push_.get(), HSET_FLOAT_FORMAT.c_str(),
+								HKEY_REFRESH.c_str(), data_info.id.c_str(), data_info.float_value)
 							), [](redisReply* p) { freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
@@ -249,13 +277,13 @@ namespace goiot {
 						data_info.data_type == DataType::BT)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_.get(), HSET_INTEGER_FORMAT.c_str(),
-								HKEY.c_str(), data_info.id.c_str(), data_info.int_value)
+							redisCommand(redis_push_.get(), HSET_INTEGER_FORMAT.c_str(),
+								HKEY_REFRESH.c_str(), data_info.id.c_str(), data_info.int_value)
 							), [](redisReply* p) { freeReplyObject(p); });
 #ifdef _DEBUG
-						if (reply->str)
+						if (reply->type == REDIS_REPLY_ERROR && reply->str)
 						{
-							std::cout << "HSET reply: " << reply->str << std::endl;
+							std::cout << "HSET reply error: " << reply->str << std::endl;
 						}
 #endif // _DEBUG
 					}
@@ -265,6 +293,105 @@ namespace goiot {
 					}
 				}
 			}
+		}
+	}
+
+	void DriverMgrService::PollDispatch()
+	{
+		while (keep_poll_)
+		{
+			if (redis_poll_ready_)
+			{
+				const std::string HGETALL = "HGETALL %s";
+				std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+					redisCommand(redis_poll_.get(), HGETALL.c_str(), HKEY_REFRESH.c_str())
+					), [](redisReply* p) { freeReplyObject(p); });
+				if (reply->type == REDIS_REPLY_ARRAY)
+				{
+					int hset_number = reply->elements / 2;  // field:value pair number
+					std::vector<DataInfo> data_info_vec;
+					for (int i = 0; i < hset_number; i++)
+					{
+						if (reply->element[i * 2]->type == REDIS_REPLY_STRING && 
+							reply->element[i * 2 + 1]->type == REDIS_REPLY_STRING)
+						{
+							auto pos = data_info_hash_.find(reply->element[i * 2]->str);
+							if (pos == data_info_hash_.end())
+							{
+								assert(false);
+								continue; // Throw exception
+							}
+							if (pos->second.read_write_priviledge == ReadWritePrivilege::READ_ONLY)
+							{
+								assert(false);
+								continue; // Throw exception
+							}
+							if (pos->second.data_type == DataType::DF)
+							{
+								data_info_vec.emplace_back(reply->element[i * 2]->str,
+									pos->second.name, pos->second.address, pos->second.register_address,
+									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
+									pos->second.data_zone, pos->second.float_decode,
+									0/* integer */, std::atof(reply->element[i * 2 + 1]->str),
+									""/* string */, std::chrono::duration_cast<std::chrono::milliseconds>(
+										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
+								);
+							}
+							else if (pos->second.data_type == DataType::STR)
+							{
+								data_info_vec.emplace_back(reply->element[i * 2]->str,
+									pos->second.name, pos->second.address, pos->second.register_address,
+									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
+									pos->second.data_zone, pos->second.float_decode,
+									0/* integer */, 0.0/* float */, reply->element[i * 2 + 1]->str,
+									std::chrono::duration_cast<std::chrono::milliseconds>(
+										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
+								);
+							}
+							else
+							{
+								data_info_vec.emplace_back(reply->element[i * 2]->str,
+									pos->second.name, pos->second.address, pos->second.register_address,
+									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
+									pos->second.data_zone, pos->second.float_decode,
+									std::atoi(reply->element[i * 2 + 1]->str), 0.0/* float */, "",
+									std::chrono::duration_cast<std::chrono::milliseconds>(
+										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
+								);
+							}
+						}
+					}
+					// Write data to devices
+					std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
+
+					//for (auto& obj : drivers_)
+					//{
+					//	std::string id;
+					//	obj->GetID(id);
+					//	std::find(data_info_vec.begin(), data_info_vec.end(),
+					//		[&id](const DataInfo& d) { return d.id.find(id) >= 0; });
+					//}
+				} 
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+	}
+
+	void DriverMgrService::SetDataInfo(const DataInfo& data_info)
+	{
+		assert(!data_info.id.empty());
+		if (data_info.id.empty())
+		{
+			return;
+		}
+		auto pos = data_info_hash_.find(data_info.id);
+		if (pos != data_info_hash_.end())
+		{
+			throw std::out_of_range("Data info hash contains key already.");
+		}
+		else
+		{
+			data_info_hash_[data_info.id] = data_info;
 		}
 	}
 }

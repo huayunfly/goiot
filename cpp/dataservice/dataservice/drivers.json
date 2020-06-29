@@ -13,37 +13,10 @@
   "name": "goiot",
   "drivers": [
     {
-      "id": "driver1",
-      "name": "modbus1",
-      "type": "modbus_rtu",
-      "port": "COM2,19200,N,8,1",
-      "response_to_msec": 500,
-      "nodes": [
-        {
-          "address": "1",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "C1",
-              "name": "µÁ—π1",
-              "register": "R4WUB0001"
-            },
-            {
-              "id": "C2",
-              "name": "µÁ—π2",
-              "register": "R4DF0002"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": "mfcpfc",
       "name": "modbus3",
       "type": "modbus_rtu",
-      "port": "COM3,19200,N,8,1",
+      "port": "COM3,19200,E,8,2",
       "response_to_msec": 500,
       "nodes": [
         {

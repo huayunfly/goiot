@@ -44,7 +44,9 @@ namespace goiot
 			connection_details_.baud, connection_details_.parity, connection_details_.data_bit, connection_details_.stop_bit),
 			[](modbus_t* p) { modbus_close(p);  modbus_free(p); std::cout << "free modbus ptr."; }
 		);
-		modbus_set_debug(connection_manager_.get(), FALSE);
+#ifdef _DEBUG
+		modbus_set_debug(connection_manager_.get(), TRUE);
+#endif // _DEBUG
 
 		// For test
 		//const uint16_t UT_BITS_NB = 0x25;
@@ -110,7 +112,8 @@ namespace goiot
 						data_info.second.name, data_info.second.address, data_info.second.register_address,
 						data_info.second.read_write_priviledge, DataFlowType::REFRESH, data_info.second.data_type,
 						data_info.second.data_zone, data_info.second.float_decode, data_info.second.int_value, data_info.second.float_value,
-						data_info.second.char_value, std::chrono::system_clock().now().time_since_epoch().count());
+						data_info.second.char_value, std::chrono::duration_cast<std::chrono::milliseconds>(
+							std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0);
 				}
 				if (data_info_vec.size() > 0)
 				{
@@ -154,7 +157,7 @@ namespace goiot
 						data_info->name, data_info->address, data_info->register_address,
 						data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
 						data_info->data_zone, data_info->float_decode, data_info->int_value, data_info->float_value,
-						data_info->char_value, std::chrono::system_clock::now().time_since_epoch().count());
+						data_info->char_value, data_info->timestamp);
 					break;
 				default:
 					break;

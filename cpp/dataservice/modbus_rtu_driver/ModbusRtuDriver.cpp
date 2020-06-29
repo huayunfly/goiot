@@ -8,7 +8,8 @@ namespace goiot
 {
     // Interface methods
     RESULT_DSAPI ModbusRtuDriver::InitDriver(const std::string& config, 
-        std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue)
+        std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue,
+        std::function<void(const DataInfo&)> set_data_info)
     {
         if (response_queue == nullptr)
         {
@@ -20,6 +21,11 @@ namespace goiot
         if (parse_code != 0)
         {
             std::cout << "ModbusRtuDriver::InitDriver() parse config failed." << std::endl;
+        }
+        // Set data_info in Driver manager
+        for (auto& pair : data_map)
+        {
+            set_data_info(pair.second);
         }
         driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map), response_queue));
         int return_code = driver_worker_->OpenConnection();
@@ -52,6 +58,9 @@ namespace goiot
             std::cout << "ModbusRtuDriver::ParseConfig() json parse error" << std::endl;
             return ECANCELED;
         }
+        // Driver ID
+        id_ = root["id"].asString();
+
         // Split port, like "COM1,9600,N,8,1"
         const std::string port = root["port"].asString();
         const std::size_t NPOS = -1;
@@ -96,7 +105,9 @@ namespace goiot
         for (auto node : root["nodes"])
         {
             // Address
+            int address = 0;
             std::istringstream iss_address(node["address"].asString());
+            iss_address >> address;
             // Float decode
             std::istringstream iss_float_decode(node["fdec"].asString());
             int float_decode_int = 0;
@@ -126,7 +137,7 @@ namespace goiot
                 DataInfo data_info;
                 data_info.id = root["id"].asString() + "." + node["address"].asString() + "." + data_node["id"].asString();
                 data_info.name = data_node["name"].asString();
-                iss_address >> data_info.address;
+                data_info.address = address;
                 data_info.float_decode = float_decode;
                 data_info.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;

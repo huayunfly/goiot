@@ -119,7 +119,7 @@ int TestObjs(const std::wstring& module_path)
         {
             std::string description;
             std::cout << x->GetDescription(description) << std::endl;
-            x->InitDriver(R"({"addr":"1"})", nullptr/* DriverMgrService only */);
+            x->InitDriver(R"({"addr":"1"})", nullptr/* DriverMgrService only */, nullptr/* set_data_info */);
             x->UnitDriver();
         }
     }

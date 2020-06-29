@@ -13,8 +13,15 @@ namespace goiot
             return 0;
         }
 
+        virtual RESULT_DSAPI GetID(std::string& id)
+        {
+            id = "demo";
+            return 0;
+        }
+
         RESULT_DSAPI InitDriver(const std::string& config, 
-            std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue)
+            std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue,
+            std::function<void(const DataInfo&)> set_data_info)
         {
             std::cout << "DemoDriver::InitDriver() " + config << std::endl;
             return 0;

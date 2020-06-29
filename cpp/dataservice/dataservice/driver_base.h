@@ -12,6 +12,7 @@
 #include <sstream>
 #include <chrono>
 #include <system_error>
+#include <functional>
 #include "ThreadSafeQueue.h"
 
 // Test to see if we are building a DLL.
@@ -94,21 +95,23 @@ namespace goiot
 	{
 		DataInfo() : id(""), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
 			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), int_value(0), float_value(0), char_value(""),
-			timestamp(static_cast<double>(std::chrono::system_clock().now().time_since_epoch().count())), result(0)
+			timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0)
 		{
 
 		}
 
 		DataInfo(const std::string& new_id) : id(new_id), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
 			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), int_value(0), float_value(0), char_value(""),
-			timestamp(static_cast<double>(std::chrono::system_clock().now().time_since_epoch().count())), result(0)
+			timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0)
 		{
 
 		}
 
 		// For data copy.
 		DataInfo(const std::string& new_id, const std::string& new_name, int new_address, int new_register_address, ReadWritePrivilege new_read_write_priviledge,
-			DataFlowType new_data_flow_type, DataType new_data_type, DataZone new_data_zone, FloatDecode new_float_decode, int new_int_value, double new_float_value, std::string& new_char_value,
+			DataFlowType new_data_flow_type, DataType new_data_type, DataZone new_data_zone, FloatDecode new_float_decode, int new_int_value, double new_float_value, const std::string& new_char_value,
 			double new_timestamp) : 
 			id(new_id), name(new_name), address(new_address), register_address(new_register_address), read_write_priviledge(new_read_write_priviledge),
 			data_flow_type(new_data_flow_type), data_type(new_data_type), data_zone(new_data_zone), float_decode(new_float_decode), int_value(new_int_value), float_value(new_float_value), char_value(new_char_value),
@@ -141,7 +144,10 @@ namespace goiot
 
         virtual RESULT_DSAPI GetDescription(std::string& description) = 0;
 
-        virtual RESULT_DSAPI InitDriver(const std::string& config, std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue) = 0;
+		virtual RESULT_DSAPI GetID(std::string& id) = 0;
+
+        virtual RESULT_DSAPI InitDriver(const std::string& config, std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue,
+			std::function<void(const DataInfo&)> set_data_info) = 0;
 
         virtual RESULT_DSAPI UnitDriver() = 0;
     };

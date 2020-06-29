@@ -12,7 +12,7 @@ namespace goiot
 	class ModbusRtuDriver : public DriverBase
 	{
 	public:
-		ModbusRtuDriver() : driver_worker_()
+		ModbusRtuDriver() : driver_worker_(), id_()
 		{
 
 		}
@@ -26,17 +26,32 @@ namespace goiot
 			return 0;
 		}
 
+		virtual RESULT_DSAPI GetID(std::string& id)
+		{
+			id = id_;
+			return 0;
+		}
+
 		RESULT_DSAPI InitDriver(const std::string& config, 
-			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue);
+			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue,
+			std::function<void(const DataInfo&)> set_data_info);
 
 		RESULT_DSAPI UnitDriver();
 
 	private:
+		/// <summary>
+		/// Parse driver ID, device data_info, connection string.
+		/// </summary>
+		/// <param name="config">Configuration json</param>
+		/// <param name="connection_info">ConnectionInfo</param>
+		/// <param name="data_map">A data map reference.</param>
+		/// <returns>0: succeeded, otherwise failed.</returns>
 		int ParseConfig(const std::string& config,
 			ConnectionInfo& connection_info, std::map<std::string, DataInfo>& data_map);
 
 	private:
 		std::unique_ptr<DriverWorker> driver_worker_;
+		std::string id_;
 	};
 }
 
