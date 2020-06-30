@@ -66,7 +66,9 @@ namespace goiot {
 		void ResponseDispatch();
 
 		/// <summary>
-		/// Poll redis using a seperate context.
+		/// Poll redis using a seperate context. Dispatch writing data, considering the deadband and timestamp.
+		/// Deadband, if the integer or float data change is in the deadband, no request will be sent to device.
+		/// Timestamp, if the data change is in the deadband but timestamp elapsed, new request will be sent to device.
 		/// </summary>
 		void PollDispatch();
 

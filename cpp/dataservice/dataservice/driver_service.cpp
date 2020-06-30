@@ -309,7 +309,8 @@ namespace goiot {
 				if (reply->type == REDIS_REPLY_ARRAY)
 				{
 					int hset_number = reply->elements / 2;  // field:value pair number
-					std::vector<DataInfo> data_info_vec;
+					std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
+					//std::vector<DataInfo> data_info_vec;
 					for (int i = 0; i < hset_number; i++)
 					{
 						if (reply->element[i * 2]->type == REDIS_REPLY_STRING && 
@@ -326,9 +327,14 @@ namespace goiot {
 								assert(false);
 								continue; // Throw exception
 							}
+							// Parse driver id seperated by ".", for example: mfcpfc.4.sv -> mfcpfc
+							std::size_t seperator_pos = pos->first.find_first_of(".");
+							std::size_t len = seperator_pos < 0 ? pos->first.size() : seperator_pos;
+							std::string driver_id = pos->first.substr(0, len);
+							auto group_pos = data_info_group.emplace(driver_id, std::vector<DataInfo>()).first;
 							if (pos->second.data_type == DataType::DF)
 							{
-								data_info_vec.emplace_back(reply->element[i * 2]->str,
+								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									pos->second.name, pos->second.address, pos->second.register_address,
 									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
 									pos->second.data_zone, pos->second.float_decode,
@@ -339,7 +345,7 @@ namespace goiot {
 							}
 							else if (pos->second.data_type == DataType::STR)
 							{
-								data_info_vec.emplace_back(reply->element[i * 2]->str,
+								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									pos->second.name, pos->second.address, pos->second.register_address,
 									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
 									pos->second.data_zone, pos->second.float_decode,
@@ -350,7 +356,7 @@ namespace goiot {
 							}
 							else
 							{
-								data_info_vec.emplace_back(reply->element[i * 2]->str,
+								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									pos->second.name, pos->second.address, pos->second.register_address,
 									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
 									pos->second.data_zone, pos->second.float_decode,
@@ -361,17 +367,28 @@ namespace goiot {
 							}
 						}
 					}
-					// Write data to devices
-					std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
-
-					//for (auto& obj : drivers_)
-					//{
-					//	std::string id;
-					//	obj->GetID(id);
-					//	std::find(data_info_vec.begin(), data_info_vec.end(),
-					//		[&id](const DataInfo& d) { return d.id.find(id) >= 0; });
-					//}
+					// Dispatch writing data to devices
+					for (auto& element : data_info_group)
+					{
+						for (auto& driver : drivers_)
+						{
+							std::string id;
+							driver->GetID(id);
+							if (id.compare(element.first) == 0)
+							{
+								// call write
+								break;
+							}
+						}
+					}
 				} 
+				else if (reply->type == REDIS_REPLY_ERROR && reply->str)
+				{
+					assert(false);
+#ifdef _DEBUG
+					std::cerr << "HGETALL reply error: " << reply->str << std::endl;
+#endif // _DEBUG
+				}
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
