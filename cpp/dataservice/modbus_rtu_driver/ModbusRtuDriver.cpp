@@ -42,6 +42,18 @@ namespace goiot
         return 0;
     }
 
+    RESULT_DSAPI ModbusRtuDriver::AsyncWrite(const std::vector<DataInfo>& data_info_vec)
+    {
+        driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
+        return 0;
+    }
+
+    RESULT_DSAPI ModbusRtuDriver::AsyncRead(const std::vector<std::string> id_vec,
+        std::function<void(std::vector<DataInfo>&&)> read_callback)
+    {
+        throw std::runtime_error("Not implemented.");
+    }
+
     // Private methods
     int ModbusRtuDriver::ParseConfig(const std::string& config,
         ConnectionInfo& connection_info, std::map<std::string, DataInfo>& data_map)

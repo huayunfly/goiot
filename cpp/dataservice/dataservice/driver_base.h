@@ -150,6 +150,11 @@ namespace goiot
 			std::function<void(const DataInfo&)> set_data_info) = 0;
 
         virtual RESULT_DSAPI UnitDriver() = 0;
+
+		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec) = 0;
+
+		virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec, 
+			std::function<void(std::vector<DataInfo>&&)> read_callback) = 0;
     };
 
     class DeviceObject {

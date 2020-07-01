@@ -38,6 +38,11 @@ namespace goiot
 
 		RESULT_DSAPI UnitDriver();
 
+		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec);
+
+		virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec,
+			std::function<void(std::vector<DataInfo>&&)> read_callback);
+
 	private:
 		/// <summary>
 		/// Parse driver ID, device data_info, connection string.

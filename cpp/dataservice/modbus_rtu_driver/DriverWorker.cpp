@@ -181,6 +181,11 @@ namespace goiot
 		}
 	}
 
+	void DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info, int trans_id)
+	{
+		;
+	}
+
 	// Read modbus device data
 	std::shared_ptr<DataInfo> DriverWorker::ReadData(const DataInfo& data_info)
 	{

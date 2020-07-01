@@ -32,6 +32,19 @@ namespace goiot
             std::cout << "DemoDriver::UnitDriver()" << std::endl;
             return 0;
         }
+
+        virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec) 
+        {
+            return 0;
+        }
+
+        virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec,
+            std::function<void(std::vector<DataInfo>&&)> read_callback)
+        {
+            std::vector<DataInfo> data_info_vec;
+            read_callback(std::move(data_info_vec));
+            return 0;
+        }
     };
 }
 
