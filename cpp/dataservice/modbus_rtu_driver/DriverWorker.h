@@ -22,7 +22,7 @@ namespace goiot
 		DriverWorker(const ConnectionInfo& connection_details, std::map<std::string, DataInfo>&& data_map,
 			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> reponse_queue) :
 			connection_details_(connection_details), driver_manager_reponse_queue_(reponse_queue), data_map_(data_map),
-			connection_manager_(), in_queue_(10), out_queue_(10), refresh_(false)
+			connection_manager_(), in_queue_(10), out_queue_(10), refresh_(false), connected_(false)
 		{
 			
 		}
@@ -45,11 +45,16 @@ namespace goiot
 		void AsyncRead(const std::vector<std::string> var_names, 
 			const std::vector<std::string> var_ids, int trans_id);
 		// Puts asynchronous write request to the out_queue.
-		void AsyncWrite(const std::vector<DataInfo>& data_info, int trans_id);
+		void AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id);
 
 	private:
 		std::shared_ptr<DataInfo> ReadData(const DataInfo& data_info);
-		std::shared_ptr<DataInfo> WriteData(const DataInfo& data_info);
+		/// <summary>
+		/// Write data to device.
+		/// </summary>
+		/// <param name="data_info">DataInfo object.</param>
+		/// <returns>Return 0 if writing succeeded. otherwise returns std</returns>
+		int WriteData(const DataInfo& data_info);
 
 		/// <summary>
 		/// Gets the number of registers, such as DWORD, float etc.
@@ -72,6 +77,20 @@ namespace goiot
 		/// <param name="bits">Modbus bits (1 bit in 1 unit8_t converted by libmodbus)</param>
 		void AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits);
 
+		/// <summary>
+		/// Get register value from the given DataInfo object.
+		/// </summary>
+		/// <param name="data_info">DataInfo object.</param>
+		/// <returns>Register array.</returns>
+		std::shared_ptr<uint16_t> GetRegisterValue(const DataInfo& data_info);
+
+		/// <summary>
+		/// Judge whether the writing data equals the modbus_write_and_read() response data.
+		/// </summary>
+		/// <param name="data_info">The writeing data_info.</param>
+		/// <param name="registers">Read response registers.</param>
+		/// <returns>True if they are equal, otherwise false.</returns>
+		bool DataInfoValueEqualsReadValue(const DataInfo& data_info, std::shared_ptr<uint16_t> registers);
 
 	private:
 		std::once_flag connection_init_flag_;
@@ -83,6 +102,7 @@ namespace goiot
 		ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>> out_queue_;
 		std::vector<std::thread> threads_;
 		bool refresh_;
+		bool connected_;
 	};
 }
 

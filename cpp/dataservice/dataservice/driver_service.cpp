@@ -336,7 +336,7 @@ namespace goiot {
 							{
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									pos->second.name, pos->second.address, pos->second.register_address,
-									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
+									pos->second.read_write_priviledge, DataFlowType::ASYNC_WRITE, pos->second.data_type,
 									pos->second.data_zone, pos->second.float_decode,
 									0/* integer */, std::atof(reply->element[i * 2 + 1]->str),
 									""/* string */, std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -347,7 +347,7 @@ namespace goiot {
 							{
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									pos->second.name, pos->second.address, pos->second.register_address,
-									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
+									pos->second.read_write_priviledge, DataFlowType::ASYNC_WRITE, pos->second.data_type,
 									pos->second.data_zone, pos->second.float_decode,
 									0/* integer */, 0.0/* float */, reply->element[i * 2 + 1]->str,
 									std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -358,7 +358,7 @@ namespace goiot {
 							{
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									pos->second.name, pos->second.address, pos->second.register_address,
-									pos->second.read_write_priviledge, DataFlowType::WRITE, pos->second.data_type,
+									pos->second.read_write_priviledge, DataFlowType::ASYNC_WRITE, pos->second.data_type,
 									pos->second.data_zone, pos->second.float_decode,
 									std::atoi(reply->element[i * 2 + 1]->str), 0.0/* float */, "",
 									std::chrono::duration_cast<std::chrono::milliseconds>(

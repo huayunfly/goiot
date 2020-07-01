@@ -68,6 +68,7 @@ namespace goiot
 			std::cout << "Connection failed: " << modbus_strerror(errno) << std::endl;
 			return ENOTCONN;
 		}
+		connected_ = true;
 		uint32_t new_response_to_sec;
 		uint32_t new_response_to_usec;
 		modbus_get_response_timeout(connection_manager_.get(), &new_response_to_sec, &new_response_to_usec);
@@ -77,6 +78,7 @@ namespace goiot
 	void DriverWorker::CloseConnection()
 	{
 		connection_manager_.reset();
+		connected_ = false;
 	}
 
 	void DriverWorker::Start()
@@ -145,6 +147,7 @@ namespace goiot
 				break; // Exit
 			}
 			auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
+			int result_code = 0;
 			for (std::size_t i = 0; i < data_info_vec->size(); i++)
 			{
 				std::shared_ptr<DataInfo> data_info;
@@ -158,6 +161,14 @@ namespace goiot
 						data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
 						data_info->data_zone, data_info->float_decode, data_info->int_value, data_info->float_value,
 						data_info->char_value, data_info->timestamp);
+					break;
+				case DataFlowType::ASYNC_WRITE:
+					result_code = WriteData(data_info_vec->at(i));
+					rp_data_info_vec->emplace_back(data_info->id,
+						data_info->name, data_info->address, data_info->register_address,
+						data_info->read_write_priviledge, DataFlowType::WRITE_RETURN, data_info->data_type,
+						data_info->data_zone, data_info->float_decode, data_info->int_value, data_info->float_value,
+						data_info->char_value, data_info->timestamp, result_code);
 					break;
 				default:
 					break;
@@ -181,9 +192,12 @@ namespace goiot
 		}
 	}
 
-	void DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info, int trans_id)
+	void DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
 	{
-		;
+		if (data_info_vec.size() > 0)
+		{
+			in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+		}
 	}
 
 	// Read modbus device data
@@ -274,6 +288,42 @@ namespace goiot
 		return rd;
 	}
 
+	// Write modbus device data
+	int DriverWorker::WriteData(const DataInfo& data_info)
+	{
+		if (!connected_)
+		{
+			return ENOTCONN;
+		}
+		int rc;
+		int result = ENODATA; // no_message_available
+		modbus_set_slave(connection_manager_.get(), data_info.address);
+		int num_registers = GetNumberOfRegister(data_info.data_type);
+		int num_bits = 1;
+		std::shared_ptr<uint16_t> in_value;
+		std::shared_ptr<uint16_t> rp_registers;
+		std::shared_ptr<uint8_t> rp_bits;
+		switch (data_info.data_zone)
+		{
+		case DataZone::OUTPUT_RELAY:
+			break;
+		case DataZone::OUTPUT_REGISTER:
+			in_value = GetRegisterValue(data_info);
+			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>());
+			rc = modbus_write_and_read_registers(connection_manager_.get(), data_info.register_address, num_registers,
+				in_value.get(), data_info.register_address, num_registers, rp_registers.get());
+			if (rc == num_registers && DataInfoValueEqualsReadValue(data_info, rp_registers))
+			{	
+				result = 0;
+			}
+			break;
+		default:
+			break;
+		}
+		return result;
+	}
+
+
 	int DriverWorker::GetNumberOfRegister(DataType datatype)
 	{
 		switch (datatype)
@@ -330,4 +380,75 @@ namespace goiot
 		data_info->int_value = bits.get()[0];
 	}
 
+	std::shared_ptr<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)
+	{
+		std::shared_ptr<uint16_t> value;
+		switch (data_info.data_type)
+		{
+		case DataType::DB:
+		case DataType::DUB:
+			value.reset(new uint16_t[2], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+			value.get()[0] = data_info.int_value & 0x0000FFFF;
+			value.get()[1] = data_info.int_value >> 16;
+			break;
+		case DataType::DF:
+			value.reset(new uint16_t[2], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+			switch (data_info.float_decode)
+			{
+			case FloatDecode::ABCD:
+				modbus_set_float_abcd(data_info.float_value, value.get());
+				break;
+			case FloatDecode::DCBA:
+				modbus_set_float_dcba(data_info.float_value, value.get());
+				break;
+			case FloatDecode::BADC:
+				modbus_set_float_badc(data_info.float_value, value.get());
+				break;
+			case FloatDecode::CDAB:
+				modbus_set_float_cdab(data_info.float_value, value.get());
+				break;
+			default:
+				throw std::invalid_argument("Unsupported float decode.");
+			}
+			break;
+		case DataType::WB:
+		case DataType::WUB:
+			value.reset(new uint16_t[1], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+			value.get()[0] = data_info.int_value & 0x0000FFFF;
+			break;
+		default:
+			throw std::invalid_argument("Unsupported data type.");
+		}
+		return value;
+	}
+
+	bool DriverWorker::DataInfoValueEqualsReadValue(const DataInfo& data_info, std::shared_ptr<uint16_t> registers)
+	{
+		switch (data_info.data_type)
+		{
+		case DataType::DB:
+		case DataType::DUB:
+			return data_info.int_value == registers.get()[0] + (registers.get()[1] << 16);
+			break;
+		case DataType::DF:
+			switch (data_info.float_decode)
+			{
+			case FloatDecode::ABCD:
+				return std::abs(data_info.float_value - modbus_get_float_abcd(registers.get())) < 1e-6;
+			case FloatDecode::DCBA:
+				return std::abs(data_info.float_value - modbus_get_float_dcba(registers.get())) < 1e-6;
+			case FloatDecode::BADC:
+				return std::abs(data_info.float_value - modbus_get_float_badc(registers.get())) < 1e-6;
+			case FloatDecode::CDAB:
+				return std::abs(data_info.float_value - modbus_get_float_cdab(registers.get())) < 1e-6;
+			default:
+				throw std::invalid_argument("Unsupported float decode.");
+			}
+		case DataType::WB:
+		case DataType::WUB:
+			return data_info.int_value == registers.get()[0];
+		default:
+			throw std::invalid_argument("Unsupported data type.");
+		}
+	}
 }

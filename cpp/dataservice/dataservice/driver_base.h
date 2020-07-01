@@ -112,10 +112,10 @@ namespace goiot
 		// For data copy.
 		DataInfo(const std::string& new_id, const std::string& new_name, int new_address, int new_register_address, ReadWritePrivilege new_read_write_priviledge,
 			DataFlowType new_data_flow_type, DataType new_data_type, DataZone new_data_zone, FloatDecode new_float_decode, int new_int_value, double new_float_value, const std::string& new_char_value,
-			double new_timestamp) : 
+			double new_timestamp, int result_code = 0) : 
 			id(new_id), name(new_name), address(new_address), register_address(new_register_address), read_write_priviledge(new_read_write_priviledge),
 			data_flow_type(new_data_flow_type), data_type(new_data_type), data_zone(new_data_zone), float_decode(new_float_decode), int_value(new_int_value), float_value(new_float_value), char_value(new_char_value),
-			timestamp(new_timestamp), result(0)
+			timestamp(new_timestamp), result(result_code)
 		{
 
 		}
