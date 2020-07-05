@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <unordered_map>
 #include "driver_base.h"
 #include "ThreadSafeQueue.h"
 #include "hiredis.h"
@@ -61,6 +60,13 @@ namespace goiot {
 
 	private:
 		/// <summary>
+		/// A callback for driver add DataInfo objects.
+		/// </summary>
+		/// <param name="data_info">A DataInfo object.</param>
+		static void AddDataInfo(const DataInfo& data_info);
+
+	private:
+		/// <summary>
 		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the DataService.
 		/// </summary>
 		void ResponseDispatch();
@@ -78,10 +84,11 @@ namespace goiot {
 			const std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>>& driver_descriptions);
 
 		/// <summary>
-		/// Set a data info in the data_info hash.
+		/// Add the redis poll set by judging DataInfo is not existed and DataInfo.datatype = W or RW
+		/// Call once only.
 		/// </summary>
-		/// <param name="data_info">A DataInfo object</param>
-		static void SetDataInfo(const DataInfo& data_info);
+		void AddRedisPollSet();
+
 
 	private:
 		const static std::wstring CONFIG_FILE;
@@ -93,7 +100,8 @@ namespace goiot {
 		const static std::string HKEY_POLL;
 
 	private:
-		static std::unordered_map<std::string, DataInfo> data_info_hash_; // Not thread safe!
+		static DataEntryCache<DataInfo> data_info_cache_;
+
 		std::wstring module_path_; // Not include the suffix "/"
 		std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>> driver_descriptions_;
 		std::vector<std::unique_ptr<DriverBase>> drivers_;

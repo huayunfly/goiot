@@ -160,15 +160,19 @@ namespace goiot
 						data_info->name, data_info->address, data_info->register_address,
 						data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
 						data_info->data_zone, data_info->float_decode, data_info->int_value, data_info->float_value,
-						data_info->char_value, data_info->timestamp);
+						data_info->char_value, 
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						data_info->result);
 					break;
 				case DataFlowType::ASYNC_WRITE:
 					result_code = WriteData(data_info_vec->at(i));
-					rp_data_info_vec->emplace_back(data_info->id,
-						data_info->name, data_info->address, data_info->register_address,
-						data_info->read_write_priviledge, DataFlowType::WRITE_RETURN, data_info->data_type,
-						data_info->data_zone, data_info->float_decode, data_info->int_value, data_info->float_value,
-						data_info->char_value, data_info->timestamp, result_code);
+					rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
+						data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
+						data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
+						data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+						data_info_vec->at(i).char_value, 
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						result_code);
 					break;
 				default:
 					break;

@@ -11,14 +11,12 @@
 #include <system_error>
 #include <cassert>
 #include <Windows.h>
-
 #include "json/json.h"
 #include "driver_service.h"
 
 namespace goiot {
 
-	std::unordered_map<std::string, DataInfo> goiot::DriverMgrService::data_info_hash_;
-
+	DataEntryCache<DataInfo> DriverMgrService::data_info_cache_;
 	const std::wstring goiot::DriverMgrService::CONFIG_FILE = L"drivers.json";
 	const std::wstring goiot::DriverMgrService::DRIVER_DIR = L"drivers";
 	const std::string goiot::DriverMgrService::HSET_STRING_FORMAT = "HSET %s %s %s";
@@ -152,7 +150,7 @@ namespace goiot {
 				if (!std::get<0>(*description).compare(driver_name))
 				{
 					auto obj = objFunc();
-					obj->InitDriver(std::get<2>(*description), response_queue_, &DriverMgrService::SetDataInfo);
+					obj->InitDriver(std::get<2>(*description), response_queue_, &DriverMgrService::AddDataInfo);
 					driver_objs.push_back(std::move(obj));
 					std::clog << driver_name << "|" << std::get<1>(*description) << " loaded!\n";
 				}
@@ -177,7 +175,7 @@ namespace goiot {
 
 	void DriverMgrService::Start()
 	{
-		// For redis
+		// For redis push
 		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 		redis_push_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout), 
 			[](redisContext* p) { redisFree(p); });
@@ -216,29 +214,35 @@ namespace goiot {
 			redis_poll_ready_ = true;
 			std::cout << "Redis poll connection OK." << std::endl;
 		}
+		// Add(Initialize) Writable and ReadWritable data into poll zone.
+		AddRedisPollSet();
+		// Start Resonse dispatch thread.
 		threads_.emplace_back(std::thread(&DriverMgrService::ResponseDispatch, this));
-		threads_.emplace_back(std::thread(&DriverMgrService::PollDispatch, this));
-		// Poll thread exit sign
+		// Poll thread.
 		keep_poll_ = true;
+		threads_.emplace_back(std::thread(&DriverMgrService::PollDispatch, this));
 	}
 
 	void DriverMgrService::Stop()
 	{
+		// Stop the polling thread.
+		keep_poll_ = false;
+		// Uninitialize drivers
 		for (auto& driver : drivers_)
 		{
 			driver->UnitDriver();
 		}
 		// Stop the response dispatch thread.
 		response_queue_->Close();
-		// Stop the polling thread.
-		keep_poll_ = false;
+
 		for (auto& entry : threads_)
 		{
 			entry.join();
 		}
-		redis_push_.reset();
 		redis_push_ready_ = false;
 		redis_poll_ready_ = false;
+		redis_push_.reset();
+		redis_poll_.reset();
 	}
 
 	void DriverMgrService::ResponseDispatch()
@@ -258,6 +262,10 @@ namespace goiot {
 			{
 				for (auto& data_info : *data_info_vec)
 				{
+					if (data_info.result != 0)
+					{
+						continue; // Todo: handle error code.
+					}
 					if (data_info.data_type == DataType::STR)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
@@ -304,7 +312,7 @@ namespace goiot {
 			{
 				const std::string HGETALL = "HGETALL %s";
 				std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-					redisCommand(redis_poll_.get(), HGETALL.c_str(), HKEY_REFRESH.c_str())
+					redisCommand(redis_poll_.get(), HGETALL.c_str(), HKEY_POLL.c_str())
 					), [](redisReply* p) { freeReplyObject(p); });
 				if (reply->type == REDIS_REPLY_ARRAY)
 				{
@@ -316,39 +324,39 @@ namespace goiot {
 						if (reply->element[i * 2]->type == REDIS_REPLY_STRING && 
 							reply->element[i * 2 + 1]->type == REDIS_REPLY_STRING)
 						{
-							auto pos = data_info_hash_.find(reply->element[i * 2]->str);
-							if (pos == data_info_hash_.end())
+							auto data_info = data_info_cache_.FindEntry(reply->element[i * 2]->str);
+							if (data_info.id.empty())
 							{
 								assert(false);
 								continue; // Throw exception
 							}
-							if (pos->second.read_write_priviledge == ReadWritePrivilege::READ_ONLY)
+							if (data_info.read_write_priviledge == ReadWritePrivilege::READ_ONLY)
 							{
 								assert(false);
 								continue; // Throw exception
 							}
 							// Parse driver id seperated by ".", for example: mfcpfc.4.sv -> mfcpfc
-							std::size_t seperator_pos = pos->first.find_first_of(".");
-							std::size_t len = seperator_pos < 0 ? pos->first.size() : seperator_pos;
-							std::string driver_id = pos->first.substr(0, len);
+							std::size_t seperator_pos = data_info.id.find_first_of(".");
+							std::size_t len = seperator_pos < 0 ? data_info.id.size() : seperator_pos;
+							std::string driver_id = data_info.id.substr(0, len);
 							auto group_pos = data_info_group.emplace(driver_id, std::vector<DataInfo>()).first;
-							if (pos->second.data_type == DataType::DF)
+							if (data_info.data_type == DataType::DF)
 							{
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
-									pos->second.name, pos->second.address, pos->second.register_address,
-									pos->second.read_write_priviledge, DataFlowType::ASYNC_WRITE, pos->second.data_type,
-									pos->second.data_zone, pos->second.float_decode,
+									data_info.name, data_info.address, data_info.register_address,
+									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+									data_info.data_zone, data_info.float_decode,
 									0/* integer */, std::atof(reply->element[i * 2 + 1]->str),
 									""/* string */, std::chrono::duration_cast<std::chrono::milliseconds>(
 										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
 								);
 							}
-							else if (pos->second.data_type == DataType::STR)
+							else if (data_info.data_type == DataType::STR)
 							{
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
-									pos->second.name, pos->second.address, pos->second.register_address,
-									pos->second.read_write_priviledge, DataFlowType::ASYNC_WRITE, pos->second.data_type,
-									pos->second.data_zone, pos->second.float_decode,
+									data_info.name, data_info.address, data_info.register_address,
+									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+									data_info.data_zone, data_info.float_decode,
 									0/* integer */, 0.0/* float */, reply->element[i * 2 + 1]->str,
 									std::chrono::duration_cast<std::chrono::milliseconds>(
 										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
@@ -357,9 +365,9 @@ namespace goiot {
 							else
 							{
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
-									pos->second.name, pos->second.address, pos->second.register_address,
-									pos->second.read_write_priviledge, DataFlowType::ASYNC_WRITE, pos->second.data_type,
-									pos->second.data_zone, pos->second.float_decode,
+									data_info.name, data_info.address, data_info.register_address,
+									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+									data_info.data_zone, data_info.float_decode,
 									std::atoi(reply->element[i * 2 + 1]->str), 0.0/* float */, "",
 									std::chrono::duration_cast<std::chrono::milliseconds>(
 										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
@@ -394,21 +402,87 @@ namespace goiot {
 		}
 	}
 
-	void DriverMgrService::SetDataInfo(const DataInfo& data_info)
+	// Static method
+	void DriverMgrService::AddDataInfo(const DataInfo& data_info)
 	{
-		assert(!data_info.id.empty());
 		if (data_info.id.empty())
 		{
-			return;
+			throw std::invalid_argument("Parameter data_info ID is empty.");
 		}
-		auto pos = data_info_hash_.find(data_info.id);
-		if (pos != data_info_hash_.end())
+		data_info_cache_.AddEntry(data_info.id, data_info);
+	}
+
+	void DriverMgrService::AddRedisPollSet()
+	{
+		if (redis_poll_ready_)
 		{
-			throw std::out_of_range("Data info hash contains key already.");
-		}
-		else
-		{
-			data_info_hash_[data_info.id] = data_info;
+			const std::string HGETALL = "HGETALL %s";
+			std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+				redisCommand(redis_poll_.get(), HGETALL.c_str(), HKEY_POLL.c_str())
+				), [](redisReply* p) { freeReplyObject(p); });
+			std::unordered_set<std::string> existed_ids;
+			if (reply->type == REDIS_REPLY_ARRAY)
+			{
+				int hset_number = reply->elements / 2;  // field:value pair number
+				std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
+				for (int i = 0; i < hset_number; i++)
+				{
+					if (reply->element[i * 2]->type == REDIS_REPLY_STRING)
+					{
+						existed_ids.insert(reply->element[i * 2]->str);
+					}
+				}
+			}
+			auto data_info_ids = data_info_cache_.GetEntryKeys();
+			std::unordered_set<std::string> diff_ids;
+			for (auto& id : existed_ids)
+			{
+				auto it = data_info_ids.find(id);
+				if (it != data_info_ids.end())
+				{
+					data_info_ids.erase(id);
+				}
+			}
+			for (auto& id : data_info_ids)
+			{
+				auto data_info = data_info_cache_.FindEntry(id);
+				if (!data_info.id.empty() && data_info.read_write_priviledge != ReadWritePrivilege::READ_ONLY)
+				{
+					if (data_info.data_type == DataType::STR)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_poll_.get(), HSET_STRING_FORMAT.c_str(),
+								HKEY_POLL.c_str(), data_info.id.c_str(), data_info.char_value.c_str())
+							), [](redisReply* p) { freeReplyObject(p); });
+					}
+					else if (data_info.data_type == DataType::DF)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_poll_.get(), HSET_FLOAT_FORMAT.c_str(),
+								HKEY_POLL.c_str(), data_info.id.c_str(), data_info.float_value)
+							), [](redisReply* p) { freeReplyObject(p); });
+					}
+					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
+						data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB ||
+						data_info.data_type == DataType::BT)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_poll_.get(), HSET_INTEGER_FORMAT.c_str(),
+								HKEY_POLL.c_str(), data_info.id.c_str(), data_info.int_value)
+							), [](redisReply* p) { freeReplyObject(p); });
+#ifdef _DEBUG
+						if (reply->type == REDIS_REPLY_ERROR && reply->str)
+						{
+							std::cout << "HSET reply error: " << reply->str << std::endl;
+						}
+#endif // _DEBUG
+					}
+					else
+					{
+						throw std::invalid_argument("Unsupported data type.");
+					}
+				}
+			}	
 		}
 	}
 }

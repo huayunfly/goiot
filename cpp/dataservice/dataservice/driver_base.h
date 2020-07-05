@@ -13,6 +13,9 @@
 #include <chrono>
 #include <system_error>
 #include <functional>
+#include <shared_mutex>
+#include <unordered_map>
+#include <unordered_set>
 #include "ThreadSafeQueue.h"
 
 // Test to see if we are building a DLL.
@@ -135,6 +138,80 @@ namespace goiot
 		std::string char_value;
 		double timestamp; // in microsecond -> std::chrono::system_clock::now().time_since_epoch().count();
 		int result; // Complies with std::error_code
+	};
+
+	template <typename T>
+	class DataEntryCache
+	{
+	public:
+		DataEntryCache() : data_entry_hash_(), entry_mutex_()
+		{
+
+		}
+
+		DataEntryCache(const DataEntryCache&) = delete;
+		DataEntryCache& operator=(const DataEntryCache&) = delete;
+
+		/// <summary>
+		/// Find an entry. If the entry is not found, it will return an empty entry.
+		/// </summary>
+		/// <param name="entry_key">Entry key.</param>
+		/// <returns>A found entry or an empty entry.</returns>
+		DataInfo FindEntry(const std::string& entry_key) const
+		{
+			std::shared_lock<std::shared_mutex> lk(entry_mutex_);
+			auto it = data_entry_hash_.find(entry_key); // Fix: const_iterator
+			return (it == data_entry_hash_.end()) ? T() : it->second;
+		}
+
+		/// <summary>
+		/// Update or add an entry.
+		/// </summary>
+		/// <param name="entry_key">The entry key.</param>
+		/// <param name="entry">The entry</param>
+		void UpateOrAddEntry(const std::string& entry_key, const T& entry)
+		{
+			std::lock_guard<std::shared_mutex> lk(entry_mutex_);
+			data_entry_hash_[entry_key] = entry;
+		}
+
+		/// <summary>
+		/// Add an entry. If an entry with the key is existed, an excepion will be thrown out.
+		/// </summary>
+		/// <param name="entry_key">The entry key.</param>
+		/// <param name="entry">The entry.</param>
+		void AddEntry(const std::string& entry_key, const T& entry)
+		{
+			std::lock_guard<std::shared_mutex> lk(entry_mutex_);
+			auto it = data_entry_hash_.find(entry_key);
+			if (it != data_entry_hash_.end())
+			{
+				throw std::out_of_range("Data cache contains the entry key already.");
+			}
+			else
+			{
+				data_entry_hash_[entry_key] = entry;
+			}
+		}
+
+		/// <summary>
+		/// Get entry key set. (Not thread safe)
+		/// </summary>
+		/// <returns></returns>
+		std::unordered_set<std::string> GetEntryKeys()
+		{
+			std::shared_lock<std::shared_mutex> lk(entry_mutex_);
+			std::unordered_set<std::string> entry_keys;
+			for (auto& entry : data_entry_hash_)
+			{
+				entry_keys.insert(entry.first);
+			}
+			return entry_keys;
+		}
+
+	private:
+		std::unordered_map<std::string, T> data_entry_hash_;
+		mutable std::shared_mutex entry_mutex_;
 	};
 
     // This is the base class for the class retrieved from the DLL.

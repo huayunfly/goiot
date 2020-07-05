@@ -25,6 +25,8 @@ namespace goiot
         // Set data_info in Driver manager
         for (auto& pair : data_map)
         {
+            pair.second.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
             set_data_info(pair.second);
         }
         driver_worker_.reset(new DriverWorker(connection_details, std::move(data_map), response_queue));
