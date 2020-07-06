@@ -33,19 +33,28 @@ namespace goiot
         int return_code = driver_worker_->OpenConnection();
         std::cout << "ModbusRtuDriver::InitDriver() returns " << return_code << std::endl;
         driver_worker_->Start();
+        worker_ready_ = true;
         return 0;
     }
 
     RESULT_DSAPI ModbusRtuDriver::UnitDriver()
     {
-        driver_worker_->Stop();
-        driver_worker_.reset();
+        if (worker_ready_)
+        {
+            worker_ready_ = false;
+            driver_worker_->Stop();
+            driver_worker_.reset();
+        }
         std::cout << "ModbusRtuDriver::UnitDriver() done." << std::endl;
         return 0;
     }
 
     RESULT_DSAPI ModbusRtuDriver::AsyncWrite(const std::vector<DataInfo>& data_info_vec)
     {
+        if (!worker_ready_) // Todo: race condition with Stop()
+        {
+            return ENOTCONN;
+        }
         driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
         return 0;
     }

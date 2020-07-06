@@ -306,6 +306,8 @@ namespace goiot {
 
 	void DriverMgrService::PollDispatch()
 	{
+		const double deadband = 1e-3;
+		const double timespan = 10.0; // in second
 		while (keep_poll_)
 		{
 			if (redis_poll_ready_)
@@ -340,37 +342,52 @@ namespace goiot {
 							std::size_t len = seperator_pos < 0 ? data_info.id.size() : seperator_pos;
 							std::string driver_id = data_info.id.substr(0, len);
 							auto group_pos = data_info_group.emplace(driver_id, std::vector<DataInfo>()).first;
+							double timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+								std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
 							if (data_info.data_type == DataType::DF)
 							{
+								// Deadband
+								double new_value = std::atof(reply->element[i * 2 + 1]->str);
+								if (std::abs(data_info.float_value - new_value) < deadband && 
+									(timestamp - data_info.timestamp) < timespan)
+								{
+									continue;
+								}		
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									data_info.name, data_info.address, data_info.register_address,
 									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 									data_info.data_zone, data_info.float_decode,
-									0/* integer */, std::atof(reply->element[i * 2 + 1]->str),
-									""/* string */, std::chrono::duration_cast<std::chrono::milliseconds>(
-										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
+									0/* integer */, new_value, ""/* string */, timestamp
 								);
 							}
 							else if (data_info.data_type == DataType::STR)
 							{
+								std::string new_value = reply->element[i * 2 + 1]->str;
+								if (data_info.char_value.compare(new_value) == 0 &&
+									(timestamp - data_info.timestamp) < timespan)
+								{
+									continue;
+								}
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									data_info.name, data_info.address, data_info.register_address,
 									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 									data_info.data_zone, data_info.float_decode,
-									0/* integer */, 0.0/* float */, reply->element[i * 2 + 1]->str,
-									std::chrono::duration_cast<std::chrono::milliseconds>(
-										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
+									0/* integer */, 0.0/* float */, new_value, timestamp
 								);
 							}
 							else
 							{
+								int new_value = std::atoi(reply->element[i * 2 + 1]->str);
+								if (data_info.int_value == new_value &&
+									(timestamp - data_info.timestamp) < timespan)
+								{
+									continue;
+								}
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									data_info.name, data_info.address, data_info.register_address,
 									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 									data_info.data_zone, data_info.float_decode,
-									std::atoi(reply->element[i * 2 + 1]->str), 0.0/* float */, "",
-									std::chrono::duration_cast<std::chrono::milliseconds>(
-										std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0
+									new_value, 0.0/* float */, "", timestamp
 								);
 							}
 						}

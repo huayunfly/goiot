@@ -223,6 +223,13 @@ namespace goiot
 			return QSize_();
 		}
 
+		void Clear()
+		{
+			std::lock_guard<std::mutex> lk(mut_);
+			std::queue<T> empty;
+			std::swap(data_queue_, empty);
+		}
+
 		// member typedefs provided through inheriting from std::iterator
 		class iterator : public std::iterator<
 			std::input_iterator_tag,   // iterator_category

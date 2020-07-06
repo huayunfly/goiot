@@ -13,7 +13,7 @@ namespace goiot
 	class ModbusRtuDriver : public DriverBase
 	{
 	public:
-		ModbusRtuDriver() : driver_worker_(), id_()
+		ModbusRtuDriver() : driver_worker_(), id_(), worker_ready_(false)
 		{
 
 		}
@@ -58,6 +58,7 @@ namespace goiot
 	private:
 		std::unique_ptr<DriverWorker> driver_worker_;
 		std::string id_;
+		bool worker_ready_;
 	};
 }
 
