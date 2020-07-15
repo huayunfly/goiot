@@ -349,22 +349,22 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			data_info->int_value = registers.get()[0] + (registers.get()[1] << 16);
+			data_info->int_value = (registers.get()[0] + (registers.get()[1] << 16)) * data_info->ratio;
 			break;
 		case DataType::DF:
 			switch (data_info->float_decode)
 			{
 			case FloatDecode::ABCD:
-				data_info->float_value = modbus_get_float_abcd(registers.get());
+				data_info->float_value = modbus_get_float_abcd(registers.get()) * data_info->ratio;
 				break;
 			case FloatDecode::DCBA:
-				data_info->float_value = modbus_get_float_dcba(registers.get());
+				data_info->float_value = modbus_get_float_dcba(registers.get()) * data_info->ratio;
 				break;
 			case FloatDecode::BADC:
-				data_info->float_value = modbus_get_float_badc(registers.get());
+				data_info->float_value = modbus_get_float_badc(registers.get()) * data_info->ratio;
 				break;
 			case FloatDecode::CDAB:
-				data_info->float_value = modbus_get_float_cdab(registers.get());
+				data_info->float_value = modbus_get_float_cdab(registers.get()) * data_info->ratio;
 				break;
 			default:
 				throw std::invalid_argument("Unsupported float decode.");
@@ -372,7 +372,7 @@ namespace goiot
 			break;
 		case DataType::WB:
 		case DataType::WUB:
-			data_info->int_value = registers.get()[0];
+			data_info->int_value = registers.get()[0] * data_info->ratio;
 			break;
 		default:
 			throw std::invalid_argument("Unsupported data type.");
@@ -387,29 +387,31 @@ namespace goiot
 	std::shared_ptr<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)
 	{
 		std::shared_ptr<uint16_t> value;
+		int int_value;
 		switch (data_info.data_type)
 		{
 		case DataType::DB:
 		case DataType::DUB:
 			value.reset(new uint16_t[2], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
-			value.get()[0] = data_info.int_value & 0x0000FFFF;
-			value.get()[1] = data_info.int_value >> 16;
+			int_value = data_info.int_value / data_info.ratio;
+			value.get()[0] = int_value & 0xFFFF;
+			value.get()[1] = (int_value >> 16) & 0xFFFF;
 			break;
 		case DataType::DF:
 			value.reset(new uint16_t[2], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
 			switch (data_info.float_decode)
 			{
 			case FloatDecode::ABCD:
-				modbus_set_float_abcd(data_info.float_value, value.get());
+				modbus_set_float_abcd(data_info.float_value / data_info.ratio, value.get());
 				break;
 			case FloatDecode::DCBA:
-				modbus_set_float_dcba(data_info.float_value, value.get());
+				modbus_set_float_dcba(data_info.float_value / data_info.ratio, value.get());
 				break;
 			case FloatDecode::BADC:
-				modbus_set_float_badc(data_info.float_value, value.get());
+				modbus_set_float_badc(data_info.float_value / data_info.ratio, value.get());
 				break;
 			case FloatDecode::CDAB:
-				modbus_set_float_cdab(data_info.float_value, value.get());
+				modbus_set_float_cdab(data_info.float_value / data_info.ratio, value.get());
 				break;
 			default:
 				throw std::invalid_argument("Unsupported float decode.");
@@ -418,7 +420,8 @@ namespace goiot
 		case DataType::WB:
 		case DataType::WUB:
 			value.reset(new uint16_t[1], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
-			value.get()[0] = data_info.int_value & 0x0000FFFF;
+			int_value = data_info.int_value / data_info.ratio;
+			value.get()[0] = int_value & 0xFFFF;
 			break;
 		default:
 			throw std::invalid_argument("Unsupported data type.");

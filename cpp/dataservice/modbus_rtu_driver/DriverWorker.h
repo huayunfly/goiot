@@ -65,6 +65,7 @@ namespace goiot
 
 		/// <summary>
 		/// Assigns the modbus register value to the data value according to the date type.
+		/// Considering the raito. 考虑转换因子
 		/// </summary>
 		/// <param name="data_info">A DataInfo object</param>
 		/// <param name="registers">Modbus registers</param>
@@ -79,6 +80,7 @@ namespace goiot
 
 		/// <summary>
 		/// Get register value from the given DataInfo object.
+		/// Considering the ratio. 考虑转换因子
 		/// </summary>
 		/// <param name="data_info">DataInfo object.</param>
 		/// <returns>Register array.</returns>

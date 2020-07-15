@@ -162,8 +162,13 @@ namespace goiot
                 data_info.name = data_node["name"].asString();
                 data_info.address = address;
                 data_info.float_decode = float_decode;
-                data_info.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+                data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+                float ratio = data_node["ratio"].asFloat();
+                if (std::abs(ratio) > 1e-6) // Ignore zero, keep ratio to default 1.0
+                {
+                    data_info.ratio = ratio;
+                }
                 std::string channel = data_node["register"].asString();
                 assert(channel.length() > 6);
                 if (channel.length() <= 6)
