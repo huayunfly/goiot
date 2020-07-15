@@ -21,28 +21,28 @@ namespace goiot
 		ModbusRtuDriver(const ModbusRtuDriver&) = delete;
 		ModbusRtuDriver& operator=(const ModbusRtuDriver&) = delete;
 
-		RESULT_DSAPI GetDescription(std::string& description)
+		virtual RESULT_DSAPI GetDescription(std::string& description) override
 		{
 			description = "Modbus_Rtu";
 			return 0;
 		}
 
-		virtual RESULT_DSAPI GetID(std::string& id)
+		virtual RESULT_DSAPI GetID(std::string& id) override
 		{
 			id = id_;
 			return 0;
 		}
 
-		RESULT_DSAPI InitDriver(const std::string& config, 
+		virtual RESULT_DSAPI InitDriver(const std::string& config, 
 			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue,
-			std::function<void(const DataInfo&)> set_data_info);
+			std::function<void(const DataInfo&)> set_data_info) override;
 
-		RESULT_DSAPI UnitDriver();
+		virtual RESULT_DSAPI UnitDriver() override;
 
-		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec);
+		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec) override;
 
 		virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec,
-			std::function<void(std::vector<DataInfo>&&)> read_callback);
+			std::function<void(std::vector<DataInfo>&&)> read_callback) override;
 
 	private:
 		/// <summary>

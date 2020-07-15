@@ -9,6 +9,12 @@
 // function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
 //                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
 // response_to_sec: response wait time in micro-second
+// -----------------------
+// s7 protocol
+// We need the client address (port) and optionally Rack and Slot
+// port: IP address,rack number,slot number
+// address: DB number?
+
 {
   "name": "goiot",
   "drivers": [
@@ -17,6 +23,35 @@
       "name": "modbus3",
       "type": "modbus_rtu",
       "port": "COM3,19200,E,8,2",
+      "response_to_msec": 500,
+      "nodes": [
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 10
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plc",
+      "name": "s7-1500",
+      "type": "s7",
+      "port": "192.168.0.13,2,2",
       "response_to_msec": 500,
       "nodes": [
         {
