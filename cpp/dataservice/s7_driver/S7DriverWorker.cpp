@@ -6,7 +6,7 @@
 int goiot::S7DriverWorker::OpenConnection()
 {
 	connection_manager_.reset(new TS7Client);
-	std::string address = "192.168.0.13";
+	std::string address = "192.168.1.110";
 	int rack = 0;
 	int slot = 0;
 	int res = connection_manager_->ConnectTo(address.c_str(), rack, slot);
