@@ -1,5 +1,6 @@
 #pragma once
 
+#include <json/json.h>
 #include "../dataservice/driver_base.h"
 #include "S7DriverWorker.h"
 
@@ -33,6 +34,17 @@ namespace goiot
 		virtual RESULT_DSAPI UnitDriver() override;
 		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec) override;
 		virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec, std::function<void(std::vector<DataInfo>&&)> read_callback) override;
+
+	private:
+		/// <summary>
+		/// Parse driver ID, device data_info, connection string.
+		/// </summary>
+		/// <param name="config">Configuration json</param>
+		/// <param name="connection_info">ConnectionInfo</param>
+		/// <param name="data_map">A data map reference.</param>
+		/// <returns>0: succeeded, otherwise failed.</returns>
+		int ParseConfig(const std::string& config,
+			ConnectionInfo& connection_info, std::map<std::string, DataInfo>& data_map);
 
 	private:
 		std::unique_ptr<S7DriverWorker> driver_worker_;

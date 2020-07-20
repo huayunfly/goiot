@@ -10,6 +10,13 @@
 
 namespace goiot
 {
+	enum class S7CPUStatus
+	{
+		Run,
+		Stop,
+		Unknown
+	};
+
 	class S7DriverWorker
 	{
 	public:
@@ -25,6 +32,18 @@ namespace goiot
 		S7DriverWorker& operator=(const S7DriverWorker&) = delete;
 		int OpenConnection();
 		void CloseConnection();
+		// Spawns working threads.
+		void Start();
+		// Stops and waits the working threads completed.
+		void Stop();
+		// Refreshs the data reading or writing requests into in_queue.
+		void Refresh();
+
+	private:
+		// Get PLC status
+		S7CPUStatus PLCStatus();
+		// List PLC blocks
+		void ListBlocks();
 
 	private:
 		std::once_flag connection_init_flag_;

@@ -43,6 +43,7 @@ namespace goiot
         {
             worker_ready_ = false;
             driver_worker_->Stop();
+            driver_worker_->CloseConnection(); // We may not need to CloseConnection(), for driver_worker_.reset() will call CloseConnection()
             driver_worker_.reset();
         }
         std::cout << "ModbusRtuDriver::UnitDriver() done." << std::endl;

@@ -56,7 +56,6 @@ namespace goiot {
 			return ECANCELED;
 		}
 		const std::string name = root["name"].asString();
-		std::cout << name << std::endl;
 		// driver descriptions
 		assert(root["drivers"].isArray());
 		driver_descriptions_.clear();
