@@ -26,9 +26,11 @@ namespace goiot
 		connected_ = true;
 
 		std::vector<byte> data_vec(1000);
-	    int read_db_ret = connection_manager_->DBRead(1, 0, 10, &data_vec.at(0));
-		int size = 100;
-	    read_db_ret = connection_manager_->DBGet(1, &data_vec.at(0), &size); // error
+	    int read_db_ret = connection_manager_->DBRead(1, 0, 4, &data_vec.at(0));
+		//int size = 16;
+	    //read_db_ret = connection_manager_->DBGet(1, &data_vec.at(0), &size); // errCliFunNotAvailable
+		data_vec.at(0) = 0xfe;
+		int write_db_ret = connection_manager_->DBWrite(1, 12, 1, &data_vec.at(0));
 		return res;
 	}
 
