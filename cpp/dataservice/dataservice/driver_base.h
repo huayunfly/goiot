@@ -69,7 +69,8 @@ namespace goiot
 		OUTPUT_RELAY = 0,
 		INPUT_RELAY = 1,
 		INPUT_REGISTER = 3,
-		OUTPUT_REGISTER = 4
+		OUTPUT_REGISTER = 4,
+		PLC_DB = 5
 	};
 
 	// modbus float decode format

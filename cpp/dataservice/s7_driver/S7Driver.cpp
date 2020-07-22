@@ -4,7 +4,7 @@
 #include <cassert>
 
 RESULT_DSAPI goiot::S7Driver::InitDriver(const std::string& config, std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue, std::function<void(const DataInfo&)> set_data_info)
-{
+ {
     if (response_queue == nullptr)
     {
         throw std::invalid_argument("Parameter response_queue is null.");
@@ -146,16 +146,19 @@ int goiot::S7Driver::ParseConfig(const std::string& config,
             data_info.float_decode = float_decode;
             data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
-            float ratio = data_node["ratio"].asFloat();
-            if (std::abs(ratio) > 1e-6) // Ignore zero, keep ratio to default 1.0
+            if (data_node.isMember("ratio") && data_node["ratio"].isDouble())
             {
-                data_info.ratio = ratio;
+                float ratio = data_node["ratio"].asFloat();
+                if (std::abs(ratio) > 1e-6) // Ignore zero, keep ratio to default 1.0
+                {
+                    data_info.ratio = ratio;
+                }
             }
             std::string channel = data_node["register"].asString();
             assert(channel.length() > 6);
             if (channel.length() <= 6)
             {
-                std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                std::cout << "S7Driver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                 continue;
             }
             if (0 == channel.find("RW"))
@@ -177,7 +180,7 @@ int goiot::S7Driver::ParseConfig(const std::string& config,
             else
             {
                 assert(false);
-                std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                std::cout << "S7Driver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                 continue;
             }
             std::istringstream iss_data_zone(channel.substr(start_pos, 1));
@@ -185,25 +188,16 @@ int goiot::S7Driver::ParseConfig(const std::string& config,
             iss_data_zone >> int_zone;
             switch (int_zone)
             {
-            case 0:
-                data_info.data_zone = DataZone::OUTPUT_RELAY;
-                break;
-            case 1:
-                data_info.data_zone = DataZone::INPUT_RELAY;
-                break;
-            case 3:
-                data_info.data_zone = DataZone::INPUT_REGISTER;
-                break;
-            case 4:
-                data_info.data_zone = DataZone::OUTPUT_REGISTER;
+            case 5:
+                data_info.data_zone = DataZone::PLC_DB;
                 break;
             default:
                 assert(false);
-                std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                data_info.data_zone = DataZone::PLC_DB;
                 break;
             }
             start_pos++;
-            if (data_info.data_zone == DataZone::INPUT_REGISTER || data_info.data_zone == DataZone::OUTPUT_REGISTER)
+            if (data_info.data_zone == DataZone::PLC_DB)
             {
                 std::string data_type = channel.substr(start_pos, 3);
                 if (data_type.find_first_of("DF") == 0)
@@ -244,7 +238,7 @@ int goiot::S7Driver::ParseConfig(const std::string& config,
                 else
                 {
                     assert(false);
-                    std::cout << "ModbusRtuDriver::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                    std::cout << "S7Driver::ParseConfig() data.register " << data_type << " is invalid." << std::endl;
                     continue;
                 }
             }
