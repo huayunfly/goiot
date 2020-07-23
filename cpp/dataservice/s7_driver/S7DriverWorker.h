@@ -38,6 +38,16 @@ namespace goiot
 		void Stop();
 		// Refreshs the data reading or writing requests into in_queue.
 		void Refresh();
+		// Dispatch worker deals with the in_queue request, which may read/write message to hardware.
+		// The return data are put into the out_queue.
+		void Request_Dispatch();
+		// Dispatch worker deals with the out_queue request, which may trasnfer data to the DataService.
+		void Response_Dispatch();
+		// Puts asynchronous read request to the in_queue.
+		void AsyncRead(const std::vector<std::string> var_names,
+			const std::vector<std::string> var_ids, int trans_id);
+		// Puts asynchronous write request to the out_queue.
+		void AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id);
 
 	private:
 		// Get PLC status

@@ -27,6 +27,8 @@ RESULT_DSAPI goiot::S7Driver::InitDriver(const std::string& config, std::shared_
     driver_worker_.reset(new S7DriverWorker(connection_details, std::move(data_map), response_queue));
     int return_code = driver_worker_->OpenConnection();
     std::cout << "S7Driver::InitDriver() returns " << return_code << std::endl;
+    driver_worker_->Start();
+    worker_ready_ = true;
     return 0;
 }
 
