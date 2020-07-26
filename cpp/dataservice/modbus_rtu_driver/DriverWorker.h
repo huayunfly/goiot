@@ -48,12 +48,17 @@ namespace goiot
 		void AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id);
 
 	private:
+		/// <summary>
+		/// Read data from device.
+		/// </summary>
+		/// <param name="data_info">DataInfo object.</param>
+		/// <returns>A DataInfo object with value or error_code.</returns>
 		std::shared_ptr<DataInfo> ReadData(const DataInfo& data_info);
 		/// <summary>
 		/// Write data to device.
 		/// </summary>
 		/// <param name="data_info">DataInfo object.</param>
-		/// <returns>Return 0 if writing succeeded. otherwise returns std</returns>
+		/// <returns>Return 0 if writing succeeded. otherwise returns std::error_code.</returns>
 		int WriteData(const DataInfo& data_info);
 
 		/// <summary>

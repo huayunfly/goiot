@@ -225,37 +225,37 @@ namespace goiot
                 if (data_info.data_zone == DataZone::INPUT_REGISTER || data_info.data_zone == DataZone::OUTPUT_REGISTER)
                 {
                     std::string data_type = channel.substr(start_pos, 3);
-                    if (data_type.find_first_of("DF") == 0)
+                    if (data_type.find("DF") == 0)
                     {
                         data_info.data_type = DataType::DF;
                         start_pos += 2;
                     }
-                    else if (data_type.find_first_of("WUB") == 0)
+                    else if (data_type.find("WUB") == 0)
                     { 
                         data_info.data_type = DataType::WUB;
                         start_pos += 3;
                     }
-                    else if (data_type.find_first_of("WB") == 0)
+                    else if (data_type.find("WB") == 0)
                     {
                         data_info.data_type = DataType::WB;
                         start_pos += 2;
                     }
-                    else if (data_type.find_first_of("DUB") == 0)
+                    else if (data_type.find("DUB") == 0)
                     {
                         data_info.data_type = DataType::DUB;
                         start_pos += 3;
                     }
-                    else if (data_type.find_first_of("DB") == 0)
+                    else if (data_type.find("DB") == 0)
                     {
                         data_info.data_type = DataType::DB;
                         start_pos += 2;
                     }
-                    else if (data_type.find_first_of("BT") == 0)
+                    else if (data_type.find("BT") == 0)
                     {
                         data_info.data_type = DataType::BT;
                         start_pos += 2;
                     }
-                    else if (data_type.find_first_of("STR") == 0)
+                    else if (data_type.find("STR") == 0)
                     {
                         data_info.data_type = DataType::STR;
                         start_pos += 3;

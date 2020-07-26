@@ -94,35 +94,182 @@ namespace goiot
 			catch (...) {
 				std::cerr << "EXCEPTION (unknown)" << std::endl;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		}
 	}
 
 	// Dispatch worker deals with the in_queue request, which may read/write message to hardware.
 	// The return data are put into the out_queue.
-	void Request_Dispatch()
+	void S7DriverWorker::Request_Dispatch()
 	{
-
+		while (true)
+		{
+			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+			in_queue_.Get(data_info_vec);
+			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+			{
+				break; // Exit
+			}
+			auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
+			int result_code = 0;
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				std::shared_ptr<DataInfo> data_info;
+				switch (data_info_vec->at(i).data_flow_type)
+				{
+				case DataFlowType::REFRESH:
+					rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
+					break;
+				case DataFlowType::ASYNC_WRITE:
+					result_code = WriteData(data_info_vec->at(i));
+					rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
+						data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
+						data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
+						data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+						data_info_vec->at(i).char_value,
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						result_code);
+					break;
+				default:
+					break;
+				}
+			}
+			out_queue_.Put(rp_data_info_vec);
+		}
 	}
 
 	// Dispatch worker deals with the out_queue request, which may trasnfer data to the DataService.
-	void Response_Dispatch()
+	void S7DriverWorker::Response_Dispatch()
 	{
-
+		while (true)
+		{
+			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+			out_queue_.Get(data_info_vec);
+			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+			{
+				break; // Exit
+			}
+			driver_manager_reponse_queue_->PutNoWait(data_info_vec);
+		}
 	}
 
 
 	// Puts asynchronous read request to the in_queue.
-	void AsyncRead(const std::vector<std::string> var_names,
+	void S7DriverWorker::AsyncRead(const std::vector<std::string> var_names,
 		const std::vector<std::string> var_ids, int trans_id)
 	{
 
 	}
 
 	// Puts asynchronous write request to the out_queue.
-	void AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
+	void S7DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
 	{
 
+	}
+
+	//Read data from device.
+	std::shared_ptr<DataInfo> S7DriverWorker::ReadData(const DataInfo& data_info)
+	{
+		std::shared_ptr<DataInfo> rd(std::make_shared<DataInfo>(data_info));
+		rd->data_flow_type = DataFlowType::READ_RETURN; // Init to read_return
+		rd->result = ENODATA; // Init to no_message_available
+		return rd;
+	}
+
+	int S7DriverWorker::WriteData(const DataInfo& data_info)
+	{
+		return ENOTSUP;
+	}
+
+	std::shared_ptr<std::vector<DataInfo>> S7DriverWorker::ReadBatchData(std::shared_ptr<std::vector<DataInfo>> data_info_vec)
+	{
+		if (connected_)
+		{
+			std::map<int/* db id */, std::vector<byte>> data_map;
+			for (auto& entry : db_mapping_)
+			{
+				data_map.insert({ entry.first, std::vector<byte>(entry.second.second - entry.second.first) });
+			}
+			std::map<int/* db id */, int/* error_code */> ret_vec;
+			for (auto& entry : db_mapping_)
+			{
+				int read_db_ret = connection_manager_->DBRead(entry.first, entry.second.first/* start */, 
+					entry.second.second - entry.second.first/* size */, &data_map[entry.first].at(0));
+				ret_vec[entry.first] = read_db_ret;
+			}
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				data_info_vec->at(i).data_flow_type = DataFlowType::READ_RETURN;
+				if (ret_vec[data_info_vec->at(i).address/* db id */] != 0)
+				{
+					data_info_vec->at(i).result = ENODATA;
+				}
+				else
+				{
+					data_info_vec->at(i).result = 0;
+					int address = data_info_vec->at(i).address;
+					int register_address = data_info_vec->at(i).register_address;
+					std::size_t pos = register_address/* absolute offset */ - db_mapping_[address].first/* db read start */;
+					switch (data_info_vec->at(i).data_type)
+					{
+					case DataType::BT:
+						pos = register_address / 8/* absolute offset */ - db_mapping_[address].first/* db read start */;
+						data_info_vec->at(i).int_value = data_map[address].at(pos); // Store a byte here.
+						break;
+					case DataType::DB:
+					case DataType::DUB:
+						data_info_vec->at(i).int_value = 
+							data_map[address].at(pos) +
+							(data_map[address].at(pos + 1) << 8) +
+							(data_map[address].at(pos + 2) << 16) +
+							(data_map[address].at(pos + 3) << 24);
+						break;
+					case DataType::DF:
+						break;
+					case DataType::WB:
+					case DataType::WUB:
+						data_info_vec->at(i).int_value =
+							data_map[address].at(pos) +
+							(data_map[address].at(pos + 1) << 8);
+						break;
+					default:
+						throw std::invalid_argument("Unsupported data type");
+					}
+				}
+				data_info_vec->at(i).timestamp =
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+			}
+		}
+		else
+		{
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				data_info_vec->at(i).data_flow_type = DataFlowType::READ_RETURN;
+				data_info_vec->at(i).result = ENOTCONN;
+				data_info_vec->at(i).timestamp =
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+			}
+		}
+		return data_info_vec;
+	}
+
+
+	int S7DriverWorker::GetNumberOfByte(DataType datatype)
+	{
+		switch (datatype)
+		{
+		case DataType::BT:
+			return 1;
+		case DataType::WB:
+		case DataType::WUB:
+			return 2;
+		case DataType::DB:
+		case DataType::DF:
+		case DataType::DUB:
+			return 4;
+		default:
+			throw std::invalid_argument("Unsupported data type.");
+		}
 	}
 
 
@@ -143,7 +290,8 @@ namespace goiot
 		}
 	}
 
-	void S7DriverWorker::ListBlocks()
+	// ListBlocks is not supported by S7-1500
+	void S7DriverWorker::ListBlocks() 
 	{
 		TS7BlocksList list;
 		int res = connection_manager_->ListBlocks(&list);
@@ -157,5 +305,51 @@ namespace goiot
 			printf("  DBCount  : %d\n", list.DBCount);
 			printf("  SDBCount : %d\n", list.SDBCount);
 		};
+	}
+
+	// Parse data block start and end offset for read optimizaiton.
+	void S7DriverWorker::ParseDBOffset()
+	{
+		if (data_map_.size() == 0)
+		{
+			return;
+		}
+		int start = 0;  // 
+		int end = 0; // not included
+		for (auto& entry : data_map_)
+		{
+			switch (entry.second.data_type)
+			{
+			case DataType::BT:
+				start = entry.second.register_address / 8;  // to byte
+				end = start + 1;
+				break;
+			case DataType::DB:
+			case DataType::DF:
+			case DataType::DUB:
+				start = entry.second.register_address;  // in byte
+				end = start + 4;
+				break;
+			case DataType::WB:
+			case DataType::WUB:
+				start = entry.second.register_address;  // in byte
+				end = start + 2;
+				break;
+			default:
+				throw std::invalid_argument("Unsupported S7 data type");
+			}
+			if (db_mapping_.find(entry.second.address) == db_mapping_.end())
+			{
+				db_mapping_.insert({entry.second.address, std::make_pair(512/* db_start_offset_ init value */, 0)});
+			}
+			if (start < db_mapping_[entry.second.address].first && start >= 0)
+			{
+				db_mapping_[entry.second.address].first = start;
+			}
+			if (end > db_mapping_[entry.second.address].second && end > 0)
+			{
+				db_mapping_[entry.second.address].second = end;
+			}
+		}
 	}
 }
