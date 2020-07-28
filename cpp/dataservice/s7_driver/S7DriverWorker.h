@@ -77,7 +77,32 @@ namespace goiot
 		/// </summary>
 		/// <param name="datatype">Datatype</param>
 		/// <returns>Byte number. For bit, always return a byte.</returns>
-		int GetNumberOfByte(DataType datatype);
+		int GetNumberOfByte(DataType datatype); 
+
+		/// <summary>
+		/// Get a float from 4 bytes.
+		/// </summary>
+		/// <param name="src">Byte array</param>
+		/// <param name="pos">Start position</param>
+		/// <returns>Float value</returns>
+		float GetFloat(const std::vector<byte>& src, std::size_t pos);
+
+		/// <summary>
+		/// Get an int value from 4 bytes.
+		/// </summary>
+		/// <param name="src">Byte array</param>
+		/// <param name="pos">Start position</param>
+		/// <returns>Int value</returns>
+		int GetInt(const std::vector<byte>& src, std::size_t pos);
+
+		/// <summary>
+		/// Get a short integer from 4 bytes.
+		/// </summary>
+		/// <param name="src">Byte array</param>
+		/// <param name="pos">Start position</param>
+		/// <returns>Int16 value</returns>
+		int16_t GetInt16(const std::vector<byte> src, std::size_t pos);
+
 
 		// Parse data block start and end offset for read optimizaiton.
 		void ParseDBOffset();
@@ -99,7 +124,7 @@ namespace goiot
 		bool refresh_;
 		bool connected_;
 		// S7 optimization
-		std::map<int/* db_id */, std::pair<int/* db_start_offset_ */, int/* db_end_offset_ */>> db_mapping_;
+		std::map<int/* db_id */, std::pair<uint64_t/* db_start_offset_ */, uint64_t/* db_end_offset_ */>> db_mapping_;
 	};
 }
 

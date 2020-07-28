@@ -218,19 +218,14 @@ namespace goiot
 						break;
 					case DataType::DB:
 					case DataType::DUB:
-						data_info_vec->at(i).int_value = 
-							data_map[address].at(pos) +
-							(data_map[address].at(pos + 1) << 8) +
-							(data_map[address].at(pos + 2) << 16) +
-							(data_map[address].at(pos + 3) << 24);
+						data_info_vec->at(i).int_value = GetInt(data_map[address], pos);
 						break;
 					case DataType::DF:
+						data_info_vec->at(i).float_value = GetFloat(data_map[address], pos);
 						break;
 					case DataType::WB:
 					case DataType::WUB:
-						data_info_vec->at(i).int_value =
-							data_map[address].at(pos) +
-							(data_map[address].at(pos + 1) << 8);
+						data_info_vec->at(i).int_value = GetInt16(data_map[address], pos);
 						break;
 					default:
 						throw std::invalid_argument("Unsupported data type");
@@ -272,6 +267,27 @@ namespace goiot
 		}
 	}
 
+	// Get a float from 4 tytes
+	float S7DriverWorker::GetFloat(const std::vector<byte>& src, std::size_t pos)
+	{
+		float f;
+		uint32_t i = 
+			src.at(pos) + src.at(pos + 1) << 8 + src.at(pos + 2) << 16 + src.at(pos + 3) << 24;
+		memcpy(&f, &i, sizeof(float));
+		return f;
+	}
+
+	// Get an integer from 4 bytes
+	int S7DriverWorker::GetInt(const std::vector<byte>& src, std::size_t pos)
+	{
+		return src.at(pos) + src.at(pos + 1) << 8 + src.at(pos + 2) << 16 + src.at(pos + 3) << 24;
+	}
+
+	// Get an short integer from 4 bytes
+	int16_t S7DriverWorker::GetInt16(const std::vector<byte> src, std::size_t pos)
+	{
+		return src.at(pos) + src.at(pos + 1) << 8;
+	}
 
 	S7CPUStatus S7DriverWorker::PLCStatus()
 	{
