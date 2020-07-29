@@ -182,15 +182,6 @@ namespace goiot
 		std::shared_ptr<DataInfo> rd(std::make_shared<DataInfo>(data_info));
 		rd->data_flow_type = DataFlowType::READ_RETURN; // default data_flow_type: read_return
 		rd->result = ENODATA; // default result: no data
-		rd->address = data_info.address;
-		rd->data_type = data_info.data_type;
-		rd->data_zone = data_info.data_zone;
-		rd->float_decode = data_info.float_decode;
-		rd->id = data_info.id;
-		rd->name = data_info.name;
-		rd->ratio = data_info.ratio;
-		rd->read_write_priviledge = data_info.read_write_priviledge;
-		rd->register_address = data_info.register_address;
 
 		if (connected_)
 		{
