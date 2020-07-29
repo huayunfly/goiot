@@ -1,3 +1,5 @@
+// S7 driver worker
+// 2020.07.29, huayunfly at 126.com
 #pragma once
 
 #include <string>

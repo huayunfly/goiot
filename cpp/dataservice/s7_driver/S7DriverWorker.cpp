@@ -1,3 +1,10 @@
+// S7 driver worker.
+//
+// Write bit of bits: https://sourceforge.net/p/snap7/discussion/general/thread/b4c7b4f4/
+// You can use WriteArea passing S7WlBit as wordlength.
+// The CP(communicator processor) changes only the desired bit.
+// To write more bit at time you can use WriteMultiVars.
+
 #include "pch.h"
 #include <iostream>
 #include <vector>
@@ -25,12 +32,14 @@ namespace goiot
 		ListBlocks();
 		connected_ = true;
 
-		std::vector<byte> data_vec(1000);
-	    int read_db_ret = connection_manager_->DBRead(1, 0, 4, &data_vec.at(0));
+		std::vector<uint8_t> data_vec(1000);
+	    int read_db_ret = connection_manager_->DBRead(1, 0, 22, &data_vec.at(0));
 		//int size = 16;
 	    //read_db_ret = connection_manager_->DBGet(1, &data_vec.at(0), &size); // errCliFunNotAvailable
 		data_vec.at(0) = 0xfe;
 		int write_db_ret = connection_manager_->DBWrite(1, 12, 1, &data_vec.at(0));
+		uint8_t status_byte = 0;
+		int write_bit_ret = connection_manager_->WriteArea(S7AreaDB, 1, 12 * 8 + 1, 1, S7WLBit, &status_byte);
 		return res;
 	}
 
@@ -75,7 +84,7 @@ namespace goiot
 					data_info_vec.emplace_back(data_info.second.id,
 						data_info.second.name, data_info.second.address, data_info.second.register_address,
 						data_info.second.read_write_priviledge, DataFlowType::REFRESH, data_info.second.data_type,
-						data_info.second.data_zone, data_info.second.float_decode, data_info.second.int_value, data_info.second.float_value,
+						data_info.second.data_zone, data_info.second.float_decode, data_info.second.byte_value, data_info.second.int_value, data_info.second.float_value,
 						data_info.second.char_value, std::chrono::duration_cast<std::chrono::milliseconds>(
 							std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0);
 				}
@@ -125,7 +134,7 @@ namespace goiot
 					rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
 						data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
 						data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
-						data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+						data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
 						data_info_vec->at(i).char_value,
 						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 						result_code);
@@ -171,14 +180,135 @@ namespace goiot
 	std::shared_ptr<DataInfo> S7DriverWorker::ReadData(const DataInfo& data_info)
 	{
 		std::shared_ptr<DataInfo> rd(std::make_shared<DataInfo>(data_info));
-		rd->data_flow_type = DataFlowType::READ_RETURN; // Init to read_return
-		rd->result = ENODATA; // Init to no_message_available
+		rd->data_flow_type = DataFlowType::READ_RETURN; // default data_flow_type: read_return
+		rd->result = ENODATA; // default result: no data
+		rd->address = data_info.address;
+		rd->data_type = data_info.data_type;
+		rd->data_zone = data_info.data_zone;
+		rd->float_decode = data_info.float_decode;
+		rd->id = data_info.id;
+		rd->name = data_info.name;
+		rd->ratio = data_info.ratio;
+		rd->read_write_priviledge = data_info.read_write_priviledge;
+		rd->register_address = data_info.register_address;
+
+		if (connected_)
+		{
+			int bytes = GetNumberOfByte(data_info.data_type);
+			std::vector<uint8_t> data_vec(bytes);
+			int s7_len = 0;
+			// Assign S7 Word Length
+			switch (data_info.data_type)
+			{
+			case DataType::BT:
+				s7_len = S7WLBit;
+				break;
+			case DataType::WB:
+			case DataType::WUB:
+				s7_len = S7WLWord;
+				break;
+			case DataType::DB:
+			case DataType::DUB:
+				s7_len = S7WLDWord;
+				break;
+			case DataType::DF:
+				s7_len = S7WLReal;
+				break;
+			default:
+				throw std::invalid_argument("Unsupported data type");		
+			}
+			int read_db_ret = connection_manager_->ReadArea(S7AreaDB, data_info.address, 
+				data_info.register_address, 1/* Amount */, s7_len, &data_vec.at(0));
+			if (read_db_ret != 0)
+			{
+				rd->result = ENODATA;
+			}
+			else
+			{
+				rd->result = 0;
+				switch (data_info.data_type)
+				{
+				case DataType::BT:
+					rd->byte_value = data_vec.at(0); // Store boolean into uint8_t
+					break;
+				case DataType::WB:
+				case DataType::WUB:
+					rd->int_value = GetInt16(data_vec, 0);
+					break;
+				case DataType::DB:
+				case DataType::DUB:
+					rd->int_value = GetInt(data_vec, 0);
+					break;
+				case DataType::DF:
+					rd->float_value = GetFloat(data_vec, 0);
+					break;
+				default:
+					throw std::invalid_argument("Unsupported data type");
+				}
+			}
+		}
+		else
+		{
+			rd->result = ENOTCONN;
+		}
+		rd->timestamp =
+			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
 		return rd;
 	}
 
 	int S7DriverWorker::WriteData(const DataInfo& data_info)
 	{
-		return ENOTSUP;
+		if (connected_)
+		{
+			int bytes = GetNumberOfByte(data_info.data_type);
+			std::vector<uint8_t> data_vec(bytes);
+			int s7_len = 0;
+			// Assign S7 Word Length
+			switch (data_info.data_type)
+			{
+			case DataType::BT:
+				s7_len = S7WLBit;
+				data_vec.at(0) = data_info.byte_value;
+				break;
+			case DataType::WB:
+			case DataType::WUB:
+				s7_len = S7WLWord;
+				data_vec.at(0) = (data_info.int_value & 0xff00) >> 8;
+				data_vec.at(1) = data_info.int_value & 0x00ff;
+				break;
+			case DataType::DB:
+			case DataType::DUB:
+				s7_len = S7WLDWord;
+				data_vec.at(0) = data_info.int_value >> 24;
+				data_vec.at(1) = (data_info.int_value >> 16) & 0x00ff;
+				data_vec.at(2) = (data_info.int_value & 0xff00) >> 8;
+				data_vec.at(3) = data_info.int_value & 0x00ff;
+				break;
+			case DataType::DF:
+				s7_len = S7WLReal;
+				data_vec.at(0) = data_info.int_value >> 24;
+				data_vec.at(1) = (data_info.int_value >> 16) & 0x00ff;
+				data_vec.at(2) = (data_info.int_value & 0xff00) >> 8;
+				data_vec.at(3) = data_info.int_value & 0x00ff;
+				break;
+			default:
+				throw std::invalid_argument("Unsupported data type");
+			}
+			int read_db_ret = connection_manager_->WriteArea(S7AreaDB, data_info.address,
+				data_info.register_address, 1/* Amount */, s7_len, &data_vec.at(0));
+			if (read_db_ret != 0)
+			{
+				return ENODATA;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return ENOTCONN;
+		}
 	}
 
 	std::shared_ptr<std::vector<DataInfo>> S7DriverWorker::ReadBatchData(std::shared_ptr<std::vector<DataInfo>> data_info_vec)
@@ -188,7 +318,7 @@ namespace goiot
 			std::map<int/* db id */, std::vector<byte>> data_map;
 			for (auto& entry : db_mapping_)
 			{
-				data_map.insert({ entry.first, std::vector<byte>(entry.second.second - entry.second.first) });
+				data_map.insert({ entry.first, std::vector<uint8_t>(entry.second.second - entry.second.first) });
 			}
 			std::map<int/* db id */, int/* error_code */> ret_vec;
 			for (auto& entry : db_mapping_)
@@ -214,7 +344,11 @@ namespace goiot
 					{
 					case DataType::BT:
 						pos = register_address / 8/* absolute offset */ - db_mapping_[address].first/* db read start */;
-						data_info_vec->at(i).int_value = data_map[address].at(pos); // Store a byte here.
+						data_info_vec->at(i).byte_value = data_map[address].at(pos) & (register_address % 8); // Store boolean into uint8_t
+						break;
+					case DataType::WB:
+					case DataType::WUB:
+						data_info_vec->at(i).int_value = GetInt16(data_map[address], pos);
 						break;
 					case DataType::DB:
 					case DataType::DUB:
@@ -222,10 +356,6 @@ namespace goiot
 						break;
 					case DataType::DF:
 						data_info_vec->at(i).float_value = GetFloat(data_map[address], pos);
-						break;
-					case DataType::WB:
-					case DataType::WUB:
-						data_info_vec->at(i).int_value = GetInt16(data_map[address], pos);
 						break;
 					default:
 						throw std::invalid_argument("Unsupported data type");
@@ -272,7 +402,7 @@ namespace goiot
 	{
 		float f;
 		uint32_t i = 
-			src.at(pos) + src.at(pos + 1) << 8 + src.at(pos + 2) << 16 + src.at(pos + 3) << 24;
+			src.at(pos) << 24 + src.at(pos + 1) << 16 + src.at(pos + 2) << 8 + src.at(pos + 3);
 		memcpy(&f, &i, sizeof(float));
 		return f;
 	}
@@ -280,13 +410,13 @@ namespace goiot
 	// Get an integer from 4 bytes
 	int S7DriverWorker::GetInt(const std::vector<byte>& src, std::size_t pos)
 	{
-		return src.at(pos) + src.at(pos + 1) << 8 + src.at(pos + 2) << 16 + src.at(pos + 3) << 24;
+		return src.at(pos) << 24 + src.at(pos + 1) << 16 + src.at(pos + 2) << 8 + src.at(pos + 3);
 	}
 
 	// Get an short integer from 4 bytes
 	int16_t S7DriverWorker::GetInt16(const std::vector<byte> src, std::size_t pos)
 	{
-		return src.at(pos) + src.at(pos + 1) << 8;
+		return src.at(pos) << 8 + src.at(pos + 1);
 	}
 
 	S7CPUStatus S7DriverWorker::PLCStatus()

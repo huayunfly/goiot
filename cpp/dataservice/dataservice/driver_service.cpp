@@ -355,7 +355,7 @@ namespace goiot {
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									data_info.name, data_info.address, data_info.register_address,
 									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-									data_info.data_zone, data_info.float_decode,
+									data_info.data_zone, data_info.float_decode, 0/* byte */,
 									0/* integer */, new_value, ""/* string */, timestamp
 								);
 							}
@@ -370,8 +370,23 @@ namespace goiot {
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									data_info.name, data_info.address, data_info.register_address,
 									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-									data_info.data_zone, data_info.float_decode,
+									data_info.data_zone, data_info.float_decode, 0/* byte */,
 									0/* integer */, 0.0/* float */, new_value, timestamp
+								);
+							}
+							else if (data_info.data_type == DataType::BT)
+							{
+								byte new_value = std::atoi(reply->element[i * 2 + 1]->str);
+								if (data_info.byte_value == new_value &&
+									(timestamp - data_info.timestamp) < timespan)
+								{
+									continue;
+								}
+								group_pos->second.emplace_back(reply->element[i * 2]->str,
+									data_info.name, data_info.address, data_info.register_address,
+									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+									data_info.data_zone, data_info.float_decode, new_value,
+									0/* integer */, 0.0/* float */, "", timestamp
 								);
 							}
 							else
@@ -385,7 +400,7 @@ namespace goiot {
 								group_pos->second.emplace_back(reply->element[i * 2]->str,
 									data_info.name, data_info.address, data_info.register_address,
 									data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-									data_info.data_zone, data_info.float_decode,
+									data_info.data_zone, data_info.float_decode, 0/* byte */,
 									new_value, 0.0/* float */, "", timestamp
 								);
 							}

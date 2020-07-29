@@ -101,7 +101,7 @@ namespace goiot
 	struct DataInfo
 	{
 		DataInfo() : id(""), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
-			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), int_value(0), float_value(0), char_value(""),
+			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), byte_value(0), int_value(0), float_value(0), char_value(""),
 			timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0), ratio(1.0)
 		{
@@ -109,7 +109,7 @@ namespace goiot
 		}
 
 		DataInfo(const std::string& new_id) : id(new_id), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
-			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), int_value(0), float_value(0), char_value(""),
+			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), byte_value(0), int_value(0), float_value(0), char_value(""),
 			timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0), ratio(1.0)
 		{
@@ -118,15 +118,14 @@ namespace goiot
 
 		// For data copy.
 		DataInfo(const std::string& new_id, const std::string& new_name, int new_address, int new_register_address, ReadWritePrivilege new_read_write_priviledge,
-			DataFlowType new_data_flow_type, DataType new_data_type, DataZone new_data_zone, FloatDecode new_float_decode, int new_int_value, double new_float_value, const std::string& new_char_value,
+			DataFlowType new_data_flow_type, DataType new_data_type, DataZone new_data_zone, FloatDecode new_float_decode, uint8_t new_byte_value, int new_int_value, double new_float_value, const std::string& new_char_value,
 			double new_timestamp, int result_code = 0, float new_ratio = 1.0) : 
 			id(new_id), name(new_name), address(new_address), register_address(new_register_address), read_write_priviledge(new_read_write_priviledge),
-			data_flow_type(new_data_flow_type), data_type(new_data_type), data_zone(new_data_zone), float_decode(new_float_decode), int_value(new_int_value), float_value(new_float_value), char_value(new_char_value),
+			data_flow_type(new_data_flow_type), data_type(new_data_type), data_zone(new_data_zone), float_decode(new_float_decode), byte_value(new_byte_value), int_value(new_int_value), float_value(new_float_value), char_value(new_char_value),
 			timestamp(new_timestamp), result(result_code), ratio(new_ratio)
 		{
 
 		}
-
 
 		std::string id;
 		std::string name;
@@ -137,6 +136,7 @@ namespace goiot
 		DataType data_type;
 		DataZone data_zone;
 		FloatDecode float_decode; // float decode with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
+		uint8_t byte_value; // for boolean
 		int int_value;
 		double float_value;
 		std::string char_value;
