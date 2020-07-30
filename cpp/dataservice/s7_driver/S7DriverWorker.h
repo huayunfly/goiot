@@ -64,7 +64,7 @@ namespace goiot
 		/// Read batch data block and decouple them into vector. Change the input parameter and return DataInfo pointer.
 		/// </summary>
 		/// <param name="data_info_vec">DataInfo vector.</param>
-		/// <returns>New dataInfo vector with return_code.</returns>
+		/// <returns>Changed dataInfo vector with return_code.</returns>
 		std::shared_ptr<std::vector<DataInfo>> ReadBatchData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
 
 		/// <summary>
@@ -73,6 +73,13 @@ namespace goiot
 		/// <param name="data_info">DataInfo object.</param>
 		/// <returns>Return 0 if writing succeeded. otherwise returns std::error_code.</returns>
 		int WriteData(const DataInfo& data_info);
+
+		/// <summary>
+		/// Write multiple data to device. Change input DataInfo return_code and data_flow directly.
+		/// </summary>
+		/// <param name="data_info">DataInfo object.</param>
+		/// <returns>Changed dataInfo vector with return_code.</returns>
+		std::shared_ptr<std::vector<DataInfo>> WriteData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
 
 		/// <summary>
 		/// Get number of byte used to read PLC data block. 

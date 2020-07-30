@@ -32,14 +32,35 @@ namespace goiot
 		ListBlocks();
 		connected_ = true;
 
+		// DBRead test
 		std::vector<uint8_t> data_vec(1000);
 	    int read_db_ret = connection_manager_->DBRead(1, 0, 22, &data_vec.at(0));
 		//int size = 16;
 	    //read_db_ret = connection_manager_->DBGet(1, &data_vec.at(0), &size); // errCliFunNotAvailable
+		// DBWrite test
 		data_vec.at(0) = 0xfe;
 		int write_db_ret = connection_manager_->DBWrite(1, 12, 1, &data_vec.at(0));
+		// WriteArea test
 		uint8_t status_byte = 0;
 		int write_bit_ret = connection_manager_->WriteArea(S7AreaDB, 1, 12 * 8 + 1, 1, S7WLBit, &status_byte);
+		// WriteMultiVars test
+		std::shared_ptr<std::vector<DataInfo>> data_info_vec(new std::vector<DataInfo>(1));
+		data_info_vec->at(0).id = "id1";
+		data_info_vec->at(0).address = 1;
+		data_info_vec->at(0).register_address = 0;
+		data_info_vec->at(0).data_type = DataType::DB;
+		data_info_vec->at(0).int_value = 0;
+		//data_info_vec->at(1).id = "id2";
+		//data_info_vec->at(1).address = 1;
+		//data_info_vec->at(1).register_address = 16 * 8 + 1;
+		//data_info_vec->at(1).data_type = DataType::BT;
+		//data_info_vec->at(1).byte_value = 1;
+		//data_info_vec->at(2).id = "id3";
+		//data_info_vec->at(2).address = 1;
+		//data_info_vec->at(2).register_address = 18;
+		//data_info_vec->at(2).data_type = DataType::DF;
+		//data_info_vec->at(2).float_value = -2000.0;
+		auto rp_vec = WriteData(data_info_vec);
 		return res;
 	}
 
@@ -119,30 +140,47 @@ namespace goiot
 			{
 				break; // Exit
 			}
-			auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
+			std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec;
 			int result_code = 0;
-			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			
+			if (data_info_vec->empty())
 			{
-				std::shared_ptr<DataInfo> data_info;
-				switch (data_info_vec->at(i).data_flow_type)
-				{
-				case DataFlowType::REFRESH:
-					rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
-					break;
-				case DataFlowType::ASYNC_WRITE:
-					result_code = WriteData(data_info_vec->at(i));
-					rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
-						data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
-						data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
-						data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
-						data_info_vec->at(i).char_value,
-						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
-						result_code);
-					break;
-				default:
-					break;
-				}
+				continue;
 			}
+			if (data_info_vec->at(0).data_flow_type == DataFlowType::REFRESH)
+			{
+				rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
+			}
+			else if (data_info_vec->at(0).data_flow_type == DataFlowType::WRITE)
+			{
+				rp_data_info_vec = WriteData(data_info_vec);
+			}
+			else
+			{
+				throw std::invalid_argument("Unsupported data flow");
+			}
+			//for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			//{
+			//	std::shared_ptr<DataInfo> data_info;
+			//	switch (data_info_vec->at(i).data_flow_type)
+			//	{
+			//	case DataFlowType::REFRESH:
+			//		rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
+			//		break;
+			//	case DataFlowType::ASYNC_WRITE:
+			//		result_code = WriteData(data_info_vec->at(i));
+			//		rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
+			//			data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
+			//			data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
+			//			data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+			//			data_info_vec->at(i).char_value,
+			//			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+			//			result_code);
+			//		break;
+			//	default:
+			//		break;
+			//	}
+			//}
 			out_queue_.Put(rp_data_info_vec);
 		}
 	}
@@ -285,9 +323,9 @@ namespace goiot
 			default:
 				throw std::invalid_argument("Unsupported data type");
 			}
-			int read_db_ret = connection_manager_->WriteArea(S7AreaDB, data_info.address,
+			int write_ret = connection_manager_->WriteArea(S7AreaDB, data_info.address,
 				data_info.register_address, 1/* Amount */, s7_len, &data_vec.at(0));
-			if (read_db_ret != 0)
+			if (write_ret != 0)
 			{
 				return ENODATA;
 			}
@@ -302,6 +340,88 @@ namespace goiot
 		}
 	}
 
+	std::shared_ptr<std::vector<DataInfo>> S7DriverWorker::WriteData(std::shared_ptr<std::vector<DataInfo>> data_info_vec)
+	{
+		if (data_info_vec == nullptr)
+		{
+			throw std::invalid_argument("data_info_vec is null.");
+		}
+
+		if (connected_)
+		{
+			std::vector<TS7DataItem> data_item_vec(data_info_vec->size());
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				int bytes = GetNumberOfByte(data_info_vec->at(i).data_type);
+				std::vector<uint8_t> data_vec(bytes); // need to be fixed
+				int s7_len = 0;
+				switch (data_info_vec->at(i).data_type)
+				{
+				case DataType::BT:
+					s7_len = S7WLBit;
+					data_vec.at(0) = data_info_vec->at(i).byte_value;
+					break;
+				case DataType::WB:
+				case DataType::WUB:
+					s7_len = S7WLWord;
+					data_vec.at(0) = (data_info_vec->at(i).int_value & 0xff00) >> 8;
+					data_vec.at(1) = data_info_vec->at(i).int_value & 0x00ff;
+					break;
+				case DataType::DB:
+				case DataType::DUB:
+					s7_len = S7WLDWord;
+					data_vec.at(0) = data_info_vec->at(i).int_value >> 24;
+					data_vec.at(1) = (data_info_vec->at(i).int_value >> 16) & 0x00ff;
+					data_vec.at(2) = (data_info_vec->at(i).int_value & 0xff00) >> 8;
+					data_vec.at(3) = data_info_vec->at(i).int_value & 0x00ff;
+					break;
+				case DataType::DF:
+					s7_len = S7WLReal;
+					data_vec.at(0) = data_info_vec->at(i).int_value >> 24;
+					data_vec.at(1) = (data_info_vec->at(i).int_value >> 16) & 0x00ff;
+					data_vec.at(2) = (data_info_vec->at(i).int_value & 0xff00) >> 8;
+					data_vec.at(3) = data_info_vec->at(i).int_value & 0x00ff;
+					break;
+				default:
+					throw std::invalid_argument("Unsupported data type");
+				}
+				data_item_vec.at(i).Amount = 1;
+				data_item_vec.at(i).Area = S7AreaDB;
+				data_item_vec.at(i).DBNumber = data_info_vec->at(i).address;
+				data_item_vec.at(i).pdata = &data_vec[0];
+				data_item_vec.at(i).Result = -1;
+				data_item_vec.at(i).Start = data_info_vec->at(i).register_address;
+				data_item_vec.at(i).WordLen = s7_len;
+			}
+			int write_ret = connection_manager_->WriteMultiVars(&data_item_vec.at(0), data_item_vec.size());
+			if (write_ret != 0)
+			{
+				for (std::size_t i = 0; i < data_info_vec->size(); i++)
+				{
+					data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+					data_info_vec->at(i).result = ENODATA;
+				}
+			}
+			else
+			{
+				for (std::size_t i = 0; i < data_info_vec->size(); i++)
+				{
+					data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+					data_info_vec->at(i).result = (data_item_vec.at(i).Result == 0) ? 0 : ENODATA;
+				}
+			}
+		}
+		else
+		{
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+				data_info_vec->at(i).result = ENOTCONN;
+			}
+		}
+		return data_info_vec;
+	}
+
 	std::shared_ptr<std::vector<DataInfo>> S7DriverWorker::ReadBatchData(std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
 		if (connected_)
@@ -309,7 +429,7 @@ namespace goiot
 			std::map<int/* db id */, std::vector<byte>> data_map;
 			for (auto& entry : db_mapping_)
 			{
-				data_map.insert({ entry.first, std::vector<uint8_t>(entry.second.second - entry.second.first) });
+				data_map.insert({ entry.first/* DB id */, std::vector<uint8_t>(entry.second.second - entry.second.first) });
 			}
 			std::map<int/* db id */, int/* error_code */> ret_vec;
 			for (auto& entry : db_mapping_)
