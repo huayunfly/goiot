@@ -33,16 +33,16 @@ namespace goiot
             return 0;
         }
 
-        virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec) 
+        virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id)
         {
             return 0;
         }
 
-        virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec,
-            std::function<void(std::vector<DataInfo>&&)> read_callback)
+        virtual RESULT_DSAPI AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id,
+            std::function<void(std::vector<DataInfo>&&, uint64_t)> read_callback)
         {
-            std::vector<DataInfo> data_info_vec;
-            read_callback(std::move(data_info_vec));
+            std::vector<DataInfo> new_data_info_vec;
+            read_callback(std::move(new_data_info_vec), 0);
             return 0;
         }
     };

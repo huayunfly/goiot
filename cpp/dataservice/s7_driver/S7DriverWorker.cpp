@@ -1,14 +1,18 @@
 // S7 driver worker.
-//
+// <1>
 // Write bit of bits: https://sourceforge.net/p/snap7/discussion/general/thread/b4c7b4f4/
 // You can use WriteArea passing S7WlBit as wordlength.
 // The CP(communicator processor) changes only the desired bit.
 // To write more bit at time you can use WriteMultiVars.
+// <2>
+// The SmartConnect feature relies on this principle to avoid the TCP connection timeout when a PLC is off or the network cable is unwired.
+// Unlike the TCP connection timeout, The ping time is fixedand we can decide how much it should be.
 
 #include "pch.h"
 #include <iostream>
 #include <vector>
 #include "S7DriverWorker.h"
+#include <cassert>
 
 namespace goiot
 {
@@ -28,7 +32,8 @@ namespace goiot
 			std::cout << "S7 Connected to: " << connection_details_.port << " Rack=" <<
 				connection_details_.rack << ", Slot=" << connection_details_.slot << std::endl;
 		}
-		S7CPUStatus status = PLCStatus();  // Todo: CPU run => connected_ ?
+		// PLC status test
+		S7CPUStatus status = PLCStatus();
 		ListBlocks();
 		connected_ = true;
 
@@ -44,22 +49,22 @@ namespace goiot
 		uint8_t status_byte = 0;
 		int write_bit_ret = connection_manager_->WriteArea(S7AreaDB, 1, 12 * 8 + 1, 1, S7WLBit, &status_byte);
 		// WriteMultiVars test
-		std::shared_ptr<std::vector<DataInfo>> data_info_vec(new std::vector<DataInfo>(1));
+		std::shared_ptr<std::vector<DataInfo>> data_info_vec(new std::vector<DataInfo>(3));
 		data_info_vec->at(0).id = "id1";
 		data_info_vec->at(0).address = 1;
 		data_info_vec->at(0).register_address = 0;
 		data_info_vec->at(0).data_type = DataType::DB;
-		data_info_vec->at(0).int_value = 0;
-		//data_info_vec->at(1).id = "id2";
-		//data_info_vec->at(1).address = 1;
-		//data_info_vec->at(1).register_address = 16 * 8 + 1;
-		//data_info_vec->at(1).data_type = DataType::BT;
-		//data_info_vec->at(1).byte_value = 1;
-		//data_info_vec->at(2).id = "id3";
-		//data_info_vec->at(2).address = 1;
-		//data_info_vec->at(2).register_address = 18;
-		//data_info_vec->at(2).data_type = DataType::DF;
-		//data_info_vec->at(2).float_value = -2000.0;
+		data_info_vec->at(0).int_value = 88886666;
+		data_info_vec->at(1).id = "id2";
+		data_info_vec->at(1).address = 1;
+		data_info_vec->at(1).register_address = 16 * 8 + 1;
+		data_info_vec->at(1).data_type = DataType::BT;
+		data_info_vec->at(1).byte_value = 0;
+		data_info_vec->at(2).id = "id3";
+		data_info_vec->at(2).address = 1;
+		data_info_vec->at(2).register_address = 18;
+		data_info_vec->at(2).data_type = DataType::DF;
+		data_info_vec->at(2).float_value = -2000.08;
 		auto rp_vec = WriteData(data_info_vec);
 		return res;
 	}
@@ -151,7 +156,7 @@ namespace goiot
 			{
 				rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
 			}
-			else if (data_info_vec->at(0).data_flow_type == DataFlowType::WRITE)
+			else if (data_info_vec->at(0).data_flow_type == DataFlowType::ASYNC_WRITE)
 			{
 				rp_data_info_vec = WriteData(data_info_vec);
 			}
@@ -159,28 +164,6 @@ namespace goiot
 			{
 				throw std::invalid_argument("Unsupported data flow");
 			}
-			//for (std::size_t i = 0; i < data_info_vec->size(); i++)
-			//{
-			//	std::shared_ptr<DataInfo> data_info;
-			//	switch (data_info_vec->at(i).data_flow_type)
-			//	{
-			//	case DataFlowType::REFRESH:
-			//		rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
-			//		break;
-			//	case DataFlowType::ASYNC_WRITE:
-			//		result_code = WriteData(data_info_vec->at(i));
-			//		rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
-			//			data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
-			//			data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
-			//			data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
-			//			data_info_vec->at(i).char_value,
-			//			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
-			//			result_code);
-			//		break;
-			//	default:
-			//		break;
-			//	}
-			//}
 			out_queue_.Put(rp_data_info_vec);
 		}
 	}
@@ -202,16 +185,23 @@ namespace goiot
 
 
 	// Puts asynchronous read request to the in_queue.
-	void S7DriverWorker::AsyncRead(const std::vector<std::string> var_names,
-		const std::vector<std::string> var_ids, int trans_id)
+	void S7DriverWorker::AsyncRead(const std::vector<DataInfo>& data_info_vec, int trans_id)
 	{
-
+		if (data_info_vec.size() > 0)
+		{
+			assert(data_info_vec.at(0).data_flow_type == DataFlowType::ASYNC_READ);
+			in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+		}
 	}
 
 	// Puts asynchronous write request to the out_queue.
 	void S7DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
 	{
-
+		if (data_info_vec.size() > 0)
+		{
+			assert(data_info_vec.at(0).data_flow_type == DataFlowType::ASYNC_WRITE);
+			in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+		}
 	}
 
 	//Read data from device.
@@ -349,49 +339,65 @@ namespace goiot
 
 		if (connected_)
 		{
+			std::vector<uint8_t> data_vec;
+			data_vec.reserve(1024);
+			std::vector<int> data_start_pos_vec;
+			data_start_pos_vec.reserve(256); // every data start position in data_vec in byte
+			std::vector<int> s7_len_vec;
+			s7_len_vec.reserve(256);
+			int byte_sum = 0;
 			std::vector<TS7DataItem> data_item_vec(data_info_vec->size());
 			for (std::size_t i = 0; i < data_info_vec->size(); i++)
 			{
-				int bytes = GetNumberOfByte(data_info_vec->at(i).data_type);
-				std::vector<uint8_t> data_vec(bytes); // need to be fixed
-				int s7_len = 0;
+				data_start_pos_vec.push_back(byte_sum);
+				float f = 0.0;
+				uint8_t* byte_addr = 0;
 				switch (data_info_vec->at(i).data_type)
 				{
 				case DataType::BT:
-					s7_len = S7WLBit;
-					data_vec.at(0) = data_info_vec->at(i).byte_value;
+					data_vec.push_back(data_info_vec->at(i).byte_value);
+					s7_len_vec.push_back(S7WLBit);
+					byte_sum += 1;
 					break;
 				case DataType::WB:
 				case DataType::WUB:
-					s7_len = S7WLWord;
-					data_vec.at(0) = (data_info_vec->at(i).int_value & 0xff00) >> 8;
-					data_vec.at(1) = data_info_vec->at(i).int_value & 0x00ff;
+					s7_len_vec.push_back(S7WLWord);
+					byte_sum += 2;
+					data_vec.push_back((data_info_vec->at(i).int_value & 0xff00) >> 8);
+					data_vec.push_back(data_info_vec->at(i).int_value & 0x00ff);
 					break;
 				case DataType::DB:
 				case DataType::DUB:
-					s7_len = S7WLDWord;
-					data_vec.at(0) = data_info_vec->at(i).int_value >> 24;
-					data_vec.at(1) = (data_info_vec->at(i).int_value >> 16) & 0x00ff;
-					data_vec.at(2) = (data_info_vec->at(i).int_value & 0xff00) >> 8;
-					data_vec.at(3) = data_info_vec->at(i).int_value & 0x00ff;
+					data_vec.push_back(data_info_vec->at(i).int_value >> 24);
+					data_vec.push_back((data_info_vec->at(i).int_value >> 16) & 0x00ff);
+					data_vec.push_back((data_info_vec->at(i).int_value & 0xff00) >> 8);
+					data_vec.push_back(data_info_vec->at(i).int_value & 0x00ff);
+					s7_len_vec.push_back(S7WLDWord);
+					byte_sum += 4;
 					break;
 				case DataType::DF:
-					s7_len = S7WLReal;
-					data_vec.at(0) = data_info_vec->at(i).int_value >> 24;
-					data_vec.at(1) = (data_info_vec->at(i).int_value >> 16) & 0x00ff;
-					data_vec.at(2) = (data_info_vec->at(i).int_value & 0xff00) >> 8;
-					data_vec.at(3) = data_info_vec->at(i).int_value & 0x00ff;
+					f = static_cast<float>(data_info_vec->at(i).float_value);
+					byte_addr = (uint8_t*)&f;
+					data_vec.push_back(*(byte_addr + 3));
+					data_vec.push_back(*(byte_addr + 2));
+					data_vec.push_back(*(byte_addr + 1));
+					data_vec.push_back(*byte_addr);
+					s7_len_vec.push_back(S7WLReal);
+					byte_sum += 4;
 					break;
 				default:
 					throw std::invalid_argument("Unsupported data type");
 				}
+			}
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
 				data_item_vec.at(i).Amount = 1;
 				data_item_vec.at(i).Area = S7AreaDB;
 				data_item_vec.at(i).DBNumber = data_info_vec->at(i).address;
-				data_item_vec.at(i).pdata = &data_vec[0];
+				data_item_vec.at(i).pdata = &data_vec.at(data_start_pos_vec.at(i));
 				data_item_vec.at(i).Result = -1;
 				data_item_vec.at(i).Start = data_info_vec->at(i).register_address;
-				data_item_vec.at(i).WordLen = s7_len;
+				data_item_vec.at(i).WordLen = s7_len_vec.at(i);
 			}
 			int write_ret = connection_manager_->WriteMultiVars(&data_item_vec.at(0), data_item_vec.size());
 			if (write_ret != 0)
@@ -455,7 +461,7 @@ namespace goiot
 					{
 					case DataType::BT:
 						pos = register_address / 8/* absolute offset */ - db_mapping_[address].first/* db read start */;
-						data_info_vec->at(i).byte_value = data_map[address].at(pos) & (register_address % 8); // Store boolean into uint8_t
+						data_info_vec->at(i).byte_value = data_map[address].at(pos) &  (1 << (register_address % 8)); // Store boolean into uint8_t
 						break;
 					case DataType::WB:
 					case DataType::WUB:
@@ -513,7 +519,7 @@ namespace goiot
 	{
 		float f;
 		uint32_t i = 
-			src.at(pos) << 24 + src.at(pos + 1) << 16 + src.at(pos + 2) << 8 + src.at(pos + 3);
+			(src.at(pos) << 24) + (src.at(pos + 1) << 16) + (src.at(pos + 2) << 8) + src.at(pos + 3);
 		memcpy(&f, &i, sizeof(float));
 		return f;
 	}
@@ -521,13 +527,13 @@ namespace goiot
 	// Get an integer from 4 bytes
 	int S7DriverWorker::GetInt(const std::vector<byte>& src, std::size_t pos)
 	{
-		return src.at(pos) << 24 + src.at(pos + 1) << 16 + src.at(pos + 2) << 8 + src.at(pos + 3);
+		return (src.at(pos) << 24) + (src.at(pos + 1) << 16) + (src.at(pos + 2) << 8) + src.at(pos + 3);
 	}
 
 	// Get an short integer from 4 bytes
 	int16_t S7DriverWorker::GetInt16(const std::vector<byte> src, std::size_t pos)
 	{
-		return src.at(pos) << 8 + src.at(pos + 1);
+		return (src.at(pos) << 8) + src.at(pos + 1);
 	}
 
 	S7CPUStatus S7DriverWorker::PLCStatus()

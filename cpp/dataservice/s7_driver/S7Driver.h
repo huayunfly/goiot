@@ -32,8 +32,8 @@ namespace goiot
 
 		virtual RESULT_DSAPI InitDriver(const std::string& config, std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue, std::function<void(const DataInfo&)> set_data_info) override;
 		virtual RESULT_DSAPI UnitDriver() override;
-		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec) override;
-		virtual RESULT_DSAPI AsyncRead(const std::vector<std::string> id_vec, std::function<void(std::vector<DataInfo>&&)> read_callback) override;
+		virtual RESULT_DSAPI AsyncWrite(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id) override;
+		virtual RESULT_DSAPI AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id, std::function<void(std::vector<DataInfo>&&, uint64_t)> read_callback) override;
 
 	private:
 		/// <summary>

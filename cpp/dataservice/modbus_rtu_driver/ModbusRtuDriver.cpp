@@ -50,7 +50,7 @@ namespace goiot
         return 0;
     }
 
-    RESULT_DSAPI ModbusRtuDriver::AsyncWrite(const std::vector<DataInfo>& data_info_vec)
+    RESULT_DSAPI ModbusRtuDriver::AsyncWrite(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id)
     {
         if (!worker_ready_) // Todo: race condition with Stop()
         {
@@ -60,8 +60,8 @@ namespace goiot
         return 0;
     }
 
-    RESULT_DSAPI ModbusRtuDriver::AsyncRead(const std::vector<std::string> id_vec,
-        std::function<void(std::vector<DataInfo>&&)> read_callback)
+    RESULT_DSAPI ModbusRtuDriver::AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id,
+        std::function<void(std::vector<DataInfo>&&, uint64_t)> read_callback)
     {
         throw std::runtime_error("Not implemented.");
     }

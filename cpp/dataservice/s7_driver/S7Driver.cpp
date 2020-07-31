@@ -45,14 +45,20 @@ RESULT_DSAPI goiot::S7Driver::UnitDriver()
     return 0;
 }
 
-RESULT_DSAPI goiot::S7Driver::AsyncWrite(const std::vector<DataInfo>& data_info_vec)
+RESULT_DSAPI goiot::S7Driver::AsyncWrite(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id)
 {
-	return RESULT_DSAPI();
+    if (!worker_ready_) // Todo: race condition with Stop()
+    {
+        return ENOTCONN;
+    }
+    driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
+    return 0;
 }
 
-RESULT_DSAPI goiot::S7Driver::AsyncRead(const std::vector<std::string> id_vec, std::function<void(std::vector<DataInfo>&&)> read_callback)
+RESULT_DSAPI goiot::S7Driver::AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id, 
+    std::function<void(std::vector<DataInfo>&&, uint64_t)> read_callback)
 {
-	return RESULT_DSAPI();
+    throw std::runtime_error("Not implemented.");
 }
 
 // Private methods

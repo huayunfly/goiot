@@ -35,6 +35,7 @@
 #include <mutex>
 #include <iostream>
 #include "DriverWorker.h"
+#include <cassert>
 
 namespace goiot
 {
@@ -200,6 +201,7 @@ namespace goiot
 	{
 		if (data_info_vec.size() > 0)
 		{
+			assert(data_info_vec.at(0).data_flow_type == DataFlowType::ASYNC_WRITE);
 			in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
 		}
 	}

@@ -415,7 +415,7 @@ namespace goiot {
 							driver->GetID(id);
 							if (id.compare(element.first) == 0)
 							{
-								driver->AsyncWrite(element.second);
+								driver->AsyncWrite(element.second, 0); // Todo: transaction id
 								break;
 							}
 						}
