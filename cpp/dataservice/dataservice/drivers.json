@@ -57,20 +57,38 @@
       "response_to_msec": 500,
       "nodes": [
         {
-          "address": "4",
+          "address": "1",
           "wdec": "0",
           "dwdec": "0",
           "fdec": "0",
           "data": [
             {
               "id": "out1",
-              "name": "smcout1",
-              "register": "RW5BT0032"
+              "name": "out1",
+              "register": "RW5DUB0000"
             },
             {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW5WUB0008",
+              "id": "writebit",
+              "name": "writebit",
+              "register": "RW5BT0128",
+              "ratio": 1
+            },
+            {
+              "id": "writebit1",
+              "name": "writebit1",
+              "register": "RW5BT0129",
+              "ratio": 1
+            },
+            {
+              "id": "out6",
+              "name": "out6",
+              "register": "RW5DF0018",
+              "ratio": 1
+            },
+            {
+              "id": "out7",
+              "name": "out7",
+              "register": "RW5WUB0022",
               "ratio": 1
             }
           ]

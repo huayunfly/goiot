@@ -60,6 +60,13 @@ namespace goiot
 		std::shared_ptr<DataInfo> ReadData(const DataInfo& data_info);
 
 		/// <summary>
+		/// Read multiple data from device using ReadMultiVars() API. Change input DataInfo return_code and assign value directly.
+		/// </summary>
+		/// <param name="data_info">DataInfo object vector</param>
+		/// <returns>A DataInfo object vector with value or error_code.</returns>
+		std::shared_ptr<std::vector<DataInfo>> ReadData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
+
+		/// <summary>
 		/// Read batch data block and decouple them into vector. Change the input parameter and return DataInfo pointer.
 		/// </summary>
 		/// <param name="data_info_vec">DataInfo vector.</param>
@@ -111,7 +118,6 @@ namespace goiot
 		/// <returns>Int16 value</returns>
 		int16_t GetInt16(const std::vector<byte> src, std::size_t pos);
 
-
 		// Parse data block start and end offset for read optimizaiton.
 		void ParseDBOffset();
 
@@ -119,6 +125,18 @@ namespace goiot
 		S7CPUStatus PLCStatus();
 		// List PLC blocks
 		void ListBlocks();
+		// Test code
+		void Test();
+		// Connected() using S7 smart connection
+		bool Connected()
+		{
+			return connection_manager_->Connected();
+		}
+		// Connect() using S7 smart connection
+		void Connect()
+		{
+			connection_manager_->Connect();
+		}
 
 	private:
 		std::once_flag connection_init_flag_;
