@@ -36,7 +36,7 @@ namespace goiot
 	class ThreadSafeQueue
 	{
 	public:
-		static const long long MAX_MILLSECONDES = 10000000;
+		static const long long MAX_MILLISECONDS = 10000000;
 		// Create a queue object with a given maximum size.
 		// If maxsize is <= 0, the queue size is infinite.
 		ThreadSafeQueue(std::size_t maxsize = 0) : maxsize_(maxsize), unfinished_tasks_(0)
@@ -54,7 +54,7 @@ namespace goiot
  		ThreadSafeQueue& operator=(const ThreadSafeQueue&) = delete;
 
 		// Put an item into the queue.
-		void Put(T new_value, bool block = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(MAX_MILLSECONDES))
+		void Put(T new_value, bool block = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(MAX_MILLISECONDS))
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (maxsize_ > 0)
@@ -66,7 +66,7 @@ namespace goiot
 						throw Full();
 					}
 				}
-				else if (timeout >= std::chrono::milliseconds(MAX_MILLSECONDES)) // block with infinite timeout
+				else if (timeout >= std::chrono::milliseconds(MAX_MILLISECONDS)) // block with infinite timeout
 				{
 					not_full_.wait(lk, [this] { return QSize_() < maxsize_; });
 				}
@@ -100,7 +100,7 @@ namespace goiot
 			Put(new_value, false);
 		}
 
-		// Get an item into the queue without blocking.
+		// Get an item from the queue without blocking.
 		bool GetNoWait(T& value)
 		{
 			return Get(value, false);
@@ -137,7 +137,7 @@ namespace goiot
 		}
 
 		// Remove and return an item from the queue.
-		void Get(T& value, bool block = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(MAX_MILLSECONDES))
+		void Get(T& value, bool block = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(MAX_MILLISECONDS))
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (!block) // no block
@@ -147,7 +147,7 @@ namespace goiot
 					throw Empty();
 				}
 			}
-			else if (timeout >= std::chrono::milliseconds(MAX_MILLSECONDES)) // block but with infinite timeout
+			else if (timeout >= std::chrono::milliseconds(MAX_MILLISECONDS)) // block but with infinite timeout
 			{
 				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
 			}
@@ -169,7 +169,7 @@ namespace goiot
 		}
 
 		// Remove and return an item from the queue.
-		std::shared_ptr<T> Get(bool block = true, std::chrono::milliseconds timeout = MAX_MILLSECONDES)
+		std::shared_ptr<T> Get(bool block = true, std::chrono::milliseconds timeout = MAX_MILLISECONDS)
 		{
 			std::unique_lock<std::mutex> lk(mut_);
 			if (!block) // no block
@@ -179,7 +179,7 @@ namespace goiot
 					throw Empty();
 				}
 			}
-			else if (timeout >= MAX_MILLSECONDES) // block but with infinite timeout
+			else if (timeout >= MAX_MILLISECONDS) // block but with infinite timeout
 			{
 				not_empty_.wait(lk, [this] { return !data_queue_.empty(); });
 			}

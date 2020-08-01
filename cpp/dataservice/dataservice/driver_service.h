@@ -21,7 +21,7 @@ namespace goiot {
 		DriverMgrService(const std::wstring& module_path) : module_path_(module_path),
 			drivers_(), driver_descriptions_(), 
 			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(1000)),
-			threads_(), redis_push_(), redis_push_ready_(false), redis_poll_ready_(false), keep_poll_(false)
+			threads_(), redis_refresh_(), redis_refresh_ready_(false), redis_poll_ready_(false), keep_poll_(false)
 		{
 
 		}
@@ -65,7 +65,11 @@ namespace goiot {
 		/// <param name="data_info">A DataInfo object.</param>
 		static void AddDataInfo(const DataInfo& data_info);
 
-	private:
+		/// <summary>
+		/// Connect to redis with more than one connection.
+		/// </summary>
+		void ConnectRedis();
+
 		/// <summary>
 		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the DataService.
 		/// </summary>
@@ -84,11 +88,27 @@ namespace goiot {
 			const std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>>& driver_descriptions);
 
 		/// <summary>
-		/// Add the redis poll set by judging DataInfo is not existed and DataInfo.datatype = W or RW
-		/// Call once only.
+		/// Add the redis poll or refresh set.
+		/// Poll: judging DataInfo is not existed and DataInfo.datatype = W or RW
+		/// Refresh: judging DataInfo is not existed only (no regard of DataInfo.datatype = W or RW or R)
+		///
+		/// Redis data key example: refresh:plc.1.out1 or poll:mfcpfc.4.pv, etc.
+		///
+		/// <param name="redis_context">redis context</param>
+		/// <param name="time_namespace">time namespace, such as time_p: or time:r</param>
+		/// <param name="key_namespace">data key namespace, such as poll: or refresh:</param>
+		/// <param name="poll_set">True: poll set, False: refresh set</param>
 		/// </summary>
-		void AddRedisPollSet();
+		void AddRedisSet(std::shared_ptr<redisContext> redis_context, const std::string& time_namespace,
+			const std::string& key_namespace, bool poll_set);
 
+		/// <summary>
+		/// Check redis reply, log error or throw exception.
+		/// </summary>
+		/// <param name="id">data id</param>
+		/// <param name="operation">operation</param>
+		/// <param name="reply">Redis reply</param>
+		void CheckRedisReply(const std::string& id, const std::string& operation, const redisReply* reply) const;
 
 	private:
 		const static std::wstring CONFIG_FILE;
@@ -98,6 +118,11 @@ namespace goiot {
 		const static std::string HSET_FLOAT_FORMAT;
 		const static std::string HKEY_REFRESH;
 		const static std::string HKEY_POLL;
+		const static std::string NS_REFRESH;
+		const static std::string NS_POLL;
+		const static std::string NS_REFRESH_TIME;
+		const static std::string NS_POLL_TIME;
+		const static std::string NS_DELIMITER;
 
 	private:
 		static DataEntryCache<DataInfo> data_info_cache_;
@@ -107,9 +132,9 @@ namespace goiot {
 		std::vector<std::unique_ptr<DriverBase>> drivers_;
 		std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
 		std::vector<std::thread> threads_;
-		std::shared_ptr<redisContext> redis_push_;
+		std::shared_ptr<redisContext> redis_refresh_;
 		std::shared_ptr<redisContext> redis_poll_;
-		bool redis_push_ready_;
+		bool redis_refresh_ready_;
 		bool redis_poll_ready_;
 		bool keep_poll_;
 	};

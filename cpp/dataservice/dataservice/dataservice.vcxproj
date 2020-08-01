@@ -120,7 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)/hiredis/v0_13_3/include/;$(YASHEN3RDLIB_HOME)/jsoncpp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)\hiredis\v0_13_3\include;$(YASHEN3RDLIB_HOME)\jsoncpp\include</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
@@ -161,7 +161,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)/hiredis/v0_13_3/include/;$(YASHEN3RDLIB_HOME)/jsoncpp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)\hiredis\v0_13_3\include;$(YASHEN3RDLIB_HOME)\jsoncpp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
