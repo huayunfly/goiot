@@ -323,27 +323,34 @@ namespace goiot {
 
 	void DriverMgrService::PollDispatch()
 	{
-		const double deadband = 1e-3;
-		const double timespan = 10.0; // in second
+		const double DEADBAND = 1e-3;
+		const double TIMESPAN = 10.0; // in second
 		while (keep_poll_)
 		{
 			if (redis_poll_ready_)
 			{
-				const std::string HGETALL = "HGETALL %s";
+				const std::string HGETALL1 = "HGETALL %s";
+				const std::string ZRANGE_BY_SCORES = "zrangebyscore %s %f %f"; // zrangebyscore key min max
+				double now = std::chrono::duration_cast<std::chrono::milliseconds>(
+					std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+				double last = now - TIMESPAN;
 				std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-					redisCommand(redis_poll_.get(), HGETALL.c_str(), HKEY_POLL.c_str())
+					redisCommand(redis_poll_.get(), ZRANGE_BY_SCORES.c_str(), HKEY_POLL.c_str(), last, now)
 					), [](redisReply* p) { freeReplyObject(p); });
 				if (reply->type == REDIS_REPLY_ARRAY)
 				{
-					int hset_number = reply->elements / 2;  // field:value pair number
 					std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
 					//std::vector<DataInfo> data_info_vec;
-					for (int i = 0; i < hset_number; i++)
+					for (int i = 0; i < reply->elements; i++)
 					{
-						if (reply->element[i * 2]->type == REDIS_REPLY_STRING && 
-							reply->element[i * 2 + 1]->type == REDIS_REPLY_STRING)
+						if (reply->element[i]->type == REDIS_REPLY_STRING)
 						{
-							auto data_info = data_info_cache_.FindEntry(reply->element[i * 2]->str);
+							// Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv
+							std::string member(reply->element[i]->str);
+							std::size_t namespace_pos = member.find_first_of(":");
+							namespace_pos = namespace_pos < 0 ? 0 : namespace_pos + 1;
+							member = member.substr(namespace_pos, member.size() - namespace_pos);
+							auto data_info = data_info_cache_.FindEntry(member);
 							if (data_info.id.empty())
 							{
 								assert(false);
@@ -354,7 +361,7 @@ namespace goiot {
 								assert(false);
 								continue; // Throw exception
 							}
-							// Parse driver id seperated by ".", for example: mfcpfc.4.sv -> mfcpfc
+							// Parse driver type id seperated by ".", for example: mfcpfc.4.sv -> mfcpfc
 							std::size_t seperator_pos = data_info.id.find_first_of(".");
 							std::size_t len = seperator_pos < 0 ? data_info.id.size() : seperator_pos;
 							std::string driver_id = data_info.id.substr(0, len);
@@ -365,8 +372,8 @@ namespace goiot {
 							{
 								// Deadband
 								double new_value = std::atof(reply->element[i * 2 + 1]->str);
-								if (std::abs(data_info.float_value - new_value) < deadband && 
-									(timestamp - data_info.timestamp) < timespan)
+								if (std::abs(data_info.float_value - new_value) < DEADBAND &&
+									(timestamp - data_info.timestamp) < TIMESPAN)
 								{
 									continue;
 								}		
@@ -381,7 +388,7 @@ namespace goiot {
 							{
 								std::string new_value = reply->element[i * 2 + 1]->str;
 								if (data_info.char_value.compare(new_value) == 0 &&
-									(timestamp - data_info.timestamp) < timespan)
+									(timestamp - data_info.timestamp) < TIMESPAN)
 								{
 									continue;
 								}
@@ -396,7 +403,7 @@ namespace goiot {
 							{
 								byte new_value = std::atoi(reply->element[i * 2 + 1]->str);
 								if (data_info.byte_value == new_value &&
-									(timestamp - data_info.timestamp) < timespan)
+									(timestamp - data_info.timestamp) < TIMESPAN)
 								{
 									continue;
 								}
@@ -411,7 +418,7 @@ namespace goiot {
 							{
 								int new_value = std::atoi(reply->element[i * 2 + 1]->str);
 								if (data_info.int_value == new_value &&
-									(timestamp - data_info.timestamp) < timespan)
+									(timestamp - data_info.timestamp) < TIMESPAN)
 								{
 									continue;
 								}
@@ -438,14 +445,11 @@ namespace goiot {
 							}
 						}
 					}
-				} 
-				else if (reply->type == REDIS_REPLY_ERROR && reply->str)
-				{
-					assert(false);
-#ifdef _DEBUG
-					std::cerr << "HGETALL reply error: " << reply->str << std::endl;
-#endif // _DEBUG
-				}
+                }
+                else if (reply->type == REDIS_REPLY_ERROR && reply->str)
+                {
+					CheckRedisReply(NS_POLL, "PollDispatch", reply.get());
+                }
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
