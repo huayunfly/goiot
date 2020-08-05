@@ -113,9 +113,9 @@ namespace goiot {
 	private:
 		const static std::wstring CONFIG_FILE;
 		const static std::wstring DRIVER_DIR;
-		const static std::string HSET_STRING_FORMAT;
-		const static std::string HSET_INTEGER_FORMAT;
-		const static std::string HSET_FLOAT_FORMAT;
+		const static std::string HMSET_STRING_FORMAT;
+		const static std::string HMSET_INTEGER_FORMAT;
+		const static std::string HMSET_FLOAT_FORMAT;
 		const static std::string HKEY_REFRESH;
 		const static std::string HKEY_POLL;
 		const static std::string NS_REFRESH;
