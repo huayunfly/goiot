@@ -22,8 +22,6 @@ namespace goiot {
 	const std::string DriverMgrService::HMSET_STRING_FORMAT = "HMSET %s value %s result %d time %f";
 	const std::string DriverMgrService::HMSET_INTEGER_FORMAT = "HMSET %s value %d result %d time %f";
 	const std::string DriverMgrService::HMSET_FLOAT_FORMAT = "HMSET %s value %f result %d time %f";
-	const std::string DriverMgrService::HKEY_REFRESH = "goiot_r";
-	const std::string DriverMgrService::HKEY_POLL = "goiot_p";
 	const std::string DriverMgrService::REDIS_PING = "PING";
 	const std::string DriverMgrService::REDIS_PONG = "PONG";
 
@@ -298,21 +296,21 @@ namespace goiot {
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_STRING_FORMAT.c_str(),
-								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.char_value.c_str(), data_info.result, data_info.timestamp)
+								refresh_id.c_str(), data_info.char_value.c_str(), data_info.result, data_info.timestamp)
 							), [](redisReply* p) { freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DF)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_FLOAT_FORMAT.c_str(),
-								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
+								refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
 							), [](redisReply* p) { freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::BT)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
-								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp)
+								refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp)
 							), [](redisReply* p) { freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
@@ -320,7 +318,7 @@ namespace goiot {
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
-								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp)
+								refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp)
 							), [](redisReply* p) { freeReplyObject(p); });
 #ifdef _DEBUG
 						if (reply && reply->type == REDIS_REPLY_ERROR && reply->str)
@@ -357,7 +355,7 @@ namespace goiot {
 					std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 				double last = now - TIMESPAN;
 				std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-					redisCommand(redis_poll_.get(), ZRANGE_BY_SCORES.c_str(), HKEY_POLL.c_str(), last, now)
+					redisCommand(redis_poll_.get(), ZRANGE_BY_SCORES.c_str(), NS_POLL_TIME.c_str(), last, now)
 					), [](redisReply* p) { freeReplyObject(p); });
 				std::vector<std::string> member_vec;
 				if (reply && reply->type == REDIS_REPLY_ARRAY)

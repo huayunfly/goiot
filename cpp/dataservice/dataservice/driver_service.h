@@ -122,8 +122,6 @@ namespace goiot {
 		const static std::string HMSET_STRING_FORMAT;
 		const static std::string HMSET_INTEGER_FORMAT;
 		const static std::string HMSET_FLOAT_FORMAT;
-		const static std::string HKEY_REFRESH;
-		const static std::string HKEY_POLL;
 		const static std::string REDIS_PING;
 		const static std::string REDIS_PONG;
 		const static std::string NS_REFRESH;
