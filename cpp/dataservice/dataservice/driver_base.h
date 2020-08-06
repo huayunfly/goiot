@@ -181,6 +181,27 @@ namespace goiot
 		}
 
 		/// <summary>
+		/// Update an entry.
+		/// </summary>
+		/// <param name="entry_key">The entry key.</param>
+		/// <param name="entry">The entry</param>
+		/// <returns>True if the entry is updated. otherwise false.</returns>
+		bool UpdateEntry(const std::string& entry_key, const T& entry)
+		{
+			std::lock_guard<std::shared_mutex> lk(entry_mutex_);
+			auto it = data_entry_hash_.find(entry_key);
+			if (it != data_entry_hash_.end())
+			{
+				it->second = entry;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Add an entry. If an entry with the key is existed, an excepion will be thrown out.
 		/// </summary>
 		/// <param name="entry_key">The entry key.</param>

@@ -24,6 +24,8 @@ namespace goiot {
 	const std::string DriverMgrService::HMSET_FLOAT_FORMAT = "HMSET %s value %f result %d time %f";
 	const std::string DriverMgrService::HKEY_REFRESH = "goiot_r";
 	const std::string DriverMgrService::HKEY_POLL = "goiot_p";
+	const std::string DriverMgrService::REDIS_PING = "PING";
+	const std::string DriverMgrService::REDIS_PONG = "PONG";
 
 	const std::string DriverMgrService::NS_REFRESH = "refresh:";
 	const std::string DriverMgrService::NS_POLL = "poll:";
@@ -181,15 +183,6 @@ namespace goiot {
 	void DriverMgrService::Start()
 	{
 		ConnectRedis();
-		// Add(Initialize) Writable and ReadWritable data into poll zone.
-		if (redis_poll_ready_)
-		{
-			AddRedisSet(redis_poll_, NS_POLL_TIME, NS_POLL, true);
-		}
-		if (redis_refresh_ready_)
-		{
-			AddRedisSet(redis_refresh_, NS_REFRESH_TIME, NS_REFRESH, false);
-		}
 		// Start Resonse dispatch thread.
 		threads_.emplace_back(std::thread(&DriverMgrService::ResponseDispatch, this));
 		// Poll thread.
@@ -199,44 +192,62 @@ namespace goiot {
 
 	void DriverMgrService::ConnectRedis()
 	{
-		// For redis push
+		// Refresh
 		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 		redis_refresh_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
 			[](redisContext* p) { redisFree(p); });
-		if (redis_refresh_ != nullptr && redis_refresh_->err)
+		if (redis_refresh_ && redis_refresh_->err)
 		{
-			redis_refresh_ready_ = false;
 			std::cout << "Redis refresh connection error: " << redis_refresh_->errstr << std::endl;
-			// handle error
+			return;
 		}
-		else if (redis_refresh_ == nullptr)
+		else if (!redis_refresh_)
 		{
-			redis_refresh_ready_ = false;
 			std::cout << "Redis refresh connection error: can't allocate redis context" << std::endl;
+			return;
 		}
 		else
 		{
-			redis_refresh_ready_ = true;
 			std::cout << "Redis refresh connection OK." << std::endl;
 		}
 		// Poll
 		redis_poll_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
 			[](redisContext* p) { redisFree(p); });
-		if (redis_poll_ != nullptr && redis_poll_->err)
+		if (redis_poll_ && redis_poll_->err)
 		{
-			redis_poll_ready_ = false;
-			std::cerr << "Redis poll connection error: " << redis_refresh_->errstr << std::endl;
-			// handle error
+			std::cerr << "Redis poll connection error: " << redis_poll_->errstr << std::endl;
+			return;
 		}
-		else if (redis_poll_ == nullptr)
+		else if (!redis_poll_)
 		{
-			redis_poll_ready_ = false;
 			std::cerr << "Redis poll connection error: can't allocate redis context" << std::endl;
+			return;
 		}
 		else
 		{
-			redis_poll_ready_ = true;
 			std::cout << "Redis poll connection OK." << std::endl;
+		}
+		// Add(Initialize) Writable and ReadWritable data into poll zone.
+		AddRedisSet(redis_poll_, NS_POLL_TIME, NS_POLL, true);
+		AddRedisSet(redis_refresh_, NS_REFRESH_TIME, NS_REFRESH, false);
+	}
+
+	bool DriverMgrService::ConnectedRedis()
+	{
+		if (!redis_refresh_ || !redis_poll_)
+		{
+			return false;
+		}
+		
+		std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+			redisCommand(redis_refresh_.get(), REDIS_PING.c_str())), [](redisReply* p) { freeReplyObject(p); });
+		if (reply && reply->type == REDIS_REPLY_STATUS && REDIS_PONG.compare(reply->str) == 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
@@ -256,8 +267,6 @@ namespace goiot {
 		{
 			entry.join();
 		}
-		redis_refresh_ready_ = false;
-		redis_poll_ready_ = false;
 		redis_refresh_.reset();
 		redis_poll_.reset();
 	}
@@ -272,18 +281,18 @@ namespace goiot {
 			{
 				break; // Exit
 			}
-#ifdef _DEBUG
-			//std::cout << "Response from device " << data_info_vec->at(0).id << std::endl;
-#endif // _DEBUG
-			if (redis_refresh_ready_)
+
+			if (ConnectedRedis())
 			{
 				for (auto& data_info : *data_info_vec)
 				{
-					if (data_info.result != 0)
+					if (data_info.data_flow_type != DataFlowType::READ_RETURN && data_info.data_flow_type != DataFlowType::WRITE_RETURN)
 					{
-						continue; // Todo: handle error code.
+						continue;
 					}
-					
+					// Todo: improve UpateEntry() by updataing the entry partly.
+					data_info_cache_.UpdateEntry(data_info.id, data_info); // update all including value, result and timestamp 
+					// Write to redis refresh zone.					
 					std::string refresh_id = NS_REFRESH + data_info.id;
 					if (data_info.data_type == DataType::STR)
 					{
@@ -299,16 +308,22 @@ namespace goiot {
 								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
 							), [](redisReply* p) { freeReplyObject(p); });
 					}
+					else if (data_info.data_type == DataType::BT)
+					{
+						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
+								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp)
+							), [](redisReply* p) { freeReplyObject(p); });
+					}
 					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
-						data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB ||
-						data_info.data_type == DataType::BT)
+						data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
 								HKEY_REFRESH.c_str(), refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp)
 							), [](redisReply* p) { freeReplyObject(p); });
 #ifdef _DEBUG
-						if (reply->type == REDIS_REPLY_ERROR && reply->str)
+						if (reply && reply->type == REDIS_REPLY_ERROR && reply->str)
 						{
 							std::cout << "HSET reply error: " << reply->str << std::endl;
 						}
@@ -320,6 +335,11 @@ namespace goiot {
 					}
 				}
 			}
+			else
+			{
+				ConnectRedis();
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		}
 	}
 
@@ -329,7 +349,7 @@ namespace goiot {
 		const double TIMESPAN = 10.0; // in second
 		while (keep_poll_)
 		{
-			if (redis_poll_ready_)
+			if (ConnectedRedis())
 			{
 				const std::string HMGET = "hmget %s %s %s"; // hmget key field [field]
 				const std::string ZRANGE_BY_SCORES = "zrangebyscore %s %f %f"; // zrangebyscore key min max
@@ -340,7 +360,7 @@ namespace goiot {
 					redisCommand(redis_poll_.get(), ZRANGE_BY_SCORES.c_str(), HKEY_POLL.c_str(), last, now)
 					), [](redisReply* p) { freeReplyObject(p); });
 				std::vector<std::string> member_vec;
-				if (reply->type == REDIS_REPLY_ARRAY)
+				if (reply && reply->type == REDIS_REPLY_ARRAY)
 				{
 					//std::vector<DataInfo> data_info_vec;
 					for (int i = 0; i < reply->elements; i++)
@@ -496,6 +516,10 @@ namespace goiot {
                     }
                 }
 			}
+			else
+			{
+				ConnectRedis();
+			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		}
 	}
@@ -528,7 +552,7 @@ namespace goiot {
 		//3) "poll:mfcpfc.4.sv"
 		//4) "1596273994.957"
 		std::unordered_set<std::string> existed_ids;
-		if (reply->type == REDIS_REPLY_ARRAY)
+		if (reply && reply->type == REDIS_REPLY_ARRAY)
 		{
 			int hset_number = reply->elements / 2;  // field:value pair number
 			std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
@@ -640,9 +664,9 @@ namespace goiot {
 
 	void DriverMgrService::CheckRedisReply(const std::string& id, const std::string& operation, const redisReply* reply) const
 	{
-		assert(reply->type != REDIS_REPLY_ERROR);
+		assert(reply && reply->type != REDIS_REPLY_ERROR);
 #ifdef _DEBUG
-		if (reply->type == REDIS_REPLY_ERROR && reply->str)
+		if (reply && reply->type == REDIS_REPLY_ERROR && reply->str)
 		{
 			std::cout << "redis reply error: [" << id << "]" << " [" + operation + "] " + reply->str << std::endl;
 		}

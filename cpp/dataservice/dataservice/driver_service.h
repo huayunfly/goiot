@@ -21,7 +21,7 @@ namespace goiot {
 		DriverMgrService(const std::wstring& module_path) : module_path_(module_path),
 			drivers_(), driver_descriptions_(), 
 			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(1000)),
-			threads_(), redis_refresh_(), redis_refresh_ready_(false), redis_poll_ready_(false), keep_poll_(false)
+			threads_(), redis_refresh_(), keep_poll_(false)
 		{
 
 		}
@@ -71,6 +71,12 @@ namespace goiot {
 		void ConnectRedis();
 
 		/// <summary>
+		/// Using PING to get redis connection status.
+		/// </summary>
+		/// <returns>true: connected, otherwise false.</returns>
+		bool ConnectedRedis();
+
+		/// <summary>
 		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the DataService.
 		/// </summary>
 		void ResponseDispatch();
@@ -118,6 +124,8 @@ namespace goiot {
 		const static std::string HMSET_FLOAT_FORMAT;
 		const static std::string HKEY_REFRESH;
 		const static std::string HKEY_POLL;
+		const static std::string REDIS_PING;
+		const static std::string REDIS_PONG;
 		const static std::string NS_REFRESH;
 		const static std::string NS_POLL;
 		const static std::string NS_REFRESH_TIME;
@@ -134,8 +142,6 @@ namespace goiot {
 		std::vector<std::thread> threads_;
 		std::shared_ptr<redisContext> redis_refresh_;
 		std::shared_ptr<redisContext> redis_poll_;
-		bool redis_refresh_ready_;
-		bool redis_poll_ready_;
 		bool keep_poll_;
 	};
 }
