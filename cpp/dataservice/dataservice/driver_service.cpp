@@ -297,6 +297,8 @@ namespace goiot {
 				break; // Exit
 			}
 
+			//double now = std::chrono::duration_cast<std::chrono::milliseconds>(
+			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 			if (ConnectedRedis())
 			{
 				for (auto& data_info : *data_info_vec)
@@ -354,7 +356,10 @@ namespace goiot {
 			{
 				ConnectRedis();
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			//double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
+			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
+			//std::cout << gap << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Avoid redis performance problem
 		}
 	}
 

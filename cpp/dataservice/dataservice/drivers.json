@@ -81,13 +81,13 @@
             },
             {
               "id": "writebyte_channel_0",
-              "name": "writebit_channel_0",
+              "name": "writebyte_channel_0",
               "register": "RW5BT0096",
               "ratio": 1
             },
             {
               "id": "writebyte_channel_1",
-              "name": "writebit_channel_1",
+              "name": "writebyte_channel_1",
               "register": "RW5BT0097",
               "ratio": 1
             },
