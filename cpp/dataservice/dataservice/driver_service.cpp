@@ -190,10 +190,27 @@ namespace goiot {
 
 	void DriverMgrService::ConnectRedis()
 	{
-		// Refresh
 		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
+		// Connect status
+		redis_status_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
+			[](redisContext* p) { if (p) redisFree(p); });
+		if (redis_status_ && redis_status_->err)
+		{
+			std::cout << "Redis status connection error: " << redis_status_->errstr << std::endl;
+			return;
+		}
+		else if (!redis_status_)
+		{
+			std::cout << "Redis status connection error: can't allocate redis context" << std::endl;
+			return;
+		}
+		else
+		{
+			std::cout << "Redis status connection OK." << std::endl;
+		}
+		// Refresh
 		redis_refresh_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
-			[](redisContext* p) { redisFree(p); });
+			[](redisContext* p) { if (p) redisFree(p); });
 		if (redis_refresh_ && redis_refresh_->err)
 		{
 			std::cout << "Redis refresh connection error: " << redis_refresh_->errstr << std::endl;
@@ -210,7 +227,7 @@ namespace goiot {
 		}
 		// Poll
 		redis_poll_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
-			[](redisContext* p) { redisFree(p); });
+			[](redisContext* p) { if (p) redisFree(p); });
 		if (redis_poll_ && redis_poll_->err)
 		{
 			std::cerr << "Redis poll connection error: " << redis_poll_->errstr << std::endl;
@@ -238,7 +255,7 @@ namespace goiot {
 		}
 		
 		std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-			redisCommand(redis_refresh_.get(), REDIS_PING.c_str())), [](redisReply* p) { freeReplyObject(p); });
+			redisCommand(redis_status_.get(), REDIS_PING.c_str())), [](redisReply* p) { if (p) freeReplyObject(p); });
 		if (reply && reply->type == REDIS_REPLY_STATUS && REDIS_PONG.compare(reply->str) == 0)
 		{
 			return true;
@@ -297,21 +314,21 @@ namespace goiot {
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_STRING_FORMAT.c_str(),
 								refresh_id.c_str(), data_info.char_value.c_str(), data_info.result, data_info.timestamp)
-							), [](redisReply* p) { freeReplyObject(p); });
+							), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DF)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_FLOAT_FORMAT.c_str(),
 								refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
-							), [](redisReply* p) { freeReplyObject(p); });
+							), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::BT)
 					{
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
 								refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp)
-							), [](redisReply* p) { freeReplyObject(p); });
+							), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
 						data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB)
@@ -319,7 +336,7 @@ namespace goiot {
 						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
 								refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp)
-							), [](redisReply* p) { freeReplyObject(p); });
+							), [](redisReply* p) { if (p) freeReplyObject(p); });
 #ifdef _DEBUG
 						if (reply && reply->type == REDIS_REPLY_ERROR && reply->str)
 						{
@@ -344,7 +361,7 @@ namespace goiot {
 	void DriverMgrService::PollDispatch()
 	{
 		const double DEADBAND = 1e-3;
-		const double TIMESPAN = 10.0; // in second
+		const double TIMESPAN = 1000.0; // in second
 		while (keep_poll_)
 		{
 			if (ConnectedRedis())
@@ -353,10 +370,10 @@ namespace goiot {
 				const std::string ZRANGE_BY_SCORES = "zrangebyscore %s %f %f"; // zrangebyscore key min max
 				double now = std::chrono::duration_cast<std::chrono::milliseconds>(
 					std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
-				double last = now - TIMESPAN;
+				double last = 0.0; // now - TIMESPAN;
 				std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 					redisCommand(redis_poll_.get(), ZRANGE_BY_SCORES.c_str(), NS_POLL_TIME.c_str(), last, now)
-					), [](redisReply* p) { freeReplyObject(p); });
+					), [](redisReply* p) { if (p) freeReplyObject(p); });
 				std::vector<std::string> member_vec;
 				if (reply && reply->type == REDIS_REPLY_ARRAY)
 				{
@@ -390,12 +407,13 @@ namespace goiot {
 					}
 					// Get Value
 					std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-						redisCommand(redis_poll_.get(), HMGET.c_str(), member, "value", "result")
-						), [](redisReply* p) { freeReplyObject(p); });
+						redisCommand(redis_poll_.get(), HMGET.c_str(), member.c_str(), "value", "result")
+						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					std::string value;
 					int result;
-					if (reply->type == REDIS_REPLY_ARRAY && reply->elements > 0)
+					if (reply && reply->type == REDIS_REPLY_ARRAY && reply->elements > 0)
 					{
+						assert(reply->element[0]->str && reply->element[1]->str);
 						value = reply->element[0]->str;
 						result = atoi(reply->element[1]->str);
 					}
@@ -544,7 +562,7 @@ namespace goiot {
 
 		std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 			redisCommand(redis_context.get()/* redisContext */, ZRANGE_ALL.c_str()/* format */, time_namespace.c_str())
-			), [](redisReply* p) { freeReplyObject(p); });
+			), [](redisReply* p) { if (p) freeReplyObject(p); });
 		//1) "poll:mfcpfc.4.pv"
 		//2) "1596273994.957"
 		//3) "poll:mfcpfc.4.sv"
@@ -597,7 +615,7 @@ namespace goiot {
 							data_info.read_write_priviledge,
 							data_info.result,
 							data_info.timestamp)
-						), [](redisReply* p) { freeReplyObject(p); });
+						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
 				else if (data_info.data_type == DataType::DF)
@@ -611,7 +629,7 @@ namespace goiot {
 							data_info.read_write_priviledge,
 							data_info.result,
 							data_info.timestamp)
-						), [](redisReply* p) { freeReplyObject(p); });
+						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
 				else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
@@ -626,7 +644,7 @@ namespace goiot {
 							data_info.read_write_priviledge,
 							data_info.result,
 							data_info.timestamp)
-						), [](redisReply* p) { freeReplyObject(p); });
+						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
 				else if (data_info.data_type == DataType::BT)
@@ -640,7 +658,7 @@ namespace goiot {
 							data_info.read_write_priviledge,
 							data_info.result,
 							data_info.timestamp)
-						), [](redisReply* p) { freeReplyObject(p); });
+						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
 				else
@@ -654,7 +672,7 @@ namespace goiot {
 						data_info.timestamp,
 						(key_namespace + data_info.id).c_str()
 					)
-					), [](redisReply* p) { freeReplyObject(p); });
+					), [](redisReply* p) { if (p) freeReplyObject(p); });
 				CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 			}
 		}

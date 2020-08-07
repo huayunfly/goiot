@@ -80,6 +80,18 @@
               "ratio": 1
             },
             {
+              "id": "writebyte_channel_0",
+              "name": "writebit_channel_0",
+              "register": "RW5BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "writebyte_channel_1",
+              "name": "writebit_channel_1",
+              "register": "RW5BT0097",
+              "ratio": 1
+            },
+            {
               "id": "out6",
               "name": "out6",
               "register": "RW5DF0018",
@@ -89,6 +101,12 @@
               "id": "out7",
               "name": "out7",
               "register": "RW5WUB0022",
+              "ratio": 1
+            },
+            {
+              "id": "pid_temp_1_pv",
+              "name": "pid_temp_1_pv",
+              "register": "RW5DF0034",
               "ratio": 1
             }
           ]

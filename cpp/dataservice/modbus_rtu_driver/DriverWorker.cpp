@@ -120,20 +120,21 @@ namespace goiot
 				}
 				if (data_info_vec.size() > 0)
 				{
-					in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+					in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec),
+						true, std::chrono::milliseconds(1000));
 				}
 			}
-			catch (const Full&)
+			catch (const QFull&)
 			{
-				std::cerr << "In-queue is full" << std::endl;
+				std::cerr << "modbus_rtu_driver In-queue is full" << std::endl;
 			}
 			catch (const std::exception& e) {
-				std::cerr << "EXCEPTION: " << e.what() << std::endl;
+				std::cerr << "modbus_rtu_driver EXCEPTION: " << e.what() << std::endl;
 			}
 			catch (...) {
-				std::cerr << "EXCEPTION (unknown)" << std::endl;
+				std::cerr << "modbus_rtu_driver EXCEPTION (unknown)" << std::endl;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(REFRESH_INTERVAL));
 		}
 	}
 
@@ -141,45 +142,58 @@ namespace goiot
 	{
 		while (true)
 		{
-			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
-			in_queue_.Get(data_info_vec);
-			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+			try
 			{
-				break; // Exit
-			}
-			auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
-			int result_code = 0;
-			for (std::size_t i = 0; i < data_info_vec->size(); i++)
-			{
-				std::shared_ptr<DataInfo> data_info;
-				switch (data_info_vec->at(i).data_flow_type)
+				std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+				in_queue_.Get(data_info_vec);
+				if (data_info_vec == nullptr) // Improve for a robust SENTINEL
 				{
-				case DataFlowType::REFRESH:
-					data_info = ReadData(data_info_vec->at(i));
-					// Copy data, may be improved.
-					rp_data_info_vec->emplace_back(data_info->id,
-						data_info->name, data_info->address, data_info->register_address,
-						data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
-						data_info->data_zone, data_info->float_decode, data_info->byte_value, data_info->int_value, data_info->float_value,
-						data_info->char_value, 
-						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
-						data_info->result);
-					break;
-				case DataFlowType::ASYNC_WRITE:
-					result_code = WriteData(data_info_vec->at(i));
-					rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
-						data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
-						data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
-						data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
-						data_info_vec->at(i).char_value, 
-						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
-						result_code);
-					break;
-				default:
-					break;
+					break; // Exit
 				}
+				auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
+				int result_code = 0;
+				for (std::size_t i = 0; i < data_info_vec->size(); i++)
+				{
+					std::shared_ptr<DataInfo> data_info;
+					switch (data_info_vec->at(i).data_flow_type)
+					{
+					case DataFlowType::REFRESH:
+						data_info = ReadData(data_info_vec->at(i));
+						// Copy data, may be improved.
+						rp_data_info_vec->emplace_back(data_info->id,
+							data_info->name, data_info->address, data_info->register_address,
+							data_info->read_write_priviledge, DataFlowType::REFRESH, data_info->data_type,
+							data_info->data_zone, data_info->float_decode, data_info->byte_value, data_info->int_value, data_info->float_value,
+							data_info->char_value,
+							std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+							data_info->result);
+						break;
+					case DataFlowType::ASYNC_WRITE:
+						result_code = WriteData(data_info_vec->at(i));
+						rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
+							data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
+							data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
+							data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+							data_info_vec->at(i).char_value,
+							std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+							result_code);
+						break;
+					default:
+						break;
+					}
+				}
+				out_queue_.Put(rp_data_info_vec, true, std::chrono::milliseconds(1000));
 			}
-			out_queue_.Put(rp_data_info_vec);
+			catch (const QFull&)
+			{
+				std::cerr << "modbus_rtu_driver Out-queue is full" << std::endl;
+			}
+			catch (const std::exception & e) {
+				std::cerr << "modbus_rtu_driver EXCEPTION: " << e.what() << std::endl;
+			}
+			catch (...) {
+				std::cerr << "modbus_rtu_driver EXCEPTION (unknown)" << std::endl;
+			}
 		}
 	}
 
@@ -193,7 +207,15 @@ namespace goiot
 			{
 				break; // Exit
 			}
-			driver_manager_reponse_queue_->PutNoWait(data_info_vec);
+			try
+			{
+				driver_manager_reponse_queue_->PutNoWait(data_info_vec);
+			}
+			catch (const QFull&)
+			{
+				assert(false);
+				std::cout << "modbus_rtu_driver driver_manager_reponse_queue_ is full." << std::endl;
+			}
 		}
 	}
 

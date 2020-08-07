@@ -75,25 +75,22 @@ namespace goiot
 			connection_details_.rack, connection_details_.slot);
 		if (res != 0)
 		{
-			std::cerr << "S7 Connection failed: " << CliErrorText(res) << std::endl;
+			std::cerr << "s7_driver Connection failed: " << CliErrorText(res) << std::endl;
 			return ENOTCONN;
 		}
 		else
 		{
-			std::cout << "S7 Connected to: " << connection_details_.port << " Rack=" <<
+			std::cout << "s7_driver Connected to: " << connection_details_.port << " Rack=" <<
 				connection_details_.rack << ", Slot=" << connection_details_.slot << std::endl;
 		}
-		//connected_ = true; // Call connection_manager_->connected() instead.
-		Test();
 		return res;
 	}
 
 	void S7DriverWorker::CloseConnection()
 	{
 		connection_manager_.reset();
-		connected_ = false;
 #ifdef _DEBUG
-		std::cout << "S7 driver worker closed connection.";
+		std::cout << "s7_driver worker closed connection.";
 #endif // _DEBUG
 	}
 
@@ -137,20 +134,21 @@ namespace goiot
 				}
 				if (data_info_vec.size() > 0)
 				{
-					in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+					in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec), 
+						true, std::chrono::milliseconds(1000));
 				}
 			}
-			catch (const Full&)
+			catch (const QFull&)
 			{
-				std::cerr << "In-queue is full" << std::endl;
+				std::cerr << "s7_driver:In-queue is full" << std::endl;
 			}
 			catch (const std::exception & e) {
-				std::cerr << "EXCEPTION: " << e.what() << std::endl;
+				std::cerr << "s7_driver:EXCEPTION: " << e.what() << std::endl;
 			}
 			catch (...) {
-				std::cerr << "EXCEPTION (unknown)" << std::endl;
+				std::cerr << "s7_driver:EXCEPTION (unknown)" << std::endl;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			std::this_thread::sleep_for(std::chrono::milliseconds(REFRESH_INTERVAL));
 		}
 	}
 
@@ -160,32 +158,45 @@ namespace goiot
 	{
 		while (true)
 		{
-			std::shared_ptr<std::vector<DataInfo>> data_info_vec;
-			in_queue_.Get(data_info_vec);
-			if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+			try
 			{
-				break; // Exit
+				std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+				in_queue_.Get(data_info_vec);
+				if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+				{
+					break; // Exit
+				}
+				std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec;
+				int result_code = 0;
+
+				if (data_info_vec->empty())
+				{
+					continue;
+				}
+				if (data_info_vec->at(0).data_flow_type == DataFlowType::REFRESH)
+				{
+					rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
+				}
+				else if (data_info_vec->at(0).data_flow_type == DataFlowType::ASYNC_WRITE)
+				{
+					rp_data_info_vec = WriteData(data_info_vec);
+				}
+				else
+				{
+					throw std::invalid_argument("Unsupported data flow");
+				}
+				out_queue_.Put(rp_data_info_vec, true, std::chrono::milliseconds(1000));
 			}
-			std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec;
-			int result_code = 0;
-			
-			if (data_info_vec->empty())
+			catch (const QFull&)
 			{
-				continue;
+				std::cerr << "s7_driver:Out-queue is full" << std::endl;
 			}
-			if (data_info_vec->at(0).data_flow_type == DataFlowType::REFRESH)
-			{
-				rp_data_info_vec = ReadBatchData(data_info_vec); // Modify data_info_vec directly, may be improve.
+			catch (const std::exception & e) {
+				std::cerr << "s7_driver:EXCEPTION: " << e.what() << std::endl;
 			}
-			else if (data_info_vec->at(0).data_flow_type == DataFlowType::ASYNC_WRITE)
-			{
-				rp_data_info_vec = WriteData(data_info_vec);
+			catch (...) {
+				std::cerr << "s7_driver:EXCEPTION (unknown)" << std::endl;
 			}
-			else
-			{
-				throw std::invalid_argument("Unsupported data flow");
-			}
-			out_queue_.Put(rp_data_info_vec);
 		}
 	}
 
@@ -200,7 +211,15 @@ namespace goiot
 			{
 				break; // Exit
 			}
-			driver_manager_reponse_queue_->PutNoWait(data_info_vec);
+			try
+			{
+				driver_manager_reponse_queue_->PutNoWait(data_info_vec);
+			}
+			catch (const QFull&)
+			{
+				assert(false);
+				std::cout << "s7_driver:driver_manager_reponse_queue_ is full." << std::endl;
+			}
 		}
 	}
 

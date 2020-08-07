@@ -14,18 +14,34 @@
 
 namespace goiot
 {
-	class Full : std::runtime_error
+	class QFull : std::runtime_error
 	{
 	public:
+		using mybase_ = runtime_error;
+		explicit QFull(const std::string& message) : mybase_(message)
+		{
+		} 
+
+		explicit QFull(const char* message) : mybase_(message)
+		{
+		}
 		virtual const char* what() const noexcept
 		{
 			return "Queue full.";
 		}
 	};
 
-	class Empty : std::runtime_error
+	class QEmpty : std::runtime_error
 	{
 	public:
+		using mybase_ = runtime_error;
+		explicit QEmpty(const std::string& message) : mybase_(message)
+		{
+		}
+
+		explicit QEmpty(const char* message) : mybase_(message)
+		{
+		}
 		virtual const char* what() const noexcept
 		{
 			return "Queue empty.";
@@ -63,7 +79,7 @@ namespace goiot
 				{
 					if (QSize_() >= maxsize_)
 					{
-						throw Full();
+						throw QFull("full");
 					}
 				}
 				else if (timeout >= std::chrono::milliseconds(MAX_MILLISECONDS)) // block with infinite timeout
@@ -79,7 +95,7 @@ namespace goiot
 					bool not_full = not_full_.wait_for(lk, timeout, [this] { return QSize_() < maxsize_; }); // the return value of the predict when woken
 					if (!not_full)
 					{
-						throw Full();
+						throw QFull("full");
 					}
 				}
 			}
@@ -144,7 +160,7 @@ namespace goiot
 			{
 				if (QSize_() == 0)
 				{
-					throw Empty();
+					throw QEmpty("empty");
 				}
 			}
 			else if (timeout >= std::chrono::milliseconds(MAX_MILLISECONDS)) // block but with infinite timeout
@@ -160,7 +176,7 @@ namespace goiot
 				bool not_empty = not_empty_.wait_for(lk, timeout, [this] { return !data_queue_.empty(); });
 				if (!not_empty)
 				{
-					throw Empty();
+					throw QEmpty("empty");
 				}
 			}
 			value = data_queue_.front();
@@ -176,7 +192,7 @@ namespace goiot
 			{
 				if (QSize_() == 0)
 				{
-					throw Empty();
+					throw QEmpty("empty");
 				}
 			}
 			else if (timeout >= MAX_MILLISECONDS) // block but with infinite timeout
@@ -192,7 +208,7 @@ namespace goiot
 				bool not_empty = not_empty_.wait_for(lk, timeout, [this] { return !data_queue_.empty(); });
 				if (!not_empty)
 				{
-					throw Empty();
+					throw QEmpty("empty");
 				}
 			}
 			std::shared_ptr<T> res(std::make_shared<T>(data_queue_.front()));

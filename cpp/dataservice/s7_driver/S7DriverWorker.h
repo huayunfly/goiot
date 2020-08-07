@@ -25,8 +25,7 @@ namespace goiot
 		S7DriverWorker(const ConnectionInfo& connection_details, std::map<std::string, DataInfo>&& data_map,
 			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> reponse_queue) :
 			connection_details_(connection_details), driver_manager_reponse_queue_(reponse_queue), data_map_(data_map),
-			connection_manager_(), in_queue_(10), out_queue_(10), refresh_(false), connected_(false),
-			db_mapping_()
+			connection_manager_(), in_queue_(10), out_queue_(10), refresh_(false), db_mapping_()
 		{
 			ParseDBOffset(); // Uses db_start_offset_ 512 as a start value.
 		}
@@ -139,6 +138,8 @@ namespace goiot
 		}
 
 	private:
+		const int REFRESH_INTERVAL = 250; // in ms
+
 		std::once_flag connection_init_flag_;
 		ConnectionInfo connection_details_;
 		std::map<std::string, DataInfo> data_map_;
@@ -148,7 +149,6 @@ namespace goiot
 		ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>> out_queue_;
 		std::vector<std::thread> threads_;
 		bool refresh_;
-		bool connected_;
 		// S7 optimization
 		std::map<int/* db_id */, std::pair<uint64_t/* db_start_offset_ */, uint64_t/* db_end_offset_ */>> db_mapping_;
 	};

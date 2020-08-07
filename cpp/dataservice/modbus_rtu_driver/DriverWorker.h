@@ -100,6 +100,8 @@ namespace goiot
 		bool DataInfoValueEqualsReadValue(const DataInfo& data_info, std::shared_ptr<uint16_t> registers);
 
 	private:
+		const int REFRESH_INTERVAL = 500; // in ms
+
 		std::once_flag connection_init_flag_;
 		ConnectionInfo connection_details_;
 		std::map<std::string, DataInfo> data_map_;
