@@ -458,7 +458,7 @@ namespace goiot
 					{
 					case DataType::BT:
 						pos = register_address / 8/* absolute offset */ - db_mapping_[address].first/* db read start */;
-						data_info_vec->at(i).byte_value = data_map[address].at(pos) & (1 << (register_address % 8)); // Store boolean into uint8_t
+						data_info_vec->at(i).byte_value = (data_map[address].at(pos) & (1 << (register_address % 8))) ? 1 : 0; // Store boolean into uint8_t
 						break;
 					case DataType::WB:
 					case DataType::WUB:

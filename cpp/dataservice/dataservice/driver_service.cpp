@@ -301,6 +301,9 @@ namespace goiot {
 			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 			if (ConnectedRedis())
 			{
+				int pipeline_result = REDIS_ERR;
+				pipeline_result = redisAppendCommand(redis_refresh_.get(), "MULTI");
+				int command_num = 1; // for redis MULTI
 				for (auto& data_info : *data_info_vec)
 				{
 					if (data_info.data_flow_type != DataFlowType::READ_RETURN && data_info.data_flow_type != DataFlowType::WRITE_RETURN)
@@ -313,45 +316,72 @@ namespace goiot {
 					std::string refresh_id = NS_REFRESH + data_info.id;
 					if (data_info.data_type == DataType::STR)
 					{
-						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_refresh_.get(), HMSET_STRING_FORMAT.c_str(),
-								refresh_id.c_str(), data_info.char_value.c_str(), data_info.result, data_info.timestamp)
-							), [](redisReply* p) { if (p) freeReplyObject(p); });
+						pipeline_result = redisAppendCommand(redis_refresh_.get(), HMSET_STRING_FORMAT.c_str(),
+							refresh_id.c_str(), data_info.char_value.c_str(), data_info.result, data_info.timestamp);
+						assert(pipeline_result == 0);
+						command_num++;
+						//std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+						//	redisCommand(redis_refresh_.get(), HMSET_STRING_FORMAT.c_str(),
+						//		refresh_id.c_str(), data_info.char_value.c_str(), data_info.result, data_info.timestamp)
+						//	), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DF)
 					{
-						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_refresh_.get(), HMSET_FLOAT_FORMAT.c_str(),
-								refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
-							), [](redisReply* p) { if (p) freeReplyObject(p); });
+						pipeline_result = redisAppendCommand(redis_refresh_.get(), HMSET_FLOAT_FORMAT.c_str(),
+							refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp);
+						assert(pipeline_result == 0);
+						command_num++;
+						//std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+						//	redisCommand(redis_refresh_.get(), HMSET_FLOAT_FORMAT.c_str(),
+						//		refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
+						//	), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::BT)
 					{
-						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
-								refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp)
-							), [](redisReply* p) { if (p) freeReplyObject(p); });
+						pipeline_result = redisAppendCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
+							refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp);
+						assert(pipeline_result == 0);
+						command_num++;
+						//std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+						//	redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
+						//		refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp)
+						//	), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
 						data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB)
 					{
-						std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-							redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
-								refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp)
-							), [](redisReply* p) { if (p) freeReplyObject(p); });
-#ifdef _DEBUG
-						if (reply && reply->type == REDIS_REPLY_ERROR && reply->str)
-						{
-							std::cout << "HSET reply error: " << reply->str << std::endl;
-						}
-#endif // _DEBUG
+						pipeline_result = redisAppendCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
+							refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp);
+						assert(pipeline_result == 0);
+						command_num++;
+						//std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
+						//	redisCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
+						//		refresh_id.c_str(), data_info.int_value, data_info.result, data_info.timestamp)
+						//	), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
 					else
 					{
 						throw std::invalid_argument("Unsupported data type.");
 					}
 				}
-			}
+                pipeline_result = redisAppendCommand(redis_refresh_.get(), "EXEC");
+				command_num++;
+				// Send commands and get reply.
+				for (int i = 0; i < command_num; i++)
+				{
+					redisReply* reply = nullptr;
+					pipeline_result = redisGetReply(redis_refresh_.get(), (void**)&reply);
+					if (!(pipeline_result == REDIS_OK && reply))
+					{
+						assert(false);
+						std::cerr << "redis refresh using transaction failed." << std::endl;
+					}
+					if (reply)
+					{
+						freeReplyObject(reply);
+					}
+				}
+            }
 			else
 			{
 				ConnectRedis();

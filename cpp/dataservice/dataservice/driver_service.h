@@ -76,7 +76,8 @@ namespace goiot {
 		bool ConnectedRedis();
 
 		/// <summary>
-		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the DataService.
+		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the Other service.
+		/// Improve the performance by calling redis pipeline.
 		/// </summary>
 		void ResponseDispatch();
 
