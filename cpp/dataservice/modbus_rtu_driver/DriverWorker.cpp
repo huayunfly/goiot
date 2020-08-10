@@ -214,7 +214,7 @@ namespace goiot
 			catch (const QFull&)
 			{
 				assert(false);
-				std::cout << "modbus_rtu_driver driver_manager_reponse_queue_ is full." << std::endl;
+				std::cout << "modbus_rtu_driver driver_manager_response_queue_ is full." << std::endl;
 			}
 		}
 	}

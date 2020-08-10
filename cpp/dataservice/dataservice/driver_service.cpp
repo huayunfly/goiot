@@ -249,7 +249,7 @@ namespace goiot {
 
 	bool DriverMgrService::ConnectedRedis()
 	{
-		if (!redis_refresh_ || !redis_poll_)
+		if (!redis_status_ || !redis_refresh_ || !redis_poll_)
 		{
 			return false;
 		}
@@ -302,8 +302,7 @@ namespace goiot {
 			if (ConnectedRedis())
 			{
 				int pipeline_result = REDIS_ERR;
-				pipeline_result = redisAppendCommand(redis_refresh_.get(), "MULTI");
-				int command_num = 1; // for redis MULTI
+				int command_num = 0;
 				for (auto& data_info : *data_info_vec)
 				{
 					if (data_info.data_flow_type != DataFlowType::READ_RETURN && data_info.data_flow_type != DataFlowType::WRITE_RETURN)
@@ -364,21 +363,17 @@ namespace goiot {
 						throw std::invalid_argument("Unsupported data type.");
 					}
 				}
-                pipeline_result = redisAppendCommand(redis_refresh_.get(), "EXEC");
-				command_num++;
 				// Send commands and get reply.
 				for (int i = 0; i < command_num; i++)
 				{
-					redisReply* reply = nullptr;
-					pipeline_result = redisGetReply(redis_refresh_.get(), (void**)&reply);
+					redisReply* raw_reply = nullptr;
+					pipeline_result = redisGetReply(redis_refresh_.get(), (void**)&raw_reply);
+					std::unique_ptr<redisReply, void(*)(redisReply*)> reply(
+						raw_reply, [](redisReply* p) { if (p) freeReplyObject(p); }); // Wrapped in the smart pointer.
 					if (!(pipeline_result == REDIS_OK && reply))
 					{
 						assert(false);
-						std::cerr << "redis refresh using transaction failed." << std::endl;
-					}
-					if (reply)
-					{
-						freeReplyObject(reply);
+						std::cerr << "ResponseDispatch() redisGetReply failed." << std::endl;
 					}
 				}
             }
@@ -405,7 +400,7 @@ namespace goiot {
 				const std::string ZRANGE_BY_SCORES = "zrangebyscore %s %f %f"; // zrangebyscore key min max
 				double now = std::chrono::duration_cast<std::chrono::milliseconds>(
 					std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
-				double last = 0.0; // now - TIMESPAN;
+				double last = now - TIMESPAN;
 				std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 					redisCommand(redis_poll_.get(), ZRANGE_BY_SCORES.c_str(), NS_POLL_TIME.c_str(), last, now)
 					), [](redisReply* p) { if (p) freeReplyObject(p); });
@@ -422,28 +417,27 @@ namespace goiot {
 					}
 				}
 
+				int pipeline_result = REDIS_ERR;
 				std::unordered_map<std::string, std::vector<DataInfo>> data_info_group;
+				// pipeline
 				for (auto& member : member_vec)
 				{
-					// Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv
-					std::size_t namespace_pos = member.find_first_of(":");
-					namespace_pos = namespace_pos < 0 ? 0 : namespace_pos + 1;
-					std::string data_info_id = member.substr(namespace_pos, member.size() - namespace_pos);
-					auto data_info = data_info_cache_.FindEntry(data_info_id);
-					if (data_info.id.empty())
+					pipeline_result = redisAppendCommand(redis_poll_.get(), HMGET.c_str(),
+						member.c_str(), "value", "result");
+					assert(pipeline_result == REDIS_OK);
+				}
+				// Get replies from pipeline
+				for (auto& member : member_vec)
+				{
+					redisReply* raw_reply = nullptr;
+					pipeline_result = redisGetReply(redis_poll_.get(), (void**)&raw_reply);
+					std::unique_ptr<redisReply, void(*)(redisReply*)> reply(
+						raw_reply, [](redisReply* p) { if (p) freeReplyObject(p); }); // Wrapped in the smart pointer.
+					if (!(pipeline_result == REDIS_OK && reply))
 					{
 						assert(false);
-						continue; // Throw exception
+						std::cerr << "redis redisGetReply failed." << std::endl;
 					}
-					if (data_info.read_write_priviledge == ReadWritePrivilege::READ_ONLY)
-					{
-						assert(false);
-						continue; // Throw exception
-					}
-					// Get Value
-					std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-						redisCommand(redis_poll_.get(), HMGET.c_str(), member.c_str(), "value", "result")
-						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					std::string value;
 					int result;
 					if (reply && reply->type == REDIS_REPLY_ARRAY && reply->elements > 0)
@@ -463,6 +457,23 @@ namespace goiot {
 						assert(false);
 						continue;
 					}
+
+					// Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv
+					std::size_t namespace_pos = member.find_first_of(":");
+					namespace_pos = namespace_pos < 0 ? 0 : namespace_pos + 1;
+					std::string data_info_id = member.substr(namespace_pos, member.size() - namespace_pos);
+					auto data_info = data_info_cache_.FindEntry(data_info_id);
+					if (data_info.id.empty())
+					{
+						assert(false);
+						continue; // Throw exception
+					}
+					if (data_info.read_write_priviledge == ReadWritePrivilege::READ_ONLY)
+					{
+						assert(false);
+						continue; // Throw exception
+					}
+
 					// Parse driver type id seperated by ".", for example: mfcpfc.4.sv -> mfcpfc
 					std::size_t seperator_pos = data_info.id.find_first_of(".");
 					std::size_t len = seperator_pos < 0 ? data_info.id.size() : seperator_pos;

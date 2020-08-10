@@ -65,7 +65,8 @@ namespace goiot {
 		static void AddDataInfo(const DataInfo& data_info);
 
 		/// <summary>
-		/// Connect to redis with more than one connection.
+		/// Connect to redis with more than one connection. One for status, one for poll, and the other for refresh.
+		/// Every connection context is not thread-safety. We use them without locks, so be care of access sequence.
 		/// </summary>
 		void ConnectRedis();
 
@@ -77,7 +78,7 @@ namespace goiot {
 
 		/// <summary>
 		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the Other service.
-		/// Improve the performance by calling redis pipeline.
+		/// Use pipeline to improve redis performance.
 		/// </summary>
 		void ResponseDispatch();
 
@@ -85,6 +86,7 @@ namespace goiot {
 		/// Poll redis using a seperate context. Dispatch writing data, considering the deadband and timestamp.
 		/// Deadband, if the integer or float data change is in the deadband, no request will be sent to device.
 		/// Timestamp, if the data change is in the deadband but timestamp elapsed, new request will be sent to device.
+		/// Use pipeline to improve redis performance.
 		/// </summary>
 		void PollDispatch();
 

@@ -218,7 +218,7 @@ namespace goiot
 			catch (const QFull&)
 			{
 				assert(false);
-				std::cout << "s7_driver:driver_manager_reponse_queue_ is full." << std::endl;
+				std::cout << "s7_driver:driver_manager_response_queue_ is full." << std::endl;
 			}
 		}
 	}
