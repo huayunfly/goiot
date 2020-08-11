@@ -92,6 +92,13 @@ namespace goiot
 		std::shared_ptr<uint16_t> GetRegisterValue(const DataInfo& data_info);
 
 		/// <summary>
+		/// Get bit value from the given DataInfo object.
+		/// </summary>
+		/// <param name="data_info">DataInfo object.</param>
+		/// <returns>data ON: 0xFF00, OFF: 0x0000</returns>
+		uint16_t GetBitValue(const DataInfo& data_info);
+
+		/// <summary>
 		/// Judge whether the writing data equals the modbus_write_and_read() response data.
 		/// </summary>
 		/// <param name="data_info">The writeing data_info.</param>

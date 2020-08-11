@@ -50,6 +50,65 @@
       ]
     },
     {
+      "id": "cylinder16",
+      "name": "modbus4",
+      "type": "modbus_rtu",
+      "port": "COM4,115200,E,8,1",
+      "response_to_msec": 500,
+      "nodes": [
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "alarm",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "RW4WUB17428",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "plc",
       "name": "s7-1500",
       "type": "s7",

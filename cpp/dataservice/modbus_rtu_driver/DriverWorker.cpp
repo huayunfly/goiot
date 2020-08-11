@@ -331,9 +331,18 @@ namespace goiot
 		std::shared_ptr<uint16_t> in_value;
 		std::shared_ptr<uint16_t> rp_registers;
 		std::shared_ptr<uint8_t> rp_bits;
+		uint16_t bit_value;
 		switch (data_info.data_zone)
 		{
 		case DataZone::OUTPUT_RELAY:
+			// ON ：変更数据 高位 FFh、低位 00h
+			// OFF ：変更数据 高位 00h、低位 00h
+			bit_value = GetBitValue(data_info);
+			rc = modbus_write_bit(connection_manager_.get(), data_info.register_address, bit_value);
+ 			if (rc == 1)
+			{
+				result = 0;
+			}
 			break;
 		case DataZone::OUTPUT_REGISTER:
 			in_value = GetRegisterValue(data_info);
@@ -405,7 +414,7 @@ namespace goiot
 
 	void DriverWorker::AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits)
 	{
-		data_info->int_value = bits.get()[0];
+		data_info->byte_value = bits.get()[0];
 	}
 
 	std::shared_ptr<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)
@@ -451,6 +460,11 @@ namespace goiot
 			throw std::invalid_argument("Unsupported data type.");
 		}
 		return value;
+	}
+
+	uint16_t DriverWorker::GetBitValue(const DataInfo& data_info)
+	{
+		return data_info.byte_value > 0 ? 1 : 0;
 	}
 
 	bool DriverWorker::DataInfoValueEqualsReadValue(const DataInfo& data_info, std::shared_ptr<uint16_t> registers)

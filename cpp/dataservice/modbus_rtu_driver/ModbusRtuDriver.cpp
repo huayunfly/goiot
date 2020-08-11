@@ -222,7 +222,8 @@ namespace goiot
                     break;
                 }
                 start_pos++;
-                if (data_info.data_zone == DataZone::INPUT_REGISTER || data_info.data_zone == DataZone::OUTPUT_REGISTER)
+                if (data_info.data_zone == DataZone::INPUT_REGISTER || data_info.data_zone == DataZone::OUTPUT_REGISTER ||
+                    data_info.data_zone == DataZone::INPUT_RELAY || data_info.data_zone == DataZone::OUTPUT_RELAY)
                 {
                     std::string data_type = channel.substr(start_pos, 3);
                     if (data_type.find("DF") == 0)
@@ -267,7 +268,7 @@ namespace goiot
                         continue;
                     }
                 }
-                std::istringstream iss_register_address(channel.substr(start_pos, 4));
+                std::istringstream iss_register_address(channel.substr(start_pos, channel.size() - start_pos));
                 iss_register_address >> data_info.register_address;
                 data_map.insert(std::pair<std::string, DataInfo>(data_info.id, data_info));
             }
