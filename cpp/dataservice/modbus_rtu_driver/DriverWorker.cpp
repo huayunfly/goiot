@@ -142,6 +142,9 @@ namespace goiot
 	{
 		while (true)
 		{
+			// * time bench mark
+			//double now = std::chrono::duration_cast<std::chrono::milliseconds>(
+			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 			try
 			{
 				std::shared_ptr<std::vector<DataInfo>> data_info_vec;
@@ -194,6 +197,10 @@ namespace goiot
 			catch (...) {
 				std::cerr << "modbus_rtu_driver EXCEPTION (unknown)" << std::endl;
 			}
+			// * time bench mark
+            //double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
+            //    std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
+            //std::cout << gap << std::endl;
 		}
 	}
 
@@ -316,6 +323,142 @@ namespace goiot
 		return rd;
 	}
 
+
+	std::shared_ptr<std::vector<DataInfo>> DriverWorker::ReadData(std::shared_ptr<std::vector<DataInfo>> data_info_vec)
+	{
+		if (!data_info_vec)
+		{
+			throw std::invalid_argument("data_info_vec is null");
+		}
+		std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec;
+		if (data_info_vec->empty())
+		{
+			return rp_data_info_vec;
+		}
+
+		const std::string OUTPUT_RELAY = "OR";
+		const std::string INPUT_RELAY = "IR";
+		const std::string OUTPUT_REGISTER = "ORE";
+		const std::string INPUT_REGISTER = "IRE";
+		std::map<std::string, std::map<int/*register*/, DataInfo>> data_info_group;
+		for (auto& data_info : *data_info_vec)
+		{
+			// Register or coil.
+			std::ostringstream oss;
+			oss << data_info.address;
+            switch (data_info.data_zone)
+            {
+			case DataZone::INPUT_RELAY:
+				oss << INPUT_RELAY;
+				break;
+			case DataZone::OUTPUT_RELAY:
+				oss << OUTPUT_RELAY;
+				break;
+			case DataZone::INPUT_REGISTER:
+				oss << INPUT_REGISTER;
+				break;
+			case DataZone::OUTPUT_REGISTER:
+				oss << OUTPUT_REGISTER;
+				break;
+			default:
+				throw std::invalid_argument("Invalid data_zone");
+            }
+			auto group_pos = data_info_group.emplace(oss.str(), std::map<int/*register*/, DataInfo>()).first;
+			// Insert ordering
+			group_pos->second.insert({ data_info.register_address, data_info });
+		}
+		for (auto& group : data_info_group)
+		{
+			int address = group.second.begin()->second.address;
+			DataZone data_zone = group.second.begin()->second.data_zone;
+			int register_begin = group.second.cbegin()->first;
+			int register_end = group.second.crbegin()->first;
+			int len = register_end - register_begin + 1;
+			if (data_zone != DataZone::INPUT_RELAY && data_zone != DataZone::OUTPUT_RELAY)
+			{
+				if (group.second.crbegin()->second.data_type == DataType::DB ||
+					group.second.crbegin()->second.data_type == DataType::DF ||
+					group.second.crbegin()->second.data_type == DataType::DUB)
+				{
+					len += 1;
+				}
+			}
+			// read multi data
+			std::shared_ptr<uint16_t> rp_registers;
+			std::shared_ptr<uint8_t> rp_bits;
+			int rc = -1;
+			switch (data_zone)
+			{
+			case DataZone::OUTPUT_RELAY:
+				rp_bits.reset(new uint8_t[len], std::default_delete<uint8_t[]>());
+				memset(rp_bits.get(), 0, len * sizeof(uint8_t));
+				rc = modbus_read_bits(connection_manager_.get(), register_begin, len, rp_bits.get());
+				if (rc != len)
+				{
+#ifdef _DEBUG
+					std::cerr << "Read output bits " << std::hex << std::showbase << register_begin << " failed." << std::endl;
+#endif // DEBUG
+					AssignBitValue(rp_data_info_vec, group.second, rp_bits, ENODATA); // no_message_available
+				}
+				else
+				{
+					AssignBitValue(rp_data_info_vec, group.second, rp_bits, 0);
+				}
+				break;
+			case DataZone::INPUT_RELAY:
+				rp_bits.reset(new uint8_t[len], std::default_delete<uint8_t[]>());
+				memset(rp_bits.get(), 0, len * sizeof(uint8_t));
+				rc = modbus_read_input_bits(connection_manager_.get(), register_begin, len, rp_bits.get());
+				if (rc != len)
+				{
+#ifdef _DEBUG
+					std::cerr << "Read input bits " << std::hex << std::showbase << register_begin << " failed." << std::endl;
+#endif // DEBUG
+					AssignBitValue(rp_data_info_vec, group.second, rp_bits, ENODATA); // no_message_available
+				}
+				else
+				{
+					AssignBitValue(rp_data_info_vec, group.second, rp_bits, 0);
+				}
+				break;
+			case DataZone::OUTPUT_REGISTER:
+				rp_registers.reset(new uint16_t[len], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+				memset(rp_registers.get(), 0, len * sizeof(uint16_t));
+				rc = modbus_read_registers(connection_manager_.get(), register_begin, len, rp_registers.get());
+				if (rc != len)
+				{
+#ifdef _DEBUG
+					std::cerr << "Read output registers " << std::hex << std::showbase << register_begin << " failed." << std::endl;
+#endif // DEBUG
+				}
+				else
+				{
+					//AssignRegisterValue(rd, rp_registers);
+				}
+				break;
+			case DataZone::INPUT_REGISTER:
+				rp_registers.reset(new uint16_t[len], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+				memset(rp_registers.get(), 0, len * sizeof(uint16_t));
+				rc = modbus_read_input_registers(connection_manager_.get(), register_begin, len, rp_registers.get());
+				if (rc != len)
+				{
+#ifdef _DEBUG
+					std::cerr << "Read input registers " << std::hex << std::showbase << register_begin << " failed." << std::endl;
+#endif // DEBUG			
+				}
+				else
+				{
+					//AssignRegisterValue(rd, rp_registers);
+				}
+				break;
+			default:
+				throw std::invalid_argument("DriverWorker::ReadData() -> Unsupported data zone.");
+			}
+			
+
+		}
+	}
+
 	// Write modbus device data
 	int DriverWorker::WriteData(const DataInfo& data_info)
 	{
@@ -415,6 +558,43 @@ namespace goiot
 	void DriverWorker::AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits)
 	{
 		data_info->byte_value = bits.get()[0];
+	}
+
+	void DriverWorker::AssignBitValue(std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec, 
+		const std::map<int/*register*/, DataInfo>& data_info_map, std::shared_ptr<uint8_t> bits, int result)
+	{
+		if (!rp_data_info_vec)
+		{
+			throw std::invalid_argument("rp_data_info_vec is null.");
+		}
+		if (result == 0)
+		{
+			int start_offset = data_info_map.cbegin()->first;
+			for (auto& data_pair : data_info_map) // ordered_map
+			{
+				uint8_t byte_value = bits.get()[data_pair.first - start_offset] > 0 ? 1 : 0;
+				rp_data_info_vec->emplace_back(data_pair.second.id,
+					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+					data_pair.second.data_zone, data_pair.second.float_decode, byte_value, data_pair.second.int_value,
+					data_pair.second.float_value, data_pair.second.char_value,
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+					0/* result */);
+			}
+		}
+		else
+		{
+			for (auto& data_pair : data_info_map) // ordered_map
+			{
+				rp_data_info_vec->emplace_back(data_pair.second.id,
+					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, data_pair.second.int_value,
+					data_pair.second.float_value, data_pair.second.char_value,
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+					result/* result */);
+			}
+		}
 	}
 
 	std::shared_ptr<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)

@@ -21,7 +21,7 @@ namespace goiot {
 		DriverMgrService(const std::wstring& module_path) : module_path_(module_path),
 			drivers_(), driver_descriptions_(), 
 			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(100)),
-			threads_(), redis_refresh_(), redis_status_(), keep_poll_(false)
+			threads_(), redis_refresh_(), keep_poll_(false)
 		{
 
 		}
@@ -74,7 +74,7 @@ namespace goiot {
 		/// Using PING to get redis connection status.
 		/// </summary>
 		/// <returns>true: connected, otherwise false.</returns>
-		bool ConnectedRedis();
+		bool ConnectedRedis(std::shared_ptr<redisContext> redis_context);
 
 		/// <summary>
 		/// Dispatch worker deals with the response_queue request, which may trasnfer data to the Other service.
@@ -142,7 +142,6 @@ namespace goiot {
 		std::vector<std::thread> threads_;
 		std::shared_ptr<redisContext> redis_refresh_; // Not thread safe.
 		std::shared_ptr<redisContext> redis_poll_; // Not thread safe;
-		std::shared_ptr<redisContext> redis_status_; // Not thread safe, for redis PING status
 		bool keep_poll_;
 	};
 }

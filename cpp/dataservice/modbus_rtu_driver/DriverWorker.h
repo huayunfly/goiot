@@ -54,6 +54,14 @@ namespace goiot
 		/// <param name="data_info">DataInfo object.</param>
 		/// <returns>A DataInfo object with value or error_code.</returns>
 		std::shared_ptr<DataInfo> ReadData(const DataInfo& data_info);
+
+		/// <summary>
+		/// Read multi data from device.
+		/// </summary>
+		/// <param name="data_info">DataInfo object vector.</param>
+		/// <returns>DataInfo object vector value or error_code.</returns>
+		std::shared_ptr<std::vector<DataInfo>> ReadData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
+
 		/// <summary>
 		/// Write data to device.
 		/// </summary>
@@ -82,6 +90,16 @@ namespace goiot
 		/// <param name="data_info">A DataInfo object</param>
 		/// <param name="bits">Modbus bits (1 bit in 1 unit8_t converted by libmodbus)</param>
 		void AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits);
+
+		/// <summary>
+		/// Assigns multi modbus bit value to the data values. If result != 0, copy DataInfo with errro result only.
+		/// </summary>
+		/// <param name="rp_data_info_vec">A response DataInfo object vector</param>
+		/// <param name="data_map">A data map with key:register and value:DataInfo</param>
+		/// <param name="bits">Modbus bits (1 bit in 1 unit8_t converted by libmodbus)</param>
+		/// <param name="result">0: parse and copy bits; otherwise: copy DataInfo with error result only.</param>
+		void AssignBitValue(std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec,
+			const std::map<int/*register*/, DataInfo>& data_info_map, std::shared_ptr<uint8_t> bits, int result);
 
 		/// <summary>
 		/// Get register value from the given DataInfo object.

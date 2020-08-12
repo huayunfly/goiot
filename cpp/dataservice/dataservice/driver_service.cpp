@@ -191,23 +191,6 @@ namespace goiot {
 	void DriverMgrService::ConnectRedis()
 	{
 		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
-		// Connect status
-		redis_status_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
-			[](redisContext* p) { if (p) redisFree(p); });
-		if (redis_status_ && redis_status_->err)
-		{
-			std::cout << "Redis status connection error: " << redis_status_->errstr << std::endl;
-			return;
-		}
-		else if (!redis_status_)
-		{
-			std::cout << "Redis status connection error: can't allocate redis context" << std::endl;
-			return;
-		}
-		else
-		{
-			std::cout << "Redis status connection OK." << std::endl;
-		}
 		// Refresh
 		redis_refresh_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
 			[](redisContext* p) { if (p) redisFree(p); });
@@ -247,15 +230,15 @@ namespace goiot {
 		AddRedisSet(redis_refresh_, NS_REFRESH_TIME, NS_REFRESH, false);
 	}
 
-	bool DriverMgrService::ConnectedRedis()
+	bool DriverMgrService::ConnectedRedis(std::shared_ptr<redisContext> redis_context)
 	{
-		if (!redis_status_ || !redis_refresh_ || !redis_poll_)
+		if (!redis_context)
 		{
 			return false;
 		}
 		
 		std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
-			redisCommand(redis_status_.get(), REDIS_PING.c_str())), [](redisReply* p) { if (p) freeReplyObject(p); });
+			redisCommand(redis_context.get(), REDIS_PING.c_str())), [](redisReply* p) { if (p) freeReplyObject(p); });
 		if (reply && reply->type == REDIS_REPLY_STATUS && REDIS_PONG.compare(reply->str) == 0)
 		{
 			return true;
@@ -299,7 +282,7 @@ namespace goiot {
 
 			//double now = std::chrono::duration_cast<std::chrono::milliseconds>(
 			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
-			if (ConnectedRedis())
+			if (ConnectedRedis(redis_refresh_))
 			{
 				int pipeline_result = REDIS_ERR;
 				int command_num = 0;
@@ -394,7 +377,7 @@ namespace goiot {
 		const double TIMESPAN = 1000.0; // in second
 		while (keep_poll_)
 		{
-			if (ConnectedRedis())
+			if (ConnectedRedis(redis_poll_))
 			{
 				const std::string HMGET = "hmget %s %s %s"; // hmget key field [field]
 				const std::string ZRANGE_BY_SCORES = "zrangebyscore %s %f %f"; // zrangebyscore key min max

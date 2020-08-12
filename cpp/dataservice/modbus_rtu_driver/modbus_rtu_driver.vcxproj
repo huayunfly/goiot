@@ -145,7 +145,7 @@
       <PreprocessorDefinitions>NDEBUG;BUILD_DLL;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\include;$(YASHEN3RDLIB_HOME)\libmodbus\v3_1_6\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\include;$(YASHEN3RDLIB_HOME)\libmodbus\v3_1_6\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
