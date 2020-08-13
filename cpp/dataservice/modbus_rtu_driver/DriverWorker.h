@@ -85,6 +85,19 @@ namespace goiot
 		void AssignRegisterValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint16_t> registers);
 
 		/// <summary>
+		/// Assigns the modbus register value to multi data value according to the date type.
+		/// Copy the DataInfo and result only if the result != 0 (error)
+		/// Considering the raito. ¿¼ÂÇ×ª»»Òò×Ó
+		/// </summary>
+		/// <param name="rp_data_info_vec">A response DataInfo object vector</param>
+		/// <param name="data_info_map">DataInfo map</param>
+		/// <param name="register_start">register start</param>
+		/// <param name="registers">Modbus registers</param>
+		/// <param name="result">0: parse and copy registers; otherwise: copy DataInfo with error result only.</param>
+		void AssignRegisterValue(std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec,
+			const std::map<int/*register*/, DataInfo>& data_info_map, int register_start, const std::vector<uint16_t>& registers, int result);
+
+		/// <summary>
 		/// Assigns the modbus bit value to the data value.
 		/// </summary>
 		/// <param name="data_info">A DataInfo object</param>
@@ -95,11 +108,13 @@ namespace goiot
 		/// Assigns multi modbus bit value to the data values. If result != 0, copy DataInfo with errro result only.
 		/// </summary>
 		/// <param name="rp_data_info_vec">A response DataInfo object vector</param>
-		/// <param name="data_map">A data map with key:register and value:DataInfo</param>
+		/// <param name="data_info_map">A data map with key:register and value:DataInfo</param>
+		/// <param name="register_start">register start</param>
 		/// <param name="bits">Modbus bits (1 bit in 1 unit8_t converted by libmodbus)</param>
 		/// <param name="result">0: parse and copy bits; otherwise: copy DataInfo with error result only.</param>
 		void AssignBitValue(std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec,
-			const std::map<int/*register*/, DataInfo>& data_info_map, std::shared_ptr<uint8_t> bits, int result);
+			const std::map<int/*register*/, DataInfo>& data_info_map, int register_start, const std::vector<uint8_t>& bits, 
+			int result);
 
 		/// <summary>
 		/// Get register value from the given DataInfo object.

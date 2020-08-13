@@ -143,46 +143,58 @@ namespace goiot
 		while (true)
 		{
 			// * time bench mark
-			//double now = std::chrono::duration_cast<std::chrono::milliseconds>(
-			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+			double now = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 			try
 			{
 				std::shared_ptr<std::vector<DataInfo>> data_info_vec;
 				in_queue_.Get(data_info_vec);
 				if (data_info_vec == nullptr) // Improve for a robust SENTINEL
 				{
-					break; // Exit
+					break; // Exit thead loop
 				}
-				auto rp_data_info_vec = std::make_shared<std::vector<DataInfo>>();
-				int result_code = 0;
-				for (std::size_t i = 0; i < data_info_vec->size(); i++)
+				if (data_info_vec->empty())
 				{
-					std::shared_ptr<DataInfo> data_info;
-					switch (data_info_vec->at(i).data_flow_type)
+					continue; // guard
+				}
+				std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec;
+				if (data_info_vec->at(0).data_flow_type == DataFlowType::REFRESH)
+				{
+					rp_data_info_vec = ReadData(data_info_vec); // batch read
+				}
+				else
+				{
+					rp_data_info_vec.reset(new std::vector<DataInfo>());
+					int result_code = 0;
+					for (std::size_t i = 0; i < data_info_vec->size(); i++)
 					{
-					case DataFlowType::REFRESH:
-						data_info = ReadData(data_info_vec->at(i));
-						// Copy data, may be improved.
-						rp_data_info_vec->emplace_back(data_info->id,
-							data_info->name, data_info->address, data_info->register_address,
-							data_info->read_write_priviledge, DataFlowType::READ_RETURN, data_info->data_type,
-							data_info->data_zone, data_info->float_decode, data_info->byte_value, data_info->int_value, data_info->float_value,
-							data_info->char_value,
-							std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
-							data_info->result);
-						break;
-					case DataFlowType::ASYNC_WRITE:
-						result_code = WriteData(data_info_vec->at(i));
-						rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
-							data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
-							data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
-							data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
-							data_info_vec->at(i).char_value,
-							std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
-							result_code);
-						break;
-					default:
-						break;
+						std::shared_ptr<DataInfo> data_info;
+						switch (data_info_vec->at(i).data_flow_type)
+						{
+							//case DataFlowType::REFRESH:
+							//	data_info = ReadData(data_info_vec->at(i));
+							//	// Copy data, may be improved.
+							//	rp_data_info_vec->emplace_back(data_info->id,
+							//		data_info->name, data_info->address, data_info->register_address,
+							//		data_info->read_write_priviledge, DataFlowType::READ_RETURN, data_info->data_type,
+							//		data_info->data_zone, data_info->float_decode, data_info->byte_value, data_info->int_value, data_info->float_value,
+							//		data_info->char_value,
+							//		std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+							//		data_info->result);
+							//	break;
+						case DataFlowType::ASYNC_WRITE:
+							result_code = WriteData(data_info_vec->at(i));
+							rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
+								data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
+								data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
+								data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+								data_info_vec->at(i).char_value,
+								std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+								result_code);
+							break;
+						default:
+							break;
+						}
 					}
 				}
 				out_queue_.Put(rp_data_info_vec, true, std::chrono::milliseconds(1000));
@@ -198,9 +210,9 @@ namespace goiot
 				std::cerr << "modbus_rtu_driver EXCEPTION (unknown)" << std::endl;
 			}
 			// * time bench mark
-            //double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
-            //    std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
-            //std::cout << gap << std::endl;
+            double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
+            std::cout << gap << std::endl;
 		}
 	}
 
@@ -330,12 +342,14 @@ namespace goiot
 		{
 			throw std::invalid_argument("data_info_vec is null");
 		}
-		std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec;
+		std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec(new std::vector<DataInfo>());
 		if (data_info_vec->empty())
 		{
 			return rp_data_info_vec;
 		}
 
+		// Group data_info by the address and data_zone using std::map
+		// MODBUS_MAX_READ_BITS = 2000 and MODBUS_MAX_READ_REGISTERS = 125
 		const std::string OUTPUT_RELAY = "OR";
 		const std::string INPUT_RELAY = "IR";
 		const std::string OUTPUT_REGISTER = "ORE";
@@ -369,20 +383,86 @@ namespace goiot
 		}
 		for (auto& group : data_info_group)
 		{
-			int address = group.second.begin()->second.address;
-			DataZone data_zone = group.second.begin()->second.data_zone;
-			int register_begin = group.second.cbegin()->first;
-			int register_end = group.second.crbegin()->first;
-			int len = register_end - register_begin + 1;
-			if (data_zone != DataZone::INPUT_RELAY && data_zone != DataZone::OUTPUT_RELAY)
+			int address = group.second.cbegin()->second.address;
+			DataZone data_zone = group.second.cbegin()->second.data_zone;
+			//int register_begin = group.second.cbegin()->first;
+			//int register_end = group.second.crbegin()->first;
+			//int len = register_end - register_begin + 1;
+			//if (data_zone != DataZone::INPUT_RELAY && data_zone != DataZone::OUTPUT_RELAY)
+			//{
+			//	if (group.second.crbegin()->second.data_type == DataType::DB ||
+			//		group.second.crbegin()->second.data_type == DataType::DF ||
+			//		group.second.crbegin()->second.data_type == DataType::DUB)
+			//	{
+			//		len += 1;
+			//	}
+			//}
+
+			// Set salve
+			modbus_set_slave(connection_manager_.get(), address);
+
+			// read bit segment preparation
+			const int MAX_READ_BITS = 100;
+			const int MAX_READ_REGISTERS = 100;
+			std::vector<std::pair<int/* start register */, int/* read register length */>> read_reg_pair;
+			// segment
+			bool segment_start = true;
+			int start_register = 0;
+			if (data_zone == DataZone::INPUT_RELAY || data_zone == DataZone::OUTPUT_RELAY)
 			{
-				if (group.second.crbegin()->second.data_type == DataType::DB ||
-					group.second.crbegin()->second.data_type == DataType::DF ||
-					group.second.crbegin()->second.data_type == DataType::DUB)
+				for (auto& data_info_pair : group.second)
 				{
-					len += 1;
+					if (segment_start)
+					{
+						start_register = data_info_pair.first;
+						segment_start = false;
+						read_reg_pair.push_back({ start_register, 1 });
+						continue;
+					}
+					if (data_info_pair.first - start_register < MAX_READ_BITS)
+					{
+						read_reg_pair.pop_back();
+						read_reg_pair.push_back({ start_register, data_info_pair.first - start_register + 1 });
+					}
+					else
+					{
+						start_register = data_info_pair.first;
+						read_reg_pair.push_back({ start_register, 1 });
+					}
 				}
 			}
+			else
+			{
+				for (auto& data_info_pair : group.second)
+				{
+					int register_num = 1;
+					if (data_info_pair.second.data_type == DataType::DB ||
+						data_info_pair.second.data_type == DataType::DF ||
+						data_info_pair.second.data_type == DataType::DUB)
+					{
+						register_num = 2;
+					}
+
+					if (segment_start)
+					{
+						start_register = data_info_pair.first;
+						segment_start = false;
+						read_reg_pair.push_back({ start_register, register_num });
+						continue;
+					}
+					if (data_info_pair.first - start_register < MAX_READ_BITS)
+					{
+						read_reg_pair.pop_back();
+						read_reg_pair.push_back({ start_register, data_info_pair.first - start_register + register_num });
+					}
+					else
+					{
+						start_register = data_info_pair.first;
+						read_reg_pair.push_back({ start_register, register_num });
+					}
+				}
+			}
+
 			// read multi data
 			std::shared_ptr<uint16_t> rp_registers;
 			std::shared_ptr<uint8_t> rp_bits;
@@ -390,73 +470,62 @@ namespace goiot
 			switch (data_zone)
 			{
 			case DataZone::OUTPUT_RELAY:
-				rp_bits.reset(new uint8_t[len], std::default_delete<uint8_t[]>());
-				memset(rp_bits.get(), 0, len * sizeof(uint8_t));
-				rc = modbus_read_bits(connection_manager_.get(), register_begin, len, rp_bits.get());
-				if (rc != len)
-				{
-#ifdef _DEBUG
-					std::cerr << "Read output bits " << std::hex << std::showbase << register_begin << " failed." << std::endl;
-#endif // DEBUG
-					AssignBitValue(rp_data_info_vec, group.second, rp_bits, ENODATA); // no_message_available
-				}
-				else
-				{
-					AssignBitValue(rp_data_info_vec, group.second, rp_bits, 0);
-				}
-				break;
 			case DataZone::INPUT_RELAY:
-				rp_bits.reset(new uint8_t[len], std::default_delete<uint8_t[]>());
-				memset(rp_bits.get(), 0, len * sizeof(uint8_t));
-				rc = modbus_read_input_bits(connection_manager_.get(), register_begin, len, rp_bits.get());
-				if (rc != len)
+				for (int i = 0; i < read_reg_pair.size(); i++)
 				{
+					std::vector<uint8_t> rp_bits(read_reg_pair.at(i).second, 0);
+					if (data_zone == DataZone::OUTPUT_RELAY)
+					{
+						rc = modbus_read_bits(connection_manager_.get(), read_reg_pair.at(i).first, read_reg_pair.at(i).second, &rp_bits.at(0));
+					}
+					else
+					{
+						rc = modbus_read_input_bits(connection_manager_.get(), read_reg_pair.at(i).first, read_reg_pair.at(i).second, &rp_bits.at(0));
+					}
+					if (rc != read_reg_pair.at(i).second)
+					{
 #ifdef _DEBUG
-					std::cerr << "Read input bits " << std::hex << std::showbase << register_begin << " failed." << std::endl;
+						std::cerr << "Read bits " << std::hex << std::showbase << read_reg_pair.at(i).first << " failed." << std::endl;
 #endif // DEBUG
-					AssignBitValue(rp_data_info_vec, group.second, rp_bits, ENODATA); // no_message_available
-				}
-				else
-				{
-					AssignBitValue(rp_data_info_vec, group.second, rp_bits, 0);
+						AssignBitValue(rp_data_info_vec, group.second, read_reg_pair.at(i).first, rp_bits, ENODATA); // no_message_available
+					}
+					else
+					{
+						AssignBitValue(rp_data_info_vec, group.second, read_reg_pair.at(i).first, rp_bits, 0);
+					}
 				}
 				break;
 			case DataZone::OUTPUT_REGISTER:
-				rp_registers.reset(new uint16_t[len], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
-				memset(rp_registers.get(), 0, len * sizeof(uint16_t));
-				rc = modbus_read_registers(connection_manager_.get(), register_begin, len, rp_registers.get());
-				if (rc != len)
-				{
-#ifdef _DEBUG
-					std::cerr << "Read output registers " << std::hex << std::showbase << register_begin << " failed." << std::endl;
-#endif // DEBUG
-				}
-				else
-				{
-					//AssignRegisterValue(rd, rp_registers);
-				}
-				break;
 			case DataZone::INPUT_REGISTER:
-				rp_registers.reset(new uint16_t[len], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
-				memset(rp_registers.get(), 0, len * sizeof(uint16_t));
-				rc = modbus_read_input_registers(connection_manager_.get(), register_begin, len, rp_registers.get());
-				if (rc != len)
+				for (int i = 0; i < read_reg_pair.size(); i++)
 				{
+					std::vector<uint16_t> rp_registers(read_reg_pair.at(i).second, 0);
+					if (data_zone == DataZone::OUTPUT_REGISTER)
+					{
+						rc = modbus_read_registers(connection_manager_.get(), read_reg_pair.at(i).first, read_reg_pair.at(i).second, &rp_registers.at(0));
+					}
+					else
+					{
+						rc = modbus_read_input_registers(connection_manager_.get(), read_reg_pair.at(i).first, read_reg_pair.at(i).second, &rp_registers.at(0));
+					}
+					if (rc != read_reg_pair.at(i).second)
+					{
 #ifdef _DEBUG
-					std::cerr << "Read input registers " << std::hex << std::showbase << register_begin << " failed." << std::endl;
-#endif // DEBUG			
-				}
-				else
-				{
-					//AssignRegisterValue(rd, rp_registers);
+						std::cerr << "Read registers " << std::hex << std::showbase << read_reg_pair.at(i).first << " failed." << std::endl;
+#endif // DEBUG
+						AssignRegisterValue(rp_data_info_vec, group.second, read_reg_pair.at(i).first, rp_registers, ENODATA); // no_message_available
+					}
+					else
+					{
+						AssignRegisterValue(rp_data_info_vec, group.second, read_reg_pair.at(i).first, rp_registers, 0);
+					}
 				}
 				break;
 			default:
 				throw std::invalid_argument("DriverWorker::ReadData() -> Unsupported data zone.");
 			}
-			
-
 		}
+		return rp_data_info_vec;
 	}
 
 	// Write modbus device data
@@ -555,24 +624,121 @@ namespace goiot
 		}
 	}
 
+	void DriverWorker::AssignRegisterValue(std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec,
+		const std::map<int/*register*/, DataInfo>& data_info_map, int register_start, const std::vector<uint16_t>& registers, int result)
+	{
+		if (!rp_data_info_vec)
+		{
+			throw std::invalid_argument("rp_data_info_vec is null.");
+		}
+		for (auto& data_pair : data_info_map) // ordered_map
+		{
+			if (data_pair.first < register_start)
+			{
+				continue;
+			}
+			if (data_pair.first >= register_start + registers.size())
+			{
+				break;
+			}
+			if (result == 0)
+			{
+				int int_value = 0;
+				float float_value = 0.0;
+				switch (data_pair.second.data_type)
+				{
+				case DataType::DB:
+				case DataType::DUB:
+					int_value = (registers.at(data_pair.first - register_start) +
+						(registers.at(data_pair.first - register_start + 1) << 16)) * data_pair.second.ratio;
+					rp_data_info_vec->emplace_back(data_pair.second.id,
+						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, int_value,
+						data_pair.second.float_value, data_pair.second.char_value,
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						0/* result */);
+					break;
+				case DataType::DF:
+					switch (data_pair.second.float_decode)
+					{
+					case FloatDecode::ABCD:
+						float_value = modbus_get_float_abcd(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						break;
+					case FloatDecode::DCBA:
+						float_value = modbus_get_float_dcba(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						break;
+					case FloatDecode::BADC:
+						float_value = modbus_get_float_badc(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						break;
+					case FloatDecode::CDAB:
+						float_value = modbus_get_float_cdab(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						break;
+					default:
+						throw std::invalid_argument("Unsupported float decode.");
+					}
+					rp_data_info_vec->emplace_back(data_pair.second.id,
+						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, data_pair.second.int_value,
+						float_value, data_pair.second.char_value,
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						0/* result */);
+					break;
+				case DataType::WB:
+				case DataType::WUB:
+					int_value = registers.at(data_pair.first - register_start) * data_pair.second.ratio;
+					rp_data_info_vec->emplace_back(data_pair.second.id,
+						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, int_value,
+						data_pair.second.float_value, data_pair.second.char_value,
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						0/* result */);
+					break;
+				default:
+					throw std::invalid_argument("Unsupported data type.");
+				}
+			}
+			else
+			{
+				rp_data_info_vec->emplace_back(data_pair.second.id,
+					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, data_pair.second.int_value,
+					data_pair.second.float_value, data_pair.second.char_value,
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+					result/* result */);
+			}
+		}
+    }
+
 	void DriverWorker::AssignBitValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint8_t> bits)
 	{
 		data_info->byte_value = bits.get()[0];
 	}
 
 	void DriverWorker::AssignBitValue(std::shared_ptr<std::vector<DataInfo>> rp_data_info_vec, 
-		const std::map<int/*register*/, DataInfo>& data_info_map, std::shared_ptr<uint8_t> bits, int result)
+		const std::map<int/*register*/, DataInfo>& data_info_map, int register_start, const std::vector<uint8_t>& bits, int result)
 	{
 		if (!rp_data_info_vec)
 		{
 			throw std::invalid_argument("rp_data_info_vec is null.");
 		}
-		if (result == 0)
+
+		for (auto& data_pair : data_info_map) // ordered_map
 		{
-			int start_offset = data_info_map.cbegin()->first;
-			for (auto& data_pair : data_info_map) // ordered_map
+			if (data_pair.first < register_start)
 			{
-				uint8_t byte_value = bits.get()[data_pair.first - start_offset] > 0 ? 1 : 0;
+				continue;
+			}
+			if (data_pair.first >= register_start + bits.size())
+			{
+				break;
+			}
+			if (result == 0)
+			{
+				uint8_t byte_value = bits.at(data_pair.first - register_start) > 0 ? 1 : 0;
 				rp_data_info_vec->emplace_back(data_pair.second.id,
 					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
@@ -581,10 +747,7 @@ namespace goiot
 					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 					0/* result */);
 			}
-		}
-		else
-		{
-			for (auto& data_pair : data_info_map) // ordered_map
+			else
 			{
 				rp_data_info_vec->emplace_back(data_pair.second.id,
 					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,

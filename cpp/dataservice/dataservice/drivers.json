@@ -88,7 +88,7 @@
             },
             {
               "id": "stb",
-              "name": "alarm",
+              "name": "stb",
               "register": "RW0BT0288",
               "ratio": 1
             },
