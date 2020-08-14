@@ -142,9 +142,11 @@ namespace goiot
 	{
 		while (true)
 		{
+#ifdef _DEBUG
 			// * time bench mark
 			double now = std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+#endif // _DEBUG
 			try
 			{
 				std::shared_ptr<std::vector<DataInfo>> data_info_vec;
@@ -209,10 +211,12 @@ namespace goiot
 			catch (...) {
 				std::cerr << "modbus_rtu_driver EXCEPTION (unknown)" << std::endl;
 			}
+#ifdef _DEBUG
 			// * time bench mark
-            double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
-            std::cout << gap << std::endl;
+			double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
+			std::cout << gap << std::endl;
+#endif // _DEBUG
 		}
 	}
 
@@ -385,18 +389,6 @@ namespace goiot
 		{
 			int address = group.second.cbegin()->second.address;
 			DataZone data_zone = group.second.cbegin()->second.data_zone;
-			//int register_begin = group.second.cbegin()->first;
-			//int register_end = group.second.crbegin()->first;
-			//int len = register_end - register_begin + 1;
-			//if (data_zone != DataZone::INPUT_RELAY && data_zone != DataZone::OUTPUT_RELAY)
-			//{
-			//	if (group.second.crbegin()->second.data_type == DataType::DB ||
-			//		group.second.crbegin()->second.data_type == DataType::DF ||
-			//		group.second.crbegin()->second.data_type == DataType::DUB)
-			//	{
-			//		len += 1;
-			//	}
-			//}
 
 			// Set salve
 			modbus_set_slave(connection_manager_.get(), address);
@@ -540,7 +532,7 @@ namespace goiot
 		modbus_set_slave(connection_manager_.get(), data_info.address);
 		int num_registers = GetNumberOfRegister(data_info.data_type);
 		int num_bits = 1;
-		std::shared_ptr<uint16_t> in_value;
+		std::vector<uint16_t> in_value;
 		std::shared_ptr<uint16_t> rp_registers;
 		std::shared_ptr<uint8_t> rp_bits;
 		uint16_t bit_value;
@@ -551,20 +543,35 @@ namespace goiot
 			// OFF ：変更数据 高位 00h、低位 00h
 			bit_value = GetBitValue(data_info);
 			rc = modbus_write_bit(connection_manager_.get(), data_info.register_address, bit_value);
- 			if (rc == 1)
+			if (rc == 1)
 			{
 				result = 0;
 			}
 			break;
 		case DataZone::OUTPUT_REGISTER:
 			in_value = GetRegisterValue(data_info);
-			rp_registers.reset(new uint16_t[num_registers], std::default_delete<uint16_t[]>());
-			rc = modbus_write_and_read_registers(connection_manager_.get(), data_info.register_address, num_registers,
-				in_value.get(), data_info.register_address, num_registers, rp_registers.get());
-			if (rc == num_registers && DataInfoValueEqualsReadValue(data_info, rp_registers))
-			{	
+			if (in_value.size() == 1)
+			{
+				rc = modbus_write_register(connection_manager_.get(), data_info.register_address, in_value.at(0));
+			}
+			else if (in_value.size() == 2)
+			{
+				rc = modbus_write_registers(connection_manager_.get(), data_info.register_address, 2, &in_value.at(0));
+			}
+			else
+			{
+				throw std::invalid_argument("Unsupported register length.");
+			}
+			if (rc == in_value.size())
+			{
 				result = 0;
 			}
+			//rc = modbus_write_and_read_registers(connection_manager_.get(), data_info.register_address, num_registers,
+			//	in_value.get(), data_info.register_address, num_registers, in_value.get());
+			//if (rc == num_registers && DataInfoValueEqualsReadValue(data_info, rp_registers))
+			//{	
+			//	result = 0;
+			//}
 			break;
 		default:
 			break;
@@ -760,34 +767,32 @@ namespace goiot
 		}
 	}
 
-	std::shared_ptr<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)
+	std::vector<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)
 	{
-		std::shared_ptr<uint16_t> value;
+		std::vector<uint16_t> value(2, 0);
 		int int_value;
 		switch (data_info.data_type)
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			value.reset(new uint16_t[2], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
 			int_value = data_info.int_value / data_info.ratio;
-			value.get()[0] = int_value & 0xFFFF;
-			value.get()[1] = (int_value >> 16) & 0xFFFF;
+			value.at(0) = int_value & 0xFFFF;
+			value.at(1) = (int_value >> 16) & 0xFFFF;
 			break;
 		case DataType::DF:
-			value.reset(new uint16_t[2], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
 			switch (data_info.float_decode)
 			{
 			case FloatDecode::ABCD:
-				modbus_set_float_abcd(data_info.float_value / data_info.ratio, value.get());
+				modbus_set_float_abcd(data_info.float_value / data_info.ratio, &value.at(0));
 				break;
 			case FloatDecode::DCBA:
-				modbus_set_float_dcba(data_info.float_value / data_info.ratio, value.get());
+				modbus_set_float_dcba(data_info.float_value / data_info.ratio, &value.at(0));
 				break;
 			case FloatDecode::BADC:
-				modbus_set_float_badc(data_info.float_value / data_info.ratio, value.get());
+				modbus_set_float_badc(data_info.float_value / data_info.ratio, &value.at(0));
 				break;
 			case FloatDecode::CDAB:
-				modbus_set_float_cdab(data_info.float_value / data_info.ratio, value.get());
+				modbus_set_float_cdab(data_info.float_value / data_info.ratio, &value.at(0));
 				break;
 			default:
 				throw std::invalid_argument("Unsupported float decode.");
@@ -795,9 +800,10 @@ namespace goiot
 			break;
 		case DataType::WB:
 		case DataType::WUB:
-			value.reset(new uint16_t[1], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
+			//value.reset(new uint16_t[1], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
 			int_value = data_info.int_value / data_info.ratio;
-			value.get()[0] = int_value & 0xFFFF;
+			value.at(0) = int_value & 0xFFFF;
+			value.pop_back();
 			break;
 		default:
 			throw std::invalid_argument("Unsupported data type.");

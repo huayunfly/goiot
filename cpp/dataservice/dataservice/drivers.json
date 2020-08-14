@@ -24,7 +24,7 @@
       "id": "mfcpfc",
       "name": "modbus3",
       "type": "modbus_rtu",
-      "port": "COM3,19200,E,8,2",
+      "port": "COM5,19200,E,8,2",
       "response_to_msec": 500,
       "nodes": [
         {
@@ -44,6 +44,12 @@
               "name": "setpoint",
               "register": "RW4WUB0033",
               "ratio": 5
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
             }
           ]
         }

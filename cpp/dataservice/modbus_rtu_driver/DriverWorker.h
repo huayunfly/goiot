@@ -122,7 +122,7 @@ namespace goiot
 		/// </summary>
 		/// <param name="data_info">DataInfo object.</param>
 		/// <returns>Register array.</returns>
-		std::shared_ptr<uint16_t> GetRegisterValue(const DataInfo& data_info);
+		std::vector<uint16_t> GetRegisterValue(const DataInfo& data_info);
 
 		/// <summary>
 		/// Get bit value from the given DataInfo object.
