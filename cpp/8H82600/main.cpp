@@ -7,11 +7,10 @@
 
 int main(int argc, char *argv[])
 {
-
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
     goiot::DataManager data_manager;
-    data_manager.Connect();
+    data_manager.Start();
     return a.exec();
 }
