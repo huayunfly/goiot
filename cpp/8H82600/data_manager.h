@@ -17,11 +17,13 @@ public:
         keep_refresh_(false)
     {
         redis_config_.setTimeouts(1500, 1500);
+        initRedisClient();
     }
 
     DataManager(const RedisClient::ConnectionConfig& redis_config) :
         redis_config_(redis_config), redis_refresh_(), redis_poll_(), keep_refresh_(false)
     {
+        initRedisClient();
     }
     DataManager(const DataManager&) = delete;
     DataManager& operator=(const DataManager&) = delete;
@@ -51,9 +53,6 @@ private:
 private:
     const static std::wstring CONFIG_FILE;
     const static std::wstring DRIVER_DIR;
-    const static std::string HMSET_STRING_FORMAT;
-    const static std::string HMSET_INTEGER_FORMAT;
-    const static std::string HMSET_FLOAT_FORMAT;
     const static std::string REDIS_PING;
     const static std::string REDIS_PONG;
     const static std::string NS_REFRESH;

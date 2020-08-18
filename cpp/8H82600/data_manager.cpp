@@ -5,9 +5,7 @@ namespace goiot {
 
 const std::wstring DataManager::CONFIG_FILE = L"drivers.json";
 const std::wstring DataManager::DRIVER_DIR = L"drivers";
-const std::string DataManager::HMSET_STRING_FORMAT = "HMSET %s value %s result %d time %f";
-const std::string DataManager::HMSET_INTEGER_FORMAT = "HMSET %s value %d result %d time %f";
-const std::string DataManager::HMSET_FLOAT_FORMAT = "HMSET %s value %f result %d time %f";
+
 const std::string DataManager::REDIS_PING = "PING";
 const std::string DataManager::REDIS_PONG = "PONG";
 
@@ -19,7 +17,6 @@ const std::string DataManager::NS_DELIMITER = ":";
 
 void DataManager::ConnectRedis()
 {
-    initRedisClient();
     redis_refresh_.reset(new RedisClient::Connection(redis_config_));
     bool connected = redis_refresh_->connect();
     if (!connected)
@@ -33,22 +30,6 @@ void DataManager::ConnectRedis()
     {
         std::cout << "redis poll_ connection failed" << std::endl;
     }
-
-    //        // Run command and wait for result
-    //        RedisClient::Response rep = redis_refresh_->commandSync({"PING"});
-
-    //    // Run command in async mode
-    //    redis_refresh_->command({"PING"});
-
-    //    // Run command in db #2
-    //    redis_refresh_->command({"PING"}, 2);
-
-    //    // Run async command with callback
-    //    redis_refresh_->command({"PING"}, nullptr, [](RedisClient::Response r, QString s) {
-    //        QVariant val = r.value(); // get value from response
-    //        std::cout << val.String << std::endl;
-    //        // do stuff
-    //    });
 }
 
 bool DataManager::ConnectedRedis(std::shared_ptr<RedisClient::Connection> redis_connection)
@@ -76,12 +57,15 @@ void DataManager::Start()
     ConnectRedis();
     keep_refresh_ = true;
     threads_.emplace_back(std::thread(&DataManager::RefreshDispatch, this));
+    threads_.emplace_back(std::thread(&DataManager::ResponseDispatch, this));
 }
 
 /// Stop working threads
 void DataManager::Stop()
 {
     keep_refresh_ = false;
+    response_queue_->Close();
+
     for (auto& entry : threads_)
     {
         entry.join();
@@ -125,7 +109,7 @@ void DataManager::RefreshDispatch()
                 }
             }
 
-            std::vector<DataInfo> data_info_vec;
+            auto data_info_vec = std::make_shared<std::vector<DataInfo>>();
             // pipeline
             RedisClient::Command cmd;
             for (auto& member : member_vec)
@@ -151,11 +135,11 @@ void DataManager::RefreshDispatch()
                         continue;
                     }
                     std::string value = inner_list.at(0).toUtf8().constData();
-                    int result = inner_list.at(1).toInt();
+                    int result = inner_list.at(1).toInt(); // Notify whether the data is healthy.
 
                     // Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv
                     std::size_t namespace_pos = member_vec.at(i).find_first_of(":");
-                    namespace_pos = namespace_pos < 0 ? 0 : namespace_pos + 1;
+                    namespace_pos = (namespace_pos == std::string::npos) ? 0 : namespace_pos + 1;
                     std::string data_info_id = member_vec.at(i).substr(namespace_pos, member_vec.at(i).size() - namespace_pos);
                     auto data_info = data_info_cache_.FindEntry(data_info_id);
                     if (data_info.id.empty())
@@ -185,11 +169,11 @@ void DataManager::RefreshDispatch()
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
 
                         }
-                        data_info_vec.emplace_back(data_info.id,
+                        data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       0/* integer */, new_value, ""/* string */, timestamp
+                                                       0/* integer */, new_value, ""/* string */, timestamp, result, data_info.ratio
                                                        );
                     }
                     else if (data_info.data_type == DataType::STR)
@@ -204,11 +188,11 @@ void DataManager::RefreshDispatch()
                             data_info.char_value = new_value; // update poll
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
                         }
-                        data_info_vec.emplace_back(data_info.id,
+                        data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
-                                                       data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+                                                       data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       0/* integer */, 0.0/* float */, new_value, timestamp
+                                                       0/* integer */, 0.0/* float */, new_value, timestamp, result, data_info.ratio
                                                        );
                     }
                     else if (data_info.data_type == DataType::BT)
@@ -223,11 +207,11 @@ void DataManager::RefreshDispatch()
                             data_info.byte_value = new_value; // updata poll
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
                         }
-                        data_info_vec.emplace_back(data_info.id,
+                        data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
-                                                       data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+                                                       data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, new_value,
-                                                       0/* integer */, 0.0/* float */, "", timestamp
+                                                       0/* integer */, 0.0/* float */, "", timestamp, result, data_info.ratio
                                                        );
                     }
                     else
@@ -242,20 +226,20 @@ void DataManager::RefreshDispatch()
                             data_info.int_value = new_value;
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
                         }
-                        data_info_vec.emplace_back(data_info.id,
+                        data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
-                                                       data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
+                                                       data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       new_value, 0.0/* float */, "", timestamp
+                                                       new_value, 0.0/* float */, "", timestamp, result, data_info.ratio
                                                        );
                     }
                 }
             }
 
             // Dispatch writing data to in-queue
-            if (data_info_vec.size() > 0)
+            if (data_info_vec->size() > 0)
             {
-                request_queue_->Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+                request_queue_->Put(data_info_vec);
             }
         }
         else
@@ -268,7 +252,88 @@ void DataManager::RefreshDispatch()
 /// Check response queue and write changed data to redis poll zone.
 void DataManager::ResponseDispatch()
 {
+    while (true)
+    {
+        std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+        response_queue_->Get(data_info_vec);
+        if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+        {
+            break; // Exit
+        }
 
+        //double now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        //	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+        if (ConnectedRedis(redis_poll_))
+        {
+            const std::string HMSET = "hmset"; // hmset key field value [field value]
+            RedisClient::Command cmd;
+            for (auto& data_info : *data_info_vec)
+            {
+                if (data_info.data_flow_type != DataFlowType::ASYNC_WRITE)
+                {
+                    continue;
+                }
+                // Todo: improve UpateEntry() by updataing the entry partly.
+                data_info_cache_.UpdateEntry(data_info.id, data_info); // update all including value, result and timestamp
+                // Write to redis poll zone.
+                std::string poll_id = NS_POLL + data_info.id; // id
+                std::ostringstream oss_result; // result
+                oss_result << data_info.result;
+                std::ostringstream oss_time; // timestamp
+                oss_time << data_info.timestamp;
+                std::ostringstream oss_value; // value
+                if (data_info.data_type == DataType::STR)
+                {
+                    oss_value << data_info.char_value;
+                    cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
+                               "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
+
+                }
+                else if (data_info.data_type == DataType::DF)
+                {
+                    oss_value << data_info.float_value;
+                    cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
+                               "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
+
+                }
+                else if (data_info.data_type == DataType::BT)
+                {
+                    oss_value << data_info.byte_value;
+                    cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
+                               "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
+                }
+                else if (data_info.data_type == DataType::DB || data_info.data_type == DataType::DUB ||
+                    data_info.data_type == DataType::WB || data_info.data_type == DataType::WUB)
+                {
+                    oss_value << data_info.int_value;
+                    cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
+                               "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
+                }
+                else
+                {
+                    throw std::invalid_argument("Unsupported data type.");
+                }
+            }
+            // Send commands and get reply.
+            if (!cmd.isEmpty())
+            {
+                auto reply = redis_poll_->commandSync(cmd);
+                if (!reply.isValid() || reply.type() != RedisClient::Response::Array)
+                {
+                    assert(false);
+                    std::cout << "ResponseDispatch() commandSync failed." << std::endl;
+                }
+            }
+        }
+        else
+        {
+            ConnectRedis();
+        }
+        //double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
+        //	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
+        //std::cout << gap << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Avoid redis performance problem
+    }
 }
 
 /// Check request queue and update UI using QT message.

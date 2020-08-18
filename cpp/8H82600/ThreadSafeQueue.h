@@ -14,6 +14,8 @@
 
 namespace goiot
 {
+    static const long long MAX_MILLISECONDS = 10000000;
+
 	class QFull : std::runtime_error
 	{
 	public:
@@ -52,7 +54,6 @@ namespace goiot
 	class ThreadSafeQueue
 	{
 	public:
-		static const long long MAX_MILLISECONDS = 10000000;
 		// Create a queue object with a given maximum size.
 		// If maxsize is <= 0, the queue size is infinite.
 		ThreadSafeQueue(std::size_t maxsize = 0) : maxsize_(maxsize), unfinished_tasks_(0)

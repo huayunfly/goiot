@@ -443,7 +443,7 @@ namespace goiot {
 
 					// Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv
 					std::size_t namespace_pos = member.find_first_of(":");
-					namespace_pos = namespace_pos < 0 ? 0 : namespace_pos + 1;
+					namespace_pos = (namespace_pos == std::string::npos) ? 0 : namespace_pos + 1;
 					std::string data_info_id = member.substr(namespace_pos, member.size() - namespace_pos);
 					auto data_info = data_info_cache_.FindEntry(data_info_id);
 					if (data_info.id.empty())
@@ -459,7 +459,7 @@ namespace goiot {
 
 					// Parse driver type id seperated by ".", for example: mfcpfc.4.sv -> mfcpfc
 					std::size_t seperator_pos = data_info.id.find_first_of(".");
-					std::size_t len = seperator_pos < 0 ? data_info.id.size() : seperator_pos;
+					std::size_t len = (seperator_pos == std::string::npos) ? data_info.id.size() : seperator_pos;
 					std::string driver_id = data_info.id.substr(0, len);
 					// About unordered_map.emplace()
 					// If the insertion takes place (because no other element existed with the same key), the function returns a pair object, whose first component is an iterator to the inserted element, and whose second component is true.
@@ -485,7 +485,7 @@ namespace goiot {
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 							data_info.data_zone, data_info.float_decode, 0/* byte */,
-							0/* integer */, new_value, ""/* string */, timestamp
+							0/* integer */, new_value, ""/* string */, timestamp, 0/* result */, data_info.ratio
 						);
 					}
 					else if (data_info.data_type == DataType::STR)
@@ -504,7 +504,7 @@ namespace goiot {
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 							data_info.data_zone, data_info.float_decode, 0/* byte */,
-							0/* integer */, 0.0/* float */, new_value, timestamp
+							0/* integer */, 0.0/* float */, new_value, timestamp, 0/* result */, data_info.ratio
 						);
 					}
 					else if (data_info.data_type == DataType::BT)
@@ -523,7 +523,7 @@ namespace goiot {
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 							data_info.data_zone, data_info.float_decode, new_value,
-							0/* integer */, 0.0/* float */, "", timestamp
+							0/* integer */, 0.0/* float */, "", timestamp, 0/* result */, data_info.ratio
 						);
 					}
 					else
@@ -542,7 +542,7 @@ namespace goiot {
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
 							data_info.data_zone, data_info.float_decode, 0/* byte */,
-							new_value, 0.0/* float */, "", timestamp
+							new_value, 0.0/* float */, "", timestamp, 0/* result */, data_info.ratio
 						);
 					}
                 }
