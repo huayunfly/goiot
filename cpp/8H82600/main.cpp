@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
-    goiot::DataManager data_manager;
+    goiot::DataManager data_manager(a.applicationDirPath().toStdString());
+    data_manager.LoadJsonConfig();
     data_manager.Start();
     return a.exec();
 }

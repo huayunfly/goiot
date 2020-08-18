@@ -1,10 +1,11 @@
 #include <iostream>
+#include <fstream>
+#include <QJsonDocument>
 #include "data_manager.h"
 
 namespace goiot {
 
-const std::wstring DataManager::CONFIG_FILE = L"drivers.json";
-const std::wstring DataManager::DRIVER_DIR = L"drivers";
+const std::string DataManager::CONFIG_FILE = "\\drivers.json";
 
 const std::string DataManager::REDIS_PING = "PING";
 const std::string DataManager::REDIS_PONG = "PONG";
@@ -49,6 +50,41 @@ bool DataManager::ConnectedRedis(std::shared_ptr<RedisClient::Connection> redis_
     {
         return false;
     }
+}
+
+/// Load json file, the same with data service.
+int DataManager::LoadJsonConfig()
+{
+    if (module_path_.empty())
+    {
+        std::cout << "DataManager::LoadJsonConfig() module_path is empty" << std::endl;
+        return ENOENT; // no_such_file_or_directory
+    }
+
+    std::fstream fstream(module_path_ + CONFIG_FILE);
+    if (!fstream)
+    {
+        std::cout << "DataManager::LoadJsonConfig() no_such_file_or_directory" << std::endl;
+        return ENOENT;  // add error log here
+    }
+    std::stringstream sstream;
+    sstream << fstream.rdbuf();
+
+    // Json parse
+    QString json = sstream.str().c_str();
+    QJsonParseError error;
+    auto json_doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (!json_doc.isObject())
+    {
+        std::cout << "Loading json is invalid." << std::endl;
+        //return -1;
+    }
+    auto root = json_doc.object();
+    if (root.contains("drivers") && root["drivers"].isArray())
+    {
+        //auto drivers = root["drivers"].toArray();
+    }
+    return 0;
 }
 
 /// Start working threads
@@ -104,7 +140,7 @@ void DataManager::RefreshDispatch()
                 {
                     if (true)
                     {
-                        member_vec.emplace_back(list.at(i).toUtf8().constData());
+                        member_vec.emplace_back(list.at(i).toStdString());
                     }
                 }
             }
@@ -134,7 +170,7 @@ void DataManager::RefreshDispatch()
                         assert(false);
                         continue;
                     }
-                    std::string value = inner_list.at(0).toUtf8().constData();
+                    std::string value = inner_list.at(0).toStdString();
                     int result = inner_list.at(1).toInt(); // Notify whether the data is healthy.
 
                     // Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv

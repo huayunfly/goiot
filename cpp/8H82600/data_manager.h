@@ -13,20 +13,27 @@ namespace goiot {
 class DataManager
 {
 public:
-    DataManager() : redis_config_("127.0.0.1"), redis_refresh_(), redis_poll_(),
+    DataManager(const std::string& module_path) : module_path_(module_path) ,
+        redis_config_("127.0.0.1"), redis_refresh_(), redis_poll_(),
+        response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(10)),
         keep_refresh_(false)
     {
         redis_config_.setTimeouts(1500, 1500);
         initRedisClient();
     }
 
-    DataManager(const RedisClient::ConnectionConfig& redis_config) :
-        redis_config_(redis_config), redis_refresh_(), redis_poll_(), keep_refresh_(false)
+    DataManager(const std::string& module_path, const RedisClient::ConnectionConfig& redis_config) :
+        module_path_(module_path), redis_config_(redis_config), redis_refresh_(), redis_poll_(),
+        response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(10)),
+        keep_refresh_(false)
     {
         initRedisClient();
     }
     DataManager(const DataManager&) = delete;
     DataManager& operator=(const DataManager&) = delete;
+
+    /// Load json file, the same with data service.
+    int LoadJsonConfig();
 
     /// Start working threads
     void Start();
@@ -51,8 +58,7 @@ private:
     void RequestDispatch();
 
 private:
-    const static std::wstring CONFIG_FILE;
-    const static std::wstring DRIVER_DIR;
+    const static std::string CONFIG_FILE;
     const static std::string REDIS_PING;
     const static std::string REDIS_PONG;
     const static std::string NS_REFRESH;
@@ -65,6 +71,7 @@ private:
 private:
     DataEntryCache<DataInfo> data_info_cache_;
 
+    std::string module_path_; // Not include the suffix "/"
     RedisClient::ConnectionConfig redis_config_;
     std::shared_ptr<RedisClient::Connection> redis_refresh_;
     std::shared_ptr<RedisClient::Connection> redis_poll_;

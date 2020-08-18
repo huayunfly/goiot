@@ -1,0 +1,182 @@
+// modbus_rtu protocol
+// address: 1~128
+// data type: [1 zone] input(DISCRETE) coils 输入继电器, [0 zone] output coils 输出继电器, [3 zone] input registers 输入寄存器 and [4 zone] output(holding) registers 输出寄存器
+// wdec: word_decode, 单字解码顺序, with value 0, 1
+// dwdec: dword_decode, 双字解码顺序, with value 0, 1, 2, 3
+// fdec: float_decode, 浮点解码顺序, with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
+// coil: only number 位仅以数字表示
+// register: driver-specified, R (readonly, 只读), W(writeonly, 只写), RW (readwrite, 读写)
+// register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
+// function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
+//                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
+// response_to_sec: response wait time in micro-second
+// -----------------------
+// s7 protocol
+// We need the client address (port) and optionally Rack and Slot
+// port: IP address,rack number,slot number
+// address: DB number
+// data block type: DBX, DBB, DBW, DBD => mapping to coil, none, WUB, DUB 暂不支持DB byte 类型
+// function code: default 0, PLC DataBlock
+{
+  "name": "goiot",
+  "drivers": [
+    {
+      "id": "mfcpfc",
+      "name": "modbus3",
+      "type": "modbus_rtu",
+      "port": "COM5,19200,E,8,2",
+      "response_to_msec": 500,
+      "nodes": [
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 10
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 5
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cylinder16",
+      "name": "modbus4",
+      "type": "modbus_rtu",
+      "port": "COM4,115200,E,8,1",
+      "response_to_msec": 500,
+      "nodes": [
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "RW4WUB17428",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plc",
+      "name": "s7-1500",
+      "type": "s7",
+      "port": "192.168.1.110,0,1",
+      "response_to_msec": 500,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "out1",
+              "name": "out1",
+              "register": "RW5DUB0000"
+            },
+            {
+              "id": "writebit",
+              "name": "writebit",
+              "register": "RW5BT0128",
+              "ratio": 1
+            },
+            {
+              "id": "writebit1",
+              "name": "writebit1",
+              "register": "RW5BT0129",
+              "ratio": 1
+            },
+            {
+              "id": "writebyte_channel_0",
+              "name": "writebyte_channel_0",
+              "register": "RW5BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "writebyte_channel_1",
+              "name": "writebyte_channel_1",
+              "register": "RW5BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "out6",
+              "name": "out6",
+              "register": "RW5DF0018",
+              "ratio": 1
+            },
+            {
+              "id": "out7",
+              "name": "out7",
+              "register": "RW5WUB0022",
+              "ratio": 1
+            },
+            {
+              "id": "pid_temp_1_pv",
+              "name": "pid_temp_1_pv",
+              "register": "RW5DF0034",
+              "ratio": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
