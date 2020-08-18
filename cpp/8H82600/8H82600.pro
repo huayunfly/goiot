@@ -35,7 +35,7 @@ TRANSLATIONS += \
 
 INCLUDEPATH += \
     #C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib
-    D:\WORK\3rdLib
+    $$PWD/../../../3rdLib
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

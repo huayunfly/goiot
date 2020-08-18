@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include "data_manager.h"
 
 namespace goiot {
@@ -74,15 +75,97 @@ int DataManager::LoadJsonConfig()
     QString json = sstream.str().c_str();
     QJsonParseError error;
     auto json_doc = QJsonDocument::fromJson(json.toUtf8(), &error);
-    if (!json_doc.isObject())
+    if (error.error != QJsonParseError::NoError || !json_doc.isObject())
     {
         std::cout << "Loading json is invalid." << std::endl;
-        //return -1;
+        return -1;
     }
     auto root = json_doc.object();
     if (root.contains("drivers") && root["drivers"].isArray())
     {
-        //auto drivers = root["drivers"].toArray();
+        auto drivers = root["drivers"].toArray();
+        for (const auto& driver : drivers)
+        {
+            if (!driver.isObject())
+            {
+                assert(false);
+                continue;
+            }
+            auto driver_obj = driver.toObject();
+            if (!driver_obj.contains("id"))
+            {
+                assert(false);
+                continue;
+            }
+            std::string driver_id = driver_obj["id"].toString().toStdString();
+            if (!driver_obj.contains("nodes") || !driver_obj["nodes"].isArray())
+            {
+                assert(false);
+                continue;
+            }
+            auto nodes = driver_obj["nodes"].toArray();
+            for (const auto& node : nodes)
+            {
+                if (!node.isObject())
+                {
+                    assert(false);
+                    continue;
+                }
+                auto node_obj = node.toObject();
+                if (!node_obj.contains("address") || !node_obj.contains("data") || !node_obj["data"].isArray())
+                {
+                    assert(false);
+                    continue;
+                }
+                int address = node_obj["address"].toString().toInt();
+                auto data_vec = node_obj["data"].toArray();
+                for (const auto& data : data_vec)
+                {
+                    if (!data.isObject())
+                    {
+                        assert(false);
+                        continue;
+                    }
+                    auto data_obj = data.toObject();
+                    if (!data_obj.contains("id") || !data_obj.contains("name") || !data_obj.contains("register"))
+                    {
+                        assert(false);
+                        continue;
+                    }
+                    std::ostringstream oss;
+                    oss << driver_id << "." << address << "." << data_obj["id"].toString().toStdString();
+                    DataInfo data_info;
+                    data_info.id = oss.str();
+                    data_info.name = data_obj["name"].toString().toStdString();
+                    data_info.address = address;
+                    data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+                    if (data_obj.contains("ratio"))
+                    {
+                        data_info.ratio = data_obj["ratio"].toDouble();
+                    }
+                    auto reg = data_obj["register"].toString();
+                    if (reg.startsWith("RW", Qt::CaseInsensitive))
+                    {
+                        data_info.read_write_priviledge = ReadWritePrivilege::READ_WRITE;
+                    }
+                    else if (reg.startsWith("W", Qt::CaseInsensitive))
+                    {
+                        data_info.read_write_priviledge = ReadWritePrivilege::WRITE_ONLY;
+                    }
+                    else if (reg.startsWith("R", Qt::CaseInsensitive))
+                    {
+                        data_info.read_write_priviledge = ReadWritePrivilege::READ_ONLY;
+                    }
+                    else
+                    {
+                        assert(false);
+                        continue;
+                    }
+                    data_info_cache_.AddEntry(data_info.id, data_info);
+                }
+            }
+        }
     }
     return 0;
 }
