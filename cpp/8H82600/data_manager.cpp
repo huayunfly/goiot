@@ -258,6 +258,7 @@ void DataManager::Start()
     ConnectRedis();
     keep_refresh_ = true;
     threads_.emplace_back(std::thread(&DataManager::RefreshDispatch, this));
+    threads_.emplace_back(std::thread(&DataManager::RequestDispatch, this));
     threads_.emplace_back(std::thread(&DataManager::ResponseDispatch, this));
 }
 
@@ -265,12 +266,49 @@ void DataManager::Start()
 void DataManager::Stop()
 {
     keep_refresh_ = false;
+    request_queue_->Close();
     response_queue_->Close();
 
     for (auto& entry : threads_)
     {
         entry.join();
     }
+}
+
+/// Read data from cache by id and return value directly.
+void DataManager::ReadDataCache(std::vector<DataInfo>& data_info_vec)
+{
+    for (auto& data_info : data_info_vec)
+    {
+        auto entry = data_info_cache_.FindEntry(data_info.id);
+        if (!entry.id.empty())
+        {
+            data_info = entry;
+        }
+        else
+        {
+            assert(false);
+        }
+    }
+}
+
+/// Write data to response queue
+int DataManager::WriteDataAsync(const std::vector<DataInfo>& data_info_vec)
+{
+    if (data_info_vec.size() > 0)
+    {
+        try
+        {
+            response_queue_->PutNoWait(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+            return 0;
+        }
+        catch (const QFull&)
+        {
+
+        }
+        return EWOULDBLOCK;
+    }
+    return ENODATA;
 }
 
 /// Get Refresh data from redis and put into the in-queue.
@@ -335,8 +373,6 @@ void DataManager::RefreshDispatch()
                         assert(false);
                         continue;
                     }
-                    std::string value = inner_list.at(0).toStdString();
-                    int result = inner_list.at(1).toInt(); // Notify whether the data is healthy.
 
                     // Remove namespace, for example: poll:mfcpfc.4.sv -> mfcpfc.4.sv
                     std::size_t namespace_pos = member_vec.at(i).find_first_of(":");
@@ -348,7 +384,8 @@ void DataManager::RefreshDispatch()
                         assert(false);
                         continue; // Throw exception
                     }
-
+                    std::string value = inner_list.at(0).toStdString();
+                    data_info.result = inner_list.at(1).toInt(); // Notify whether the data is healthy.
                     double timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
                                 std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
                     if (data_info.data_type == DataType::DF)
@@ -361,7 +398,7 @@ void DataManager::RefreshDispatch()
                         }
                         else // data_info.result != 0
                         {
-                            data_info.float_value = new_value; // update poll
+                            data_info.float_value = new_value; // update refresh
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
 
                         }
@@ -369,7 +406,7 @@ void DataManager::RefreshDispatch()
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       0/* integer */, new_value, ""/* string */, timestamp, result, data_info.ratio
+                                                       0/* integer */, new_value, ""/* string */, timestamp, data_info.result, data_info.ratio
                                                        );
                     }
                     else if (data_info.data_type == DataType::STR)
@@ -381,14 +418,14 @@ void DataManager::RefreshDispatch()
                         }
                         else
                         {
-                            data_info.char_value = new_value; // update poll
+                            data_info.char_value = new_value; // update refresh
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
                         }
                         data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       0/* integer */, 0.0/* float */, new_value, timestamp, result, data_info.ratio
+                                                       0/* integer */, 0.0/* float */, new_value, timestamp, data_info.result, data_info.ratio
                                                        );
                     }
                     else if (data_info.data_type == DataType::BT)
@@ -400,14 +437,14 @@ void DataManager::RefreshDispatch()
                         }
                         else
                         {
-                            data_info.byte_value = new_value; // updata poll
+                            data_info.byte_value = new_value; // updata refresh
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
                         }
                         data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, new_value,
-                                                       0/* integer */, 0.0/* float */, "", timestamp, result, data_info.ratio
+                                                       0/* integer */, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio
                                                        );
                     }
                     else
@@ -426,7 +463,7 @@ void DataManager::RefreshDispatch()
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
                                                        data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       new_value, 0.0/* float */, "", timestamp, result, data_info.ratio
+                                                       new_value, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio
                                                        );
                     }
                 }
@@ -533,7 +570,15 @@ void DataManager::ResponseDispatch()
 /// Check request queue and update UI using QT message.
 void DataManager::RequestDispatch()
 {
-
+    while (true)
+    {
+        std::shared_ptr<std::vector<DataInfo>> data_info_vec;
+        request_queue_->Get(data_info_vec);
+        if (data_info_vec == nullptr) // Improve for a robust SENTINEL
+        {
+            break; // Exit
+        }
+    }
 }
 
 }

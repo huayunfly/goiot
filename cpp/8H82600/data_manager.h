@@ -42,6 +42,14 @@ public:
     /// Stop working threads
     void Stop();
 
+    /// Read data from cache by id and return value directly.
+    void ReadDataCache(std::vector<DataInfo>& data_info_vec);
+
+    /// Write data to response queue
+    /// <param name="data_info_vec">data info vector</param>
+    /// <returns> 0 if the data is put into the queue. Otherwise -1 </returns>
+    int WriteDataAsync(const std::vector<DataInfo>& data_info_vec);
+
 private:
     /// Connect redis with refresh and poll connections.
     void ConnectRedis();
