@@ -15,6 +15,7 @@ class DataManager
 public:
     DataManager(const std::string& module_path) : module_path_(module_path) ,
         redis_config_("127.0.0.1"), redis_refresh_(), redis_poll_(),
+        request_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(10)),
         response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(10)),
         keep_refresh_(false)
     {
@@ -75,8 +76,8 @@ private:
     RedisClient::ConnectionConfig redis_config_;
     std::shared_ptr<RedisClient::Connection> redis_refresh_;
     std::shared_ptr<RedisClient::Connection> redis_poll_;
-    std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
     std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> request_queue_;
+    std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
     std::vector<std::thread> threads_;
     bool keep_refresh_;
 };

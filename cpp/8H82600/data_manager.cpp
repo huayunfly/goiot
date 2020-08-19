@@ -144,22 +144,104 @@ int DataManager::LoadJsonConfig()
                     {
                         data_info.ratio = data_obj["ratio"].toDouble();
                     }
-                    auto reg = data_obj["register"].toString();
-                    if (reg.startsWith("RW", Qt::CaseInsensitive))
+                    // data type
+                    auto channel = data_obj["register"].toString().toStdString();
+                    assert(channel.length() > 6);
+                    if (channel.length() <= 6)
+                    {
+                        std::cout << "DataManager::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                        continue;
+                    }
+                    int start_pos = 0;
+                    if (0 == channel.find("RW"))
                     {
                         data_info.read_write_priviledge = ReadWritePrivilege::READ_WRITE;
+                        start_pos = 2;
                     }
-                    else if (reg.startsWith("W", Qt::CaseInsensitive))
-                    {
-                        data_info.read_write_priviledge = ReadWritePrivilege::WRITE_ONLY;
-                    }
-                    else if (reg.startsWith("R", Qt::CaseInsensitive))
+                    else if (0 == channel.find("R"))
                     {
                         data_info.read_write_priviledge = ReadWritePrivilege::READ_ONLY;
+                        start_pos = 1;
+
+                    }
+                    else if (0 == channel.find("W"))
+                    {
+                        data_info.read_write_priviledge = ReadWritePrivilege::WRITE_ONLY;
+                        start_pos = 1;
                     }
                     else
                     {
                         assert(false);
+                        std::cout << "DataManager::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                        continue;
+                    }
+                    std::istringstream iss_data_zone(channel.substr(start_pos, 1));
+                    int int_zone = 0;
+                    iss_data_zone >> int_zone;
+                    switch (int_zone)
+                    {
+                    case 0:
+                        data_info.data_zone = DataZone::OUTPUT_RELAY;
+                        break;
+                    case 1:
+                        data_info.data_zone = DataZone::INPUT_RELAY;
+                        break;
+                    case 3:
+                        data_info.data_zone = DataZone::INPUT_REGISTER;
+                        break;
+                    case 4:
+                        data_info.data_zone = DataZone::OUTPUT_REGISTER;
+                        break;
+                    case 5:
+                        data_info.data_zone = DataZone::PLC_DB;
+                        break;
+                    default:
+                        assert(false);
+                        std::cout << "DataManager::ParseConfig() data.register " << channel << " is invalid." << std::endl;
+                        break;
+                    }
+
+                    start_pos++;
+                    std::string data_type = channel.substr(start_pos, 3);
+                    if (data_type.find("DF") == 0)
+                    {
+                        data_info.data_type = DataType::DF;
+                        start_pos += 2;
+                    }
+                    else if (data_type.find("WUB") == 0)
+                    {
+                        data_info.data_type = DataType::WUB;
+                        start_pos += 3;
+                    }
+                    else if (data_type.find("WB") == 0)
+                    {
+                        data_info.data_type = DataType::WB;
+                        start_pos += 2;
+                    }
+                    else if (data_type.find("DUB") == 0)
+                    {
+                        data_info.data_type = DataType::DUB;
+                        start_pos += 3;
+                    }
+                    else if (data_type.find("DB") == 0)
+                    {
+                        data_info.data_type = DataType::DB;
+                        start_pos += 2;
+                    }
+                    else if (data_type.find("BT") == 0)
+                    {
+                        data_info.data_type = DataType::BT;
+                        start_pos += 2;
+                    }
+                    else if (data_type.find("STR") == 0)
+                    {
+                        data_info.data_type = DataType::STR;
+                        start_pos += 3;
+                    }
+                    else
+                    {
+                        assert(false);
+                        std::cout << "DataManager::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                         continue;
                     }
                     data_info_cache_.AddEntry(data_info.id, data_info);
@@ -239,9 +321,9 @@ void DataManager::RefreshDispatch()
             if (reply.isValid() && reply.type() == RedisClient::Response::Array)
             {
                 auto list = reply.value().toList();
-                assert(list.size() == (int)member_vec.size());
                 if (list.size() != (int)member_vec.size())
                 {
+                    assert(false);
                     throw std::runtime_error("pipeline reply is not match with request.");
                 }
                 // Get replies from pipeline
@@ -262,11 +344,6 @@ void DataManager::RefreshDispatch()
                     std::string data_info_id = member_vec.at(i).substr(namespace_pos, member_vec.at(i).size() - namespace_pos);
                     auto data_info = data_info_cache_.FindEntry(data_info_id);
                     if (data_info.id.empty())
-                    {
-                        assert(false);
-                        continue; // Throw exception
-                    }
-                    if (data_info.read_write_priviledge == ReadWritePrivilege::READ_ONLY)
                     {
                         assert(false);
                         continue; // Throw exception
@@ -392,8 +469,6 @@ void DataManager::ResponseDispatch()
                 {
                     continue;
                 }
-                // Todo: improve UpateEntry() by updataing the entry partly.
-                data_info_cache_.UpdateEntry(data_info.id, data_info); // update all including value, result and timestamp
                 // Write to redis poll zone.
                 std::string poll_id = NS_POLL + data_info.id; // id
                 std::ostringstream oss_result; // result
