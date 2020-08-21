@@ -16,6 +16,7 @@ public:
     ~FormGasFeed();
 
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+    bool event(QEvent *event) override;
 
 private:
     Ui::FormGasFeed *ui;

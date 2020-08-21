@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     data_manager.cpp \
+    events.cpp \
     form_gasfeed.cpp \
     main.cpp \
     mainwindow.cpp
@@ -26,6 +27,7 @@ HEADERS += \
     asyncfuture.h \
     data_manager.h \
     driver_base.h \
+    events.h \
     form_gasfeed.h \
     mainwindow.h
 

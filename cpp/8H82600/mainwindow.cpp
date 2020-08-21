@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "form_gasfeed.h"
+#include "events.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,5 +21,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-
+    QApplication::sendEvent(ui->tabWidget->widget(0),
+                new Ui::RefreshEvent("textEdit", "xxyy", Ui::ControlStatus::OK));
 }
