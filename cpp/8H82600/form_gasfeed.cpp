@@ -1,6 +1,7 @@
 #include <qwindowdefs_win.h>
 #include "form_gasfeed.h"
 #include "ui_form_gasfeed.h"
+#include "events.h"
 
 FormGasFeed::FormGasFeed(QWidget *parent) :
     QWidget(parent),
@@ -28,4 +29,23 @@ bool FormGasFeed::nativeEvent(const QByteArray &eventType, void *message, long *
     }
 
     return QWidget::nativeEvent(eventType, message, result);
+}
+
+bool FormGasFeed::event(QEvent *event)
+{
+    if (event == nullptr)
+    {
+        return false;
+    }
+
+    if (event->type() == Ui::RefreshEvent::myType)
+    {
+        Ui::RefreshEvent* e = static_cast<Ui::RefreshEvent*>(event);
+        auto text_edit = this->findChild<QTextEdit*>(e->Name());
+        if (text_edit != nullptr)
+        {
+            text_edit->setText(e->Text());
+        }
+    }
+    return QWidget::event(event);
 }
