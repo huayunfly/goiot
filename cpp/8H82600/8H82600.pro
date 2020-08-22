@@ -17,6 +17,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     data_manager.cpp \
+    data_model.cpp \
+    dialog_setvalue.cpp \
     events.cpp \
     form_common.cpp \
     form_gasfeed.cpp \
@@ -27,6 +29,8 @@ HEADERS += \
     ThreadSafeQueue.h \
     asyncfuture.h \
     data_manager.h \
+    data_model.h \
+    dialog_setvalue.h \
     driver_base.h \
     events.h \
     form_common.h \
@@ -34,6 +38,7 @@ HEADERS += \
     mainwindow.h
 
 FORMS += \
+    dialog_setvalue.ui \
     form_gasfeed.ui \
     mainwindow.ui
 
