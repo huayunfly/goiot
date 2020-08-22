@@ -22,5 +22,5 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     QApplication::sendEvent(ui->tabWidget->widget(0),
-                new Ui::RefreshEvent("textEdit", "xxyy", Ui::ControlStatus::OK));
+                new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, "xxyy"));
 }
