@@ -3,6 +3,7 @@
 #include "form_gasfeed.h"
 #include "events.h"
 #include "dialog_setvalue.h"
+#include "dialog_setposition.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,7 +26,7 @@ void MainWindow::on_pushButton_clicked()
     QWidget* sender = static_cast<QWidget*>(this->sender());
     QApplication::sendEvent(ui->tabWidget->widget(0),
                 new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, "xxyy"));
-    DialogSetValue set_value_dialog(ui->pushButton, "34.5", MeasurementUnit::DEGREE);
+    DialogSetValue set_value_dialog(sender, "34.5", MeasurementUnit::DEGREE);
 
     // convert the widget position to the screen position.
     QPoint screen_pos = this->mapToGlobal(sender->pos());
@@ -42,4 +43,8 @@ void MainWindow::on_pushButton_clicked()
     {
 
     }
+    // dialog_setposition
+    DialogSetPosition set_position_dialog(sender, 8, 4);
+    set_position_dialog.exec();
+
 }
