@@ -16,7 +16,18 @@ bool FormCommon::event(QEvent *event)
         if (text_edit != nullptr)
         {
             text_edit->setText(e->Text());
+            return true;
         }
     }
+    else if (event->type() == Ui::RefreshStateEvent::myType)
+    {
+        Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);
+        auto state_edit = this->findChild<QWidget*>(e->Name());
+        if (state_edit != nullptr)
+        {
+            return true;
+        }
+    }
+
     return QWidget::event(event);
 }

@@ -474,6 +474,7 @@ void DataManager::RefreshDispatch()
             {
                 request_queue_->Put(data_info_vec);
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Avoid redis performance problem
         }
         else
         {
@@ -578,6 +579,18 @@ void DataManager::RequestDispatch()
         {
             break; // Exit
         }
+        if (refresh_func_)
+        {
+            refresh_func_(data_info_vec);
+        }
+    }
+}
+
+void DataManager::RegisterRefreshFunc(std::function<void(std::shared_ptr<std::vector<DataInfo>>)> func)
+{
+    if (func)
+    {
+        refresh_func_ = std::move(func);
     }
 }
 

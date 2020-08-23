@@ -4,6 +4,9 @@
 #ifndef DATAMODEL_H
 #define DATAMODEL_H
 
+#include <unordered_map>
+#include <QWidget>
+
 enum class MeasurementUnit
 {
     NONE = 0,
@@ -13,12 +16,57 @@ enum class MeasurementUnit
     SCCM = 4,
 };
 
+enum class WidgetType
+{
+    TEXT = 0,
+    STATE = 1,
+};
+
+typedef struct tagUiInfo
+{
+    tagUiInfo() : parent(nullptr), ui_name(QString()), format(QString()), decimals(0), type(WidgetType::TEXT)
+    {
+
+    }
+
+    tagUiInfo(QWidget* p, const QString& n, const QString& fmt, int d, WidgetType t) :
+        parent(p), ui_name(n), format(fmt), decimals(d), type(t)
+    {
+
+    }
+    QWidget* parent;
+    QString ui_name;
+    QString format;
+    int decimals;
+    WidgetType type;
+} UiInfo;
+
 class DataModel
 {
 public:
-    DataModel();
+    DataModel() : data_to_ui_map_(), ui_to_data_map_()
+    {
+
+    }
     DataModel(const DataModel& model) = delete;
     DataModel operator=(const DataModel& model) = delete;
+
+    // Add a item pair into the dato-to-ui map.
+    // No thread safe.
+    void SetDataToUiMap(const std::string& data_id, UiInfo ui_info);
+
+    // Set the ui-to-data map from the dato-to-ui map.
+    // ui key rule: parent_name.ui_name
+    // No thread safe.
+    void SetUiToDataMap();
+
+    UiInfo GetUiInfo(const std::string& data_id);
+
+    std::string GetDataId(const QString& ui_name);
+
+private:
+    std::unordered_map<std::string/* data id */, UiInfo> data_to_ui_map_;
+    std::unordered_map<QString/* ui name */, std::string/* data id */> ui_to_data_map_;
 };
 
 #endif // DATAMODEL_H

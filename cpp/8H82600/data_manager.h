@@ -9,6 +9,8 @@
 #include "qredisclient/include/redisclient.h"
 #include "driver_base.h"
 
+class MainWindow;
+
 namespace goiot {
 class DataManager
 {
@@ -45,10 +47,14 @@ public:
     /// Read data from cache by id and return value directly.
     void ReadDataCache(std::vector<DataInfo>& data_info_vec);
 
-    /// Write data to response queue
+    /// Write data to response queue.
     /// <param name="data_info_vec">data info vector</param>
     /// <returns> 0 if the data is put into the queue. Otherwise -1 </returns>
     int WriteDataAsync(const std::vector<DataInfo>& data_info_vec);
+
+    /// Register UI refresh function.
+    /// <param name="func">function object</param>
+    void RegisterRefreshFunc(std::function<void(std::shared_ptr<std::vector<DataInfo>>)> func);
 
 private:
     /// Connect redis with refresh and poll connections.
@@ -88,6 +94,8 @@ private:
     std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;
     std::vector<std::thread> threads_;
     bool keep_refresh_;
+
+    std::function<void(std::shared_ptr<std::vector<DataInfo>>)> refresh_func_;
 };
 }
 
