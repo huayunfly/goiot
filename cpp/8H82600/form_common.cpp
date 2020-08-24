@@ -2,6 +2,7 @@
 #include <QtWidgets/QLabel>
 #include "events.h"
 #include "form_common.h"
+#include "dialog_setvalue.h"
 
 FormCommon::FormCommon(QWidget *parent) : QWidget(parent)
 {
@@ -71,4 +72,38 @@ UiStateDef FormCommon::GetUiState(const QString& ui_name)
         return iter->second;
     }
     return UiStateDef();
+}
+
+void FormCommon::UiSetValue(QWidget* sender)
+{
+    if (sender == nullptr)
+    {
+        assert(false);
+        return;
+    }
+
+    auto state = GetUiState(sender->objectName());
+    if (state.normal_pixmap.isEmpty())
+    {
+        assert(false);
+        return;
+    }
+
+    DialogSetValue set_value_dialog(sender, "34.5", state.measure_unit);
+
+    // convert the widget position to the screen position.
+    QPoint screen_pos = this->mapToGlobal(sender->pos());
+    screen_pos.setX(screen_pos.x() + 25);
+    screen_pos.setY(screen_pos.y() + 10);
+    set_value_dialog.move(screen_pos);
+    int result = set_value_dialog.exec();
+    if (result == QDialog::Accepted)
+    {
+        float f = set_value_dialog.NewValue();
+        f++;
+    }
+    else
+    {
+
+    }
 }
