@@ -6,6 +6,7 @@
 #include "events.h"
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
+#include "dialog_onoff.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -34,8 +35,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::InitDataModel()
 {
-    data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), 1, WidgetType::TEXT));
-    data_model_.SetUiToDataMap();
+    // data_to_ui
+    data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), WidgetType::TEXT, 1, 100, 0));
+
+    // ui_to_data
+    data_model_.SetUiToDataMap("gasfeed.textEdit", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)
@@ -124,4 +128,18 @@ void MainWindow::on_pushButton_2_clicked()
         int pos = set_position_dialog.NewValue();
         std::cout << "pos: " << pos << std::endl;
     }
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QWidget* sender = static_cast<QWidget*>(this->sender());
+    // dialog_setposition
+    DialogOnOff on_off_dialog(sender, 1);
+    int result = on_off_dialog.exec();
+    if (result == QDialog::Accepted)
+    {
+        int pos = on_off_dialog.NewValue();
+        std::cout << "pos: " << pos << std::endl;
+    }
+
 }

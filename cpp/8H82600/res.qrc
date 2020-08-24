@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/ui_ctrls">
+        <file>UICtrls/Res/poweroff.bmp</file>
+        <file>UICtrls/Res/poweron.bmp</file>
+    </qresource>
+</RCC>

@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     data_manager.cpp \
     data_model.cpp \
+    dialog_onoff.cpp \
     dialog_setposition.cpp \
     dialog_setvalue.cpp \
     events.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     asyncfuture.h \
     data_manager.h \
     data_model.h \
+    dialog_onoff.h \
     dialog_setposition.h \
     dialog_setvalue.h \
     driver_base.h \
@@ -40,6 +42,7 @@ HEADERS += \
     mainwindow.h
 
 FORMS += \
+    dialog_onoff.ui \
     dialog_setposition.ui \
     dialog_setvalue.ui \
     form_gasfeed.ui \
@@ -65,3 +68,6 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisc
 
 DISTFILES += \
     drivers.json
+
+RESOURCES += \
+    res.qrc

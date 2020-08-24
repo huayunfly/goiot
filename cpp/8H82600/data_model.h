@@ -24,21 +24,41 @@ enum class WidgetType
 
 typedef struct tagUiInfo
 {
-    tagUiInfo() : parent(nullptr), ui_name(QString()), decimals(0), type(WidgetType::TEXT)
+    tagUiInfo() : parent(nullptr), ui_name(QString()), type(WidgetType::TEXT),
+        decimals(0), high_limit(0), low_limit(0)
     {
 
     }
 
-    tagUiInfo(QWidget* p, const QString& n, int d, WidgetType t) :
-        parent(p), ui_name(n), decimals(d), type(t)
+    tagUiInfo(QWidget* p, const QString& n, WidgetType t, int d, int high, int low) :
+        parent(p), ui_name(n), type(t), decimals(d), high_limit(high), low_limit(low)
     {
 
     }
     QWidget* parent;
     QString ui_name;
-    int decimals;
     WidgetType type;
+    int decimals;
+    int high_limit;
+    int low_limit;
 } UiInfo;
+
+typedef struct tagDataDef
+{
+    tagDataDef() : pv_id(std::string()), sv_read_id(std::string()), sv_write_id(std::string())
+    {
+
+    }
+
+    tagDataDef(const std::string& pv, const std::string& sv_r, const std::string& sv_w) :
+        pv_id(pv), sv_read_id(sv_r), sv_write_id(sv_w)
+    {
+
+    }
+    std::string pv_id;
+    std::string sv_read_id;
+    std::string sv_write_id;
+} DataDef;
 
 class DataModel
 {
@@ -58,10 +78,12 @@ public:
     void SetDataToUiMap(const std::string& data_id, UiInfo ui_info);
 
     // <summary>
-    // Set the ui-to-data map from the dato-to-ui map. No thread safe.
-    // ui key rule: parent_ui_objectName().ui_name
+    // Set the ui-to-data map. No thread safe.
+    // ui name rule: parent_ui_objectName().ui_name
     // <summary>
-    void SetUiToDataMap();
+    // <param name="ui_key">An ui key</param>
+    // <param name="data_def">DataDef</param>
+    void SetUiToDataMap(const QString& ui_key, DataDef data_def);
 
     // <summary>
     // Get UiInfo by a DataInfo id.
@@ -75,11 +97,11 @@ public:
     // </summary>
     // <param name="ui_name">An Ui name</param>
     // <returns>A DataInfo id if it is found, otherwise an empty string.</returns>
-    std::string GetDataId(const QString& ui_name);
+    DataDef GetDataDef(const QString& ui_name);
 
 private:
     std::unordered_map<std::string/* data id */, UiInfo> data_to_ui_map_;
-    std::unordered_map<QString/* ui name */, std::string/* data id */> ui_to_data_map_;
+    std::unordered_map<QString/* ui name */, DataDef/* data definition */> ui_to_data_map_;
 };
 
 #endif // DATAMODEL_H

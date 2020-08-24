@@ -5,14 +5,9 @@ void DataModel::SetDataToUiMap(const std::string& data_id, UiInfo ui_info)
     data_to_ui_map_.emplace(data_id, ui_info);
 }
 
-void DataModel::SetUiToDataMap()
+void DataModel::SetUiToDataMap(const QString& ui_key, DataDef data_def)
 {
-    ui_to_data_map_.clear();
-    for (const auto& pair : data_to_ui_map_)
-    {
-        // ui key rule: parent_name.ui_name
-        ui_to_data_map_.emplace(pair.second.parent->objectName() + "." + pair.second.ui_name, pair.first);
-    }
+    ui_to_data_map_.emplace(ui_key, data_def);
 }
 
 UiInfo DataModel::GetUiInfo(const std::string& data_id)
@@ -25,12 +20,13 @@ UiInfo DataModel::GetUiInfo(const std::string& data_id)
     return UiInfo();
 }
 
-std::string DataModel::GetDataId(const QString& ui_name)
+
+DataDef DataModel::GetDataDef(const QString& ui_name)
 {
     const auto iter = ui_to_data_map_.find(ui_name);
     if (iter != ui_to_data_map_.end())
     {
         return iter->second;
     }
-    return std::string();
+    return DataDef();
 }
