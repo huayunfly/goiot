@@ -37,6 +37,7 @@ void MainWindow::InitDataModel()
 {
     // data_to_ui
     data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), WidgetType::TEXT, 1, 100, 0));
+    data_model_.SetDataToUiMap("cylinder16.4.srv_on", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label"), WidgetType::STATE, 0, 1, 0));
 
     // ui_to_data
     data_model_.SetUiToDataMap("gasfeed.textEdit", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));

@@ -17,6 +17,8 @@ public:
 
     bool event(QEvent *event) override;
 
+    void InitUiState() override;
+
 private:
     Ui::FormGasFeed *ui;
 };

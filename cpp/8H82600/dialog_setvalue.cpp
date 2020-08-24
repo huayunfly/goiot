@@ -3,9 +3,11 @@
 #include "dialog_setvalue.h"
 #include "ui_dialog_setvalue.h"
 
-DialogSetValue::DialogSetValue(QWidget *parent, const QString& current, MeasurementUnit unit) :
+DialogSetValue::DialogSetValue(QWidget *parent, const QString& current, MeasurementUnit unit,
+                               int high_limit, int low_limit) :
     QDialog(parent),
-    ui(new Ui::DialogSetValue), new_value_(0.0)
+    ui(new Ui::DialogSetValue),
+    new_value_(0.0), high_limit_(high_limit), low_limit_(low_limit)
 {
     ui->setupUi(this);
     Qt::WindowFlags flags= this->windowFlags();
@@ -82,6 +84,9 @@ void DialogSetValue::on_lineEditSV_textChanged(const QString &arg1)
     float f = arg1.toFloat(&is_numeric);
     if (is_numeric)
     {
-        new_value_ = f;
+        if (f <= high_limit_ && f >= low_limit_) // Check value range
+        {
+            new_value_ = f;
+        }
     }
 }

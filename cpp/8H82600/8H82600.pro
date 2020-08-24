@@ -39,7 +39,8 @@ HEADERS += \
     events.h \
     form_common.h \
     form_gasfeed.h \
-    mainwindow.h
+    mainwindow.h \
+    resourcedef.h
 
 FORMS += \
     dialog_onoff.ui \

@@ -13,7 +13,8 @@ class DialogSetValue : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogSetValue(QWidget *parent = nullptr, const QString& current = QString(), MeasurementUnit unit = MeasurementUnit::NONE);
+    explicit DialogSetValue(QWidget *parent = nullptr, const QString& current = QString(),
+                            MeasurementUnit unit = MeasurementUnit::NONE, int high_limit = 0, int low_limit = 0);
     ~DialogSetValue();
 
     void keyPressEvent(QKeyEvent* e) override;
@@ -29,6 +30,8 @@ private slots:
 private:
     Ui::DialogSetValue *ui;
     float new_value_;
+    int high_limit_;
+    int low_limit_;
 };
 
 #endif // DIALOG_SETVALUE_H

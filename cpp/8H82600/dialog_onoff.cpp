@@ -1,5 +1,6 @@
 #include "dialog_onoff.h"
 #include "ui_dialog_onoff.h"
+#include "resourcedef.h"
 
 DialogOnOff::DialogOnOff(QWidget *parent, int on) :
     QDialog(parent),
@@ -12,11 +13,11 @@ DialogOnOff::DialogOnOff(QWidget *parent, int on) :
     QIcon button_icon;
     if (new_value_ == OFF)
     {
-        button_icon.addFile(":/ui_ctrls/UICtrls/Res/poweron.bmp");
+        button_icon.addFile(RES_ON);
     }
     else
     {
-        button_icon.addFile(":/ui_ctrls/UICtrls/Res/poweroff.bmp");
+        button_icon.addFile(RES_OFF);
     }
     ui->toolButton->setIcon(button_icon); // pushButton->setIcon() 图像错位
     ui->toolButton->setIconSize(QSize(48, 56));
