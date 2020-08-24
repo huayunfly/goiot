@@ -8,6 +8,7 @@ FormGasFeed::FormGasFeed(QWidget *parent) :
     ui(new Ui::FormGasFeed)
 {
     ui->setupUi(this);
+    this->setObjectName("gasfeed");
 }
 
 FormGasFeed::~FormGasFeed()

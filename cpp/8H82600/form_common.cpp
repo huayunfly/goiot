@@ -2,6 +2,11 @@
 #include "events.h"
 #include "form_common.h"
 
+FormCommon::FormCommon(QWidget *parent) : QWidget(parent)
+{
+
+}
+
 bool FormCommon::event(QEvent *event)
 {
     if (event == nullptr)

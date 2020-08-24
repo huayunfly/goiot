@@ -9,19 +9,28 @@
 
 class FormCommon : public QWidget
 {
+    // <summary>
     // About qmake error: undefined reference to 'vtable for FormCommon',
     // add Q_OBJECT to use signal and slot and recompile the whole project.
+    // </summary>
     Q_OBJECT
 
 public:
-    explicit FormCommon(QWidget *parent = nullptr) : QWidget(parent)
-    {
-    }
+    explicit FormCommon(QWidget *parent = nullptr);
 
     virtual ~FormCommon()
     {
-
     }
+
+    // <summary>
+    // Get the page's display name.
+    // </summary>
+    // <returns>Display name</returns>
+    virtual QString GetDisplayName()
+    {
+        return QString("void");
+    }
+
 
 protected:
     // Event handlers

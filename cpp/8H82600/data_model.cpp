@@ -11,7 +11,7 @@ void DataModel::SetUiToDataMap()
     for (const auto& pair : data_to_ui_map_)
     {
         // ui key rule: parent_name.ui_name
-        ui_to_data_map_.emplace(pair.second.parent->accessibleName() + "." + pair.second.ui_name, pair.first);
+        ui_to_data_map_.emplace(pair.second.parent->objectName() + "." + pair.second.ui_name, pair.first);
     }
 }
 

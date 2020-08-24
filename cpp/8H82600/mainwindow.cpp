@@ -34,7 +34,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::InitDataModel()
 {
-    data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), "f", 1, WidgetType::TEXT));
+    data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), 1, WidgetType::TEXT));
     data_model_.SetUiToDataMap();
 }
 
