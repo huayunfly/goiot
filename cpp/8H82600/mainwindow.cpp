@@ -142,5 +142,106 @@ void MainWindow::on_pushButton_3_clicked()
         int pos = on_off_dialog.NewValue();
         std::cout << "pos: " << pos << std::endl;
     }
-
 }
+
+bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name, QString& value, Ui::ControlStatus& status)
+{
+    value = QString();
+    status = Ui::ControlStatus::FAILURE;
+
+    auto data_def = data_model_.GetDataDef(parent_ui_name + "." + ui_name);
+    if (data_def.sv_read_id.empty())
+    {
+        return false;
+    }
+
+    std::vector<std::string> data_id_vec;
+    data_id_vec.emplace_back(data_def.sv_read_id);
+    auto data_info_vec = data_manager_.ReadDataCache(data_id_vec);
+    assert(data_info_vec.size() == 1);
+    auto& data_info = data_info_vec.at(0);
+    if (data_info.id.empty())
+    {
+        return false;
+    }
+
+    UiInfo ui_info = data_model_.GetUiInfo(data_info.id);
+    if (!ui_info.ui_name.isEmpty())
+    {
+        status = data_info.result == 0 ? Ui::ControlStatus::OK : Ui::ControlStatus::FAILURE;
+        switch (data_info.data_type)
+        {
+        case goiot::DataType::STR:
+            value.fromStdString(data_info.char_value);
+            break;
+        case goiot::DataType::DF:
+            value = QString::number(data_info.float_value, 'f', ui_info.decimals);
+            break;
+        case goiot::DataType::BT:
+            value = QString::number(data_info.byte_value);
+            break;
+        case goiot::DataType::DB:
+        case goiot::DataType::DUB:
+        case goiot::DataType::WB:
+        case goiot::DataType::WUB:
+            value = QString::number(data_info.int_value);
+            break;
+        default:
+            throw std::invalid_argument("Unsupported data type");
+        }
+    }
+    return true;
+}
+
+void MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name, const QString& value)
+{
+    auto data_def = data_model_.GetDataDef(parent_ui_name + "." + ui_name);
+    if (data_def.sv_write_id.empty())
+    {
+        assert(false);
+        return;
+    }
+
+    std::vector<std::string> data_id_vec;
+    data_id_vec.emplace_back(data_def.sv_write_id);
+    auto data_info_vec = data_manager_.ReadDataCache(data_id_vec);
+    assert(data_info_vec.size() == 1);
+    auto& data_info = data_info_vec.at(0);
+    if (data_info.id.empty())
+    {
+        assert(false);
+        return;
+    }
+
+    float float_value = 0.0;
+    uint8_t byte_value = 0;
+    int int_value = 0;
+    bool ok = false;
+    switch (data_info.data_type)
+    {
+    case goiot::DataType::STR:
+        data_info.char_value = value.toStdString();
+        break;
+    case goiot::DataType::DF:
+        float_value = value.toFloat(&ok);
+        assert(ok);
+        data_info.float_value = float_value;
+        break;
+    case goiot::DataType::BT:
+        byte_value = value.toUShort(&ok);
+        assert(ok);
+        data_info.byte_value = byte_value;
+        break;
+    case goiot::DataType::DB:
+    case goiot::DataType::DUB:
+    case goiot::DataType::WB:
+    case goiot::DataType::WUB:
+        int_value = value.toInt(&ok);
+        assert(ok);
+        data_info.int_value = int_value;
+        break;
+    default:
+        throw std::invalid_argument("Unsupported data type");
+    }
+}
+

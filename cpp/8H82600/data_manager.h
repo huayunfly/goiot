@@ -44,8 +44,13 @@ public:
     /// Stop working threads
     void Stop();
 
+    /// <summary>
     /// Read data from cache by id and return value directly.
-    void ReadDataCache(std::vector<DataInfo>& data_info_vec);
+    /// </summary>
+    /// <param name="data_id_vec">data id vector</param>
+    /// <returns>A DataInfo vector. If the data id is found, it returns a valid DataInfo.
+    /// Otherwise, it returns an empty DataInfo.</returns>
+    std::vector<DataInfo>&& ReadDataCache(const std::vector<std::string>& data_id_vec);
 
     /// Write data to response queue.
     /// <param name="data_info_vec">data info vector</param>

@@ -30,5 +30,5 @@ bool FormGasFeed::event(QEvent *event)
 
 void FormGasFeed::InitUiState()
 {
-    ui_state_map_.emplace("label", UiStateDef(RES_ON, RES_OFF, RES_OFF, 1, 0, VDeviceType::ONOFF));
+    ui_state_map_.emplace("label", UiStateDef(RES_ON, RES_OFF, RES_OFF, 1, 0, VDeviceType::ONOFF, MeasurementUnit::DEGREE));
 }
