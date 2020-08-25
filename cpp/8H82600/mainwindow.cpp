@@ -193,13 +193,13 @@ bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name,
     return true;
 }
 
-void MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name, const QString& value)
+bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name, const QString& value)
 {
     auto data_def = data_model_.GetDataDef(parent_ui_name + "." + ui_name);
     if (data_def.sv_write_id.empty())
     {
         assert(false);
-        return;
+        return false;
     }
 
     std::vector<std::string> data_id_vec;
@@ -210,7 +210,7 @@ void MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     if (data_info.id.empty())
     {
         assert(false);
-        return;
+        return false;
     }
 
     float float_value = 0.0;
@@ -243,5 +243,6 @@ void MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     default:
         throw std::invalid_argument("Unsupported data type");
     }
+    return data_manager_.WriteDataAsync(data_info_vec) == 0 ? true : false;
 }
 

@@ -45,7 +45,8 @@ private:
     /// <param name="parent_ui_name">Parent Ui name.</param>
     /// <param name="ui_name">Ui control name.</param>
     /// <param name="value">Value reference in string.</param>
-    void WriteData(const QString& parent_ui_name, const QString& ui_name, const QString& value);
+    /// <returns>True if the writing data is put in the output queue</returns>
+    bool WriteData(const QString& parent_ui_name, const QString& ui_name, const QString& value);
 
 private:
     Ui::MainWindow *ui_;
