@@ -26,6 +26,7 @@ private slots:
 
 private:
     void InitDataModel();
+
     /// Refresh UI callback registered in DataManager.
     void RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec);
 
@@ -39,6 +40,7 @@ private:
     /// <returns>True if it gets the data. otherwise false.</returns>
     bool ReadData(const QString& parent_ui_name, const QString& ui_name, QString& value, Ui::ControlStatus& status);
 
+public:
     /// <summary>
     /// Write data into the data_manager queue. It catches the queue exceptions.
     /// </summary>

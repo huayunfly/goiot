@@ -14,9 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui_(new Ui::MainWindow), data_manager_(QApplication::applicationDirPath().toStdString() )
 {
     ui_->setupUi(this);
-    QWidget* tab = new FormGasFeed();
-    tab->setObjectName(QString::fromUtf8("tab"));
-    ui_->tabWidget->addTab(tab, QString());
+    FormCommon* tab_gasfeed = new FormGasFeed();
+    tab_gasfeed->RegisterReadDataFunc(std::bind(&MainWindow::ReadData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+    tab_gasfeed->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    ui_->tabWidget->addTab(tab_gasfeed, QString());
 
     // Setup data model
     InitDataModel();
@@ -37,10 +38,11 @@ void MainWindow::InitDataModel()
 {
     // data_to_ui
     data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), WidgetType::TEXT, 1, 100, 0));
-    data_model_.SetDataToUiMap("cylinder16.4.srv_on", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label"), WidgetType::STATE, 0, 1, 0));
+    data_model_.SetDataToUiMap("mfcpfc.4.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("gasfeed.svlabel_3"), WidgetType::TEXT, 1, 100, 0));
+    data_model_.SetDataToUiMap("cylinder16.4.srv_on", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("svlabel"), WidgetType::STATE, 0, 1, 0));
 
     // ui_to_data
-    data_model_.SetUiToDataMap("gasfeed.textEdit", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
+    data_model_.SetUiToDataMap("gasfeed.svlabel_3", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)

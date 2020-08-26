@@ -50,7 +50,7 @@ public:
     /// <param name="data_id_vec">data id vector</param>
     /// <returns>A DataInfo vector. If the data id is found, it returns a valid DataInfo.
     /// Otherwise, it returns an empty DataInfo.</returns>
-    std::vector<DataInfo>&& ReadDataCache(const std::vector<std::string>& data_id_vec);
+    std::vector<DataInfo> ReadDataCache(const std::vector<std::string>& data_id_vec);
 
     /// Write data to response queue.
     /// <param name="data_info_vec">data info vector</param>

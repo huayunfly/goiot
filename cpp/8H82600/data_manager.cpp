@@ -276,7 +276,7 @@ void DataManager::Stop()
 }
 
 /// Read data from cache by id and return value directly.
-std::vector<DataInfo>&& DataManager::ReadDataCache(const std::vector<std::string>& data_id_vec)
+std::vector<DataInfo> DataManager::ReadDataCache(const std::vector<std::string>& data_id_vec)
 {
     std::vector<DataInfo> data_info_vec;
     for (auto& data_id : data_id_vec)
@@ -292,7 +292,7 @@ std::vector<DataInfo>&& DataManager::ReadDataCache(const std::vector<std::string
             data_info_vec.emplace_back(DataInfo());
         }
     }
-    return std::move(data_info_vec);
+    return data_info_vec;
 }
 
 /// Write data to response queue
