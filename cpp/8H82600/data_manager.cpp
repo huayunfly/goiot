@@ -319,7 +319,7 @@ int DataManager::WriteDataAsync(const std::vector<DataInfo>& data_info_vec)
 void DataManager::RefreshDispatch()
 {
     const double DEADBAND = 1e-3;
-    const double TIMESPAN = 100000000.0; // in second
+    const double TIMESPAN = 10.0; // in second
 
     while(keep_refresh_)
     {
@@ -332,8 +332,8 @@ void DataManager::RefreshDispatch()
             double last = now - TIMESPAN;
             std::ostringstream oss_now;
             std::ostringstream oss_last;
-            oss_now << now;
-            oss_last << last;
+            oss_now << std::fixed << std::setprecision(3) << now;
+            oss_last << std::fixed << std::setprecision(3) << last;
 
             auto reply = redis_refresh_->commandSync(
             {ZRANGE_BY_SCORES.c_str(), NS_REFRESH_TIME.c_str(), oss_last.str().c_str(), oss_now.str().c_str()});
@@ -342,14 +342,20 @@ void DataManager::RefreshDispatch()
             if (reply.isValid() && reply.type() == RedisClient::Response::Array)
             {
                 auto list = reply.value().toStringList();
-
                 for (int i = 0; i < list.size(); i++)
                 {
-                    if (true)
-                    {
-                        member_vec.emplace_back(list.at(i).toStdString());
-                    }
+                    member_vec.emplace_back(list.at(i).toStdString());
                 }
+            }
+            else
+            {
+                std::cout << "redis reply is invalid." << std::endl; // Todo: log
+                continue;
+            }
+            // check data length
+            if (member_vec.empty())
+            {
+                continue;
             }
 
             auto data_info_vec = std::make_shared<std::vector<DataInfo>>();
@@ -359,7 +365,16 @@ void DataManager::RefreshDispatch()
             {
                 cmd.addToPipeline({HMGET.c_str(), member.c_str(), "value", "result"});
             }
-            reply = redis_refresh_->commandSync(cmd);
+            try
+            {
+                reply = redis_refresh_->commandSync(cmd);
+            }
+            catch (RedisClient::Connection::Exception& e)
+            {
+                std::cout << e.what() << std::endl; // Todo: log
+                continue;
+            }
+
             if (reply.isValid() && reply.type() == RedisClient::Response::Array)
             {
                 auto list = reply.value().toList();
