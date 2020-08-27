@@ -4,6 +4,7 @@
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
 #include "dialog_onoff.h"
+#include <QResource>
 
 FormCommon::FormCommon(QWidget *parent) : QWidget(parent)
 {
@@ -74,17 +75,51 @@ bool FormCommon::event(QEvent *event)
                 if (state.device_type == VDeviceType::ONOFF)
                 {
                     QPixmap pixmap;
-                    e->State() == 0 ? pixmap.load(state.normal_pixmap) : pixmap.load(state.active_pixmap);
+                    if (e->State() == 0)
+                    {
+                        pixmap = GetImageCache(state.normal_pixmap);
+                    }
+                    else
+                    {
+                        pixmap = GetImageCache(state.active_pixmap);
+                    }
                     label->setPixmap(pixmap);
                 }
-                else if (state.device_type == VDeviceType::SVALVE)
+                else if (state.device_type == VDeviceType::MULTI_STATE)
                 {
-
+                    QPixmap pixmap = GetImageCache(state.normal_pixmap);
+                    int w = pixmap.size().width() / state.positions_for_normal_pixmap;
+                    int h = pixmap.size().height();
+                    assert(w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap);
+                    if (w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap)
+                    {
+                        label->setPixmap(pixmap.copy(w * e->State(), // valve position starts from 1
+                                                     0,
+                                                     w,
+                                                     h));
+                    }
                 }
             }
             else
             {
-                label->setPixmap(QPixmap(state.error_pixmap)); // error status
+                if (state.device_type == VDeviceType::MULTI_STATE)
+                {
+                    QPixmap pixmap = GetImageCache(state.normal_pixmap);
+                    int w = pixmap.size().width() / state.positions_for_normal_pixmap;
+                    int h = pixmap.size().height();
+                    assert(w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap);
+                    if (w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap)
+                    {
+                        label->setPixmap(pixmap.copy(0, // valve position 0 indicated abnormal state
+                                                     0,
+                                                     w,
+                                                     h));
+                    }
+                }
+                else
+                {
+                    label->setPixmap(QPixmap(state.error_pixmap)); // error status
+                }
             }
         }
         return true;
@@ -158,7 +193,7 @@ void FormCommon::UiSetValue(QWidget* sender)
             ok = write_data_func_(this->objectName(), sender->objectName(), QString::number(pos, 10));
         }
     }
-    else if (state.device_type == VDeviceType::SVALVE)
+    else if (state.device_type == VDeviceType::MULTI_STATE)
     {
         DialogSetPosition set_position_dialog(sender, state.high_limit, value.toInt());
         set_position_dialog.move(screen_pos);
@@ -169,4 +204,17 @@ void FormCommon::UiSetValue(QWidget* sender)
             ok = write_data_func_(this->objectName(), sender->objectName(), QString::number(pos, 10));
         }
     }
+}
+
+QPixmap FormCommon::GetImageCache(const QString& image_path)
+{
+    const auto iter = image_cache_.find(image_path);
+    if (iter != image_cache_.end())
+    {
+        return iter->second;
+    }
+    // About unordered_map.emplace()
+    // If the insertion takes place (because no other element existed with the same key), the function returns a pair object, whose first component is an iterator to the inserted element, and whose second component is true.
+    // Otherwise, the pair object returned has as first component an iterator pointing to the element in the container with the same key, and false as its second component.
+    return image_cache_.emplace(image_path, QPixmap(image_path)).first->first;
 }

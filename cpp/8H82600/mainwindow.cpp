@@ -38,10 +38,12 @@ void MainWindow::InitDataModel()
 {
     // data_to_ui
     data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit"), WidgetType::TEXT, 1, 100, 0));
-    data_model_.SetDataToUiMap("mfcpfc.4.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("gasfeed.svlabel_3"), WidgetType::TEXT, 1, 100, 0));
-    data_model_.SetDataToUiMap("cylinder16.4.srv_on", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("svlabel"), WidgetType::STATE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.writebyte_channel_0", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("svlabel"), WidgetType::STATE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.out1", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("svlabel_2"), WidgetType::STATE, 0, 8, 1));
 
     // ui_to_data
+    data_model_.SetUiToDataMap("gasfeed.svlabel", DataDef("plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0"));
+    data_model_.SetUiToDataMap("gasfeed.svlabel_2", DataDef("plc.1.out1", "plc.1.out1", "plc.1.out1"));
     data_model_.SetUiToDataMap("gasfeed.svlabel_3", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
 }
 
@@ -226,7 +228,11 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
         break;
     case goiot::DataType::DF:
         float_value = value.toFloat(&ok);
-        assert(ok);
+        if (!ok)
+        {
+            assert(false);
+            throw std::invalid_argument("MainWindow::WriteData converts an invalid value.");
+        }
         data_info.float_value = float_value;
         break;
     case goiot::DataType::BT:
@@ -239,12 +245,31 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     case goiot::DataType::WB:
     case goiot::DataType::WUB:
         int_value = value.toInt(&ok);
-        assert(ok);
-        data_info.int_value = int_value;
+        if (ok)
+        {
+           data_info.int_value = int_value;
+        }
+        else
+        {
+            float_value = value.toFloat(&ok);
+            if (ok)
+            {
+                data_info.int_value = static_cast<int>(float_value);
+            }
+            else
+            {
+                assert(false);
+                throw std::invalid_argument("MainWindow::WriteData converts an invalid value.");
+            }
+        }
         break;
     default:
         throw std::invalid_argument("Unsupported data type");
     }
+    data_info.data_flow_type = goiot::DataFlowType::ASYNC_WRITE;
+    data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+    data_info.result = 0;
     return data_manager_.WriteDataAsync(data_info_vec) == 0 ? true : false;
 }
 

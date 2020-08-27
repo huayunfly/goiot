@@ -15,20 +15,21 @@ enum class VDeviceType
 {
     EMPTY = 0,
     ONOFF = 1,
-    SVALVE = 2,
+    MULTI_STATE = 2, // used by selective value typically.
     PROCESS_FLOAT = 3
 };
 
 typedef struct tagUiStateDef
 {
     tagUiStateDef() : normal_pixmap(QString()), active_pixmap(QString()),
-        error_pixmap(QString()), high_limit(0), low_limit(0), device_type(VDeviceType::EMPTY), measure_unit(MeasurementUnit::NONE)
+        error_pixmap(QString()), high_limit(0), low_limit(0), device_type(VDeviceType::EMPTY), measure_unit(MeasurementUnit::NONE), positions_for_normal_pixmap(0)
     {
 
     }
 
-    tagUiStateDef(const QString& normal, const QString& active, const QString& error, int high, int low, VDeviceType dtype, MeasurementUnit unit) :
-        normal_pixmap(normal), active_pixmap(active), error_pixmap(error), high_limit(high), low_limit(low), device_type(dtype), measure_unit(unit)
+    tagUiStateDef(const QString& normal, const QString& active, const QString& error, int high, int low, VDeviceType dtype, MeasurementUnit unit, int positions) :
+        normal_pixmap(normal), active_pixmap(active), error_pixmap(error), high_limit(high), low_limit(low), device_type(dtype), measure_unit(unit),
+        positions_for_normal_pixmap(positions)
     {
 
     }
@@ -40,6 +41,7 @@ typedef struct tagUiStateDef
     int low_limit;
     VDeviceType device_type;
     MeasurementUnit measure_unit;
+    int positions_for_normal_pixmap; // used by selective value.
 } UiStateDef;
 
 class FormCommon : public QWidget
@@ -113,26 +115,23 @@ protected:
     /// <returns>Ui state if it is found, otherwise an empty one.</returns>
     UiStateDef GetUiState(const QString& ui_name);
 
-    // <summary>
-    // Ui sets value using setvalue dialog and write to data manager.
-    // </summary>
-    // <param name="sender">Widget sender.</sender>
+    /// <summary>
+    /// Ui sets value using setvalue dialog and write to data manager.
+    /// </summary>
+    /// <param name="sender">Widget sender.</sender>
     void UiSetValue(QWidget* sender);
 
-    // <summary>
-    // Ui sets position using list dialog and write to data manager.
-    // </summary>
-    // <param name="sender">Widget sender.</sender>
-    void UiSetPosition(QWidget* sender);
-
-    // <summary>
-    // Ui sets value using onoff dialog and write to data manager.
-    // </summary>
-    // <param name="sender">Widget sender.</sender>
-    void UiSetState(QWidget* sender);
+    /// <summary>
+    /// Get image by path from the cache.If it is not existed, load the image from file.
+    /// No thread safe.
+    /// </summary>
+    /// <param name="image_path">Image path res.qrc</image_path>
+    /// <returns>QPixmap object.</returns>
+    QPixmap GetImageCache(const QString& image_path);
 
 protected:
     std::unordered_map<QString/* ui name */, UiStateDef> ui_state_map_;
+    std::unordered_map<QString/* pixmap path */, QPixmap> image_cache_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, const QString&/* value */)> write_data_func_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&)> read_data_func_;
 };

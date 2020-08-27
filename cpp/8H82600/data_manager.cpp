@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -307,7 +308,7 @@ int DataManager::WriteDataAsync(const std::vector<DataInfo>& data_info_vec)
         }
         catch (const QFull&)
         {
-
+            std::cout << "QFull" << std::endl;
         }
         return EWOULDBLOCK;
     }
@@ -318,7 +319,7 @@ int DataManager::WriteDataAsync(const std::vector<DataInfo>& data_info_vec)
 void DataManager::RefreshDispatch()
 {
     const double DEADBAND = 1e-3;
-    const double TIMESPAN = 1000000.0; // in second
+    const double TIMESPAN = 100000000.0; // in second
 
     while(keep_refresh_)
     {
@@ -503,6 +504,7 @@ void DataManager::ResponseDispatch()
         if (ConnectedRedis(redis_poll_))
         {
             const std::string HMSET = "hmset"; // hmset key field value [field value]
+            const std::string ZADD = "zadd"; // zadd key score member [score member]
             RedisClient::Command cmd;
             for (auto& data_info : *data_info_vec)
             {
@@ -512,11 +514,11 @@ void DataManager::ResponseDispatch()
                 }
                 // Write to redis poll zone.
                 std::string poll_id = NS_POLL + data_info.id; // id
-                std::ostringstream oss_result; // result
+                std::stringstream oss_result; // result
                 oss_result << data_info.result;
-                std::ostringstream oss_time; // timestamp
-                oss_time << data_info.timestamp;
-                std::ostringstream oss_value; // value
+                std::stringstream oss_time; // timestamp
+                oss_time << std::fixed << std::setprecision(3) << data_info.timestamp;
+                std::stringstream oss_value; // value
                 if (data_info.data_type == DataType::STR)
                 {
                     oss_value << data_info.char_value;
@@ -526,14 +528,15 @@ void DataManager::ResponseDispatch()
                 }
                 else if (data_info.data_type == DataType::DF)
                 {
-                    oss_value << data_info.float_value;
+                    oss_value << std::fixed << std::setprecision(3) << data_info.float_value;
                     cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
                                "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
 
                 }
                 else if (data_info.data_type == DataType::BT)
                 {
-                    oss_value << data_info.byte_value;
+                    oss_value << static_cast<int>(data_info.byte_value); // for unsigned char conversion '\0001' problem
+                    auto s = oss_value.str();
                     cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
                                "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
                 }
@@ -548,6 +551,18 @@ void DataManager::ResponseDispatch()
                 {
                     throw std::invalid_argument("Unsupported data type.");
                 }
+            }
+            if (data_info_vec->size() > 0)
+            {
+                QList<QByteArray> zadd_list;
+                zadd_list << ZADD.c_str() << NS_POLL_TIME.c_str();
+                for (const auto& data_info : *data_info_vec)
+                {
+                    std::ostringstream oss_time; // timestamp
+                    oss_time << std::fixed << std::setprecision(3) << data_info.timestamp;
+                    zadd_list << oss_time.str().c_str() << (NS_POLL + data_info.id).c_str();
+                }
+                cmd.addToPipeline(zadd_list);
             }
             // Send commands and get reply.
             if (!cmd.isEmpty())

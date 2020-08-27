@@ -20,7 +20,7 @@
       <x>60</x>
       <y>60</y>
       <width>551</width>
-      <height>301</height>
+      <height>411</height>
      </rect>
     </property>
     <widget class="QTabWidget" name="tabWidget">
@@ -29,7 +29,7 @@
        <x>0</x>
        <y>0</y>
        <width>531</width>
-       <height>291</height>
+       <height>411</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -41,7 +41,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>440</y>
+      <y>500</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>440</y>
+      <y>500</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -66,8 +66,8 @@
    <widget class="QPushButton" name="pushButton_3">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>440</y>
+      <x>270</x>
+      <y>500</y>
       <width>75</width>
       <height>23</height>
      </rect>
