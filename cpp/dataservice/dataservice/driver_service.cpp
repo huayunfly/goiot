@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <system_error>
 #include <cassert>
 #include <Windows.h>
@@ -279,13 +280,16 @@ namespace goiot {
 			{
 				break; // Exit
 			}
-
-			//double now = std::chrono::duration_cast<std::chrono::milliseconds>(
-			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+#ifdef _DEBUG
+			double now = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+#endif // _DEBUG
 			if (ConnectedRedis(redis_refresh_))
 			{
 				int pipeline_result = REDIS_ERR;
 				int command_num = 0;
+				std::vector<std::pair<std::string/* timestamp */, std::string/* id */>> time_id_vec; // for zadd time_r:
+				std::ostringstream oss_time;
 				for (auto& data_info : *data_info_vec)
 				{
 					if (data_info.data_flow_type != DataFlowType::READ_RETURN && data_info.data_flow_type != DataFlowType::WRITE_RETURN)
@@ -345,6 +349,29 @@ namespace goiot {
 					{
 						throw std::invalid_argument("Unsupported data type.");
 					}
+					oss_time.str("");
+					oss_time << std::fixed << std::setprecision(3) << data_info.timestamp;
+					time_id_vec.push_back({oss_time.str(), refresh_id});
+				}
+				if (!time_id_vec.empty()) // time_id_vec caches string in the thread stack.
+				{
+					// zadd
+					std::vector<const char*> argv;
+					std::vector<std::size_t> argvlen;
+					argv.push_back("ZADD");
+					argvlen.push_back(4);
+					argv.push_back(NS_REFRESH_TIME.c_str());
+					argvlen.push_back(NS_REFRESH_TIME.size());
+					for (auto& pair : time_id_vec)
+					{
+						argv.push_back(pair.first.c_str());
+						argvlen.push_back(pair.first.size());
+						argv.push_back(pair.second.c_str());
+						argvlen.push_back(pair.second.size());
+					}
+					pipeline_result = redisAppendCommandArgv(redis_refresh_.get(), argv.size(), &argv.at(0), &argvlen.at(0));
+					assert(pipeline_result == 0);
+					command_num++;
 				}
 				// Send commands and get reply.
 				for (int i = 0; i < command_num; i++)
@@ -364,9 +391,11 @@ namespace goiot {
 			{
 				ConnectRedis();
 			}
-			//double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
-			//	std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
-			//std::cout << gap << std::endl;
+#ifdef _DEBUG
+			double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
+			std::cout << "refresh: " << gap << std::endl;
+#endif // _DEBUG
 			std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Avoid redis performance problem
 		}
 	}
@@ -374,7 +403,7 @@ namespace goiot {
 	void DriverMgrService::PollDispatch()
 	{
 		const double DEADBAND = 1e-3;
-		const double TIMESPAN = 1000.0; // in second
+		const double TIMESPAN = 10.0; // in second
 		while (keep_poll_)
 		{
 			if (ConnectedRedis(redis_poll_))
