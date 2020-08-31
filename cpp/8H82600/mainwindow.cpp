@@ -3,6 +3,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "form_gasfeed.h"
+#include "form_liquidswitch.h"
+#include "form_liquidfeeda.h"
+#include "form_liquidfeedb.h"
+#include "form_liquidsamplinga.h"
+#include "form_liquidsamplingb.h"
 #include "events.h"
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
@@ -14,10 +19,22 @@ MainWindow::MainWindow(QWidget *parent)
     , ui_(new Ui::MainWindow), data_manager_(QApplication::applicationDirPath().toStdString() )
 {
     ui_->setupUi(this);
-    FormCommon* tab_gasfeed = new FormGasFeed();
-    tab_gasfeed->RegisterReadDataFunc(std::bind(&MainWindow::ReadData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-    tab_gasfeed->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    ui_->tabWidget->addTab(tab_gasfeed, QString());
+
+    std::vector<FormCommon*> form_vec;
+    form_vec.push_back(new FormGasFeed);
+    form_vec.push_back(new FormLiquidSwitch);
+    form_vec.push_back(new FormLiquidFeedA);
+    form_vec.push_back(new FormLiquidFeedB);
+    form_vec.push_back(new FormLiquidSamplingA);
+    form_vec.push_back(new FormLiquidSamplingB);
+
+    for (auto& entry : form_vec)
+    {
+        entry->setBaseSize(QSize(1180, 900));
+        entry->RegisterReadDataFunc(std::bind(&MainWindow::ReadData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+        entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        ui_->tabWidget->addTab(entry, entry->GetDisplayName());
+    }
 
     // Setup data model
     InitDataModel();

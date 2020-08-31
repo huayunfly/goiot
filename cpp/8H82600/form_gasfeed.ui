@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
-    <height>399</height>
+    <width>1180</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
@@ -37,6 +43,12 @@
      <width>61</width>
      <height>61</height>
     </size>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;你好&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="text">
     <string>TextLabel</string>
@@ -80,7 +92,27 @@
     <string>TextLabel</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_background">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1180</width>
+     <height>900</height>
+    </rect>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/layout1.png</pixmap>
+   </property>
+  </widget>
+  <zorder>label_background</zorder>
+  <zorder>textEdit</zorder>
+  <zorder>svlabel</zorder>
+  <zorder>svlabel_2</zorder>
+  <zorder>svlabel_3</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -65,7 +65,7 @@ public:
     /// <returns>Display name</returns>
     virtual QString GetDisplayName()
     {
-        return QString("void");
+        return QString::fromUtf8("void");
     }
 
 

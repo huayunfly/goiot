@@ -2,6 +2,12 @@
     <qresource prefix="/ui_ctrls">
         <file>UICtrls/Res/poweroff.bmp</file>
         <file>UICtrls/Res/poweron.bmp</file>
+        <file>Res/layout1.png</file>
         <file>Res/svalve1.bmp</file>
+        <file>Res/layout2.png</file>
+        <file>Res/layout3.png</file>
+        <file>Res/layout4.png</file>
+        <file>Res/layout9.png</file>
+        <file>Res/layout10.png</file>
     </qresource>
 </RCC>
