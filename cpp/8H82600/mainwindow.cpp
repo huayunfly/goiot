@@ -6,6 +6,7 @@
 #include "form_liquidswitch.h"
 #include "form_liquidfeeda.h"
 #include "form_liquidfeedb.h"
+#include "form_liquidcollection.h"
 #include "form_liquidsamplinga.h"
 #include "form_liquidsamplingb.h"
 #include "events.h"
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     form_vec.push_back(new FormLiquidSwitch);
     form_vec.push_back(new FormLiquidFeedA);
     form_vec.push_back(new FormLiquidFeedB);
+    form_vec.push_back(new FormLiquidCollection);
     form_vec.push_back(new FormLiquidSamplingA);
     form_vec.push_back(new FormLiquidSamplingB);
 

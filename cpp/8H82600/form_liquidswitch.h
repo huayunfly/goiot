@@ -21,7 +21,7 @@ public:
 
     QString GetDisplayName() override
     {
-        return QString::fromUtf8("液体切换");
+        return QString::fromUtf8("原液切换");
     }
 
 private:
