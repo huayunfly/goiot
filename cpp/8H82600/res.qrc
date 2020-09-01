@@ -10,5 +10,9 @@
         <file>Res/layout9.png</file>
         <file>Res/layout10.png</file>
         <file>Res/layout8.png</file>
+        <file>Res/layout6-1.png</file>
+        <file>Res/layout7.png</file>
+        <file>Res/layout6-2.png</file>
+        <file>Res/layout5-1.png</file>
     </qresource>
 </RCC>

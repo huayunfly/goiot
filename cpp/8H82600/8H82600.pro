@@ -23,13 +23,17 @@ SOURCES += \
     dialog_setvalue.cpp \
     events.cpp \
     form_common.cpp \
+    form_cylindera.cpp \
     form_gasfeed.cpp \
+    form_gassampling.cpp \
     form_liquidcollection.cpp \
     form_liquidfeeda.cpp \
     form_liquidfeedb.cpp \
     form_liquidsamplinga.cpp \
     form_liquidsamplingb.cpp \
     form_liquidswitch.cpp \
+    form_reactora.cpp \
+    form_reactorb.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -44,13 +48,17 @@ HEADERS += \
     driver_base.h \
     events.h \
     form_common.h \
+    form_cylindera.h \
     form_gasfeed.h \
+    form_gassampling.h \
     form_liquidcollection.h \
     form_liquidfeeda.h \
     form_liquidfeedb.h \
     form_liquidsamplinga.h \
     form_liquidsamplingb.h \
     form_liquidswitch.h \
+    form_reactora.h \
+    form_reactorb.h \
     mainwindow.h \
     resourcedef.h
 
@@ -58,13 +66,17 @@ FORMS += \
     dialog_onoff.ui \
     dialog_setposition.ui \
     dialog_setvalue.ui \
+    form_cylindera.ui \
     form_gasfeed.ui \
+    form_gassampling.ui \
     form_liquidcollection.ui \
     form_liquidfeeda.ui \
     form_liquidfeedb.ui \
     form_liquidsamplinga.ui \
     form_liquidsamplingb.ui \
     form_liquidswitch.ui \
+    form_reactora.ui \
+    form_reactorb.ui \
     mainwindow.ui
 
 TRANSLATIONS += \
