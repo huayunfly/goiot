@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>8H82600</string>
+   <string>PPSR-16E平行反应釜系统</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="widget_control" native="true">

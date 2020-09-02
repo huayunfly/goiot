@@ -112,8 +112,9 @@ protected:
     /// Get Ui state by name.
     /// </summary>
     /// <param name="ui_name">Ui name</param>
+    /// <param name="ok">True if it is found, otherwise false.</param>
     /// <returns>Ui state if it is found, otherwise an empty one.</returns>
-    UiStateDef GetUiState(const QString& ui_name);
+    UiStateDef GetUiState(const QString& ui_name, bool& ok);
 
     /// <summary>
     /// Ui sets value using setvalue dialog and write to data manager.

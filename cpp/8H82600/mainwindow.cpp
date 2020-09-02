@@ -7,6 +7,7 @@
 #include "form_liquidfeeda.h"
 #include "form_liquidfeedb.h"
 #include "form_cylindera.h"
+#include "form_cylinderb.h"
 #include "form_reactora.h"
 #include "form_reactorb.h"
 #include "form_gassampling.h"
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     form_vec.push_back(new FormLiquidFeedA);
     form_vec.push_back(new FormLiquidFeedB);
     form_vec.push_back(new FormCylinderA);
+    form_vec.push_back(new FormCylinderB);
     form_vec.push_back(new FormReactorA);
     form_vec.push_back(new FormReactorB);
     form_vec.push_back(new FormGasSampling);

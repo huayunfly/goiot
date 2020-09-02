@@ -42,11 +42,18 @@ bool DataManager::ConnectedRedis(std::shared_ptr<RedisClient::Connection> redis_
         return false;
     }
 
-    RedisClient::Response reply = redis_connection->commandSync({REDIS_PING.c_str()});
-    if (reply.isValid() && reply.type() == RedisClient::Response::Status &&
-            reply.value().toString().compare(REDIS_PONG.c_str()) == 0)
+    if (redis_connection->isConnected())
     {
-        return true;
+        RedisClient::Response reply = redis_connection->commandSync({REDIS_PING.c_str()});
+        if (reply.isValid() && reply.type() == RedisClient::Response::Status &&
+                reply.value().toString().compare(REDIS_PONG.c_str()) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -143,7 +150,11 @@ int DataManager::LoadJsonConfig()
                         std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
                     if (data_obj.contains("ratio"))
                     {
-                        data_info.ratio = data_obj["ratio"].toDouble();
+                        double ratio = data_obj["ratio"].toDouble();
+                        if (ratio > 1e-6)
+                        {
+                            data_info.ratio = ratio; // guard, otherwise default 1.0
+                        }
                     }
                     // data type
                     auto channel = data_obj["register"].toString().toStdString();
@@ -493,12 +504,12 @@ void DataManager::RefreshDispatch()
             {
                 request_queue_->Put(data_info_vec);
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Avoid redis performance problem
         }
         else
         {
             ConnectRedis();
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Avoid redis performance problem
     }
 }
 

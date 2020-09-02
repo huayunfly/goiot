@@ -24,6 +24,7 @@ SOURCES += \
     events.cpp \
     form_common.cpp \
     form_cylindera.cpp \
+    form_cylinderb.cpp \
     form_gasfeed.cpp \
     form_gassampling.cpp \
     form_liquidcollection.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     events.h \
     form_common.h \
     form_cylindera.h \
+    form_cylinderb.h \
     form_gasfeed.h \
     form_gassampling.h \
     form_liquidcollection.h \
@@ -67,6 +69,7 @@ FORMS += \
     dialog_setposition.ui \
     dialog_setvalue.ui \
     form_cylindera.ui \
+    form_cylinderb.ui \
     form_gasfeed.ui \
     form_gassampling.ui \
     form_liquidcollection.ui \

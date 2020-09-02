@@ -67,8 +67,9 @@ bool FormCommon::event(QEvent *event)
     {
         Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);
         auto label = this->findChild<QLabel*>(e->Name());
-        auto state = GetUiState(e->Name());
-        if (label != nullptr && !state.normal_pixmap.isEmpty())
+        bool ok = false;
+        auto state = GetUiState(e->Name(), ok);
+        if (label != nullptr && ok)
         {
             if (e->Status() == Ui::ControlStatus::OK)
             {
@@ -128,11 +129,13 @@ bool FormCommon::event(QEvent *event)
     return QWidget::event(event);
 }
 
-UiStateDef FormCommon::GetUiState(const QString& ui_name)
+UiStateDef FormCommon::GetUiState(const QString& ui_name, bool& ok)
 {
+    ok = false;
     const auto iter = ui_state_map_.find(ui_name);
     if (iter != ui_state_map_.cend())
     {
+        ok = true;
         return iter->second;
     }
     return UiStateDef();
@@ -146,8 +149,9 @@ void FormCommon::UiSetValue(QWidget* sender)
         return;
     }
 
-    auto state = GetUiState(sender->objectName());
-    if (state.device_type == VDeviceType::EMPTY)
+    bool ok = false;
+    auto state = GetUiState(sender->objectName(), ok);
+    if (!ok)
     {
         assert(false);
         return;
@@ -155,7 +159,7 @@ void FormCommon::UiSetValue(QWidget* sender)
 
     QString value;
     Ui::ControlStatus status;
-    bool ok = read_data_func_(this->objectName(), sender->objectName(), value, status);
+    ok = read_data_func_(this->objectName(), sender->objectName(), value, status);
     if (!ok)
     {
         assert(false);
