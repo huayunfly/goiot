@@ -4,5 +4,6 @@
 *~
 *.cur
 *.bmp
+*.png
 build*
 

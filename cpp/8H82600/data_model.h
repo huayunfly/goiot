@@ -19,27 +19,31 @@ enum class MeasurementUnit
 enum class WidgetType
 {
     TEXT = 0,
-    STATE = 1,
+    ONOFF = 1,
+    STATE = 2,
+    PROCESS_VALUE = 3
 };
 
 typedef struct tagUiInfo
 {
-    tagUiInfo() : parent(nullptr), ui_name(QString()), type(WidgetType::TEXT),
-        decimals(0), high_limit(0), low_limit(0)
+    tagUiInfo() : parent(nullptr), ui_name(QString()), pixmap_path(QString()), type(WidgetType::TEXT),
+        unit(MeasurementUnit::NONE), decimals(0), high_limit(0), low_limit(0)
     {
 
     }
 
-    tagUiInfo(QWidget* p, const QString& n, WidgetType t, int d, int high, int low) :
-        parent(p), ui_name(n), type(t), decimals(d), high_limit(high), low_limit(low)
+    tagUiInfo(QWidget* p, const QString& n, const QString& path, WidgetType t, MeasurementUnit measurement_unit, int d, int high, int low) :
+        parent(p), ui_name(n), pixmap_path(path), type(t), unit(measurement_unit), decimals(d), high_limit(high), low_limit(low)
     {
 
     }
     QWidget* parent;
     QString ui_name;
+    QString pixmap_path;
     WidgetType type;
+    MeasurementUnit unit;
     int decimals;
-    int high_limit;
+    int high_limit; // also used as (multiple) state high limit
     int low_limit;
 } UiInfo;
 
@@ -70,34 +74,36 @@ public:
     DataModel(const DataModel& model) = delete;
     DataModel operator=(const DataModel& model) = delete;
 
-    // <summary>
-    // Add a item pair into the dato-to-ui map. No thread safe.
-    // </summary>
-    // <param name="data_id">A DataInfo id</param>
-    // <param name="ui_info">UiInfo</param>
+    /// <summary>
+    /// Add a item pair into the dato-to-ui map. No thread safe.
+    /// </summary>
+    /// <param name="data_id">A DataInfo id</param>
+    /// <param name="ui_info">UiInfo</param>
     void SetDataToUiMap(const std::string& data_id, UiInfo ui_info);
 
-    // <summary>
-    // Set the ui-to-data map. No thread safe.
-    // ui name rule: parent_ui_objectName().ui_name
-    // <summary>
-    // <param name="ui_key">An ui key</param>
-    // <param name="data_def">DataDef</param>
+    /// <summary>
+    /// Set the ui-to-data map. No thread safe.
+    /// ui name rule: parent_ui_objectName().ui_name
+    /// <summary>
+    /// <param name="ui_key">An ui key</param>
+    /// <param name="data_def">DataDef</param>
     void SetUiToDataMap(const QString& ui_key, DataDef data_def);
 
-    // <summary>
-    // Get UiInfo by a DataInfo id.
-    // </summary>
-    // <param name="data_id">A DataInfo id</param>
-    // <returns>An UiInfo if it is found, otherwise an empty UiInfo.</returns>
-    UiInfo GetUiInfo(const std::string& data_id);
+    /// <summary>
+    /// Get UiInfo by a DataInfo id.
+    /// </summary>
+    /// <param name="data_id">A DataInfo id</param>
+    /// <param name="ok">True if UiInfo exists, otherwise False</param>
+    /// <returns>An UiInfo if it is found, otherwise an empty UiInfo.</returns>
+    UiInfo GetUiInfo(const std::string& data_id, bool& ok);
 
-    // <summary>
-    // Get DataInfo id by an ui name.
-    // </summary>
-    // <param name="ui_name">An Ui name</param>
-    // <returns>A DataInfo id if it is found, otherwise an empty string.</returns>
-    DataDef GetDataDef(const QString& ui_name);
+    /// <summary>
+    /// Get DataInfo id by an ui name.
+    /// </summary>
+    /// <param name="ui_name">An Ui name</param>
+    /// <param name="ok">True if DataDef exists, otherwise False</param>
+    /// <returns>A DataInfo id if it is found, otherwise an empty string.</returns>
+    DataDef GetDataDef(const QString& ui_name, bool& ok);
 
 private:
     std::unordered_map<std::string/* data id */, UiInfo> data_to_ui_map_;

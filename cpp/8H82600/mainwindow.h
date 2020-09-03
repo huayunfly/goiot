@@ -27,22 +27,29 @@ private slots:
 private:
     void InitDataModel();
 
+    /// <summary>
     /// Refresh UI callback registered in DataManager.
+    /// Updatings include numeric conversion: value * data_info.ratio, if ratio is not 1.0.
+    /// </summary>
+    /// <param name="data_info_vec">DataInfo vector.</param>
     void RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec);
 
     /// <summary>
     /// Read data cache.
+    /// Readings include numeric conversion: value * data_info.ratio, if ratio is not 1.0.
     /// </summary>
     /// <param name="parent_ui_name">Parent Ui name.</param>
     /// <param name="ui_name">Ui control name.</param>
     /// <param name="value">Value reference in string.</param>
     /// <param name="status">Control status.</param>
+    /// <param name="ui_info">UiInfo</param>
     /// <returns>True if it gets the data. otherwise false.</returns>
-    bool ReadData(const QString& parent_ui_name, const QString& ui_name, QString& value, Ui::ControlStatus& status);
+    bool ReadData(const QString& parent_ui_name, const QString& ui_name, QString& value, Ui::ControlStatus& status, UiInfo& ui_info);
 
 public:
     /// <summary>
     /// Write data into the data_manager queue. It catches the queue exceptions.
+    /// Writings include numeric conversion: set value / data_info.ratio, if ratio is not 1.0.
     /// </summary>
     /// <param name="parent_ui_name">Parent Ui name.</param>
     /// <param name="ui_name">Ui control name.</param>

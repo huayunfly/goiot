@@ -151,7 +151,7 @@ int DataManager::LoadJsonConfig()
                     if (data_obj.contains("ratio"))
                     {
                         double ratio = data_obj["ratio"].toDouble();
-                        if (ratio > 1e-6)
+                        if (std::abs(ratio) > 1e-6)
                         {
                             data_info.ratio = ratio; // guard, otherwise default 1.0
                         }

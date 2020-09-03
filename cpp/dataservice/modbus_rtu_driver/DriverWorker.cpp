@@ -775,7 +775,7 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			int_value = data_info.int_value / data_info.ratio;
+			int_value = data_info.int_value/* / data_info.ratio*/;
 			value.at(0) = int_value & 0xFFFF;
 			value.at(1) = (int_value >> 16) & 0xFFFF;
 			break;
@@ -783,16 +783,16 @@ namespace goiot
 			switch (data_info.float_decode)
 			{
 			case FloatDecode::ABCD:
-				modbus_set_float_abcd(data_info.float_value / data_info.ratio, &value.at(0));
+				modbus_set_float_abcd(data_info.float_value/* / data_info.ratio*/, &value.at(0));
 				break;
 			case FloatDecode::DCBA:
-				modbus_set_float_dcba(data_info.float_value / data_info.ratio, &value.at(0));
+				modbus_set_float_dcba(data_info.float_value/* / data_info.ratio*/, &value.at(0));
 				break;
 			case FloatDecode::BADC:
-				modbus_set_float_badc(data_info.float_value / data_info.ratio, &value.at(0));
+				modbus_set_float_badc(data_info.float_value/* / data_info.ratio*/, &value.at(0));
 				break;
 			case FloatDecode::CDAB:
-				modbus_set_float_cdab(data_info.float_value / data_info.ratio, &value.at(0));
+				modbus_set_float_cdab(data_info.float_value/* / data_info.ratio*/, &value.at(0));
 				break;
 			default:
 				throw std::invalid_argument("Unsupported float decode.");
@@ -801,7 +801,7 @@ namespace goiot
 		case DataType::WB:
 		case DataType::WUB:
 			//value.reset(new uint16_t[1], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
-			int_value = data_info.int_value / data_info.ratio;
+			int_value = data_info.int_value/* / data_info.ratio*/;
 			value.at(0) = int_value & 0xFFFF;
 			value.pop_back();
 			break;

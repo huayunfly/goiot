@@ -19,30 +19,30 @@ enum class VDeviceType
     PROCESS_FLOAT = 3
 };
 
-typedef struct tagUiStateDef
-{
-    tagUiStateDef() : normal_pixmap(QString()), active_pixmap(QString()),
-        error_pixmap(QString()), high_limit(0), low_limit(0), device_type(VDeviceType::EMPTY), measure_unit(MeasurementUnit::NONE), positions_for_normal_pixmap(0)
-    {
+//typedef struct tagUiStateDef
+//{
+//    tagUiStateDef() : normal_pixmap(QString()), active_pixmap(QString()),
+//        error_pixmap(QString()), high_limit(0), low_limit(0), device_type(VDeviceType::EMPTY), measure_unit(MeasurementUnit::NONE), positions_for_normal_pixmap(0)
+//    {
 
-    }
+//    }
 
-    tagUiStateDef(const QString& normal, const QString& active, const QString& error, int high, int low, VDeviceType dtype, MeasurementUnit unit, int positions) :
-        normal_pixmap(normal), active_pixmap(active), error_pixmap(error), high_limit(high), low_limit(low), device_type(dtype), measure_unit(unit),
-        positions_for_normal_pixmap(positions)
-    {
+//    tagUiStateDef(const QString& normal, const QString& active, const QString& error, int high, int low, VDeviceType dtype, MeasurementUnit unit, int positions) :
+//        normal_pixmap(normal), active_pixmap(active), error_pixmap(error), high_limit(high), low_limit(low), device_type(dtype), measure_unit(unit),
+//        positions_for_normal_pixmap(positions)
+//    {
 
-    }
+//    }
 
-    QString normal_pixmap;
-    QString active_pixmap;
-    QString error_pixmap;
-    int high_limit;
-    int low_limit;
-    VDeviceType device_type;
-    MeasurementUnit measure_unit;
-    int positions_for_normal_pixmap; // used by selective value.
-} UiStateDef;
+//    QString normal_pixmap;
+//    QString active_pixmap;
+//    QString error_pixmap;
+//    int high_limit;
+//    int low_limit;
+//    VDeviceType device_type;
+//    MeasurementUnit measure_unit;
+//    int positions_for_normal_pixmap; // used by selective value.
+//} UiStateDef;
 
 class FormCommon : public QWidget
 {
@@ -82,7 +82,7 @@ public:
     /// </summary>
     /// <param name="func">Read data function</param>
     /// <returns>Display name</returns>
-    void RegisterReadDataFunc(std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&)> func)
+    void RegisterReadDataFunc(std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&, UiInfo& ui_info)> func)
     {
         read_data_func_ = func;
     }
@@ -114,7 +114,7 @@ protected:
     /// <param name="ui_name">Ui name</param>
     /// <param name="ok">True if it is found, otherwise false.</param>
     /// <returns>Ui state if it is found, otherwise an empty one.</returns>
-    UiStateDef GetUiState(const QString& ui_name, bool& ok);
+    //UiStateDef GetUiState(const QString& ui_name, bool& ok);
 
     /// <summary>
     /// Ui sets value using setvalue dialog and write to data manager.
@@ -131,10 +131,10 @@ protected:
     QPixmap GetImageCache(const QString& image_path);
 
 protected:
-    std::unordered_map<QString/* ui name */, UiStateDef> ui_state_map_;
+    //std::unordered_map<QString/* ui name */, UiStateDef> ui_state_map_;
     std::unordered_map<QString/* pixmap path */, QPixmap> image_cache_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, const QString&/* value */)> write_data_func_;
-    std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&)> read_data_func_;
+    std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&, UiInfo&)> read_data_func_;
 };
 
 #endif // FORM_COMMON_H

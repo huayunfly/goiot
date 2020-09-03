@@ -67,32 +67,49 @@ bool FormCommon::event(QEvent *event)
     {
         Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);
         auto label = this->findChild<QLabel*>(e->Name());
-        bool ok = false;
-        auto state = GetUiState(e->Name(), ok);
-        if (label != nullptr && ok)
+        auto ui_info = e->GetUiInfo();
+        if (label != nullptr)
         {
-            if (e->Status() == Ui::ControlStatus::OK)
+            if (ui_info.type == WidgetType::ONOFF)
             {
-                if (state.device_type == VDeviceType::ONOFF)
+                QPixmap pixmap = GetImageCache(ui_info.pixmap_path);
+                int w = pixmap.size().width() / 3; // alarm, normal and active states
+                int h = pixmap.size().height();
+                assert(w > 0 && h > 0 && e->State() <= ui_info.high_limit);
+                if (e->Status() == Ui::ControlStatus::OK)
                 {
-                    QPixmap pixmap;
-                    if (e->State() == 0)
+                    if (w > 0 && h > 0 && e->State() <= ui_info.high_limit)
                     {
-                        pixmap = GetImageCache(state.normal_pixmap);
+                        if (e->State() == 0)
+                        {
+                            label->setPixmap(pixmap.copy(w, // jump alarm position
+                                                         0,
+                                                         w,
+                                                         h));
+                        }
+                        else
+                        {
+                            label->setPixmap(pixmap.copy(w * 2, // jump alarm and normal position
+                                                         0,
+                                                         w,
+                                                         h));
+                        }
                     }
-                    else
-                    {
-                        pixmap = GetImageCache(state.active_pixmap);
-                    }
-                    label->setPixmap(pixmap);
                 }
-                else if (state.device_type == VDeviceType::MULTI_STATE)
+                else
                 {
-                    QPixmap pixmap = GetImageCache(state.normal_pixmap);
-                    int w = pixmap.size().width() / state.positions_for_normal_pixmap;
-                    int h = pixmap.size().height();
-                    assert(w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap);
-                    if (w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap)
+                    label->setPixmap(pixmap.copy(0, 0, w, h));
+                }
+            }
+            else if (ui_info.type == WidgetType::STATE)
+            {
+                QPixmap pixmap = GetImageCache(ui_info.pixmap_path);
+                int w = pixmap.size().width() / (ui_info.high_limit + 1/* alarm position */);
+                int h = pixmap.size().height();
+                assert(w > 0 && h > 0 && e->State() <= ui_info.high_limit);
+                if (e->Status() == Ui::ControlStatus::OK)
+                {
+                    if (w > 0 && h > 0 && e->State() < ui_info.high_limit)
                     {
                         label->setPixmap(pixmap.copy(w * e->State(), // valve position starts from 1
                                                      0,
@@ -100,28 +117,12 @@ bool FormCommon::event(QEvent *event)
                                                      h));
                     }
                 }
-            }
-            else
-            {
-                if (state.device_type == VDeviceType::MULTI_STATE)
-                {
-                    QPixmap pixmap = GetImageCache(state.normal_pixmap);
-                    int w = pixmap.size().width() / state.positions_for_normal_pixmap;
-                    int h = pixmap.size().height();
-                    assert(w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap);
-                    if (w > 0 && h > 0 && state.positions_for_normal_pixmap > 0 && e->State() < state.positions_for_normal_pixmap)
-                    {
-                        label->setPixmap(pixmap.copy(0, // valve position 0 indicated abnormal state
-                                                     0,
-                                                     w,
-                                                     h));
-                    }
-                }
                 else
                 {
-                    label->setPixmap(QPixmap(state.error_pixmap)); // error status
+                    label->setPixmap(pixmap.copy(0, 0, w, h));
                 }
             }
+
         }
         return true;
     }
@@ -129,17 +130,17 @@ bool FormCommon::event(QEvent *event)
     return QWidget::event(event);
 }
 
-UiStateDef FormCommon::GetUiState(const QString& ui_name, bool& ok)
-{
-    ok = false;
-    const auto iter = ui_state_map_.find(ui_name);
-    if (iter != ui_state_map_.cend())
-    {
-        ok = true;
-        return iter->second;
-    }
-    return UiStateDef();
-}
+//UiStateDef FormCommon::GetUiState(const QString& ui_name, bool& ok)
+//{
+//    ok = false;
+//    const auto iter = ui_state_map_.find(ui_name);
+//    if (iter != ui_state_map_.cend())
+//    {
+//        ok = true;
+//        return iter->second;
+//    }
+//    return UiStateDef();
+//}
 
 void FormCommon::UiSetValue(QWidget* sender)
 {
@@ -150,16 +151,11 @@ void FormCommon::UiSetValue(QWidget* sender)
     }
 
     bool ok = false;
-    auto state = GetUiState(sender->objectName(), ok);
-    if (!ok)
-    {
-        assert(false);
-        return;
-    }
 
     QString value;
     Ui::ControlStatus status;
-    ok = read_data_func_(this->objectName(), sender->objectName(), value, status);
+    UiInfo ui_info;
+    ok = read_data_func_(this->objectName(), sender->objectName(), value, status, ui_info);
     if (!ok)
     {
         assert(false);
@@ -175,9 +171,9 @@ void FormCommon::UiSetValue(QWidget* sender)
     screen_pos.setX(screen_pos.x() + 25);
     screen_pos.setY(screen_pos.y() + 10);
 
-    if (state.device_type == VDeviceType::PROCESS_FLOAT)
+    if (ui_info.type == WidgetType::PROCESS_VALUE)
     {
-         DialogSetValue set_value_dialog(sender, value, state.measure_unit, state.high_limit, state.low_limit);
+         DialogSetValue set_value_dialog(sender, value, ui_info.unit, ui_info.high_limit, ui_info.low_limit);
          set_value_dialog.move(screen_pos);
          int result = set_value_dialog.exec();
          if (result == QDialog::Accepted)
@@ -186,7 +182,7 @@ void FormCommon::UiSetValue(QWidget* sender)
              ok = write_data_func_(this->objectName(), sender->objectName(), QString::number(f, 'f', 2));
          }
     }
-    else if (state.device_type == VDeviceType::ONOFF)
+    else if (ui_info.type == WidgetType::ONOFF)
     {
         DialogOnOff set_onoff_dialog(sender, value.toInt());
         set_onoff_dialog.move(screen_pos);
@@ -197,9 +193,9 @@ void FormCommon::UiSetValue(QWidget* sender)
             ok = write_data_func_(this->objectName(), sender->objectName(), QString::number(pos, 10));
         }
     }
-    else if (state.device_type == VDeviceType::MULTI_STATE)
+    else if (ui_info.type == WidgetType::STATE)
     {
-        DialogSetPosition set_position_dialog(sender, state.high_limit, value.toInt());
+        DialogSetPosition set_position_dialog(sender, ui_info.high_limit, value.toInt());
         set_position_dialog.move(screen_pos);
         int result = set_position_dialog.exec();
         if (result == QDialog::Accepted)

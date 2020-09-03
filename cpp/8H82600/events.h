@@ -2,6 +2,7 @@
 #define EVENTS_H
 
 #include <qevent.h>
+#include "data_model.h"
 
 namespace Ui
 {
@@ -15,8 +16,8 @@ enum class ControlStatus
 class RefreshEvent : public QEvent
 {
 public:
-    explicit RefreshEvent(QEvent::Type type, const QString& name, ControlStatus status) :
-        QEvent (type), name_(name), status_(status)
+    explicit RefreshEvent(QEvent::Type type, const QString& name, ControlStatus status, const UiInfo& ui_info) :
+        QEvent (type), name_(name), status_(status), ui_info_(ui_info)
     {
 
     }
@@ -36,9 +37,15 @@ public:
         return status_;
     }
 
+    const UiInfo& GetUiInfo() const
+    {
+        return ui_info_;
+    }
+
 private:
     QString name_;
     ControlStatus status_;
+    UiInfo ui_info_;
 };
 
 class RefreshTextEvent : public RefreshEvent
@@ -46,8 +53,8 @@ class RefreshTextEvent : public RefreshEvent
 public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1001);
 
-    explicit RefreshTextEvent(const QString& name, ControlStatus status, const QString& text) :
-        RefreshEvent (myType, name, status), text_(text)
+    explicit RefreshTextEvent(const QString& name, ControlStatus status, const UiInfo& ui_info, const QString& text) :
+        RefreshEvent (myType, name, status, ui_info), text_(text)
     {
 
     }
@@ -67,8 +74,8 @@ class RefreshStateEvent : public RefreshEvent
 public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1002);
 
-    explicit RefreshStateEvent(const QString& name, ControlStatus status, int state) :
-        RefreshEvent (myType, name, status), state_(state)
+    explicit RefreshStateEvent(const QString& name, ControlStatus status, const UiInfo& ui_info, int state) :
+        RefreshEvent (myType, name, status, ui_info), state_(state)
     {
 
     }

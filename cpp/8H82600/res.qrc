@@ -15,5 +15,6 @@
         <file>Res/layout6-2.png</file>
         <file>Res/layout5-1.png</file>
         <file>Res/layout5-2.png</file>
+        <file>UICtrls/Res/valve-gas.png</file>
     </qresource>
 </RCC>
