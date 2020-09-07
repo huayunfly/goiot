@@ -601,22 +601,22 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			data_info->int_value = (registers.get()[0] + (registers.get()[1] << 16)) * data_info->ratio;
+			data_info->int_value = (registers.get()[0] + (registers.get()[1] << 16))/* * data_info->ratio*/;
 			break;
 		case DataType::DF:
 			switch (data_info->float_decode)
 			{
 			case FloatDecode::ABCD:
-				data_info->float_value = modbus_get_float_abcd(registers.get()) * data_info->ratio;
+				data_info->float_value = modbus_get_float_abcd(registers.get())/* * data_info->ratio*/;
 				break;
 			case FloatDecode::DCBA:
-				data_info->float_value = modbus_get_float_dcba(registers.get()) * data_info->ratio;
+				data_info->float_value = modbus_get_float_dcba(registers.get())/* * data_info->ratio*/;
 				break;
 			case FloatDecode::BADC:
-				data_info->float_value = modbus_get_float_badc(registers.get()) * data_info->ratio;
+				data_info->float_value = modbus_get_float_badc(registers.get())/* * data_info->ratio*/;
 				break;
 			case FloatDecode::CDAB:
-				data_info->float_value = modbus_get_float_cdab(registers.get()) * data_info->ratio;
+				data_info->float_value = modbus_get_float_cdab(registers.get())/* * data_info->ratio*/;
 				break;
 			default:
 				throw std::invalid_argument("Unsupported float decode.");
@@ -624,7 +624,7 @@ namespace goiot
 			break;
 		case DataType::WB:
 		case DataType::WUB:
-			data_info->int_value = registers.get()[0] * data_info->ratio;
+			data_info->int_value = registers.get()[0]/* * data_info->ratio*/;
 			break;
 		default:
 			throw std::invalid_argument("Unsupported data type.");
@@ -657,7 +657,7 @@ namespace goiot
 				case DataType::DB:
 				case DataType::DUB:
 					int_value = (registers.at(data_pair.first - register_start) +
-						(registers.at(data_pair.first - register_start + 1) << 16)) * data_pair.second.ratio;
+						(registers.at(data_pair.first - register_start + 1) << 16))/* * data_pair.second.ratio*/;
 					rp_data_info_vec->emplace_back(data_pair.second.id,
 						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
@@ -670,16 +670,16 @@ namespace goiot
 					switch (data_pair.second.float_decode)
 					{
 					case FloatDecode::ABCD:
-						float_value = modbus_get_float_abcd(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						float_value = modbus_get_float_abcd(&registers.at(data_pair.first - register_start))/* * data_pair.second.ratio*/;
 						break;
 					case FloatDecode::DCBA:
-						float_value = modbus_get_float_dcba(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						float_value = modbus_get_float_dcba(&registers.at(data_pair.first - register_start))/* * data_pair.second.ratio*/;
 						break;
 					case FloatDecode::BADC:
-						float_value = modbus_get_float_badc(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						float_value = modbus_get_float_badc(&registers.at(data_pair.first - register_start))/* * data_pair.second.ratio*/;
 						break;
 					case FloatDecode::CDAB:
-						float_value = modbus_get_float_cdab(&registers.at(data_pair.first - register_start)) * data_pair.second.ratio;
+						float_value = modbus_get_float_cdab(&registers.at(data_pair.first - register_start))/* * data_pair.second.ratio*/;
 						break;
 					default:
 						throw std::invalid_argument("Unsupported float decode.");
@@ -694,7 +694,7 @@ namespace goiot
 					break;
 				case DataType::WB:
 				case DataType::WUB:
-					int_value = registers.at(data_pair.first - register_start) * data_pair.second.ratio;
+					int_value = registers.at(data_pair.first - register_start)/* * data_pair.second.ratio*/;
 					rp_data_info_vec->emplace_back(data_pair.second.id,
 						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,

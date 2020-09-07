@@ -614,9 +614,9 @@ namespace goiot {
 		//const std::string HGETALL = "HGETALL %s";
 		const std::string ZRANGE_ALL = "zrange %s 0 -1 withscores"; // zrange key start end [withscores]
 		const std::string ZADD = "zadd %s %f %s"; // zadd key score member [score member...]
-		const std::string HMSET_STRING = "hmset %s id %s name %s value %s rw %d result %d time %f"; // hmset key field value [field value...]
-		const std::string HMSET_FLOAT = "hmset %s id %s name %s value %f rw %d result %d time %f"; // hmset key field value [field value...]
-		const std::string HMSET_INTEGER = "hmset %s id %s name %s value %d rw %d result %d time %f"; // hmset key field value [field value...]
+		const std::string HMSET_STRING = "hmset %s id %s name %s value %s rw %d result %d time %f ratio %f type %d"; // hmset key field value [field value...]
+		const std::string HMSET_FLOAT = "hmset %s id %s name %s value %f rw %d result %d time %f ratio %f type %d"; // hmset key field value [field value...]
+		const std::string HMSET_INTEGER = "hmset %s id %s name %s value %d rw %d result %d time %f ratio %f type %d"; // hmset key field value [field value...]
 
 		std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 			redisCommand(redis_context.get()/* redisContext */, ZRANGE_ALL.c_str()/* format */, time_namespace.c_str())
@@ -672,7 +672,9 @@ namespace goiot {
 							data_info.char_value.c_str(),
 							data_info.read_write_priviledge,
 							data_info.result,
-							data_info.timestamp)
+							data_info.timestamp,
+							data_info.ratio,
+							data_info.data_type)
 						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
@@ -686,7 +688,9 @@ namespace goiot {
 							data_info.float_value,
 							data_info.read_write_priviledge,
 							data_info.result,
-							data_info.timestamp)
+							data_info.timestamp,
+							data_info.ratio,
+							data_info.data_type)
 						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
@@ -701,7 +705,9 @@ namespace goiot {
 							data_info.int_value,
 							data_info.read_write_priviledge,
 							data_info.result,
-							data_info.timestamp)
+							data_info.timestamp,
+							data_info.ratio,
+							data_info.data_type)
 						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
@@ -715,7 +721,9 @@ namespace goiot {
 							data_info.byte_value,
 							data_info.read_write_priviledge,
 							data_info.result,
-							data_info.timestamp)
+							data_info.timestamp,
+							data_info.ratio,
+							data_info.data_type)
 						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
