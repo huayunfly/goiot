@@ -1,11 +1,11 @@
 // modbus_rtu protocol
 // address: 1~128
-// data type: [1 zone] input(DISCRETE) coils ÊäÈë¼ÌµçÆ÷, [0 zone] output coils Êä³ö¼ÌµçÆ÷, [3 zone] input registers ÊäÈë¼Ä´æÆ÷ and [4 zone] output(holding) registers Êä³ö¼Ä´æÆ÷
-// wdec: word_decode, µ¥×Ö½âÂëË³Ğò, with value 0, 1
-// dwdec: dword_decode, Ë«×Ö½âÂëË³Ğò, with value 0, 1, 2, 3
-// fdec: float_decode, ¸¡µã½âÂëË³Ğò, with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
-// coil: only number Î»½öÒÔÊı×Ö±íÊ¾
-// register: driver-specified, R (readonly, Ö»¶Á), W(writeonly, Ö»Ğ´), RW (readwrite, ¶ÁĞ´)
+// data type: [1 zone] input(DISCRETE) coils è¾“å…¥ç»§ç”µå™¨, [0 zone] output coils è¾“å‡ºç»§ç”µå™¨, [3 zone] input registers è¾“å…¥å¯„å­˜å™¨ and [4 zone] output(holding) registers è¾“å‡ºå¯„å­˜å™¨
+// wdec: word_decode, å•å­—è§£ç é¡ºåº, with value 0, 1
+// dwdec: dword_decode, åŒå­—è§£ç é¡ºåº, with value 0, 1, 2, 3
+// fdec: float_decode, æµ®ç‚¹è§£ç é¡ºåº, with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
+// coil: only number ä½ä»…ä»¥æ•°å­—è¡¨ç¤º
+// register: driver-specified, R (readonly, åªè¯»), W(writeonly, åªå†™), RW (readwrite, è¯»å†™)
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
 //                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
@@ -15,7 +15,7 @@
 // We need the client address (port) and optionally Rack and Slot
 // port: IP address,rack number,slot number
 // address: DB number
-// data block type: DBX, DBB, DBW, DBD => mapping to coil, none, WUB, DUB Ôİ²»Ö§³ÖDB byte ÀàĞÍ
+// data block type: DBX, DBB, DBW, DBD => mapping to coil, none, WUB, DUB æš‚ä¸æ”¯æŒDB byte ç±»å‹
 // function code: default 0, PLC DataBlock
 {
   "name": "goiot",
