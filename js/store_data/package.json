@@ -9,6 +9,8 @@
   "author": "huayunfly@126.com",
   "license": "ISC",
   "dependencies": {
+    "pg": "^8.4.1",
+    "redis": "^3.0.2",
     "yargs": "^16.0.3"
   }
 }

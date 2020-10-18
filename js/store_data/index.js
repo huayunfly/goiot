@@ -3,6 +3,8 @@
 
 const read_file = require('fs').readFile;
 const yargs = require('yargs');
+const RedisConnector = require('./db_connector').RedisConnector;
+const PostgreSQLConnector = require('./db_connector').PostgreSQLConnector;
 const argv = yargs.demandOption('f').nargs('f', 1).describe('f', 'JSON file to parse').argv;
 const file = argv.f;
 
@@ -14,8 +16,17 @@ read_file(argv.f, (err, data_buffer) => {
     }
     else
     {
-        const value = JSON.parse(data_buffer.toString());
-        console.log(JSON.stringify(value));
+        try
+        {
+            const data_config = JSON.parse(data_buffer.toString());
+            const redis_connector = new RedisConnector('127.0.0.1:6379', data_config);
+            const postgre_connector = new PostgreSQLConnector('127.0.0.1:5432:goiot');
+        }
+        catch (e)
+        {
+            console.error(e);
+            process.exit(1);
+        }
     }
 });
 
