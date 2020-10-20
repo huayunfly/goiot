@@ -138,7 +138,7 @@ class PostgreSQLConnector extends DBConnector {
             this.db_.query(`
  CREATE TABLE IF NOT EXISTS ${item.driver_id}
  (id SERIAL primary key, ${item.data_array.map(n => '"' + n + '"' + ' TEXT').join(',')}, 
- time DOUBLE PRECISION, create_time TIMESTAMP WITH TIME ZONE not null default localtimestamp(0));
+ time DOUBLE PRECISION, createtime TIMESTAMP WITH TIME ZONE not null default localtimestamp(0));
  `, (err, result) => {
                 if (err) {
                     throw err;
