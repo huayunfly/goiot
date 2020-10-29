@@ -76,6 +76,21 @@
      <string>PushButton</string>
     </property>
    </widget>
+   <widget class="QAxWidget" name="axWidget">
+    <property name="geometry" stdset="0">
+     <rect>
+      <x>40</x>
+      <y>0</y>
+      <width>441</width>
+      <height>391</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>axWidget</zorder>
+   <zorder>widget_control</zorder>
+   <zorder>pushButton</zorder>
+   <zorder>pushButton_2</zorder>
+   <zorder>pushButton_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -89,6 +104,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QAxWidget</class>
+   <extends>QWidget</extends>
+   <header>qaxwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

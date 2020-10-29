@@ -27,13 +27,13 @@ enum class WidgetType
 typedef struct tagUiInfo
 {
     tagUiInfo() : parent(nullptr), ui_name(QString()), pixmap_path(QString()), type(WidgetType::TEXT),
-        unit(MeasurementUnit::NONE), decimals(0), high_limit(0), low_limit(0)
+        unit(MeasurementUnit::NONE), decimals(0), high_limit(0), low_limit(0), int_offset(0)
     {
 
     }
 
-    tagUiInfo(QWidget* p, const QString& n, const QString& path, WidgetType t, MeasurementUnit measurement_unit, int d, int high, int low) :
-        parent(p), ui_name(n), pixmap_path(path), type(t), unit(measurement_unit), decimals(d), high_limit(high), low_limit(low)
+    tagUiInfo(QWidget* p, const QString& n, const QString& path, WidgetType t, MeasurementUnit measurement_unit, int d, int high, int low, int offset = 0) :
+        parent(p), ui_name(n), pixmap_path(path), type(t), unit(measurement_unit), decimals(d), high_limit(high), low_limit(low), int_offset(offset)
     {
 
     }
@@ -45,6 +45,9 @@ typedef struct tagUiInfo
     int decimals;
     int high_limit; // also used as (multiple) state high limit
     int low_limit;
+    int int_offset; // integer offset for UI state (muliple valve especially), default 0
+                    // Read: device_value + int_offset => UI, or (device_value * device_ratio) + int_offset => UI
+                    // Write: UI - int_offset => device_value, or (UI - int_offset) / device_ratio => device_value
 } UiInfo;
 
 typedef struct tagDataDef

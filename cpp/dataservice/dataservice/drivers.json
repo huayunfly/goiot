@@ -56,6 +56,29 @@
       ]
     },
     {
+      "id": "balance",
+      "name": "modbus7",
+      "type": "modbus_rtu",
+      "port": "COM7,19200,N,8,1",
+      "response_to_msec": 500,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 0.1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "cylinder16",
       "name": "modbus4",
       "type": "modbus_rtu",

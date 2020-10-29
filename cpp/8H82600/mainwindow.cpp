@@ -49,6 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
         ui_->tabWidget->addTab(entry, entry->GetDisplayName());
     }
 
+    // Setup Ocx
+    //ui_->tabWidget->hide();
+    //bool ok = ui_->axWidget->setControl("{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"); // WorkflowComponent.WorkflowComponentCtrl.1
+    //ui_->axWidget->show();
+
+
     // Setup data model
     InitDataModel();
 
@@ -109,19 +115,19 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
                     value = QString::number(fvalue, 'f', ui_info.decimals);
                     break;
                 case goiot::DataType::BT:
-                    value = QString::number(data_info.byte_value);
+                    value = QString::number(data_info.byte_value + ui_info.int_offset); // with UI offset
                     break;
                 case goiot::DataType::DB:
                 case goiot::DataType::DUB:
                 case goiot::DataType::WB:
                 case goiot::DataType::WUB:
-                    if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion
+                    if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion with UI offset
                     {
-                        value = QString::number(data_info.int_value);
+                        value = QString::number(data_info.int_value + ui_info.int_offset);
                     }
                     else
                     {
-                        fvalue = data_info.int_value * data_info.ratio;
+                        fvalue = data_info.int_value * data_info.ratio + ui_info.int_offset;
                         value = QString::number(fvalue, 'f', ui_info.decimals);
                     }
                     break;
@@ -246,19 +252,19 @@ bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name,
             value = QString::number(fvalue, 'f', ui_info.decimals);
             break;
         case goiot::DataType::BT:
-            value = QString::number(data_info.byte_value);
+            value = QString::number(data_info.byte_value + ui_info.int_offset); // with UI offset
             break;
         case goiot::DataType::DB:
         case goiot::DataType::DUB:
         case goiot::DataType::WB:
         case goiot::DataType::WUB:
-            if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion
+            if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion with UI offset
             {
-                value = QString::number(data_info.int_value);
+                value = QString::number(data_info.int_value + ui_info.int_offset);
             }
             else
             {
-                fvalue = data_info.int_value * data_info.ratio;
+                fvalue = data_info.int_value * data_info.ratio + ui_info.int_offset;
                 value = QString::number(fvalue, 'f', ui_info.decimals);
             }
             break;
@@ -294,6 +300,13 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
         return false;
     }
 
+    UiInfo ui_info = data_model_.GetUiInfo(data_info.id, ok);
+    if (!ok)
+    {
+        assert(false);
+        return false;
+    }
+
     double float_value = 0.0;
     uint8_t byte_value = 0;
     int int_value = 0;
@@ -318,6 +331,7 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     case goiot::DataType::BT:
         byte_value = value.toUShort(&ok);
         assert(ok);
+        byte_value -= ui_info.int_offset; // with UI offset
         data_info.byte_value = byte_value;
         break;
     case goiot::DataType::DB:
@@ -327,6 +341,7 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
         int_value = value.toInt(&ok);
         if (ok)
         {
+            int_value -= ui_info.int_offset; // with UI offset
             if (std::abs(data_info.ratio - 1.0) >= 1e-6) // ratio conversion
             {
                 int_value = static_cast<int>(int_value / data_info.ratio);
@@ -338,6 +353,7 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
             float_value = value.toDouble(&ok);
             if (ok)
             {
+                float_value -= ui_info.int_offset; // with UI offset
                 if (std::abs(data_info.ratio - 1.0) >= 1e-6) // ratio conversion
                 {
                     float_value /= data_info.ratio;
