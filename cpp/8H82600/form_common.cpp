@@ -109,7 +109,7 @@ bool FormCommon::event(QEvent *event)
                 assert(w > 0 && h > 0 && e->State() <= ui_info.high_limit);
                 if (e->Status() == Ui::ControlStatus::OK)
                 {
-                    if (w > 0 && h > 0 && e->State() < ui_info.high_limit)
+                    if (w > 0 && h > 0 && e->State() <= ui_info.high_limit)
                     {
                         label->setPixmap(pixmap.copy(w * e->State(), // valve position starts from 1
                                                      0,

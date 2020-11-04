@@ -29,6 +29,1318 @@
     <pixmap resource="res.qrc">:/ui_ctrls/Res/layout5-1.png</pixmap>
    </property>
   </widget>
+  <widget class="QLabel" name="label_HC3201">
+   <property name="geometry">
+    <rect>
+     <x>112</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3401">
+   <property name="geometry">
+    <rect>
+     <x>222</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3101">
+   <property name="geometry">
+    <rect>
+     <x>57</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3301">
+   <property name="geometry">
+    <rect>
+     <x>167</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3501">
+   <property name="geometry">
+    <rect>
+     <x>117</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3601">
+   <property name="geometry">
+    <rect>
+     <x>172</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3701">
+   <property name="geometry">
+    <rect>
+     <x>227</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3801">
+   <property name="geometry">
+    <rect>
+     <x>282</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3102">
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3202">
+   <property name="geometry">
+    <rect>
+     <x>392</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3302">
+   <property name="geometry">
+    <rect>
+     <x>447</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3402">
+   <property name="geometry">
+    <rect>
+     <x>502</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3502">
+   <property name="geometry">
+    <rect>
+     <x>397</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3602">
+   <property name="geometry">
+    <rect>
+     <x>452</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3702">
+   <property name="geometry">
+    <rect>
+     <x>507</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3802">
+   <property name="geometry">
+    <rect>
+     <x>562</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3103">
+   <property name="geometry">
+    <rect>
+     <x>617</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3203">
+   <property name="geometry">
+    <rect>
+     <x>672</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3303">
+   <property name="geometry">
+    <rect>
+     <x>727</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3403">
+   <property name="geometry">
+    <rect>
+     <x>782</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3503">
+   <property name="geometry">
+    <rect>
+     <x>677</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3603">
+   <property name="geometry">
+    <rect>
+     <x>732</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3703">
+   <property name="geometry">
+    <rect>
+     <x>787</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3803">
+   <property name="geometry">
+    <rect>
+     <x>842</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3104">
+   <property name="geometry">
+    <rect>
+     <x>897</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3204">
+   <property name="geometry">
+    <rect>
+     <x>952</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3304">
+   <property name="geometry">
+    <rect>
+     <x>1007</x>
+     <y>59</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3404">
+   <property name="geometry">
+    <rect>
+     <x>1062</x>
+     <y>5</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3504">
+   <property name="geometry">
+    <rect>
+     <x>957</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3604">
+   <property name="geometry">
+    <rect>
+     <x>1012</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3704">
+   <property name="geometry">
+    <rect>
+     <x>1067</x>
+     <y>239</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3804">
+   <property name="geometry">
+    <rect>
+     <x>1122</x>
+     <y>185</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3105">
+   <property name="geometry">
+    <rect>
+     <x>57</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3205">
+   <property name="geometry">
+    <rect>
+     <x>112</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3305">
+   <property name="geometry">
+    <rect>
+     <x>167</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3405">
+   <property name="geometry">
+    <rect>
+     <x>222</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3505">
+   <property name="geometry">
+    <rect>
+     <x>117</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3605">
+   <property name="geometry">
+    <rect>
+     <x>172</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3705">
+   <property name="geometry">
+    <rect>
+     <x>227</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3805">
+   <property name="geometry">
+    <rect>
+     <x>282</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3106">
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3206">
+   <property name="geometry">
+    <rect>
+     <x>392</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3306">
+   <property name="geometry">
+    <rect>
+     <x>447</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3406">
+   <property name="geometry">
+    <rect>
+     <x>502</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3506">
+   <property name="geometry">
+    <rect>
+     <x>397</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3606">
+   <property name="geometry">
+    <rect>
+     <x>452</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3706">
+   <property name="geometry">
+    <rect>
+     <x>507</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3806">
+   <property name="geometry">
+    <rect>
+     <x>562</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3107">
+   <property name="geometry">
+    <rect>
+     <x>617</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3207">
+   <property name="geometry">
+    <rect>
+     <x>672</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3307">
+   <property name="geometry">
+    <rect>
+     <x>727</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3407">
+   <property name="geometry">
+    <rect>
+     <x>782</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3507">
+   <property name="geometry">
+    <rect>
+     <x>677</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3607">
+   <property name="geometry">
+    <rect>
+     <x>732</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3707">
+   <property name="geometry">
+    <rect>
+     <x>787</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3807">
+   <property name="geometry">
+    <rect>
+     <x>842</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3108">
+   <property name="geometry">
+    <rect>
+     <x>897</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3208">
+   <property name="geometry">
+    <rect>
+     <x>952</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3308">
+   <property name="geometry">
+    <rect>
+     <x>1007</x>
+     <y>499</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3408">
+   <property name="geometry">
+    <rect>
+     <x>1062</x>
+     <y>444</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3508">
+   <property name="geometry">
+    <rect>
+     <x>957</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve3.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3608">
+   <property name="geometry">
+    <rect>
+     <x>1012</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="indent">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3708">
+   <property name="geometry">
+    <rect>
+     <x>1067</x>
+     <y>679</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC3808">
+   <property name="geometry">
+    <rect>
+     <x>1122</x>
+     <y>624</y>
+     <width>23</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

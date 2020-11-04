@@ -3,7 +3,6 @@
         <file>UICtrls/Res/poweroff.bmp</file>
         <file>UICtrls/Res/poweron.bmp</file>
         <file>Res/layout1.png</file>
-        <file>Res/svalve1.bmp</file>
         <file>Res/layout2.png</file>
         <file>Res/layout3.png</file>
         <file>Res/layout4.png</file>
@@ -16,5 +15,7 @@
         <file>Res/layout5-1.png</file>
         <file>Res/layout5-2.png</file>
         <file>UICtrls/Res/valve-gas.png</file>
+        <file>Res/svalve3.png</file>
+        <file>Res/svalve4.png</file>
     </qresource>
 </RCC>
