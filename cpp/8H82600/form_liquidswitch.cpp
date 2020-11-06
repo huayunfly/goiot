@@ -6,7 +6,7 @@ FormLiquidSwitch::FormLiquidSwitch(QWidget *parent) :
     ui(new Ui::FormLiquidSwitch)
 {
     ui->setupUi(this);
-    this->setObjectName("liquidswtich");
+    this->setObjectName("liquidswitch");
     InitUiState();
 }
 
@@ -27,5 +27,11 @@ bool FormLiquidSwitch::event(QEvent *event)
 
 void FormLiquidSwitch::InitUiState()
 {
-
+    ui->label_HC2301->installEventFilter(this);
+    ui->label_HC2302->installEventFilter(this);
+    ui->label_HC2303->installEventFilter(this);
+    ui->label_HC2304->installEventFilter(this);
+    ui->label_HC2401->installEventFilter(this);
+    ui->label_HC2403->installEventFilter(this);
+    ui->label_HC2404->installEventFilter(this);
 }

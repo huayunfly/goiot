@@ -32,6 +32,139 @@
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="label_HC2301">
+   <property name="geometry">
+    <rect>
+     <x>392</x>
+     <y>204</y>
+     <width>146</width>
+     <height>146</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve1.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC2401">
+   <property name="geometry">
+    <rect>
+     <x>199</x>
+     <y>544</y>
+     <width>146</width>
+     <height>146</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve1.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC2303">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>181</y>
+     <width>146</width>
+     <height>146</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve2.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC2403">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>446</y>
+     <width>146</width>
+     <height>146</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve2.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC2304">
+   <property name="geometry">
+    <rect>
+     <x>826</x>
+     <y>180</y>
+     <width>148</width>
+     <height>148</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve8.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC2404">
+   <property name="geometry">
+    <rect>
+     <x>826</x>
+     <y>446</y>
+     <width>148</width>
+     <height>148</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve8.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC2302">
+   <property name="geometry">
+    <rect>
+     <x>513</x>
+     <y>525</y>
+     <width>90</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve5.png</pixmap>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

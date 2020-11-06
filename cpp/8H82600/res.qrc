@@ -20,5 +20,8 @@
         <file>Res/svalve5.png</file>
         <file>Res/svalve6.png</file>
         <file>Res/svalve7.png</file>
+        <file>Res/svalve8.png</file>
+        <file>Res/svalve1.png</file>
+        <file>Res/svalve2.png</file>
     </qresource>
 </RCC>

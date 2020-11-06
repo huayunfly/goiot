@@ -30,10 +30,20 @@ bool FormGasFeed::event(QEvent *event)
 
 void FormGasFeed::InitUiState()
 {
-//    ui_state_map_.emplace("svlabel", UiStateDef(RES_ON, RES_OFF, RES_OFF, 1, 0, VDeviceType::ONOFF, MeasurementUnit::DEGREE, 0));
-//    ui_state_map_.emplace("svlabel_2", UiStateDef(RES_PRO_SV1, QString(), QString(), 8, 1, VDeviceType::MULTI_STATE, MeasurementUnit::NONE, 9));
-//    ui_state_map_.emplace("svlabel_3", UiStateDef(RES_ON, RES_OFF, RES_OFF, 200, 0, VDeviceType::PROCESS_FLOAT, MeasurementUnit::NONE, 0));
-    ui->svlabel->installEventFilter(this);
-    ui->svlabel_2->installEventFilter(this);
-    ui->svlabel_3->installEventFilter(this);
+    ui->label_HC1020->installEventFilter(this);
+    ui->label_HC1021->installEventFilter(this);
+    ui->label_HC1110->installEventFilter(this);
+    ui->label_HC1120->installEventFilter(this);
+    ui->label_HC1130->installEventFilter(this);
+    ui->label_HC1140->installEventFilter(this);
+    ui->label_HC1201->installEventFilter(this);
+    ui->label_HC1202->installEventFilter(this);
+    ui->label_HC1203->installEventFilter(this);
+    ui->label_HC1204->installEventFilter(this);
+    ui->label_HC1205->installEventFilter(this);
+    ui->label_HC1206->installEventFilter(this);
+    ui->label_HC1207->installEventFilter(this);
+    ui->label_HC1208->installEventFilter(this);
+    ui->label_HC3110->installEventFilter(this);
+    ui->label_HC3120->installEventFilter(this);
 }
