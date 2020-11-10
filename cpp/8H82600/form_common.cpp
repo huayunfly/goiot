@@ -63,6 +63,30 @@ bool FormCommon::event(QEvent *event)
         }
         return true;
     }
+    else if (event->type() == Ui::ProcessValueEvent::myType)
+    {
+        Ui::ProcessValueEvent* e = static_cast<Ui::ProcessValueEvent*>(event);
+        auto label = this->findChild<QLabel*>(e->Name());
+        auto ui_info = e->GetUiInfo();
+        if (label != nullptr)
+        {
+            QPixmap pixmap = GetImageCache(ui_info.pixmap_path);
+            int w = pixmap.size().width() / 2; // alarm, normal
+            int h = pixmap.size().height();
+            assert(w > 0 && h > 0);
+            if (e->Status() == Ui::ControlStatus::OK)
+            {
+                label->setPixmap(pixmap.copy(w, // jump alarm position
+                                             0,
+                                             w,
+                                             h));
+            }
+            else
+            {
+                label->setPixmap(pixmap.copy(0, 0, w, h));
+            }
+        }
+    }
     else if (event->type() == Ui::RefreshStateEvent::myType)
     {
         Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);

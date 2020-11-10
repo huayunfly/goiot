@@ -23,7 +23,7 @@ DialogSetValue::DialogSetValue(QWidget *parent, const QString& current, Measurem
 
     // set properties
     text_current_sv->setStyleSheet("background-color:lightyellow");
-    QRegExp float_regex("100|([0-9]{0,3}[\\.][0-9]{1})");
+    QRegExp float_regex("100|([0-9]{0,4}[\\.][0-9]{1})");
     text_sv->setValidator(new QRegExpValidator(float_regex, this));
     text_sv->setFocus();
     text_unit->setStyleSheet("background:transparent;border-width:0;border-style:outset");
@@ -45,7 +45,7 @@ DialogSetValue::DialogSetValue(QWidget *parent, const QString& current, Measurem
         text_unit->setText("barG");
         break;
     case MeasurementUnit::SCCM:
-        text_unit->setText("ml/min");
+        text_unit->setText("SCCM");
         break;
     case MeasurementUnit::DEGREE:
         text_unit->setText(u8"°C");

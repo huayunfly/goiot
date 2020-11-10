@@ -9,6 +9,84 @@
       "response_to_msec": 500,
       "nodes": [
         {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 10
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 5
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "2",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 10
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 5
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "3",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 10
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 5
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
           "address": "4",
           "wdec": "0",
           "dwdec": "0",
@@ -25,6 +103,422 @@
               "name": "setpoint",
               "register": "RW4WUB0033",
               "ratio": 5
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "11",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "12",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "13",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "14",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "15",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "16",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "17",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "18",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "19",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "20",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "21",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "22",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "23",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "24",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "25",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "fsv",
+              "name": "fsetpoint",
+              "register": "RW4DF41240",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "26",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0015625
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0015625
             },
             {
               "id": "fsv",

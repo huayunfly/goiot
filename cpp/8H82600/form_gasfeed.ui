@@ -19,14 +19,20 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <widget class="QTextEdit" name="textEdit">
+  <widget class="QTextEdit" name="textEdit_FICA1110">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>81</width>
-     <height>31</height>
+     <x>223</x>
+     <y>140</y>
+     <width>70</width>
+     <height>28</height>
     </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_background">
@@ -349,8 +355,132 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
+  <widget class="QLabel" name="label_FICA1110">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>174</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1120">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>264</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1130">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>354</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1140">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>444</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1120">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>230</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1130">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>320</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1140">
+   <property name="geometry">
+    <rect>
+     <x>223</x>
+     <y>410</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
-  <zorder>textEdit</zorder>
+  <zorder>textEdit_FICA1110</zorder>
   <zorder>label_HC1201</zorder>
   <zorder>label_HC1202</zorder>
   <zorder>label_HC1203</zorder>
@@ -367,6 +497,13 @@
   <zorder>label_HC3120</zorder>
   <zorder>label_HC1020</zorder>
   <zorder>label_HC1021</zorder>
+  <zorder>label_FICA1110</zorder>
+  <zorder>label_FICA1120</zorder>
+  <zorder>label_FICA1130</zorder>
+  <zorder>label_FICA1140</zorder>
+  <zorder>textEdit_FICA1120</zorder>
+  <zorder>textEdit_FICA1130</zorder>
+  <zorder>textEdit_FICA1140</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

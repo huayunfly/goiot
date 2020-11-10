@@ -23,5 +23,9 @@
         <file>Res/svalve8.png</file>
         <file>Res/svalve1.png</file>
         <file>Res/svalve2.png</file>
+        <file>UICtrls/Res/mfc.png</file>
+        <file>UICtrls/Res/pfc.png</file>
+        <file>UICtrls/Res/valve-gas-left.png</file>
+        <file>UICtrls/Res/temperature_controller.png</file>
     </qresource>
 </RCC>

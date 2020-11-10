@@ -14,5 +14,10 @@
 #define RES_SVALVE_6  ":/ui_ctrls/Res/svalve6.png"
 #define RES_SVALVE_7  ":/ui_ctrls/Res/svalve7.png"
 #define RES_SVALVE_8  ":/ui_ctrls/Res/svalve8.png"
+#define RES_MFC ":/ui_ctrls/UICtrls/Res/mfc.png"
+#define RES_PFC ":/ui_ctrls/UICtrls/Res/pfc.png"
+#define RES_VALVE_GAS_LEFT ":/ui_ctrls/UICtrls/Res/valve-gas-left.png"
+#define RES_TC ":/ui_ctrls/UICtrls/Res/temperature_controller.png"
+
 
 #endif // RESOURCEDEF_H

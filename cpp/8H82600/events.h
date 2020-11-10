@@ -89,6 +89,20 @@ private:
     int state_;
 };
 
+// Refresh process value for alarm/normal state only.
+class ProcessValueEvent : public RefreshEvent
+{
+public:
+    static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1003);
+
+    explicit ProcessValueEvent(const QString& name, ControlStatus status, const UiInfo& ui_info) :
+        RefreshEvent (myType, name, status, ui_info)
+    {
+
+    }
+};
+
+
 }
 
 #endif // EVENTS_H

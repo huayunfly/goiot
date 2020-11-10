@@ -29,7 +29,1290 @@
     <pixmap resource="res.qrc">:/ui_ctrls/Res/layout6-1.png</pixmap>
    </property>
   </widget>
- </widget>
+  <widget class="QLabel" name="label_HC4601">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>140</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4602">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>140</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4603">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>140</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4604">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>140</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4605">
+   <property name="geometry">
+    <rect>
+     <x>116</x>
+     <y>550</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4606">
+   <property name="geometry">
+    <rect>
+     <x>376</x>
+     <y>550</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4607">
+   <property name="geometry">
+    <rect>
+     <x>636</x>
+     <y>550</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4608">
+   <property name="geometry">
+    <rect>
+     <x>896</x>
+     <y>550</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas-left.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4301">
+   <property name="geometry">
+    <rect>
+     <x>168</x>
+     <y>16</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4302">
+   <property name="geometry">
+    <rect>
+     <x>428</x>
+     <y>16</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4303">
+   <property name="geometry">
+    <rect>
+     <x>688</x>
+     <y>16</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4304">
+   <property name="geometry">
+    <rect>
+     <x>948</x>
+     <y>16</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4305">
+   <property name="geometry">
+    <rect>
+     <x>244</x>
+     <y>427</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4306">
+   <property name="geometry">
+    <rect>
+     <x>504</x>
+     <y>427</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4307">
+   <property name="geometry">
+    <rect>
+     <x>764</x>
+     <y>427</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_PICA4308">
+   <property name="geometry">
+    <rect>
+     <x>1024</x>
+     <y>427</y>
+     <width>40</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/pfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4301">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>0</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4302">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>0</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4303">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>0</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4304">
+   <property name="geometry">
+    <rect>
+     <x>990</x>
+     <y>0</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4305">
+   <property name="geometry">
+    <rect>
+     <x>284</x>
+     <y>410</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4306">
+   <property name="geometry">
+    <rect>
+     <x>544</x>
+     <y>410</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4307">
+   <property name="geometry">
+    <rect>
+     <x>804</x>
+     <y>410</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PICA4308">
+   <property name="geometry">
+    <rect>
+     <x>1064</x>
+     <y>410</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4101">
+   <property name="geometry">
+    <rect>
+     <x>218</x>
+     <y>253</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4102">
+   <property name="geometry">
+    <rect>
+     <x>478</x>
+     <y>253</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4103">
+   <property name="geometry">
+    <rect>
+     <x>738</x>
+     <y>253</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4104">
+   <property name="geometry">
+    <rect>
+     <x>998</x>
+     <y>253</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4121">
+   <property name="geometry">
+    <rect>
+     <x>218</x>
+     <y>162</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4122">
+   <property name="geometry">
+    <rect>
+     <x>478</x>
+     <y>162</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4123">
+   <property name="geometry">
+    <rect>
+     <x>738</x>
+     <y>162</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4124">
+   <property name="geometry">
+    <rect>
+     <x>998</x>
+     <y>162</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4141">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>36</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4142">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>36</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4143">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>36</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4144">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>36</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4601">
+   <property name="geometry">
+    <rect>
+     <x>218</x>
+     <y>126</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4602">
+   <property name="geometry">
+    <rect>
+     <x>478</x>
+     <y>126</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4603">
+   <property name="geometry">
+    <rect>
+     <x>738</x>
+     <y>126</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4604">
+   <property name="geometry">
+    <rect>
+     <x>998</x>
+     <y>126</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4105">
+   <property name="geometry">
+    <rect>
+     <x>294</x>
+     <y>664</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4106">
+   <property name="geometry">
+    <rect>
+     <x>554</x>
+     <y>664</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4107">
+   <property name="geometry">
+    <rect>
+     <x>814</x>
+     <y>664</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4108">
+   <property name="geometry">
+    <rect>
+     <x>1074</x>
+     <y>664</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4125">
+   <property name="geometry">
+    <rect>
+     <x>294</x>
+     <y>573</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4126">
+   <property name="geometry">
+    <rect>
+     <x>554</x>
+     <y>573</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4127">
+   <property name="geometry">
+    <rect>
+     <x>814</x>
+     <y>573</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4128">
+   <property name="geometry">
+    <rect>
+     <x>1074</x>
+     <y>573</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4605">
+   <property name="geometry">
+    <rect>
+     <x>294</x>
+     <y>539</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4606">
+   <property name="geometry">
+    <rect>
+     <x>554</x>
+     <y>539</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4607">
+   <property name="geometry">
+    <rect>
+     <x>814</x>
+     <y>539</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA4608">
+   <property name="geometry">
+    <rect>
+     <x>1074</x>
+     <y>539</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4145">
+   <property name="geometry">
+    <rect>
+     <x>106</x>
+     <y>442</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4146">
+   <property name="geometry">
+    <rect>
+     <x>366</x>
+     <y>442</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4147">
+   <property name="geometry">
+    <rect>
+     <x>626</x>
+     <y>442</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TIA4148">
+   <property name="geometry">
+    <rect>
+     <x>886</x>
+     <y>442</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4101">
+   <property name="geometry">
+    <rect>
+     <x>183</x>
+     <y>252</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4102">
+   <property name="geometry">
+    <rect>
+     <x>443</x>
+     <y>252</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4103">
+   <property name="geometry">
+    <rect>
+     <x>703</x>
+     <y>252</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4104">
+   <property name="geometry">
+    <rect>
+     <x>963</x>
+     <y>252</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4121">
+   <property name="geometry">
+    <rect>
+     <x>183</x>
+     <y>161</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4122">
+   <property name="geometry">
+    <rect>
+     <x>443</x>
+     <y>161</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4123">
+   <property name="geometry">
+    <rect>
+     <x>703</x>
+     <y>161</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4124">
+   <property name="geometry">
+    <rect>
+     <x>963</x>
+     <y>161</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4601">
+   <property name="geometry">
+    <rect>
+     <x>183</x>
+     <y>125</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4602">
+   <property name="geometry">
+    <rect>
+     <x>443</x>
+     <y>125</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4603">
+   <property name="geometry">
+    <rect>
+     <x>703</x>
+     <y>125</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4604">
+   <property name="geometry">
+    <rect>
+     <x>963</x>
+     <y>125</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+ <widget class="QLabel" name="label_TICA4105">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>663</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4106">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>663</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_TICA4107">
+     <property name="geometry">
+      <rect>
+       <x>780</x>
+       <y>663</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_TICA4108">
+      <property name="geometry">
+       <rect>
+        <x>1040</x>
+        <y>663</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+      </property>
+     </widget>
+
+<widget class="QLabel" name="label_TICA4125">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>572</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4126">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>572</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_TICA4127">
+       <property name="geometry">
+        <rect>
+         <x>780</x>
+         <y>572</y>
+         <width>30</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_TICA4128">
+         <property name="geometry">
+          <rect>
+           <x>1040</x>
+           <y>572</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+         </property>
+        </widget>
+
+<widget class="QLabel" name="label_TICA4605">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>538</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4606">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>538</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_TICA4607">
+       <property name="geometry">
+        <rect>
+         <x>780</x>
+         <y>538</y>
+         <width>30</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_TICA4608">
+         <property name="geometry">
+          <rect>
+           <x>1040</x>
+           <y>538</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+         </property>
+        </widget>
+
+</widget>
  <resources>
   <include location="res.qrc"/>
  </resources>
