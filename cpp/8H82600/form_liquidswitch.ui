@@ -165,6 +165,182 @@
     <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve5.png</pixmap>
    </property>
   </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2101">
+   <property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>60</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2102">
+   <property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>180</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2103">
+   <property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>300</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2104">
+   <property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>420</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2201">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>400</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2202">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>520</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2203">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>640</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_WIA2204">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>760</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

@@ -28,6 +28,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -440,6 +446,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -456,6 +468,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -471,6 +489,188 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1110">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>140</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1120">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>230</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1130">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>320</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1140">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>410</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA3110">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>490</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA3120">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>570</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1010">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>10</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1020">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>60</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -504,6 +704,14 @@
   <zorder>textEdit_FICA1120</zorder>
   <zorder>textEdit_FICA1130</zorder>
   <zorder>textEdit_FICA1140</zorder>
+  <zorder>textEdit_PIA1110</zorder>
+  <zorder>textEdit_PIA1120</zorder>
+  <zorder>textEdit_PIA1130</zorder>
+  <zorder>textEdit_PIA1140</zorder>
+  <zorder>textEdit_PIA3110</zorder>
+  <zorder>textEdit_PIA3120</zorder>
+  <zorder>textEdit_FICA1010</zorder>
+  <zorder>textEdit_FICA1020</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

@@ -42,7 +42,7 @@
    </property>
    <property name="font">
     <font>
-     <family>Agency FB</family>
+     <family>Tahoma</family>
      <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>
@@ -69,7 +69,7 @@
    </property>
    <property name="font">
     <font>
-     <family>Agency FB</family>
+     <family>Tahoma</family>
      <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>

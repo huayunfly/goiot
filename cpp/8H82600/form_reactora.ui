@@ -342,6 +342,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -354,6 +360,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -368,6 +380,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -380,6 +398,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -394,6 +418,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -406,6 +436,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -420,6 +456,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -432,6 +474,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -446,6 +494,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -458,6 +512,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -472,6 +532,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -484,6 +550,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -498,6 +570,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -510,6 +588,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -524,6 +608,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -536,6 +626,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -550,6 +646,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -562,6 +664,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -576,6 +684,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -588,6 +702,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -602,6 +722,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -614,6 +740,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -628,6 +760,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -640,6 +778,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -654,6 +798,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -666,6 +816,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -680,6 +836,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -692,6 +854,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -706,6 +874,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -718,6 +892,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -732,6 +912,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -744,6 +930,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -758,6 +950,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -770,6 +968,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -784,6 +988,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -796,6 +1006,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -810,6 +1026,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -822,6 +1044,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -836,6 +1064,12 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
@@ -848,6 +1082,12 @@
      <width>70</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -1081,7 +1321,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
    </property>
   </widget>
- <widget class="QLabel" name="label_TICA4105">
+  <widget class="QLabel" name="label_TICA4105">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -1101,64 +1341,63 @@
    </property>
   </widget>
   <widget class="QLabel" name="label_TICA4106">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>663</y>
-      <width>30</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_TICA4107">
-     <property name="geometry">
-      <rect>
-       <x>780</x>
-       <y>663</y>
-       <width>30</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_TICA4108">
-      <property name="geometry">
-       <rect>
-        <x>1040</x>
-        <y>663</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-      </property>
-     </widget>
-
-<widget class="QLabel" name="label_TICA4125">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>663</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4107">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>663</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4108">
+   <property name="geometry">
+    <rect>
+     <x>1040</x>
+     <y>663</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4125">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -1178,64 +1417,63 @@
    </property>
   </widget>
   <widget class="QLabel" name="label_TICA4126">
-     <property name="geometry">
-      <rect>
-       <x>520</x>
-       <y>572</y>
-       <width>30</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_TICA4127">
-       <property name="geometry">
-        <rect>
-         <x>780</x>
-         <y>572</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_TICA4128">
-         <property name="geometry">
-          <rect>
-           <x>1040</x>
-           <y>572</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="cursor">
-          <cursorShape>PointingHandCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-         </property>
-        </widget>
-
-<widget class="QLabel" name="label_TICA4605">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>572</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4127">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>572</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4128">
+   <property name="geometry">
+    <rect>
+     <x>1040</x>
+     <y>572</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4605">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -1255,64 +1493,464 @@
    </property>
   </widget>
   <widget class="QLabel" name="label_TICA4606">
-     <property name="geometry">
-      <rect>
-       <x>520</x>
-       <y>538</y>
-       <width>30</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_TICA4607">
-       <property name="geometry">
-        <rect>
-         <x>780</x>
-         <y>538</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_TICA4608">
-         <property name="geometry">
-          <rect>
-           <x>1040</x>
-           <y>538</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="cursor">
-          <cursorShape>PointingHandCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
-         </property>
-        </widget>
-
-</widget>
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>538</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4607">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>538</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA4608">
+   <property name="geometry">
+    <rect>
+     <x>1040</x>
+     <y>538</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4201">
+   <property name="geometry">
+    <rect>
+     <x>96</x>
+     <y>280</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4202">
+   <property name="geometry">
+    <rect>
+     <x>356</x>
+     <y>280</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4203">
+   <property name="geometry">
+    <rect>
+     <x>616</x>
+     <y>280</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4204">
+   <property name="geometry">
+    <rect>
+     <x>876</x>
+     <y>280</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4205">
+   <property name="geometry">
+    <rect>
+     <x>172</x>
+     <y>691</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4206">
+   <property name="geometry">
+    <rect>
+     <x>432</x>
+     <y>691</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4207">
+   <property name="geometry">
+    <rect>
+     <x>692</x>
+     <y>691</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4208">
+   <property name="geometry">
+    <rect>
+     <x>952</x>
+     <y>691</y>
+     <width>51</width>
+     <height>132</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_up.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4621">
+   <property name="geometry">
+    <rect>
+     <x>61</x>
+     <y>85</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4622">
+   <property name="geometry">
+    <rect>
+     <x>321</x>
+     <y>85</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4623">
+   <property name="geometry">
+    <rect>
+     <x>581</x>
+     <y>85</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4624">
+   <property name="geometry">
+    <rect>
+     <x>841</x>
+     <y>85</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4625">
+   <property name="geometry">
+    <rect>
+     <x>138</x>
+     <y>497</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4626">
+   <property name="geometry">
+    <rect>
+     <x>398</x>
+     <y>497</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4627">
+   <property name="geometry">
+    <rect>
+     <x>658</x>
+     <y>497</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ZI4628">
+   <property name="geometry">
+    <rect>
+     <x>918</x>
+     <y>497</y>
+     <width>23</width>
+     <height>83</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
+   </property>
+  </widget>
+  <zorder>label_background</zorder>
+  <zorder>label_PICA4301</zorder>
+  <zorder>label_PICA4302</zorder>
+  <zorder>label_PICA4303</zorder>
+  <zorder>label_PICA4304</zorder>
+  <zorder>label_PICA4305</zorder>
+  <zorder>label_PICA4306</zorder>
+  <zorder>label_PICA4307</zorder>
+  <zorder>label_PICA4308</zorder>
+  <zorder>textEdit_PICA4301</zorder>
+  <zorder>textEdit_PICA4302</zorder>
+  <zorder>textEdit_PICA4303</zorder>
+  <zorder>textEdit_PICA4304</zorder>
+  <zorder>textEdit_PICA4305</zorder>
+  <zorder>textEdit_PICA4306</zorder>
+  <zorder>textEdit_PICA4307</zorder>
+  <zorder>textEdit_PICA4308</zorder>
+  <zorder>textEdit_TICA4101</zorder>
+  <zorder>textEdit_TICA4102</zorder>
+  <zorder>textEdit_TICA4103</zorder>
+  <zorder>textEdit_TICA4104</zorder>
+  <zorder>textEdit_TICA4121</zorder>
+  <zorder>textEdit_TICA4122</zorder>
+  <zorder>textEdit_TICA4123</zorder>
+  <zorder>textEdit_TICA4124</zorder>
+  <zorder>textEdit_TIA4141</zorder>
+  <zorder>textEdit_TIA4142</zorder>
+  <zorder>textEdit_TIA4143</zorder>
+  <zorder>textEdit_TIA4144</zorder>
+  <zorder>textEdit_TICA4601</zorder>
+  <zorder>textEdit_TICA4602</zorder>
+  <zorder>textEdit_TICA4603</zorder>
+  <zorder>textEdit_TICA4604</zorder>
+  <zorder>textEdit_TICA4105</zorder>
+  <zorder>textEdit_TICA4106</zorder>
+  <zorder>textEdit_TICA4107</zorder>
+  <zorder>textEdit_TICA4108</zorder>
+  <zorder>textEdit_TICA4125</zorder>
+  <zorder>textEdit_TICA4126</zorder>
+  <zorder>textEdit_TICA4127</zorder>
+  <zorder>textEdit_TICA4128</zorder>
+  <zorder>textEdit_TICA4605</zorder>
+  <zorder>textEdit_TICA4606</zorder>
+  <zorder>textEdit_TICA4607</zorder>
+  <zorder>textEdit_TICA4608</zorder>
+  <zorder>textEdit_TIA4145</zorder>
+  <zorder>textEdit_TIA4146</zorder>
+  <zorder>textEdit_TIA4147</zorder>
+  <zorder>textEdit_TIA4148</zorder>
+  <zorder>label_TICA4101</zorder>
+  <zorder>label_TICA4102</zorder>
+  <zorder>label_TICA4103</zorder>
+  <zorder>label_TICA4104</zorder>
+  <zorder>label_TICA4121</zorder>
+  <zorder>label_TICA4122</zorder>
+  <zorder>label_TICA4123</zorder>
+  <zorder>label_TICA4124</zorder>
+  <zorder>label_TICA4601</zorder>
+  <zorder>label_TICA4602</zorder>
+  <zorder>label_TICA4603</zorder>
+  <zorder>label_TICA4604</zorder>
+  <zorder>label_TICA4105</zorder>
+  <zorder>label_TICA4106</zorder>
+  <zorder>label_TICA4107</zorder>
+  <zorder>label_TICA4108</zorder>
+  <zorder>label_TICA4125</zorder>
+  <zorder>label_TICA4126</zorder>
+  <zorder>label_TICA4127</zorder>
+  <zorder>label_TICA4128</zorder>
+  <zorder>label_TICA4605</zorder>
+  <zorder>label_TICA4606</zorder>
+  <zorder>label_TICA4607</zorder>
+  <zorder>label_TICA4608</zorder>
+  <zorder>label_HC4201</zorder>
+  <zorder>label_HC4202</zorder>
+  <zorder>label_HC4203</zorder>
+  <zorder>label_HC4204</zorder>
+  <zorder>label_HC4205</zorder>
+  <zorder>label_HC4206</zorder>
+  <zorder>label_HC4207</zorder>
+  <zorder>label_HC4208</zorder>
+  <zorder>label_ZI4621</zorder>
+  <zorder>label_HC4601</zorder>
+  <zorder>label_ZI4622</zorder>
+  <zorder>label_ZI4623</zorder>
+  <zorder>label_ZI4624</zorder>
+  <zorder>label_HC4602</zorder>
+  <zorder>label_HC4603</zorder>
+  <zorder>label_HC4604</zorder>
+  <zorder>label_ZI4625</zorder>
+  <zorder>label_HC4605</zorder>
+  <zorder>label_ZI4626</zorder>
+  <zorder>label_ZI4627</zorder>
+  <zorder>label_ZI4628</zorder>
+  <zorder>label_HC4606</zorder>
+  <zorder>label_HC4607</zorder>
+  <zorder>label_HC4608</zorder>
+ </widget>
  <resources>
   <include location="res.qrc"/>
  </resources>

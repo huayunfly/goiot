@@ -27,6 +27,15 @@ bool FormReactorA::event(QEvent *event)
 
 void FormReactorA::InitUiState()
 {
+    ui->label_HC4201->installEventFilter(this);
+    ui->label_HC4202->installEventFilter(this);
+    ui->label_HC4203->installEventFilter(this);
+    ui->label_HC4204->installEventFilter(this);
+    ui->label_HC4205->installEventFilter(this);
+    ui->label_HC4206->installEventFilter(this);
+    ui->label_HC4207->installEventFilter(this);
+    ui->label_HC4208->installEventFilter(this);
+
     ui->label_HC4601->installEventFilter(this);
     ui->label_HC4602->installEventFilter(this);
     ui->label_HC4603->installEventFilter(this);

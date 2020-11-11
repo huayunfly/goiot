@@ -18,6 +18,7 @@
 #define RES_PFC ":/ui_ctrls/UICtrls/Res/pfc.png"
 #define RES_VALVE_GAS_LEFT ":/ui_ctrls/UICtrls/Res/valve-gas-left.png"
 #define RES_TC ":/ui_ctrls/UICtrls/Res/temperature_controller.png"
-
+#define RES_CYLINDER_UP ":/ui_ctrls/UICtrls/Res/cylinder_up.png"
+#define RES_CYLINDER_DOWN ":/ui_ctrls/UICtrls/Res/cylinder_down.png"
 
 #endif // RESOURCEDEF_H
