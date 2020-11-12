@@ -29,5 +29,6 @@
         <file>UICtrls/Res/temperature_controller.png</file>
         <file>UICtrls/Res/cylinder_up.png</file>
         <file>UICtrls/Res/cylinder_down.png</file>
+        <file>UICtrls/Res/water_pump.png</file>
     </qresource>
 </RCC>

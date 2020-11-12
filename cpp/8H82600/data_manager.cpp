@@ -331,6 +331,12 @@ void DataManager::RefreshDispatch()
 {
     const double DEADBAND = 1e-3;
     const double TIMESPAN = 10.0; // in second
+    const double UI_FORCE_REFRESH_TIMESPAN = 10.0; // in second
+
+    // UI force refresh timer
+    double last_ui_force_refresh_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+    bool ui_force_refresh = true;
 
     while(keep_refresh_)
     {
@@ -341,10 +347,17 @@ void DataManager::RefreshDispatch()
             double now = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
             double last = now - TIMESPAN;
+            // for redis refresh time span
             std::ostringstream oss_now;
             std::ostringstream oss_last;
             oss_now << std::fixed << std::setprecision(3) << now;
             oss_last << std::fixed << std::setprecision(3) << last;
+            // for UI
+            if (now - last_ui_force_refresh_time > UI_FORCE_REFRESH_TIMESPAN)
+            {
+                ui_force_refresh = true;
+                last_ui_force_refresh_time = now;
+            }
 
             auto reply = redis_refresh_->commandSync(
             {ZRANGE_BY_SCORES.c_str(), NS_REFRESH_TIME.c_str(), oss_last.str().c_str(), oss_now.str().c_str()});
@@ -422,7 +435,7 @@ void DataManager::RefreshDispatch()
                     {
                         // Deadband
                         double new_value = std::atof(value.c_str());
-                        if (std::abs(data_info.float_value - new_value) < DEADBAND && data_info.result == 0)
+                        if (std::abs(data_info.float_value - new_value) < DEADBAND && data_info.result == 0 && ui_force_refresh)
                         {
                             continue;
                         }
@@ -442,7 +455,7 @@ void DataManager::RefreshDispatch()
                     else if (data_info.data_type == DataType::STR)
                     {
                         std::string& new_value = value;
-                        if (data_info.char_value.compare(new_value) == 0 && data_info.result == 0)
+                        if (data_info.char_value.compare(new_value) == 0 && data_info.result == 0 && ui_force_refresh)
                         {
                             continue;
                         }
@@ -461,7 +474,7 @@ void DataManager::RefreshDispatch()
                     else if (data_info.data_type == DataType::BT)
                     {
                         uint8_t new_value = std::atoi(value.c_str()) > 0 ? 1 : 0;
-                        if (data_info.byte_value == new_value && data_info.result == 0)
+                        if (data_info.byte_value == new_value && data_info.result == 0 && ui_force_refresh)
                         {
                             continue;
                         }
@@ -480,7 +493,7 @@ void DataManager::RefreshDispatch()
                     else
                     {
                         int new_value = std::atoi(value.c_str());
-                        if (data_info.int_value == new_value && data_info.result == 0)
+                        if (data_info.int_value == new_value && data_info.result == 0 && ui_force_refresh)
                         {
                             continue;
                         }
@@ -504,6 +517,8 @@ void DataManager::RefreshDispatch()
             {
                 request_queue_->Put(data_info_vec);
             }
+            // Restore timer
+            ui_force_refresh = false;
         }
         else
         {

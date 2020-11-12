@@ -87,7 +87,6 @@ private:
     const static std::string NS_POLL_TIME;
     const static std::string NS_DELIMITER;
 
-
 private:
     DataEntryCache<DataInfo> data_info_cache_;
 

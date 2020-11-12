@@ -46,4 +46,7 @@ void FormLiquidSamplingB::InitUiState()
     ui->label_HC7415->installEventFilter(this);
     ui->label_HC7416->installEventFilter(this);
     ui->label_HC7417->installEventFilter(this);
+
+    ui->label_TICA7503->installEventFilter(this);
+    ui->label_TICA7504->installEventFilter(this);
 }
