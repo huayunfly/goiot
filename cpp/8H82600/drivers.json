@@ -18,13 +18,13 @@
               "id": "pv",
               "name": "measure",
               "register": "R4WUB0032",
-              "ratio": 10
+              "ratio": 0.3125
             },
             {
               "id": "sv",
               "name": "setpoint",
               "register": "RW4WUB0033",
-              "ratio": 5
+              "ratio": 0.3125
             }
           ]
         },
@@ -38,13 +38,13 @@
               "id": "pv",
               "name": "measure",
               "register": "R4WUB0032",
-              "ratio": 10
+              "ratio": 0.03125
             },
             {
               "id": "sv",
               "name": "setpoint",
               "register": "RW4WUB0033",
-              "ratio": 5
+              "ratio": 0.03125
             }
           ]
         },
@@ -58,13 +58,13 @@
               "id": "pv",
               "name": "measure",
               "register": "R4WUB0032",
-              "ratio": 10
+              "ratio": 0.03125
             },
             {
               "id": "sv",
               "name": "setpoint",
               "register": "RW4WUB0033",
-              "ratio": 5
+              "ratio": 0.03125
             }
           ]
         },
@@ -78,13 +78,13 @@
               "id": "pv",
               "name": "measure",
               "register": "R4WUB0032",
-              "ratio": 10
+              "ratio": 0.3125
             },
             {
               "id": "sv",
               "name": "setpoint",
               "register": "RW4WUB0033",
-              "ratio": 5
+              "ratio": 0.3125
             }
           ]
         },

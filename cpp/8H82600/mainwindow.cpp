@@ -495,6 +495,9 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp47_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4615"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp48_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4616"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     // gassampling
+    data_model_.SetDataToUiMap("plc.1.smc14_9", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4401"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.smc14_10", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4402"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.smc14_11", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4403"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.mvalve12_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5101"), RES_SVALVE_8, WidgetType::STATE, MeasurementUnit::NONE, 0, 8, 1));
     data_model_.SetDataToUiMap("plc.1.smc10_21", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5102"), RES_SVALVE_6, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
     data_model_.SetDataToUiMap("plc.1.smc10_22", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5103"), RES_SVALVE_4, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
@@ -911,6 +914,9 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("reactorb.label_TICA4616", DataDef("plc.1.temp48_pv", "plc.1.temp48_sv", "plc.1.temp48_sv"));
 
     // gassampling
+    data_model_.SetUiToDataMap("gassampling.label_HC4401", DataDef("plc.1.smc14_9", "plc.1.smc14_9", "plc.1.smc14_9"));
+    data_model_.SetUiToDataMap("gassampling.label_HC4402", DataDef("plc.1.smc14_10", "plc.1.smc14_10", "plc.1.smc14_10"));
+    data_model_.SetUiToDataMap("gassampling.label_HC4403", DataDef("plc.1.smc14_11", "plc.1.smc14_11", "plc.1.smc14_11"));
     data_model_.SetUiToDataMap("gassampling.label_HC5101", DataDef("plc.1.mvalve12_pv", "plc.1.mvalve12_pv", "plc.1.mvalve12_sv"));
     data_model_.SetUiToDataMap("gassampling.label_HC5102", DataDef("plc.1.smc10_21", "plc.1.smc10_21", "plc.1.smc10_21"));
     data_model_.SetUiToDataMap("gassampling.label_HC5103", DataDef("plc.1.smc10_22", "plc.1.smc10_22", "plc.1.smc10_22"));

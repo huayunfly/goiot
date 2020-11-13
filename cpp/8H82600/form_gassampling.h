@@ -21,7 +21,7 @@ public:
 
     QString GetDisplayName() override
     {
-        return QString::fromUtf8("采气");
+        return QString::fromUtf8("采气/尾气");
     }
 
 private:

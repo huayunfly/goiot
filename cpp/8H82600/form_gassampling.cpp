@@ -27,6 +27,10 @@ bool FormGasSampling::event(QEvent *event)
 
 void FormGasSampling::InitUiState()
 {
+     ui->label_HC4401->installEventFilter(this); // PFC downstream /VAC valves
+     ui->label_HC4402->installEventFilter(this);
+     ui->label_HC4403->installEventFilter(this);
+
      ui->label_HC5101->installEventFilter(this);
      ui->label_HC5102->installEventFilter(this);
      ui->label_HC5103->installEventFilter(this);
