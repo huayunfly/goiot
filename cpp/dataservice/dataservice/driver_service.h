@@ -18,8 +18,8 @@ namespace goiot {
 	class DriverMgrService
 	{
 	public:
-		DriverMgrService(const std::wstring& module_path) : module_path_(module_path),
-			drivers_(), driver_descriptions_(), 
+		DriverMgrService(const std::wstring& module_path) : module_path_(module_path), 
+			redis_ip_("127.0.0.1"), redis_port_(6379), drivers_(), driver_descriptions_(), 
 			response_queue_(std::make_shared<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>>(100)),
 			threads_(), redis_refresh_(), keep_poll_(false)
 		{
@@ -136,6 +136,8 @@ namespace goiot {
 		static DataEntryCache<DataInfo> data_info_cache_;
 
 		std::wstring module_path_; // Not include the suffix "/"
+		std::string redis_ip_;
+		int redis_port_;
 		std::vector<std::shared_ptr<std::tuple<std::string/*type*/, std::string/*port*/, std::string/*content*/>>> driver_descriptions_;
 		std::vector<std::unique_ptr<DriverBase>> drivers_;
 		std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> response_queue_;

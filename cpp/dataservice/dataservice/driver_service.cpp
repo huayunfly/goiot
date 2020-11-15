@@ -63,6 +63,23 @@ namespace goiot {
 			return ECANCELED;
 		}
 		const std::string name = root["name"].asString();
+		// parse redis connection string
+		if (root["redis"])
+		{
+			std::string redis_string = root["redis"].asString();
+			std::size_t split_pos = redis_string.find(':');
+			if (split_pos > 0)
+			{
+				redis_ip_ = redis_string.substr(0, split_pos);
+				int new_port = atoi(
+					redis_string.substr(split_pos + 1, redis_string.size() - split_pos - 1).c_str()
+				);
+				if (new_port > 0)
+				{
+					redis_port_ = new_port;
+				}
+			}
+		}
 		// driver descriptions
 		assert(root["drivers"].isArray());
 		driver_descriptions_.clear();
@@ -192,8 +209,9 @@ namespace goiot {
 	void DriverMgrService::ConnectRedis()
 	{
 		struct timeval timeout = { 1, 500000 }; // 1.5 seconds
+
 		// Refresh
-		redis_refresh_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
+		redis_refresh_.reset(redisConnectWithTimeout(redis_ip_.c_str(), redis_port_, timeout),
 			[](redisContext* p) { if (p) redisFree(p); });
 		if (redis_refresh_ && redis_refresh_->err)
 		{
@@ -210,7 +228,7 @@ namespace goiot {
 			std::cout << "Redis refresh connection OK." << std::endl;
 		}
 		// Poll
-		redis_poll_.reset(redisConnectWithTimeout("127.0.0.1", 6379, timeout),
+		redis_poll_.reset(redisConnectWithTimeout(redis_ip_.c_str(), redis_port_, timeout),
 			[](redisContext* p) { if (p) redisFree(p); });
 		if (redis_poll_ && redis_poll_->err)
 		{

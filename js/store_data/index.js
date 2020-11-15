@@ -20,8 +20,18 @@ read_file(argv.f, (err, data_buffer) => {
         try
         {
             const data_config = JSON.parse(data_buffer.toString());
-            const postgresql = new PostgreSQLConnector('127.0.0.1:5432:goiot:postgres:hello@123');
-            const redis_connector = new RedisConnector('127.0.0.1:6379', data_config, postgresql);
+            postgresql_string = '127.0.0.1:5432:goiot:postgres:hello@123';
+            if (data_config.db)
+            {
+                postgresql_string = data_config.db;
+            }
+            const postgresql = new PostgreSQLConnector(postgresql_string);
+            redis_string = '127.0.0.1:6379';
+            if (data_config.redis)
+            {
+                redis_string = data_config.redis;
+            }
+            const redis_connector = new RedisConnector(redis_string, data_config, postgresql);
         }
         catch (e)
         {

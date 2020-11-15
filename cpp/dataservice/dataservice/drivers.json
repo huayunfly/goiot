@@ -19,6 +19,8 @@
 // function code: default 0, PLC DataBlock
 {
   "name": "goiot",
+  "redis": "127.0.0.1:6379",
+  "db": "127.0.0.1:5432:goiot:postgres:hello@123",
   "drivers": [
     {
       "id": "mfcpfc",
