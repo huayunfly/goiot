@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItem>
 #include "data_model.h"
 #include "data_manager.h"
 #include "events.h"
@@ -23,6 +24,8 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_3_clicked();
+
+    void on_listView_clicked(const QModelIndex &index);
 
 private:
     void InitDataModel();

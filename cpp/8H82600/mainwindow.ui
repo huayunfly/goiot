@@ -2,26 +2,63 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>790</width>
-    <height>603</height>
+    <width>1180</width>
+    <height>1000</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>PPSR-16E平行反应釜系统</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <widget class="QAxWidget" name="axWidget">
+    <property name="enabled" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="geometry" stdset="0">
+     <rect>
+      <x>40</x>
+      <y>480</y>
+      <width>137</width>
+      <height>219</height>
+     </rect>
+    </property>
+   </widget>
    <widget class="QWidget" name="widget_control" native="true">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
+      <x>76</x>
+      <y>0</y>
       <width>1180</width>
       <height>900</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <widget class="QTabWidget" name="tabWidget">
      <property name="geometry">
@@ -32,30 +69,83 @@
        <height>900</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>600</width>
+       <height>600</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="currentIndex">
       <number>-1</number>
      </property>
     </widget>
    </widget>
-   <widget class="QAxWidget" name="axWidget">
-    <property name="geometry" stdset="0">
+   <widget class="QListView" name="listView">
+    <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>0</y>
-      <width>441</width>
-      <height>391</height>
+      <x>1</x>
+      <y>1</y>
+      <width>75</width>
+      <height>900</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>75</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>75</width>
+      <height>75</height>
+     </size>
+    </property>
+    <property name="viewMode">
+     <enum>QListView::IconMode</enum>
+    </property>
    </widget>
-   <zorder>axWidget</zorder>
-   <zorder>widget_control</zorder>
+   <widget class="QWidget" name="widget_trend" native="true">
+    <property name="geometry">
+     <rect>
+      <x>76</x>
+      <y>0</y>
+      <width>1180</width>
+      <height>900</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>790</width>
+     <width>1180</width>
      <height>23</height>
     </rect>
    </property>

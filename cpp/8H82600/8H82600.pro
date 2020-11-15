@@ -1,4 +1,4 @@
-QT       += core gui network axcontainer
+QT       += core gui network axcontainer charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -35,6 +35,7 @@ SOURCES += \
     form_liquidswitch.cpp \
     form_reactora.cpp \
     form_reactorb.cpp \
+    form_trend.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -61,6 +62,7 @@ HEADERS += \
     form_liquidswitch.h \
     form_reactora.h \
     form_reactorb.h \
+    form_trend.h \
     mainwindow.h \
     resourcedef.h
 
@@ -80,6 +82,7 @@ FORMS += \
     form_liquidswitch.ui \
     form_reactora.ui \
     form_reactorb.ui \
+    form_trend.ui \
     mainwindow.ui
 
 TRANSLATIONS += \

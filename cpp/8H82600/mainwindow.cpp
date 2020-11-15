@@ -14,6 +14,7 @@
 #include "form_liquidcollection.h"
 #include "form_liquidsamplinga.h"
 #include "form_liquidsamplingb.h"
+#include "form_trend.h"
 #include "events.h"
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
@@ -49,11 +50,23 @@ MainWindow::MainWindow(QWidget *parent)
         ui_->tabWidget->addTab(entry, entry->GetDisplayName());
     }
 
+    FormTrend* form_trend = new FormTrend(ui_->widget_trend);
+
+    this->setWindowState(Qt::WindowMaximized);
+
     // Setup Ocx
     //ui_->tabWidget->hide();
     //bool ok = ui_->axWidget->setControl("{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"); // WorkflowComponent.WorkflowComponentCtrl.1
     //ui_->axWidget->show();
 
+    // Setup listview
+    QStandardItemModel* model = new QStandardItemModel(this);
+    QList<QStandardItem*> list;
+    QStandardItem* s1 = new QStandardItem(QIcon(RES_TC), QString("流程"));
+    QStandardItem* s2 = new QStandardItem(QIcon(RES_VALVE_GAS), QString("趋势"));
+    model->appendRow(s1);
+    model->appendRow(s2);
+    ui_->listView->setModel(model);
 
     // Setup data model
     InitDataModel();
@@ -1289,3 +1302,23 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     return data_manager_.WriteDataAsync(data_info_vec) == 0 ? true : false;
 }
 
+void MainWindow::on_listView_clicked(const QModelIndex &index)
+{
+    QRegularExpression re("^widget_");
+
+    QList<QWidget*> children = ui_->centralwidget->findChildren<QWidget*>(re, Qt::FindDirectChildrenOnly);
+    for (auto& child : children)
+    {
+        if ((index.row() == 0 && child->objectName() == "widget_control") ||
+                (index.row() == 1 && child->objectName() == "widget_trend"))
+        {
+            child->setEnabled(true);
+            child->setVisible(true);
+        }
+        else
+        {
+            child->setEnabled(false);
+            child->setVisible(false);
+        }
+    }
+}
