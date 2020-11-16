@@ -46,6 +46,8 @@ void FormGasFeed::InitUiState()
     ui->label_HC1208->installEventFilter(this);
     ui->label_HC3110->installEventFilter(this);
     ui->label_HC3120->installEventFilter(this);
+    ui->label_HC1400->installEventFilter(this);
+    ui->label_HC1402->installEventFilter(this);
     //
     ui->label_FICA1110->installEventFilter(this);
     ui->label_FICA1120->installEventFilter(this);

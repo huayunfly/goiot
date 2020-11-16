@@ -30,5 +30,8 @@
         <file>UICtrls/Res/cylinder_up.png</file>
         <file>UICtrls/Res/cylinder_down.png</file>
         <file>UICtrls/Res/water_pump.png</file>
+        <file>UICtrls/Res/valve_electric.png</file>
+        <file>UICtrls/Res/gc.png</file>
+        <file>UICtrls/Res/mechanical_pump.png</file>
     </qresource>
 </RCC>

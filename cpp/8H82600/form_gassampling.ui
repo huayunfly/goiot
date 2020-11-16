@@ -484,6 +484,44 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
+  <widget class="QLabel" name="label_HC5106">
+   <property name="geometry">
+    <rect>
+     <x>898</x>
+     <y>133</y>
+     <width>74</width>
+     <height>74</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/gc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC5206">
+   <property name="geometry">
+    <rect>
+     <x>898</x>
+     <y>373</y>
+     <width>74</width>
+     <height>74</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/gc.png</pixmap>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

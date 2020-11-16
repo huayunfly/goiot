@@ -118,6 +118,18 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("mfcpfc.3.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_FICA1130"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::SCCM, 1, 1000, 0));
     data_model_.SetDataToUiMap("mfcpfc.4.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_FICA1140"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::SCCM, 1, 10000, 0));
 
+    data_model_.SetDataToUiMap("plc.1.pg_1", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1110"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1120"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_3", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1130"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1140"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_5", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1010"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 10, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_6", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1020"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 10, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA3110"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 5, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA3120"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 5, 0));
+    // gasfeed - pump,electric valve
+    data_model_.SetDataToUiMap("plc.1.dq3_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1400"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dq3_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1402"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+
     // liquidswtich
     data_model_.SetDataToUiMap("plc.1.mvalve1_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2301"), RES_SVALVE_1, WidgetType::STATE, MeasurementUnit::NONE, 0, 4, 1));
     data_model_.SetDataToUiMap("plc.1.smc9_1", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2302"), RES_SVALVE_5, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
@@ -532,6 +544,9 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp58_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5205"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp59_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp60_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5201"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // gassampling - GC ready
+    data_model_.SetDataToUiMap("plc.1.di1_21", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5106"), RES_GC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_23", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5206"), RES_GC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
 
     // liquidcollection
     data_model_.SetDataToUiMap("plc.1.smc11_19", UiInfo(ui_->tabWidget->widget(9), QString::fromUtf8("label_HC6101"), RES_SVALVE_6, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
@@ -627,6 +642,10 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("gasfeed.label_FICA1120", DataDef("mfcpfc.2.pv", "mfcpfc.2.sv", "mfcpfc.2.sv"));
     data_model_.SetUiToDataMap("gasfeed.label_FICA1130", DataDef("mfcpfc.3.pv", "mfcpfc.3.sv", "mfcpfc.3.sv"));
     data_model_.SetUiToDataMap("gasfeed.label_FICA1140", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
+    // gasfeed - pump,electric valve
+    data_model_.SetUiToDataMap("gasfeed.label_HC1400", DataDef("plc.1.dq3_2", "plc.1.dq3_2", "plc.1.dq3_2"));
+    data_model_.SetUiToDataMap("gasfeed.label_HC1402", DataDef("plc.1.dq3_7", "plc.1.dq3_7", "plc.1.dq3_7"));
+
     // liquidswitch
     data_model_.SetUiToDataMap("liquidswitch.label_HC2301", DataDef("plc.1.mvalve1_pv", "plc.1.mvalve1_pv", "plc.1.mvalve1_sv"));
     data_model_.SetUiToDataMap("liquidswitch.label_HC2302", DataDef("plc.1.smc9_1", "plc.1.smc9_1", "plc.1.smc9_1"));

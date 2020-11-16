@@ -20,5 +20,8 @@
 #define RES_TC ":/ui_ctrls/UICtrls/Res/temperature_controller.png"
 #define RES_CYLINDER_UP ":/ui_ctrls/UICtrls/Res/cylinder_up.png"
 #define RES_CYLINDER_DOWN ":/ui_ctrls/UICtrls/Res/cylinder_down.png"
+#define RES_GC ":/ui_ctrls/UICtrls/Res/gc.png"
+#define RES_MECHANICAL_PUMP ":/ui_ctrls/UICtrls/Res/mechanical_pump.png"
+#define RES_VALVE_ELECTRIC ":/ui_ctrls/UICtrls/Res/valve_electric.png"
 
 #endif // RESOURCEDEF_H

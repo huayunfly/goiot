@@ -3375,6 +3375,56 @@
               "id": "dq3_32",
               "name": "dq3_32",
               "register": "RW5BT5871"
+            },
+            {
+              "id": "pg_1",
+              "name": "PIA1110",
+              "register": "RW5DF0734"
+            },
+            {
+              "id": "pg_2",
+              "name": "PIA1120",
+              "register": "RW5DF0738"
+            },
+            {
+              "id": "pg_3",
+              "name": "PIA1130",
+              "register": "RW5DF0742"
+            },
+            {
+              "id": "pg_4",
+              "name": "PIA1140",
+              "register": "RW5DF0746"
+            },
+            {
+              "id": "pg_5",
+              "name": "PIA1010",
+              "register": "RW5DF0750"
+            },
+            {
+              "id": "pg_6",
+              "name": "PIA1020",
+              "register": "RW5DF0754"
+            },
+            {
+              "id": "pg_7",
+              "name": "PIA3110",
+              "register": "RW5DF0758"
+            },
+            {
+              "id": "pg_8",
+              "name": "PIA3120",
+              "register": "RW5DF0762"
+            },
+            {
+              "id": "gas_1",
+              "name": "XISA3901",
+              "register": "RW5DF0766"
+            },
+            {
+              "id": "gas_2",
+              "name": "XISA3902",
+              "register": "RW5DF0770"
             }
           ]
         }

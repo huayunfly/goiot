@@ -1,5 +1,8 @@
-// 在界面使用Qt Creator添加一个QGraphicsView组件，然后提升为QChartView。
-// 提升的时候，这样写提升为的类：QtCharts::QChartView，头文件写：qchartview.h。
+// Trend graph
+//
+// Programming tip:
+// Using QT creator to add a QGraphicsView component and upgrade to QChartView.
+// The upgraded class is QtCharts::QChartView, the headfile is qchartview.h。
 
 #include "form_trend.h"
 #include "ui_form_trend.h"

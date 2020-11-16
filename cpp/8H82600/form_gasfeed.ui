@@ -54,7 +54,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/layout1.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/layout1.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1201">
@@ -73,7 +73,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve1.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve1.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1202">
@@ -92,7 +92,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve4.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1203">
@@ -111,7 +111,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve4.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1204">
@@ -130,7 +130,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve4.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve4.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1205">
@@ -149,7 +149,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve7.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve7.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1206">
@@ -168,7 +168,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve7.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve7.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1207">
@@ -187,7 +187,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve7.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve7.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1208">
@@ -206,7 +206,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/Res/svalve7.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/svalve7.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1110">
@@ -225,7 +225,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1120">
@@ -244,7 +244,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1130">
@@ -263,7 +263,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1140">
@@ -282,7 +282,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC3110">
@@ -301,7 +301,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC3120">
@@ -320,7 +320,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1020">
@@ -339,7 +339,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_HC1021">
@@ -358,7 +358,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve-gas.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_FICA1110">
@@ -377,7 +377,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_FICA1120">
@@ -396,7 +396,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_FICA1130">
@@ -415,7 +415,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_FICA1140">
@@ -434,7 +434,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
    </property>
   </widget>
   <widget class="QTextEdit" name="textEdit_FICA1120">
@@ -635,7 +635,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_FICA1010">
+  <widget class="QTextEdit" name="textEdit_PIA1010">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -657,7 +657,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_FICA1020">
+  <widget class="QTextEdit" name="textEdit_PIA1020">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -677,6 +677,44 @@
    </property>
    <property name="acceptRichText">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC1400">
+   <property name="geometry">
+    <rect>
+     <x>396</x>
+     <y>750</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mechanical_pump.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC1402">
+   <property name="geometry">
+    <rect>
+     <x>982</x>
+     <y>707</y>
+     <width>33</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve_electric.png</pixmap>
    </property>
   </widget>
   <zorder>label_background</zorder>
@@ -710,9 +748,13 @@
   <zorder>textEdit_PIA1140</zorder>
   <zorder>textEdit_PIA3110</zorder>
   <zorder>textEdit_PIA3120</zorder>
-  <zorder>textEdit_FICA1010</zorder>
-  <zorder>textEdit_FICA1020</zorder>
+  <zorder>textEdit_PIA1010</zorder>
+  <zorder>textEdit_PIA1020</zorder>
+  <zorder>label_HC1400</zorder>
+  <zorder>label_HC1402</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>
