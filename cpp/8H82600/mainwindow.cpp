@@ -50,8 +50,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui_->tabWidget->addTab(entry, entry->GetDisplayName());
     }
 
-    FormTrend* form_trend = new FormTrend(ui_->widget_trend);
-
     this->setWindowState(Qt::WindowMaximized);
 
     // Setup Ocx
@@ -67,6 +65,9 @@ MainWindow::MainWindow(QWidget *parent)
     model->appendRow(s1);
     model->appendRow(s2);
     ui_->listView->setModel(model);
+    QModelIndex index_want = model->index(0, 0);
+    on_listView_clicked(index_want);
+    //ui_->listView->setCurrentIndex(index_want);
 
     // Setup data model
     InitDataModel();

@@ -1853,6 +1853,390 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/cylinder_down.png</pixmap>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_HC4213">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>820</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4213</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4314">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>460</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4314</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4214">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>820</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4214</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4315">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>460</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4315</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4312">
+   <property name="geometry">
+    <rect>
+     <x>950</x>
+     <y>50</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4312</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4212">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>410</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4212</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4610">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>120</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4610</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4316">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>460</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4316</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4616">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>530</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4616</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4611">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>120</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4611</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4609">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>120</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4609</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4210">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>410</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4210</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4215">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>820</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4215</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4209">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>410</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4209</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4309">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>50</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4309</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4614">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>530</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4614</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4216">
+   <property name="geometry">
+    <rect>
+     <x>950</x>
+     <y>820</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4216</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4612">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>120</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4612</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4310">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>50</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4310</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4311">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>50</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4311</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4615">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>530</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4615</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PICA4313">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>460</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PICA4313</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4211">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>410</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4211</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC4613">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>530</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC4613</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>label_PICA4309</zorder>
   <zorder>label_PICA4310</zorder>
@@ -1950,6 +2334,30 @@
   <zorder>label_HC4614</zorder>
   <zorder>label_HC4615</zorder>
   <zorder>label_HC4616</zorder>
+  <zorder>txt_label_HC4213</zorder>
+  <zorder>txt_label_PICA4314</zorder>
+  <zorder>txt_label_HC4214</zorder>
+  <zorder>txt_label_PICA4315</zorder>
+  <zorder>txt_label_PICA4312</zorder>
+  <zorder>txt_label_HC4212</zorder>
+  <zorder>txt_label_HC4610</zorder>
+  <zorder>txt_label_PICA4316</zorder>
+  <zorder>txt_label_HC4616</zorder>
+  <zorder>txt_label_HC4611</zorder>
+  <zorder>txt_label_HC4609</zorder>
+  <zorder>txt_label_HC4210</zorder>
+  <zorder>txt_label_HC4215</zorder>
+  <zorder>txt_label_HC4209</zorder>
+  <zorder>txt_label_PICA4309</zorder>
+  <zorder>txt_label_HC4614</zorder>
+  <zorder>txt_label_HC4216</zorder>
+  <zorder>txt_label_HC4612</zorder>
+  <zorder>txt_label_PICA4310</zorder>
+  <zorder>txt_label_PICA4311</zorder>
+  <zorder>txt_label_HC4615</zorder>
+  <zorder>txt_label_PICA4313</zorder>
+  <zorder>txt_label_HC4211</zorder>
+  <zorder>txt_label_HC4613</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

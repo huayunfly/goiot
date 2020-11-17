@@ -393,7 +393,7 @@
   <widget class="QTextEdit" name="textEdit_TICA7501">
    <property name="geometry">
     <rect>
-     <x>1110</x>
+     <x>1100</x>
      <y>44</y>
      <width>70</width>
      <height>28</height>
@@ -415,7 +415,7 @@
   <widget class="QTextEdit" name="textEdit_TICA7502">
    <property name="geometry">
     <rect>
-     <x>1110</x>
+     <x>1100</x>
      <y>550</y>
      <width>70</width>
      <height>28</height>
@@ -470,6 +470,342 @@
    </property>
    <property name="pixmap">
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7201">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7201</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7202">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7202</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7203">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7203</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7204">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7204</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7205">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7205</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7206">
+   <property name="geometry">
+    <rect>
+     <x>770</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7206</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7207">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7207</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7208">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>160</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7208</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7209">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>320</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7209</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7210">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>320</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7210</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7211">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>320</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7211</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7212">
+   <property name="geometry">
+    <rect>
+     <x>770</x>
+     <y>320</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7212</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7213">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>320</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7213</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7214">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>320</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7214</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7215">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>540</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7215</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7216">
+   <property name="geometry">
+    <rect>
+     <x>770</x>
+     <y>540</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7216</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7217">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>540</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7217</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7101">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>540</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7101</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC7102">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>540</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC7102</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA7501">
+   <property name="geometry">
+    <rect>
+     <x>1120</x>
+     <y>70</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA7501</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA7502">
+   <property name="geometry">
+    <rect>
+     <x>1120</x>
+     <y>610</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA7502</string>
    </property>
   </widget>
  </widget>
