@@ -56,8 +56,7 @@ namespace goiot
         {
             return ENOTCONN;
         }
-        driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
-        return 0;
+        return driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
     }
 
     RESULT_DSAPI ModbusRtuDriver::AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id,

@@ -602,7 +602,11 @@ namespace goiot {
                         driver->GetID(id);
                         if (id.compare(element.first) == 0 && element.second.size() > 0)
                         {
-                            driver->AsyncWrite(element.second, 0); // Todo: transaction id
+                            int return_code = driver->AsyncWrite(element.second, 0); // Todo: transaction id
+							if (return_code != 0)
+							{
+								std::cout << "AsyncWrite to " << id << " failed due to queue full." << std::endl;
+							}
                             break;
                         }
                     }
