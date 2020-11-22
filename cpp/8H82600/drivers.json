@@ -3406,6 +3406,26 @@
               "id": "gas_2",
               "name": "XISA3902",
               "register": "RW5DF0770"
+            },
+            {
+              "id": "pump1_sv",
+              "name": "pump1_sv",
+              "register": "RW5WUB0774"
+            },
+            {
+              "id": "pump1_pv",
+              "name": "pump1_pv",
+              "register": "RW5WUB0776"
+            },
+            {
+              "id": "pump2_sv",
+              "name": "pump2_sv",
+              "register": "RW5WUB0778"
+            },
+            {
+              "id": "pump2_pv",
+              "name": "pump2_pv",
+              "register": "RW5WUB0780"
             }
           ]
         }

@@ -131,7 +131,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.dq3_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1400"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dq3_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1402"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
 
-    // liquidswtich
+    // liquidswitch
     data_model_.SetDataToUiMap("plc.1.mvalve1_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2301"), RES_SVALVE_1, WidgetType::STATE, MeasurementUnit::NONE, 0, 4, 1));
     data_model_.SetDataToUiMap("plc.1.smc9_1", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2302"), RES_SVALVE_5, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
     data_model_.SetDataToUiMap("plc.1.mvalve2_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2303"), RES_SVALVE_2, WidgetType::STATE, MeasurementUnit::NONE, 0, 4, 1));
@@ -139,6 +139,12 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.mvalve4_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2401"), RES_SVALVE_1, WidgetType::STATE, MeasurementUnit::NONE, 0, 4, 1));
     data_model_.SetDataToUiMap("plc.1.mvalve5_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2403"), RES_SVALVE_2, WidgetType::STATE, MeasurementUnit::NONE, 0, 4, 1));
     data_model_.SetDataToUiMap("plc.1.mvalve6_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2404"), RES_SVALVE_8, WidgetType::STATE, MeasurementUnit::NONE, 0, 8, 1));
+    // liquidswitch - pump
+    data_model_.SetDataToUiMap("plc.1.pump1_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_FICA2305"), RES_WATER_PUMP, WidgetType::PROCESS_VALUE, MeasurementUnit::SCCM, 0, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump2_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_FICA2405"), RES_WATER_PUMP, WidgetType::PROCESS_VALUE, MeasurementUnit::SCCM, 0, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump1_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::SCCM, 0, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump2_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2405"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::SCCM, 0, 100, 0));
+
     // liquidfeed
     data_model_.SetDataToUiMap("plc.1.smc9_2", UiInfo(ui_->tabWidget->widget(2), QString::fromUtf8("label_HC2306"), RES_SVALVE_5, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
     data_model_.SetDataToUiMap("plc.1.smc9_3", UiInfo(ui_->tabWidget->widget(2), QString::fromUtf8("label_HC2307"), RES_SVALVE_4, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
@@ -321,7 +327,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.smc14_17", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4606"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc14_18", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4607"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc14_19", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4608"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
-    // reactor-liqudi collction cylinder, using proximity switch signal
+    // reactor-liquid collction cylinder, using proximity switch signal 接近开关
     data_model_.SetDataToUiMap("plc.1.di3_1", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_ZI4621"), RES_CYLINDER_DOWN, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.di3_2", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_ZI4622"), RES_CYLINDER_DOWN, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.di3_3", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_ZI4623"), RES_CYLINDER_DOWN, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -655,6 +661,10 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("liquidswitch.label_HC2401", DataDef("plc.1.mvalve4_pv", "plc.1.mvalve4_pv", "plc.1.mvalve4_sv"));
     data_model_.SetUiToDataMap("liquidswitch.label_HC2403", DataDef("plc.1.mvalve5_pv", "plc.1.mvalve5_pv", "plc.1.mvalve5_sv"));
     data_model_.SetUiToDataMap("liquidswitch.label_HC2404", DataDef("plc.1.mvalve6_pv", "plc.1.mvalve6_pv", "plc.1.mvalve6_sv"));
+    // liquidswitch - pump
+    data_model_.SetUiToDataMap("liquidswitch.label_FICA2305", DataDef("plc.1.pump1_pv", "plc.1.pump1_pv", "plc.1.pump1_sv"));
+    data_model_.SetUiToDataMap("liquidswitch.label_FICA2405", DataDef("plc.1.pump2_pv", "plc.1.pump2_pv", "plc.1.pump2_sv"));
+
     // liquidfeed
     data_model_.SetUiToDataMap("liquidfeeda.label_HC2306", DataDef("plc.1.smc9_2", "plc.1.smc9_2", "plc.1.smc9_2"));
     data_model_.SetUiToDataMap("liquidfeeda.label_HC2307", DataDef("plc.1.smc9_3", "plc.1.smc9_3", "plc.1.smc9_3"));
