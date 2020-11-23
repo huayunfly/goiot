@@ -1064,6 +1064,38 @@
     <string>HC7302-4</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_HC2408">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>590</y>
+     <width>50</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC2408-3</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_N2">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>410</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>N2</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

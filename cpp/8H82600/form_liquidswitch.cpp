@@ -33,5 +33,7 @@ void FormLiquidSwitch::InitUiState()
     ui->label_HC2304->installEventFilter(this);
     ui->label_HC2401->installEventFilter(this);
     ui->label_HC2403->installEventFilter(this);
-    ui->label_HC2404->installEventFilter(this);
+    ui->label_HC2404->installEventFilter(this);   
+    ui->label_FICA2305->installEventFilter(this);
+    ui->label_FICA2405->installEventFilter(this);
 }

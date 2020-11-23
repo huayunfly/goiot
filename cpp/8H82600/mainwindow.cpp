@@ -662,8 +662,8 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("liquidswitch.label_HC2403", DataDef("plc.1.mvalve5_pv", "plc.1.mvalve5_pv", "plc.1.mvalve5_sv"));
     data_model_.SetUiToDataMap("liquidswitch.label_HC2404", DataDef("plc.1.mvalve6_pv", "plc.1.mvalve6_pv", "plc.1.mvalve6_sv"));
     // liquidswitch - pump
-    data_model_.SetUiToDataMap("liquidswitch.label_FICA2305", DataDef("plc.1.pump1_pv", "plc.1.pump1_pv", "plc.1.pump1_sv"));
-    data_model_.SetUiToDataMap("liquidswitch.label_FICA2405", DataDef("plc.1.pump2_pv", "plc.1.pump2_pv", "plc.1.pump2_sv"));
+    data_model_.SetUiToDataMap("liquidswitch.label_FICA2305", DataDef("plc.1.pump1_pv", "plc.1.pump1_sv", "plc.1.pump1_sv"));
+    data_model_.SetUiToDataMap("liquidswitch.label_FICA2405", DataDef("plc.1.pump2_pv", "plc.1.pump2_sv", "plc.1.pump2_sv"));
 
     // liquidfeed
     data_model_.SetUiToDataMap("liquidfeeda.label_HC2306", DataDef("plc.1.smc9_2", "plc.1.smc9_2", "plc.1.smc9_2"));
