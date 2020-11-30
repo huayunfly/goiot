@@ -435,7 +435,7 @@ void DataManager::RefreshDispatch()
                     {
                         // Deadband
                         double new_value = std::atof(value.c_str());
-                        if (std::abs(data_info.float_value - new_value) < DEADBAND && data_info.result == 0 && ui_force_refresh)
+                        if (std::abs(data_info.float_value - new_value) < DEADBAND && data_info.result == 0 && !ui_force_refresh)
                         {
                             continue;
                         }
@@ -455,7 +455,7 @@ void DataManager::RefreshDispatch()
                     else if (data_info.data_type == DataType::STR)
                     {
                         std::string& new_value = value;
-                        if (data_info.char_value.compare(new_value) == 0 && data_info.result == 0 && ui_force_refresh)
+                        if (data_info.char_value.compare(new_value) == 0 && data_info.result == 0 && !ui_force_refresh)
                         {
                             continue;
                         }
@@ -474,8 +474,10 @@ void DataManager::RefreshDispatch()
                     else if (data_info.data_type == DataType::BT)
                     {
                         uint8_t new_value = std::atoi(value.c_str()) > 0 ? 1 : 0;
-                        if (data_info.byte_value == new_value && data_info.result == 0 && ui_force_refresh)
+                        if (data_info.byte_value == new_value && data_info.result == 0 && !ui_force_refresh)
                         {
+                            int i = 0;
+                            i++;
                             continue;
                         }
                         else
@@ -493,7 +495,7 @@ void DataManager::RefreshDispatch()
                     else
                     {
                         int new_value = std::atoi(value.c_str());
-                        if (data_info.int_value == new_value && data_info.result == 0 && ui_force_refresh)
+                        if (data_info.int_value == new_value && data_info.result == 0 && !ui_force_refresh)
                         {
                             continue;
                         }

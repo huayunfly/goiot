@@ -18,10 +18,11 @@ enum class MeasurementUnit
 
 enum class WidgetType
 {
-    TEXT = 0,
-    ONOFF = 1,
-    STATE = 2,
-    PROCESS_VALUE = 3
+    NONE = 0, // Don't update UI widget
+    TEXT = 1,
+    ONOFF = 2,
+    STATE = 3,
+    PROCESS_VALUE = 4
 };
 
 typedef struct tagUiInfo

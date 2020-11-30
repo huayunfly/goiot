@@ -2621,6 +2621,198 @@
     <string>反应器16</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_EO">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>290</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>EO</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_8">
+   <property name="geometry">
+    <rect>
+     <x>1000</x>
+     <y>450</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PO">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PO</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_6">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>450</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_7">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>450</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PO_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>520</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PO</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>10</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_EO_2">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>730</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>EO</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_3">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>10</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_5">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>450</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_2">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>10</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_VACN2_4">
+   <property name="geometry">
+    <rect>
+     <x>1000</x>
+     <y>10</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>VAC/N2</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

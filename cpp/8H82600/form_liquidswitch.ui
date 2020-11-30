@@ -951,6 +951,102 @@
     <string>液体罐3</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_PUMP1">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>200</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>液体泵1</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PUMP1_2">
+   <property name="geometry">
+    <rect>
+     <x>1020</x>
+     <y>470</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>液体泵2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC2306_1">
+   <property name="geometry">
+    <rect>
+     <x>1060</x>
+     <y>80</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC2306-1</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC2306_2">
+   <property name="geometry">
+    <rect>
+     <x>1060</x>
+     <y>340</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC2306-2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC2306_3">
+   <property name="geometry">
+    <rect>
+     <x>1060</x>
+     <y>110</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>进液切换</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC2306_4">
+   <property name="geometry">
+    <rect>
+     <x>1060</x>
+     <y>370</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>进液切换</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>
