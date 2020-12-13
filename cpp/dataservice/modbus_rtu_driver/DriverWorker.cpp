@@ -114,7 +114,7 @@ namespace goiot
 					data_info_vec.emplace_back(data_info.second.id,
 						data_info.second.name, data_info.second.address, data_info.second.register_address,
 						data_info.second.read_write_priviledge, DataFlowType::REFRESH, data_info.second.data_type,
-						data_info.second.data_zone, data_info.second.float_decode, data_info.second.byte_value, data_info.second.int_value, data_info.second.float_value,
+						data_info.second.data_zone, data_info.second.float_decode, data_info.second.dword_decode, data_info.second.byte_value, data_info.second.int_value, data_info.second.float_value,
 						data_info.second.char_value, std::chrono::duration_cast<std::chrono::milliseconds>(
 							std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0);
 				}
@@ -189,7 +189,7 @@ namespace goiot
 							rp_data_info_vec->emplace_back(data_info_vec->at(i).id,
 								data_info_vec->at(i).name, data_info_vec->at(i).address, data_info_vec->at(i).register_address,
 								data_info_vec->at(i).read_write_priviledge, DataFlowType::WRITE_RETURN, data_info_vec->at(i).data_type,
-								data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
+								data_info_vec->at(i).data_zone, data_info_vec->at(i).float_decode, data_info_vec->at(i).dword_decode, data_info_vec->at(i).byte_value, data_info_vec->at(i).int_value, data_info_vec->at(i).float_value,
 								data_info_vec->at(i).char_value,
 								std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 								result_code);
@@ -614,7 +614,17 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			data_info->int_value = (registers.get()[0] << 16) + registers.get()[1]/* * data_info->ratio*/;
+			switch (data_info->dword_decode)
+			{
+			case DWordDecode::ABCD:
+				data_info->int_value = (registers.get()[0] << 16) + registers.get()[1]/* * data_info->ratio*/;
+				break;
+			case DWordDecode::CDAB:
+				data_info->int_value = registers.get()[0] + (registers.get()[1] << 16)/* * data_info->ratio*/;
+				break;
+			default:
+				throw std::invalid_argument("Unsupported dword decode.");
+			}
 			break;
 		case DataType::DF:
 			switch (data_info->float_decode)
@@ -669,12 +679,23 @@ namespace goiot
 				{
 				case DataType::DB:
 				case DataType::DUB:
-					int_value = ((registers.at(data_pair.first - register_start) << 16) +
-						registers.at(data_pair.first - register_start + 1))/* * data_pair.second.ratio*/;
+					switch (data_pair.second.dword_decode)
+					{
+					case DWordDecode::ABCD:
+						int_value = ((registers.at(data_pair.first - register_start) << 16) +
+							registers.at(data_pair.first - register_start + 1))/* * data_pair.second.ratio*/;
+						break;
+					case DWordDecode::CDAB:
+						int_value = (registers.at(data_pair.first - register_start) +
+							(registers.at(data_pair.first - register_start + 1) << 16))/* * data_pair.second.ratio*/;
+						break;
+					default:
+						throw std::invalid_argument("Unsupported dword decode.");
+					}
 					rp_data_info_vec->emplace_back(data_pair.second.id,
 						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
-						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, int_value,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, int_value,
 						data_pair.second.float_value, data_pair.second.char_value,
 						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 						0/* result */);
@@ -700,7 +721,7 @@ namespace goiot
 					rp_data_info_vec->emplace_back(data_pair.second.id,
 						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
-						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, data_pair.second.int_value,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, data_pair.second.int_value,
 						float_value, data_pair.second.char_value,
 						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 						0/* result */);
@@ -711,7 +732,7 @@ namespace goiot
 					rp_data_info_vec->emplace_back(data_pair.second.id,
 						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
-						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, int_value,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, int_value,
 						data_pair.second.float_value, data_pair.second.char_value,
 						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 						0/* result */);
@@ -725,7 +746,7 @@ namespace goiot
 				rp_data_info_vec->emplace_back(data_pair.second.id,
 					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
-					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, data_pair.second.int_value,
+					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, data_pair.second.int_value,
 					data_pair.second.float_value, data_pair.second.char_value,
 					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 					result/* result */);
@@ -762,7 +783,7 @@ namespace goiot
 				rp_data_info_vec->emplace_back(data_pair.second.id,
 					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
-					data_pair.second.data_zone, data_pair.second.float_decode, byte_value, data_pair.second.int_value,
+					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, byte_value, data_pair.second.int_value,
 					data_pair.second.float_value, data_pair.second.char_value,
 					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 					0/* result */);
@@ -772,7 +793,7 @@ namespace goiot
 				rp_data_info_vec->emplace_back(data_pair.second.id,
 					data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 					data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
-					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.byte_value, data_pair.second.int_value,
+					data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, data_pair.second.int_value,
 					data_pair.second.float_value, data_pair.second.char_value,
 					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
 					result/* result */);
@@ -788,9 +809,21 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			int_value = data_info.int_value/* / data_info.ratio*/;
-			value.at(0) = (int_value >> 16) & 0xFFFF;
-			value.at(1) = int_value & 0xFFFF;
+			switch (data_info.dword_decode)
+			{
+			case DWordDecode::ABCD:
+				int_value = data_info.int_value/* / data_info.ratio*/;
+				value.at(0) = (int_value >> 16) & 0xFFFF;
+				value.at(1) = int_value & 0xFFFF;
+				break;
+			case DWordDecode::CDAB:
+				int_value = data_info.int_value/* / data_info.ratio*/;
+				value.at(0) = int_value & 0xFFFF;
+				value.at(1) = (int_value >> 16) & 0xFFFF;
+				break;
+			default:
+				throw std::invalid_argument("Unsupported dword decode.");
+			}
 			break;
 		case DataType::DF:
 			switch (data_info.float_decode)
@@ -835,7 +868,15 @@ namespace goiot
 		{
 		case DataType::DB:
 		case DataType::DUB:
-			return data_info.int_value == ((registers.get()[0] << 16) + registers.get()[1]);
+			switch (data_info.dword_decode)
+			{
+			case DWordDecode::ABCD:
+				return data_info.int_value == ((registers.get()[0] << 16) + (registers.get()[1]));
+			case DWordDecode::CDAB:
+				return data_info.int_value == ((registers.get()[0]) + (registers.get()[1]) << 16);
+			default:
+				throw std::invalid_argument("Unsupported dword decode.");
+			}
 			break;
 		case DataType::DF:
 			switch (data_info.float_decode)

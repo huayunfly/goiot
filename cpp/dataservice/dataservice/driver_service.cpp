@@ -531,7 +531,7 @@ namespace goiot {
 						group_pos->second.emplace_back(data_info.id,
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-							data_info.data_zone, data_info.float_decode, 0/* byte */,
+							data_info.data_zone, data_info.float_decode, data_info.dword_decode, 0/* byte */,
 							0/* integer */, new_value, ""/* string */, timestamp, 0/* result */, data_info.ratio
 						);
 					}
@@ -550,7 +550,7 @@ namespace goiot {
 						group_pos->second.emplace_back(data_info.id,
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-							data_info.data_zone, data_info.float_decode, 0/* byte */,
+							data_info.data_zone, data_info.float_decode, data_info.dword_decode, 0/* byte */,
 							0/* integer */, 0.0/* float */, new_value, timestamp, 0/* result */, data_info.ratio
 						);
 					}
@@ -569,7 +569,7 @@ namespace goiot {
 						group_pos->second.emplace_back(data_info.id,
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-							data_info.data_zone, data_info.float_decode, new_value,
+							data_info.data_zone, data_info.float_decode, data_info.dword_decode, new_value,
 							0/* integer */, 0.0/* float */, "", timestamp, 0/* result */, data_info.ratio
 						);
 					}
@@ -588,7 +588,7 @@ namespace goiot {
 						group_pos->second.emplace_back(data_info.id,
 							data_info.name, data_info.address, data_info.register_address,
 							data_info.read_write_priviledge, DataFlowType::ASYNC_WRITE, data_info.data_type,
-							data_info.data_zone, data_info.float_decode, 0/* byte */,
+							data_info.data_zone, data_info.float_decode, data_info.dword_decode, 0/* byte */,
 							new_value, 0.0/* float */, "", timestamp, 0/* result */, data_info.ratio
 						);
 					}

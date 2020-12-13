@@ -153,6 +153,29 @@ namespace goiot
             default:
                 throw std::invalid_argument("Invalid float decode.");
             }
+            // DWord decode
+            std::istringstream iss_dword_decode(node["dwdec"].asString());
+            int dword_decode_int = 0;
+            iss_dword_decode >> dword_decode_int;
+            DWordDecode dword_decode;
+            switch (dword_decode_int)
+            {
+            case 0:
+                dword_decode = DWordDecode::ABCD;
+                break;
+            case 1:
+                dword_decode = DWordDecode::DCBA;
+                break;
+            case 2:
+                dword_decode = DWordDecode::BADC;
+                break;
+            case 3:
+                dword_decode = DWordDecode::CDAB;
+                break;
+            default:
+                throw std::invalid_argument("Invalid dword decode.");
+            }
+
             // Nodes
             assert(node["data"].isArray());
             for (auto data_node : node["data"])
@@ -162,6 +185,7 @@ namespace goiot
                 data_info.name = data_node["name"].asString();
                 data_info.address = address;
                 data_info.float_decode = float_decode;
+                data_info.dword_decode = dword_decode;
                 data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
                 float ratio = data_node["ratio"].asFloat();

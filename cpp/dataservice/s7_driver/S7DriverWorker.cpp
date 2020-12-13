@@ -128,7 +128,7 @@ namespace goiot
 					data_info_vec.emplace_back(data_info.second.id,
 						data_info.second.name, data_info.second.address, data_info.second.register_address,
 						data_info.second.read_write_priviledge, DataFlowType::REFRESH, data_info.second.data_type,
-						data_info.second.data_zone, data_info.second.float_decode, data_info.second.byte_value, data_info.second.int_value, data_info.second.float_value,
+						data_info.second.data_zone, data_info.second.float_decode, data_info.second.dword_decode, data_info.second.byte_value, data_info.second.int_value, data_info.second.float_value,
 						data_info.second.char_value, std::chrono::duration_cast<std::chrono::milliseconds>(
 							std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0);
 				}
