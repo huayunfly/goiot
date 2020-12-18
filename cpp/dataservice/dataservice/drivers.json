@@ -462,7 +462,7 @@
       "response_to_msec": 500,
       "nodes": [
         {
-          "address": "4",
+          "address": "1",
           "wdec": "0",
           "dwdec": "3",
           "fdec": "0",
@@ -498,27 +498,39 @@
               "ratio": 1
             },
             {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
               "ratio": 1
             },
             {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 1
+            },
+            {
               "id": "block_num",
               "name": "block_number",
-              "register": "RW4WUB17428",
+              "register": "W4WUB17428",
               "ratio": 1
             },
             {
               "id": "block_v0",
               "name": "block_v0",
-              "register": "RW4WUB17920",
+              "register": "W4WUB17920",
               "ratio": 1
             },
             {
               "id": "block_data2",
               "name": "block_data2",
-              "register": "RW4DB18442",
+              "register": "W4DB18442",
               "ratio": 1
             }
           ]
