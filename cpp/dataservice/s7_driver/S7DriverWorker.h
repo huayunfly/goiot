@@ -138,8 +138,6 @@ namespace goiot
 		}
 
 	private:
-		const int REFRESH_INTERVAL = 250; // in ms
-
 		std::once_flag connection_init_flag_;
 		ConnectionInfo connection_details_;
 		std::map<std::string, DataInfo> data_map_;

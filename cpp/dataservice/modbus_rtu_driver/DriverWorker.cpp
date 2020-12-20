@@ -62,8 +62,8 @@ namespace goiot
 		uint32_t old_response_to_sec;
 		uint32_t old_response_to_usec;
 		modbus_get_response_timeout(connection_manager_.get(), &old_response_to_sec, &old_response_to_usec);
-		int response_to_sec = connection_details_.response_to_msec / 1000;
-		int response_to_micro_sec = connection_details_.response_to_msec % 1000;
+		int response_to_sec = connection_details_.response_timeout_msec / 1000;
+		int response_to_micro_sec = connection_details_.response_timeout_msec % 1000;
 		modbus_set_response_timeout(connection_manager_.get(), response_to_sec, response_to_micro_sec * 1000);
 		if (modbus_connect(connection_manager_.get()) == -1) {
 			std::cout << "Connection failed: " << modbus_strerror(errno) << std::endl;
@@ -137,7 +137,7 @@ namespace goiot
 			catch (...) {
 				std::cerr << "modbus_rtu_driver EXCEPTION (unknown)" << std::endl;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(REFRESH_INTERVAL));
+			std::this_thread::sleep_for(std::chrono::milliseconds(connection_details_.refresh_interval_msec));
 		}
 	}
 

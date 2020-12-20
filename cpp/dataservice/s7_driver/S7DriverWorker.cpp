@@ -148,7 +148,7 @@ namespace goiot
 			catch (...) {
 				std::cerr << "s7_driver:EXCEPTION (unknown)" << std::endl;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(REFRESH_INTERVAL));
+			std::this_thread::sleep_for(std::chrono::milliseconds(connection_details_.refresh_interval_msec));
 		}
 	}
 

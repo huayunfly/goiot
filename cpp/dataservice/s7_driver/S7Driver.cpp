@@ -111,7 +111,22 @@ int goiot::S7Driver::ParseConfig(const std::string& config,
     }
     std::istringstream iss(port.substr(start_pos, split_pos - start_pos));
     iss >> connection_info.slot;
-    connection_info.response_to_msec = root["response_to_msec"].asInt();
+    if (root["response_timeout_msec"] && root["response_timeout_msec"].isInt())
+    {
+        connection_info.response_timeout_msec = root["response_timeout_msec"].asInt();
+    }
+    if (connection_info.response_timeout_msec <= 0)
+    {
+        connection_info.response_timeout_msec = 500;
+    }
+    if (root["refresh_interval_msec"] && root["refresh_interval_msec"].isInt())
+    {
+        connection_info.refresh_interval_msec = root["refresh_interval_msec"].asInt();
+    }
+    if (connection_info.refresh_interval_msec <= 0)
+    {
+        connection_info.refresh_interval_msec = 500;
+    }
 
     // nodes
     assert(root["nodes"].isArray());

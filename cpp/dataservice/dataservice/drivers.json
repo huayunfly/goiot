@@ -9,7 +9,7 @@
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
 //                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
-// response_to_sec: response wait time in micro-second
+// response_timeout_msec: response wait time in micro-second
 // -----------------------
 // s7 protocol
 // We need the client address (port) and optionally Rack and Slot
@@ -27,7 +27,8 @@
       "name": "modbus3",
       "type": "modbus_rtu",
       "port": "COM5,19200,E,8,2",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
       "nodes": [
         {
           "address": "1",
@@ -436,7 +437,8 @@
       "name": "modbus7",
       "type": "modbus_rtu",
       "port": "COM7,19200,N,8,1",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
       "nodes": [
         {
           "address": "1",
@@ -459,7 +461,8 @@
       "name": "modbus4",
       "type": "modbus_rtu",
       "port": "COM4,115200,E,8,1",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
       "nodes": [
         {
           "address": "1",
@@ -542,7 +545,8 @@
       "name": "s7-1500",
       "type": "s7",
       "port": "192.168.1.110,0,1",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 250,
       "nodes": [
         {
           "address": "1",
