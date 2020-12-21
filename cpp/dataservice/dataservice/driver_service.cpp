@@ -605,6 +605,11 @@ namespace goiot {
                             int return_code = driver->AsyncWrite(element.second, 0); // Todo: transaction id
 							if (return_code != 0)
 							{
+								for (auto& data_info : element.second)
+								{
+									data_info.result = EWOULDBLOCK; // Queue blocked.
+									data_info_cache_.UpateOrAddEntry(data_info.id, data_info); // Try to queue in the next poll cycle for data_info.result != 0
+								}
 								std::cout << "AsyncWrite to " << id << " failed due to queue full." << std::endl;
 							}
                             break;
