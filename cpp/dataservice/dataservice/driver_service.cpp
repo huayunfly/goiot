@@ -516,15 +516,17 @@ namespace goiot {
 						std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
 					if (data_info.data_type == DataType::DF)
 					{
-						// Deadband
+						// Deadband and timestamp
 						double new_value = std::atof(value.c_str());
-						if (std::abs(data_info.float_value - new_value) < DEADBAND && data_info.result == 0)
+						if (std::abs(data_info.float_value - new_value) < DEADBAND && data_info.result == 0 && 
+							(timestamp - data_info.timestamp) < TIMESPAN)
 						{
 							continue;
 						}
 						else // data_info.result != 0
 						{
 							data_info.float_value = new_value; // update poll
+							data_info.timestamp = timestamp;
 							data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
 
 						}
@@ -538,13 +540,15 @@ namespace goiot {
 					else if (data_info.data_type == DataType::STR)
 					{
 						std::string& new_value = value;
-						if (data_info.char_value.compare(new_value) == 0 && data_info.result == 0)
+						if (data_info.char_value.compare(new_value) == 0 && data_info.result == 0 && 
+							(timestamp - data_info.timestamp) < TIMESPAN)
 						{
 							continue;
 						}
 						else
 						{
 							data_info.char_value = new_value; // update poll
+							data_info.timestamp = timestamp;
 							data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
 						}
 						group_pos->second.emplace_back(data_info.id,
@@ -557,13 +561,15 @@ namespace goiot {
 					else if (data_info.data_type == DataType::BT)
 					{
 						byte new_value = std::atoi(value.c_str());
-						if (data_info.byte_value == new_value && data_info.result == 0)
+						if (data_info.byte_value == new_value && data_info.result == 0 &&
+							(timestamp - data_info.timestamp) < TIMESPAN)
 						{
 							continue;
 						}
 						else
 						{
 							data_info.byte_value = new_value; // updata poll
+							data_info.timestamp = timestamp;
 							data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
 						}
 						group_pos->second.emplace_back(data_info.id,
@@ -576,13 +582,15 @@ namespace goiot {
 					else
 					{
 						int new_value = std::atoi(value.c_str());
-						if (data_info.int_value == new_value && data_info.result == 0)
+						if (data_info.int_value == new_value && data_info.result == 0 &&
+							(timestamp - data_info.timestamp) < TIMESPAN)
 						{
 							continue;
 						}
 						else
 						{
 							data_info.int_value = new_value;
+							data_info.timestamp = timestamp;
 							data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
 						}
 						group_pos->second.emplace_back(data_info.id,
