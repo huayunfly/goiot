@@ -1,18 +1,17 @@
 {
-  "name": "store_data",
+  "name": "data_mirror",
   "version": "1.0.0",
-  "description": "store application data to database",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js -f ./drivers.json"
   },
+  "keywords": [],
   "author": "huayunfly@126.com",
   "license": "ISC",
   "dependencies": {
-    "pg": "^8.4.1",
     "redis": "^3.0.2",
-    "winston": "^3.3.3",
-    "yargs": "^16.0.3"
+    "yargs": "^16.2.0"
   }
 }
