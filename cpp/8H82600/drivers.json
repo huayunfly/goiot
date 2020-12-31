@@ -8,7 +8,8 @@
       "name": "modbus3",
       "type": "modbus_rtu",
       "port": "COM5,19200,E,8,2",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
       "nodes": [
         {
           "address": "1",
@@ -417,7 +418,8 @@
       "name": "modbus7",
       "type": "modbus_rtu",
       "port": "COM7,19200,N,8,1",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
       "nodes": [
         {
           "address": "1",
@@ -440,12 +442,13 @@
       "name": "modbus4",
       "type": "modbus_rtu",
       "port": "COM4,115200,E,8,1",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
       "nodes": [
         {
-          "address": "4",
+          "address": "1",
           "wdec": "0",
-          "dwdec": "0",
+          "dwdec": "3",
           "fdec": "0",
           "data": [
             {
@@ -479,15 +482,1149 @@
               "ratio": 1
             },
             {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
               "ratio": 1
             },
             {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
               "id": "block_num",
               "name": "block_number",
-              "register": "RW4WUB17428",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "2",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "3",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "5",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "6",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "7",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "8",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "9",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "10",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "11",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "12",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "13",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "14",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "15",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
+              "ratio": 1
+            }
+          ]
+        },
+        {
+          "address": "16",
+          "wdec": "0",
+          "dwdec": "3",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "srv_on",
+              "name": "servo_on",
+              "register": "RW0BT0096",
+              "ratio": 1
+            },
+            {
+              "id": "a_clr",
+              "name": "alarm_clear",
+              "register": "RW0BT0097",
+              "ratio": 1
+            },
+            {
+              "id": "s_rdy",
+              "name": "servo_ready",
+              "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "alm",
+              "name": "alarm",
+              "register": "R0BT0161",
+              "ratio": 1
+            },
+            {
+              "id": "stb",
+              "name": "stb",
+              "register": "RW0BT0288",
+              "ratio": 1
+            },
+            {
+              "id": "s_stop",
+              "name": "s_stop",
+              "register": "RW0BT0292",
+              "ratio": 1
+            },
+            {
+              "id": "busy",
+              "name": "busy",
+              "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "multi_turn",
+              "name": "multi_turn",
+              "register": "R4DB16900",
+              "ratio": 0.01454
+            },
+            {
+              "id": "block_num",
+              "name": "block_number",
+              "register": "W4WUB17428",
+              "ratio": 1
+            },
+            {
+              "id": "block_v0",
+              "name": "block_v0",
+              "register": "W4WUB17920",
+              "ratio": 1
+            },
+            {
+              "id": "block_data0",
+              "name": "block_data0",
+              "register": "W4DB18434",
               "ratio": 1
             }
           ]
@@ -499,7 +1636,8 @@
       "name": "s7-1500",
       "type": "s7",
       "port": "192.168.1.110,0,1",
-      "response_to_msec": 500,
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 250,
       "nodes": [
         {
           "address": "1",

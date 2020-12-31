@@ -24,5 +24,6 @@
 #define RES_MECHANICAL_PUMP ":/ui_ctrls/UICtrls/Res/mechanical_pump.png"
 #define RES_WATER_PUMP ":/ui_ctrls/UICtrls/Res/water_pump.png"
 #define RES_VALVE_ELECTRIC ":/ui_ctrls/UICtrls/Res/valve_electric.png"
+#define RES_ELECTRIC_CYLINDER ":/ui_ctrls/UICtrls/Res/electric_cylinder.png"
 
 #endif // RESOURCEDEF_H

@@ -54,7 +54,31 @@ bool FormCommon::event(QEvent *event)
         {
             if (e->Status() == Ui::ControlStatus::OK)
             {
-                text_edit->setText(e->Text());
+                QString unit;
+                switch (e->GetUiInfo().unit)
+                {
+                case MeasurementUnit::ML:
+                    unit = "ml";
+                    break;
+                case MeasurementUnit::BARA:
+                    unit = "barA";
+                    break;
+                case MeasurementUnit::BARG:
+                    unit = "barG";
+                    break;
+                case MeasurementUnit::SCCM:
+                    unit = "scm";
+                    break;
+                case MeasurementUnit::DEGREE:
+                    unit = u8"°C";
+                    break;
+                case MeasurementUnit::MM:
+                    unit = "mm";
+                    break;
+                default:
+                    break;
+                }
+                text_edit->setText(e->Text() + unit);
             }
             else
             {

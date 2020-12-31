@@ -33,5 +33,6 @@
         <file>UICtrls/Res/valve_electric.png</file>
         <file>UICtrls/Res/gc.png</file>
         <file>UICtrls/Res/mechanical_pump.png</file>
+        <file>UICtrls/Res/electric_cylinder.png</file>
     </qresource>
 </RCC>

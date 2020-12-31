@@ -2813,6 +2813,761 @@
     <string>VAC/N2</string>
    </property>
   </widget>
+
+<widget class="QLabel" name="label_FICA3109">
+ <property name="geometry">
+  <rect>
+   <x>70</x>
+   <y>155</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3110">
+ <property name="geometry">
+  <rect>
+   <x>350</x>
+   <y>155</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3111">
+ <property name="geometry">
+  <rect>
+   <x>630</x>
+   <y>155</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3112">
+ <property name="geometry">
+  <rect>
+   <x>910</x>
+   <y>155</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3509">
+ <property name="geometry">
+  <rect>
+   <x>130</x>
+   <y>335</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3510">
+ <property name="geometry">
+  <rect>
+   <x>410</x>
+   <y>335</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3511">
+ <property name="geometry">
+  <rect>
+   <x>690</x>
+   <y>335</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3512">
+ <property name="geometry">
+  <rect>
+   <x>970</x>
+   <y>335</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3113">
+ <property name="geometry">
+  <rect>
+   <x>70</x>
+   <y>595</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3114">
+ <property name="geometry">
+  <rect>
+   <x>350</x>
+   <y>595</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3115">
+ <property name="geometry">
+  <rect>
+   <x>630</x>
+   <y>595</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3116">
+ <property name="geometry">
+  <rect>
+   <x>910</x>
+   <y>595</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3513">
+ <property name="geometry">
+  <rect>
+   <x>130</x>
+   <y>775</y>
+   <width>45</width>
+   <height>95</height>
+  </rect>
+ </property>
+ <property name="cursor">
+  <cursorShape>PointingHandCursor</cursorShape>
+ </property>
+ <property name="text">
+  <string/>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+ </property>
+</widget>
+<widget class="QLabel" name="label_FICA3514">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>775</y>
+     <width>45</width>
+     <height>95</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+   </property>
+  </widget>
+<widget class="QLabel" name="label_FICA3515">
+       <property name="geometry">
+        <rect>
+         <x>690</x>
+         <y>775</y>
+         <width>45</width>
+         <height>95</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+       </property>
+      </widget>
+<widget class="QLabel" name="label_FICA3516">
+           <property name="geometry">
+            <rect>
+             <x>970</x>
+             <y>775</y>
+             <width>45</width>
+             <height>95</height>
+            </rect>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/electric_cylinder.png</pixmap>
+           </property>
+          </widget>
+
+<widget class="QTextEdit" name="textEdit_FICA3109">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>148</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3110">
+           <property name="geometry">
+            <rect>
+             <x>300</x>
+             <y>148</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3111">
+           <property name="geometry">
+            <rect>
+             <x>580</x>
+             <y>148</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3112">
+           <property name="geometry">
+            <rect>
+             <x>860</x>
+             <y>148</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3509">
+           <property name="geometry">
+            <rect>
+             <x>80</x>
+             <y>328</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3510">
+           <property name="geometry">
+            <rect>
+             <x>360</x>
+             <y>328</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3511">
+           <property name="geometry">
+            <rect>
+             <x>640</x>
+             <y>328</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3512">
+           <property name="geometry">
+            <rect>
+             <x>920</x>
+             <y>328</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3113">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>588</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3114">
+           <property name="geometry">
+            <rect>
+             <x>300</x>
+             <y>588</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3115">
+           <property name="geometry">
+            <rect>
+             <x>580</x>
+             <y>588</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3116">
+           <property name="geometry">
+            <rect>
+             <x>860</x>
+             <y>588</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3513">
+           <property name="geometry">
+            <rect>
+             <x>80</x>
+             <y>768</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3514">
+           <property name="geometry">
+            <rect>
+             <x>360</x>
+             <y>768</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3515">
+           <property name="geometry">
+            <rect>
+             <x>640</x>
+             <y>768</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+<widget class="QTextEdit" name="textEdit_FICA3516">
+           <property name="geometry">
+            <rect>
+             <x>920</x>
+             <y>768</y>
+             <width>70</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Tahoma</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:transparent;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="acceptRichText">
+            <bool>true</bool>
+           </property>
+          </widget>
+
  </widget>
  <resources>
   <include location="res.qrc"/>

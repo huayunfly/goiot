@@ -98,4 +98,13 @@ void FormCylinderB::InitUiState()
     ui->label_HC3616->installEventFilter(this);
     ui->label_HC3716->installEventFilter(this);
     ui->label_HC3816->installEventFilter(this);
+    //
+    ui->label_FICA3109->installEventFilter(this);
+    ui->label_FICA3110->installEventFilter(this);
+    ui->label_FICA3111->installEventFilter(this);
+    ui->label_FICA3112->installEventFilter(this);
+    ui->label_FICA3113->installEventFilter(this);
+    ui->label_FICA3114->installEventFilter(this);
+    ui->label_FICA3115->installEventFilter(this);
+    ui->label_FICA3116->installEventFilter(this);
 }
