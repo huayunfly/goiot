@@ -218,7 +218,7 @@ namespace goiot
 			// * time bench mark
 			double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
-			std::cout << gap << std::endl;
+			std::cout << "modbus refresh:" << gap << std::endl;
 #endif // _DEBUG
 		}
 	}
@@ -289,7 +289,7 @@ namespace goiot
 			if (rc != num_bits) 
 			{
 #ifdef _DEBUG
-				std::cerr << "Read output bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+				std::cerr << "Address " << data_info.address << " Read output bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG
 			}
 			else
@@ -306,7 +306,7 @@ namespace goiot
 			if (rc != num_bits)
 			{
 #ifdef _DEBUG
-				std::cerr << "Read input bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+				std::cerr << "Address " << data_info.address << " Read input bits " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG
 			}
 			else
@@ -323,7 +323,7 @@ namespace goiot
 			if (rc != num_registers) 
 			{
 #ifdef _DEBUG
-				std::cerr << "Read output registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+				std::cerr << "Address " << data_info.address << " Read output registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG
 			}
 			else
@@ -340,7 +340,7 @@ namespace goiot
 			if (rc != num_registers)
 			{
 #ifdef _DEBUG
-				std::cerr << "Read input registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
+				std::cerr << "Address " << data_info.address << " Read input registers " << std::hex << std::showbase << data_info.register_address << " failed." << std::endl;
 #endif // DEBUG			
 			}
 			else
@@ -493,7 +493,7 @@ namespace goiot
 					if (rc != read_reg_pair.at(i).second)
 					{
 #ifdef _DEBUG
-						std::cerr << "Read bits " << std::hex << std::showbase << read_reg_pair.at(i).first << " failed." << std::endl;
+						std::cerr << "Address " << address << " Read bits " << std::hex << std::showbase << read_reg_pair.at(i).first << " failed." << std::endl;
 #endif // DEBUG
 						AssignBitValue(rp_data_info_vec, group.second, read_reg_pair.at(i).first, rp_bits, ENODATA); // no_message_available
 					}
@@ -519,7 +519,7 @@ namespace goiot
 					if (rc != read_reg_pair.at(i).second)
 					{
 #ifdef _DEBUG
-						std::cerr << "Read registers " << std::hex << std::showbase << read_reg_pair.at(i).first << " failed." << std::endl;
+						std::cerr << "Address " << address << " Read registers " << std::hex << std::showbase << read_reg_pair.at(i).first << " failed." << std::endl;
 #endif // DEBUG
 						AssignRegisterValue(rp_data_info_vec, group.second, read_reg_pair.at(i).first, rp_registers, ENODATA); // no_message_available
 					}
@@ -532,6 +532,9 @@ namespace goiot
 			default:
 				throw std::invalid_argument("DriverWorker::ReadData() -> Unsupported data zone.");
 			}
+			// Wait the serial port to turn to next salve round. Or libmodbus error. 下一站请求前等待，否则libmodbus可能读错误（19200bps）,(115200bps未见出错，但线路受到电机干扰太大）
+			// 19200bps读取16个松下伺服，每个两组参数，耗时约850ms
+			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
 		}
 		return rp_data_info_vec;
 	}
