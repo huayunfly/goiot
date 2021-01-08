@@ -4,448 +4,14 @@
   "db": "127.0.0.1:5432:goiot:postgres:hello@123",
   "drivers": [
     {
-      "id": "mfcpfc",
-      "name": "modbus3",
-      "type": "modbus_rtu",
-      "port": "COM5,19200,E,8,2",
-      "response_timeout_msec": 500,
-      "refresh_interval_msec": 500,
-      "nodes": [
-        {
-          "address": "1",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.3125
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.3125
-            }
-          ]
-        },
-        {
-          "address": "2",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.03125
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.03125
-            }
-          ]
-        },
-        {
-          "address": "3",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.03125
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.03125
-            }
-          ]
-        },
-        {
-          "address": "4",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.3125
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.3125
-            }
-          ]
-        },
-        {
-          "address": "11",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "12",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "13",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "14",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "15",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "16",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "17",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "18",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "19",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "20",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "21",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "22",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "23",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "24",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "25",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        },
-        {
-          "address": "26",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4WUB0032",
-              "ratio": 0.0015625
-            },
-            {
-              "id": "sv",
-              "name": "setpoint",
-              "register": "RW4WUB0033",
-              "ratio": 0.0015625
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "balance",
-      "name": "modbus7",
-      "type": "modbus_rtu",
-      "port": "COM7,19200,N,8,1",
-      "response_timeout_msec": 500,
-      "refresh_interval_msec": 500,
-      "nodes": [
-        {
-          "address": "1",
-          "wdec": "0",
-          "dwdec": "0",
-          "fdec": "0",
-          "data": [
-            {
-              "id": "pv",
-              "name": "measure",
-              "register": "R4DUB0000",
-              "ratio": 0.1
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": "cylinder16",
       "name": "modbus4",
       "type": "modbus_rtu",
-      "port": "COM4,115200,E,8,1",
+      "port": "COM6,19200,E,8,1",
       "response_timeout_msec": 500,
-      "refresh_interval_msec": 500,
+      "refresh_interval_msec": 1000,
       "nodes": [
-        {
+      {
           "address": "1",
           "wdec": "0",
           "dwdec": "3",
@@ -454,13 +20,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -476,15 +42,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -519,7 +91,7 @@
             }
           ]
         },
-        {
+      {
           "address": "2",
           "wdec": "0",
           "dwdec": "3",
@@ -528,13 +100,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -550,15 +122,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -593,7 +171,7 @@
             }
           ]
         },
-        {
+      {
           "address": "3",
           "wdec": "0",
           "dwdec": "3",
@@ -602,13 +180,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -624,15 +202,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -676,13 +260,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -698,15 +282,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -750,13 +340,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -772,15 +362,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -824,13 +420,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -846,15 +442,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -898,13 +500,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -920,15 +522,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -972,13 +580,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -994,15 +602,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1046,13 +660,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1068,15 +682,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1120,13 +740,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1142,15 +762,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1194,13 +820,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1216,15 +842,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1268,13 +900,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1290,15 +922,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1342,13 +980,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1364,15 +1002,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1416,19 +1060,25 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
               "id": "s_rdy",
               "name": "servo_ready",
               "register": "R0BT0160",
+              "ratio": 1
+            },
+            {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
               "ratio": 1
             },
             {
@@ -1440,13 +1090,13 @@
             {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1490,13 +1140,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1512,15 +1162,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -1564,13 +1220,13 @@
             {
               "id": "srv_on",
               "name": "servo_on",
-              "register": "RW0BT0096",
+              "register": "W0BT0096",
               "ratio": 1
             },
             {
               "id": "a_clr",
               "name": "alarm_clear",
-              "register": "RW0BT0097",
+              "register": "W0BT0097",
               "ratio": 1
             },
             {
@@ -1586,15 +1242,21 @@
               "ratio": 1
             },
             {
+              "id": "brk_off",
+              "name": "break_off",
+              "register": "R0BT0163",
+              "ratio": 1
+            },
+            {
               "id": "stb",
               "name": "stb",
-              "register": "RW0BT0288",
+              "register": "W0BT0288",
               "ratio": 1
             },
             {
               "id": "s_stop",
               "name": "s_stop",
-              "register": "RW0BT0292",
+              "register": "W0BT0292",
               "ratio": 1
             },
             {
@@ -4548,22 +4210,38 @@
             {
               "id": "pump1_sv",
               "name": "pump1_sv",
-              "register": "RW5WUB0774"
+              "register": "RW5WUB0774",
+              "ratio": 0.01
             },
             {
               "id": "pump1_pv",
               "name": "pump1_pv",
-              "register": "RW5WUB0776"
+              "register": "RW5WUB0778",
+              "ratio": 0.01
             },
             {
               "id": "pump2_sv",
               "name": "pump2_sv",
-              "register": "RW5WUB0778"
+              "register": "RW5WUB0776",
+              "ratio": 0.01
             },
             {
               "id": "pump2_pv",
               "name": "pump2_pv",
-              "register": "RW5WUB0780"
+              "register": "RW5WUB0780",
+              "ratio": 0.01
+            },
+            {
+              "id": "pump1_pressure",
+              "name": "pump1_pressure",
+              "register": "RW5WUB0782",
+              "ratio": 0.1
+            },
+            {
+              "id": "pump2_pressure",
+              "name": "pump2_pressure",
+              "register": "RW5WUB0784",
+              "ratio": 0.1
             }
           ]
         }

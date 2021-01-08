@@ -39,20 +39,34 @@ DialogSetValue::DialogSetValue(QWidget *parent, const QString& current, Measurem
     switch (unit)
     {
     case MeasurementUnit::BARA:
-        text_unit->setText("barA");
+        text_unit->setText("bara");
         break;
     case MeasurementUnit::BARG:
-        text_unit->setText("barG");
+        text_unit->setText("barg");
         break;
     case MeasurementUnit::SCCM:
-        text_unit->setText("SCCM");
+        text_unit->setText("sccm");
         break;
     case MeasurementUnit::DEGREE:
         text_unit->setText(u8"°C");
         break;
+    case MeasurementUnit::MLM:
+        text_unit->setText("mlm");
+        break;
+    case MeasurementUnit::MM:
+        text_unit->setText("mm");
+        break;
+    case MeasurementUnit::MPA:
+        text_unit->setText("mpa");
+        break;
+    case MeasurementUnit::ML:
+        text_unit->setText("ml");
+        break;
     default:
         text_unit->setText("-");
         break;
+
+
     }
 }
 

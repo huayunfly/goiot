@@ -34,5 +34,7 @@
         <file>UICtrls/Res/gc.png</file>
         <file>UICtrls/Res/mechanical_pump.png</file>
         <file>UICtrls/Res/electric_cylinder.png</file>
+        <file>UICtrls/Res/alarm.png</file>
+        <file>UICtrls/Res/srv_on.png</file>
     </qresource>
 </RCC>

@@ -25,5 +25,7 @@
 #define RES_WATER_PUMP ":/ui_ctrls/UICtrls/Res/water_pump.png"
 #define RES_VALVE_ELECTRIC ":/ui_ctrls/UICtrls/Res/valve_electric.png"
 #define RES_ELECTRIC_CYLINDER ":/ui_ctrls/UICtrls/Res/electric_cylinder.png"
+#define RES_ALARM ":/ui_ctrls/UICtrls/Res/alarm.png"
+#define RES_SRV_ON ":/ui_ctrls/UICtrls/Res/srv_on.png"
 
 #endif // RESOURCEDEF_H

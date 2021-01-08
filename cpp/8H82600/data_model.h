@@ -15,7 +15,9 @@ enum class MeasurementUnit
     BARG = 3,
     SCCM = 4,
     ML = 5,
-    MM = 6
+    MM = 6,
+    MLM = 7,
+    MPA = 8
 };
 
 enum class WidgetType

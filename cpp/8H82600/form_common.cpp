@@ -61,19 +61,25 @@ bool FormCommon::event(QEvent *event)
                     unit = "ml";
                     break;
                 case MeasurementUnit::BARA:
-                    unit = "barA";
+                    unit = "bara";
                     break;
                 case MeasurementUnit::BARG:
-                    unit = "barG";
+                    unit = "barg";
                     break;
                 case MeasurementUnit::SCCM:
-                    unit = "scm";
+                    unit = "sccm";
                     break;
                 case MeasurementUnit::DEGREE:
                     unit = u8"°C";
                     break;
                 case MeasurementUnit::MM:
                     unit = "mm";
+                    break;
+                case MeasurementUnit::MLM:
+                    unit = "mlm";
+                    break;
+                case MeasurementUnit::MPA:
+                    unit = "mpa";
                     break;
                 default:
                     break;
