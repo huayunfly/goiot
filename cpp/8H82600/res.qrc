@@ -36,5 +36,13 @@
         <file>UICtrls/Res/electric_cylinder.png</file>
         <file>UICtrls/Res/alarm.png</file>
         <file>UICtrls/Res/srv_on.png</file>
+        <file>UICtrls/Res/motor.png</file>
+        <file>Res/icon_control.png</file>
+        <file>Res/icon_distributor.png</file>
+        <file>Res/icon_history.png</file>
+        <file>Res/icon_motor.png</file>
+        <file>Res/icon_trend.png</file>
+        <file>Res/icon_workflow.png</file>
+        <file>Res/icon_device.png</file>
     </qresource>
 </RCC>

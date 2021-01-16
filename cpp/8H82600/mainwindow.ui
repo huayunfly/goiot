@@ -22,6 +22,11 @@
   <property name="windowTitle">
    <string>PPSR-16E平行反应釜系统</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normalon>:/ui_ctrls/Res/icon_device.png</normalon>
+   </iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -48,10 +53,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>76</x>
+      <x>61</x>
       <y>0</y>
-      <width>1180</width>
-      <height>900</height>
+      <width>1200</width>
+      <height>1100</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -59,6 +64,9 @@
       <horstretch>0</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:#FFFFFF</string>
     </property>
     <widget class="QTabWidget" name="tabWidget">
      <property name="geometry">
@@ -97,8 +105,8 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>75</width>
-      <height>900</height>
+      <width>60</width>
+      <height>1100</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -113,30 +121,61 @@
       <height>16777215</height>
      </size>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:#333333;color:#FFFFFF</string>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
     </property>
     <property name="iconSize">
      <size>
-      <width>75</width>
-      <height>75</height>
+      <width>30</width>
+      <height>30</height>
      </size>
+    </property>
+    <property name="textElideMode">
+     <enum>Qt::ElideRight</enum>
     </property>
     <property name="viewMode">
      <enum>QListView::IconMode</enum>
+    </property>
+    <property name="modelColumn">
+     <number>0</number>
     </property>
    </widget>
    <widget class="QWidget" name="widget_trend" native="true">
     <property name="geometry">
      <rect>
-      <x>76</x>
+      <x>61</x>
       <y>0</y>
-      <width>1180</width>
-      <height>900</height>
+      <width>1200</width>
+      <height>1100</height>
      </rect>
     </property>
     <property name="autoFillBackground">
-     <bool>true</bool>
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:#FFFFFF</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="widget_motor" native="true">
+    <property name="geometry">
+     <rect>
+      <x>61</x>
+      <y>0</y>
+      <width>1200</width>
+      <height>1100</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:#FFFFFF</string>
     </property>
    </widget>
   </widget>

@@ -33,6 +33,7 @@ SOURCES += \
     form_liquidsamplinga.cpp \
     form_liquidsamplingb.cpp \
     form_liquidswitch.cpp \
+    form_motorcontrol.cpp \
     form_reactora.cpp \
     form_reactorb.cpp \
     form_trend.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     form_liquidsamplinga.h \
     form_liquidsamplingb.h \
     form_liquidswitch.h \
+    form_motorcontrol.h \
     form_reactora.h \
     form_reactorb.h \
     form_trend.h \
@@ -80,6 +82,7 @@ FORMS += \
     form_liquidsamplinga.ui \
     form_liquidsamplingb.ui \
     form_liquidswitch.ui \
+    form_motorcontrol.ui \
     form_reactora.ui \
     form_reactorb.ui \
     form_trend.ui \

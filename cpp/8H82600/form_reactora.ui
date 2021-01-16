@@ -2237,6 +2237,638 @@
     <string>HC4608</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_FICA3101_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>70</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3102_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>70</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3103_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>70</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3104_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>70</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3101_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>50</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3102_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>50</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3103_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>50</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3104_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>50</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4101">
+   <property name="geometry">
+    <rect>
+     <x>99</x>
+     <y>95</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4102">
+   <property name="geometry">
+    <rect>
+     <x>359</x>
+     <y>95</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4103">
+   <property name="geometry">
+    <rect>
+     <x>619</x>
+     <y>95</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4104">
+   <property name="geometry">
+    <rect>
+     <x>879</x>
+     <y>95</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4105">
+   <property name="geometry">
+    <rect>
+     <x>175</x>
+     <y>506</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4106">
+   <property name="geometry">
+    <rect>
+     <x>435</x>
+     <y>506</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4107">
+   <property name="geometry">
+    <rect>
+     <x>695</x>
+     <y>506</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4108">
+   <property name="geometry">
+    <rect>
+     <x>955</x>
+     <y>506</y>
+     <width>32</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3105_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>460</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3106_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>460</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3107_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>460</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3108_SrvOn">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>460</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3105_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>480</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3106_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>480</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3107_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>480</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA3108_Alarm">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>480</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4101">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>220</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4102">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>220</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4103">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>220</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4104">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>220</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4105">
+   <property name="geometry">
+    <rect>
+     <x>196</x>
+     <y>630</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4106">
+   <property name="geometry">
+    <rect>
+     <x>456</x>
+     <y>630</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4107">
+   <property name="geometry">
+    <rect>
+     <x>716</x>
+     <y>630</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_HC4108">
+   <property name="geometry">
+    <rect>
+     <x>976</x>
+     <y>630</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>label_PICA4301</zorder>
   <zorder>label_PICA4302</zorder>
@@ -2358,6 +2990,38 @@
   <zorder>txt_label_HC4606</zorder>
   <zorder>txt_label_HC4607</zorder>
   <zorder>txt_label_HC4608</zorder>
+  <zorder>label_FICA3101_Alarm</zorder>
+  <zorder>label_FICA3102_Alarm</zorder>
+  <zorder>label_FICA3103_Alarm</zorder>
+  <zorder>label_FICA3104_Alarm</zorder>
+  <zorder>label_FICA3105_Alarm</zorder>
+  <zorder>label_FICA3106_Alarm</zorder>
+  <zorder>label_FICA3107_Alarm</zorder>
+  <zorder>label_FICA3108_Alarm</zorder>
+  <zorder>label_FICA3101_SrvOn</zorder>
+  <zorder>label_FICA3102_SrvOn</zorder>
+  <zorder>label_FICA3103_SrvOn</zorder>
+  <zorder>label_FICA3104_SrvOn</zorder>
+  <zorder>label_FICA3105_SrvOn</zorder>
+  <zorder>label_FICA3106_SrvOn</zorder>
+  <zorder>label_FICA3107_SrvOn</zorder>
+  <zorder>label_FICA3108_SrvOn</zorder>
+  <zorder>label_HC4101</zorder>
+  <zorder>label_HC4102</zorder>
+  <zorder>label_HC4103</zorder>
+  <zorder>label_HC4104</zorder>
+  <zorder>label_HC4105</zorder>
+  <zorder>label_HC4106</zorder>
+  <zorder>label_HC4107</zorder>
+  <zorder>label_HC4108</zorder>
+  <zorder>textEdit_HC4101</zorder>
+  <zorder>textEdit_HC4102</zorder>
+  <zorder>textEdit_HC4103</zorder>
+  <zorder>textEdit_HC4104</zorder>
+  <zorder>textEdit_HC4105</zorder>
+  <zorder>textEdit_HC4106</zorder>
+  <zorder>textEdit_HC4107</zorder>
+  <zorder>textEdit_HC4108</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

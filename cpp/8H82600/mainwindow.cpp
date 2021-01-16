@@ -19,6 +19,7 @@
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
 #include "dialog_onoff.h"
+#include "form_motorcontrol.h"
 #include "resourcedef.h"
 
 
@@ -50,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui_->tabWidget->addTab(entry, entry->GetDisplayName());
     }
 
+    // Setup motor control widget
+
     this->setWindowState(Qt::WindowMaximized);
 
     // Setup Ocx
@@ -60,14 +63,26 @@ MainWindow::MainWindow(QWidget *parent)
     // Setup listview
     QStandardItemModel* model = new QStandardItemModel(this);
     QList<QStandardItem*> list;
-    QStandardItem* s1 = new QStandardItem(QIcon(RES_TC), QString("流程"));
-    QStandardItem* s2 = new QStandardItem(QIcon(RES_VALVE_GAS), QString("趋势"));
+    QStandardItem* s1 = new QStandardItem(QIcon(ICON_CONTROL), QString("控制"));
+    QStandardItem* s2 = new QStandardItem(QIcon(ICON_MOTOR), QString("伺服"));
+    QStandardItem* s3 = new QStandardItem(QIcon(ICON_WORKFLOW), QString("流程"));
+    QStandardItem* s4 = new QStandardItem(QIcon(ICON_TREND), QString("趋势"));
+    QStandardItem* s5 = new QStandardItem(QIcon(ICON_HISTORY), QString("历史"));
+    QStandardItem* s6 = new QStandardItem(QIcon(ICON_DISTRIBUTOR), QString("液体分配"));
     model->appendRow(s1);
     model->appendRow(s2);
+    model->appendRow(s3);
+    model->appendRow(s4);
+    model->appendRow(s5);
+    model->appendRow(s6);
     ui_->listView->setModel(model);
     QModelIndex index_want = model->index(0, 0);
     on_listView_clicked(index_want);
     //ui_->listView->setCurrentIndex(index_want);
+
+    // Setup motor control widget
+    QWidget* motor_widget = new FormMotorControl(ui_->widget_motor);
+    motor_widget->move(0, 1);
 
     // Setup data model
     InitDataModel();
@@ -151,10 +166,12 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.mvalve5_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2403"), RES_SVALVE_2, WidgetType::STATE, MeasurementUnit::NONE, 0, 4, 1));
     data_model_.SetDataToUiMap("plc.1.mvalve6_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2404"), RES_SVALVE_8, WidgetType::STATE, MeasurementUnit::NONE, 0, 8, 1));    
     // liquidswitch - pump
-    data_model_.SetDataToUiMap("plc.1.pump1_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_FICA2305"), RES_WATER_PUMP, WidgetType::PROCESS_VALUE, MeasurementUnit::MLM, 0, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.pump2_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_FICA2405"), RES_WATER_PUMP, WidgetType::PROCESS_VALUE, MeasurementUnit::MLM, 0, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.pump1_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MLM, 0, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.pump2_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2405"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MLM, 0, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump1_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_FICA2305"), RES_WATER_PUMP, WidgetType::PROCESS_VALUE, MeasurementUnit::MLM, 2, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump2_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_FICA2405"), RES_WATER_PUMP, WidgetType::PROCESS_VALUE, MeasurementUnit::MLM, 2, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump1_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MLM, 2, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump2_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2405"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MLM, 2, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.pump1_pressure", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MPA, 1, 10, 0));
+    data_model_.SetDataToUiMap("plc.1.pump2_pressure", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2405"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MPA, 1, 10, 0));
 
     // liquidfeed
     data_model_.SetDataToUiMap("plc.1.smc9_2", UiInfo(ui_->tabWidget->widget(2), QString::fromUtf8("label_HC2306"), RES_SVALVE_5, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
@@ -1503,13 +1520,21 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
 
 void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
+    std::vector<std::string> controls;
+    controls.push_back("widget_control");
+    controls.push_back("widget_motor");
+    controls.push_back("widget_workflow");
+    controls.push_back("widget_trend");
+    controls.push_back("widget_history");
+    controls.push_back("widget_distributor");
+
     QRegularExpression re("^widget_");
 
     QList<QWidget*> children = ui_->centralwidget->findChildren<QWidget*>(re, Qt::FindDirectChildrenOnly);
+    std::string control_name = controls.at(index.row());
     for (auto& child : children)
     {
-        if ((index.row() == 0 && child->objectName() == "widget_control") ||
-                (index.row() == 1 && child->objectName() == "widget_trend"))
+        if (child->objectName().toStdString() == control_name)
         {
             child->setEnabled(true);
             child->setVisible(true);

@@ -27,5 +27,13 @@
 #define RES_ELECTRIC_CYLINDER ":/ui_ctrls/UICtrls/Res/electric_cylinder.png"
 #define RES_ALARM ":/ui_ctrls/UICtrls/Res/alarm.png"
 #define RES_SRV_ON ":/ui_ctrls/UICtrls/Res/srv_on.png"
+#define RES_MOTOR ":/ui_ctrls/UICtrls/Res/motor.png"
+
+#define ICON_CONTROL ":/ui_ctrls/Res/icon_control.png"
+#define ICON_WORKFLOW ":/ui_ctrls/Res/icon_workflow.png"
+#define ICON_MOTOR ":/ui_ctrls/Res/icon_motor.png"
+#define ICON_DISTRIBUTOR ":/ui_ctrls/Res/icon_distributor.png"
+#define ICON_TREND ":/ui_ctrls/Res/icon_trend.png"
+#define ICON_HISTORY ":/ui_ctrls/Res/icon_history.png"
 
 #endif // RESOURCEDEF_H
