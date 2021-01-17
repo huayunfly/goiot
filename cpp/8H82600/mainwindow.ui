@@ -66,14 +66,14 @@
      </sizepolicy>
     </property>
     <property name="styleSheet">
-     <string notr="true">background:#FFFFFF</string>
+     <string notr="true">background:transparent</string>
     </property>
     <widget class="QTabWidget" name="tabWidget">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>1180</width>
+       <width>1200</width>
        <height>900</height>
       </rect>
      </property>
@@ -132,8 +132,8 @@
     </property>
     <property name="iconSize">
      <size>
-      <width>30</width>
-      <height>30</height>
+      <width>32</width>
+      <height>32</height>
      </size>
     </property>
     <property name="textElideMode">
@@ -144,6 +144,9 @@
     </property>
     <property name="modelColumn">
      <number>0</number>
+    </property>
+    <property name="uniformItemSizes">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QWidget" name="widget_trend" native="true">
@@ -162,7 +165,7 @@
      <string notr="true">background:#FFFFFF</string>
     </property>
    </widget>
-   <widget class="QWidget" name="widget_motor" native="true">
+   <widget class="QTabWidget" name="widget_motor">
     <property name="geometry">
      <rect>
       <x>61</x>
@@ -178,6 +181,11 @@
      <string notr="true">background:#FFFFFF</string>
     </property>
    </widget>
+   <zorder>axWidget</zorder>
+   <zorder>listView</zorder>
+   <zorder>widget_trend</zorder>
+   <zorder>widget_control</zorder>
+   <zorder>widget_motor</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

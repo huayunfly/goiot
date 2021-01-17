@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QTableWidget" name="tableWidget">
+  <widget class="QTableWidget" name="tableWidget_cylinder16">
    <property name="geometry">
     <rect>
      <x>0</x>

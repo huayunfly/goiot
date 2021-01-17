@@ -16,8 +16,9 @@ enum class ControlStatus
 class RefreshEvent : public QEvent
 {
 public:
-    explicit RefreshEvent(QEvent::Type type, const QString& name, ControlStatus status, const UiInfo& ui_info) :
-        QEvent (type), name_(name), status_(status), ui_info_(ui_info)
+    explicit RefreshEvent(QEvent::Type type, const QString& name, ControlStatus status,
+                          const UiInfo& ui_info, const std::string& data_info_id) :
+        QEvent (type), name_(name), status_(status), ui_info_(ui_info), data_info_id_(data_info_id)
     {
 
     }
@@ -42,10 +43,16 @@ public:
         return ui_info_;
     }
 
+    const std::string& GetDataInfoId() const
+    {
+        return data_info_id_;
+    }
+
 private:
     QString name_;
     ControlStatus status_;
     UiInfo ui_info_;
+    std::string data_info_id_;
 };
 
 class RefreshTextEvent : public RefreshEvent
@@ -53,8 +60,9 @@ class RefreshTextEvent : public RefreshEvent
 public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1001);
 
-    explicit RefreshTextEvent(const QString& name, ControlStatus status, const UiInfo& ui_info, const QString& text) :
-        RefreshEvent (myType, name, status, ui_info), text_(text)
+    explicit RefreshTextEvent(const QString& name, ControlStatus status, const UiInfo& ui_info,
+                              const std::string& data_info_id, const QString& text) :
+        RefreshEvent (myType, name, status, ui_info, data_info_id), text_(text)
     {
 
     }
@@ -74,8 +82,9 @@ class RefreshStateEvent : public RefreshEvent
 public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1002);
 
-    explicit RefreshStateEvent(const QString& name, ControlStatus status, const UiInfo& ui_info, int state) :
-        RefreshEvent (myType, name, status, ui_info), state_(state)
+    explicit RefreshStateEvent(const QString& name, ControlStatus status, const UiInfo& ui_info,
+                               const std::string& data_info_id, int state) :
+        RefreshEvent (myType, name, status, ui_info, data_info_id), state_(state)
     {
 
     }
@@ -95,8 +104,9 @@ class ProcessValueEvent : public RefreshEvent
 public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1003);
 
-    explicit ProcessValueEvent(const QString& name, ControlStatus status, const UiInfo& ui_info) :
-        RefreshEvent (myType, name, status, ui_info)
+    explicit ProcessValueEvent(const QString& name, ControlStatus status, const UiInfo& ui_info,
+                               const std::string& data_info_id) :
+        RefreshEvent (myType, name, status, ui_info, data_info_id)
     {
 
     }

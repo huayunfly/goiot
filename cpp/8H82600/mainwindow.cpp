@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui_->setupUi(this);
 
+    // Control tab pages
     std::vector<FormCommon*> form_vec;
     form_vec.push_back(new FormGasFeed);
     form_vec.push_back(new FormLiquidSwitch);
@@ -50,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
         entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         ui_->tabWidget->addTab(entry, entry->GetDisplayName());
     }
-
-    // Setup motor control widget
 
     this->setWindowState(Qt::WindowMaximized);
 
@@ -80,9 +79,9 @@ MainWindow::MainWindow(QWidget *parent)
     on_listView_clicked(index_want);
     //ui_->listView->setCurrentIndex(index_want);
 
-    // Setup motor control widget
-    QWidget* motor_widget = new FormMotorControl(ui_->widget_motor);
-    motor_widget->move(0, 1);
+    // Attach motor control widget
+    QWidget* motor_widget_16 = new FormMotorControl();
+    ui_->widget_motor->addTab(motor_widget_16, QString("1#-8#"));
 
     // Setup data model
     InitDataModel();
@@ -279,7 +278,9 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.smc4_15", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_HC3708"), RES_SVALVE_4, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));
     data_model_.SetDataToUiMap("plc.1.smc4_16", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_HC3808"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // EO/PO cylinder
-    data_model_.SetDataToUiMap("cylinder16.1.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    // block busy PO
+    data_model_.SetDataToUiMap("cylinder16.1.busy", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3102"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.5.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3103"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.7.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3104"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -288,7 +289,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.13.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3107"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.15.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3108"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // break_off PO
-    data_model_.SetDataToUiMap("cylinder16.1.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("cylinder16.1.brk_off", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3102_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.5.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3103_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.7.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3104_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -297,7 +299,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.13.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3107_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.15.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3108_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // alarm PO
-    data_model_.SetDataToUiMap("cylinder16.1.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("cylinder16.1.alm", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3102_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.5.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3103_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.7.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3104_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -305,8 +308,9 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.11.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3106_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.13.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3107_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.15.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3108_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
-    // block busy PO
-    data_model_.SetDataToUiMap("cylinder16.2.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3501"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    // block busy EO
+    data_model_.SetDataToUiMap("cylinder16.2.busy", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3501"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.4.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3502"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.6.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3503"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.8.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3504"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -315,7 +319,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.14.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3507"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.16.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3508"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // break_off EO
-    data_model_.SetDataToUiMap("cylinder16.2.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3501_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("cylinder16.2.brk_off", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3501_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.4.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3502_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.6.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3503_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.8.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3504_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -333,7 +338,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.14.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3507_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.16.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3508_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // multi_turn PO
-    data_model_.SetDataToUiMap("cylinder16.1.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
+    data_model_.SetDataToUiMap("cylinder16.1.multi_turn", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0),
+                                                           UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3102"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
     data_model_.SetDataToUiMap("cylinder16.5.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3103"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
     data_model_.SetDataToUiMap("cylinder16.7.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3104"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
@@ -1229,70 +1235,73 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
         for (const auto& data_info : *data_info_vec)
         {
             bool ok = false;
-            UiInfo ui_info = data_model_.GetUiInfo(data_info.id, ok);
+            std::vector<UiInfo> ui_info_list = data_model_.GetUiInfo(data_info.id, ok);
             if (ok)
             {
-                Ui::ControlStatus status = data_info.result == 0 ? Ui::ControlStatus::OK : Ui::ControlStatus::FAILURE;
-                QString value;
-                double fvalue;
-                switch (data_info.data_type)
+                for (auto& ui_info : ui_info_list)
                 {
-                case goiot::DataType::STR:
-                    value.fromStdString(data_info.char_value);
-                    break;
-                case goiot::DataType::DF:
-                    if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion
+                    Ui::ControlStatus status = data_info.result == 0 ? Ui::ControlStatus::OK : Ui::ControlStatus::FAILURE;
+                    QString value;
+                    double fvalue;
+                    switch (data_info.data_type)
                     {
-                        fvalue = data_info.float_value;
-                    }
-                    else
-                    {
-                        fvalue = data_info.float_value * data_info.ratio;
-                    }
-                    value = QString::number(fvalue, 'f', ui_info.decimals);
-                    break;
-                case goiot::DataType::BT:
-                    value = QString::number(data_info.byte_value + ui_info.int_offset); // with UI offset
-                    break;
-                case goiot::DataType::DB:
-                case goiot::DataType::DUB:
-                case goiot::DataType::WB:
-                case goiot::DataType::WUB:
-                    if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion with UI offset
-                    {
-                        value = QString::number(data_info.int_value + ui_info.int_offset);
-                    }
-                    else
-                    {
-                        fvalue = data_info.int_value * data_info.ratio + ui_info.int_offset;
+                    case goiot::DataType::STR:
+                        value.fromStdString(data_info.char_value);
+                        break;
+                    case goiot::DataType::DF:
+                        if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion
+                        {
+                            fvalue = data_info.float_value;
+                        }
+                        else
+                        {
+                            fvalue = data_info.float_value * data_info.ratio;
+                        }
                         value = QString::number(fvalue, 'f', ui_info.decimals);
+                        break;
+                    case goiot::DataType::BT:
+                        value = QString::number(data_info.byte_value + ui_info.int_offset); // with UI offset
+                        break;
+                    case goiot::DataType::DB:
+                    case goiot::DataType::DUB:
+                    case goiot::DataType::WB:
+                    case goiot::DataType::WUB:
+                        if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion with UI offset
+                        {
+                            value = QString::number(data_info.int_value + ui_info.int_offset);
+                        }
+                        else
+                        {
+                            fvalue = data_info.int_value * data_info.ratio + ui_info.int_offset;
+                            value = QString::number(fvalue, 'f', ui_info.decimals);
+                        }
+                        break;
+                    default:
+                        throw std::invalid_argument("Unsupported data type");
                     }
-                    break;
-                default:
-                    throw std::invalid_argument("Unsupported data type");
+                    QEvent* event = nullptr;
+                    if (ui_info.type == WidgetType::TEXT)
+                    {
+                        event = new Ui::RefreshTextEvent(ui_info.ui_name, status, ui_info, data_info.id, value);
+                    }
+                    else if (ui_info.type == WidgetType::ONOFF || ui_info.type == WidgetType::STATE)
+                    {
+                        event = new Ui::RefreshStateEvent(ui_info.ui_name, status, ui_info, data_info.id, value.toInt());
+                    }
+                    else if (ui_info.type == WidgetType::PROCESS_VALUE)
+                    {
+                        event = new Ui::ProcessValueEvent(ui_info.ui_name, status, ui_info, data_info.id);
+                    }
+                    else if (ui_info.type == WidgetType::NONE)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        assert(false);
+                    }
+                    QApplication::postEvent(ui_info.parent, event); // not using sendEvent() for UI update using the same thread problem.
                 }
-                QEvent* event = nullptr;
-                if (ui_info.type == WidgetType::TEXT)
-                {
-                    event = new Ui::RefreshTextEvent(ui_info.ui_name, status, ui_info, value);
-                }
-                else if (ui_info.type == WidgetType::ONOFF || ui_info.type == WidgetType::STATE)
-                {
-                    event = new Ui::RefreshStateEvent(ui_info.ui_name, status, ui_info, value.toInt());
-                }
-                else if (ui_info.type == WidgetType::PROCESS_VALUE)
-                {
-                    event = new Ui::ProcessValueEvent(ui_info.ui_name, status, ui_info);
-                }
-                else if (ui_info.type == WidgetType::NONE)
-                {
-                    continue;
-                }
-                else
-                {
-                    assert(false);
-                }
-                QApplication::postEvent(ui_info.parent, event); // not using sendEvent() for UI update using the same thread problem.
             }
         }
     }
@@ -1302,7 +1311,7 @@ void MainWindow::on_pushButton_clicked()
 {
     QWidget* sender = static_cast<QWidget*>(this->sender());
     QApplication::sendEvent(ui_->tabWidget->widget(0),
-                new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, UiInfo(), "xxyy"));
+                new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, UiInfo(), "mockid", "xxyy"));
     DialogSetValue set_value_dialog(sender, "34.5", MeasurementUnit::DEGREE);
 
     // convert the widget position to the screen position.
@@ -1371,9 +1380,10 @@ bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name,
         return false;
     }
 
-    ui_info = data_model_.GetUiInfo(data_info.id, ok);
+    auto ui_info_list = data_model_.GetUiInfo(data_info.id, ok);
     if (ok)
     {
+        ui_info = ui_info_list[0]; // Get the first one only.
         status = data_info.result == 0 ? Ui::ControlStatus::OK : Ui::ControlStatus::FAILURE;
         double fvalue;
         switch (data_info.data_type)
@@ -1441,13 +1451,14 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
         return false;
     }
 
-    UiInfo ui_info = data_model_.GetUiInfo(data_info.id, ok);
+    auto ui_info_list = data_model_.GetUiInfo(data_info.id, ok);
     if (!ok)
     {
         assert(false);
         return false;
     }
 
+    UiInfo ui_info = ui_info_list[0]; // Get the first one only.
     double float_value = 0.0;
     uint8_t byte_value = 0;
     int int_value = 0;

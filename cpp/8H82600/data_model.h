@@ -90,6 +90,13 @@ public:
     void SetDataToUiMap(const std::string& data_id, UiInfo ui_info);
 
     /// <summary>
+    /// Add a item pair into the dato-to-ui map. No thread safe.
+    /// </summary>
+    /// <param name="data_id">A DataInfo id</param>
+    /// <param name="ui_info_list">UiInfo list</param>
+    void SetDataToUiMap(const std::string& data_id, std::initializer_list<UiInfo> ui_info_list);
+
+    /// <summary>
     /// Set the ui-to-data map. No thread safe.
     /// ui name rule: parent_ui_objectName().ui_name
     /// <summary>
@@ -103,7 +110,7 @@ public:
     /// <param name="data_id">A DataInfo id</param>
     /// <param name="ok">True if UiInfo exists, otherwise False</param>
     /// <returns>An UiInfo if it is found, otherwise an empty UiInfo.</returns>
-    UiInfo GetUiInfo(const std::string& data_id, bool& ok);
+    std::vector<UiInfo> GetUiInfo(const std::string& data_id, bool& ok);
 
     /// <summary>
     /// Get DataInfo id by an ui name.
@@ -114,7 +121,7 @@ public:
     DataDef GetDataDef(const QString& ui_name, bool& ok);
 
 private:
-    std::unordered_map<std::string/* data id */, UiInfo> data_to_ui_map_;
+    std::unordered_map<std::string/* data id */, std::vector<UiInfo>> data_to_ui_map_;
     std::unordered_map<QString/* ui name */, DataDef/* data definition */> ui_to_data_map_;
 };
 
