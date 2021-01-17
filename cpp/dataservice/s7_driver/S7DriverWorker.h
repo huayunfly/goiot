@@ -47,8 +47,8 @@ namespace goiot
 		void Response_Dispatch();
 		// Puts asynchronous read request to the in_queue.
 		void AsyncRead(const std::vector<DataInfo>& data_info_vec, int trans_id);
-		// Puts asynchronous write request to the out_queue.
-		void AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id);
+		// Puts asynchronous write request to the out_queue. Return non zero if the queue is full.
+		int AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id);
 
 	private:
 		/// <summary>

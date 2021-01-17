@@ -234,13 +234,25 @@ namespace goiot
 	}
 
 	// Puts asynchronous write request to the out_queue.
-	void S7DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
+	int S7DriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
 	{
 		if (data_info_vec.size() > 0)
 		{
 			assert(data_info_vec.at(0).data_flow_type == DataFlowType::ASYNC_WRITE);
-			in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec));
+			try
+			{
+				in_queue_.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec),
+					true, std::chrono::milliseconds(200)); // prevent blocking DataService poll dispatch()
+			}
+			catch (const QFull&)
+			{
+#ifdef _DEBUG
+				std::cout << "S7 in_queue_ is full." << std::endl;
+#endif // _DEBUG
+				return ETIMEDOUT;
+			}
 		}
+		return 0;
 	}
 
 	//Read data from device.

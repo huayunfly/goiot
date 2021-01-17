@@ -51,8 +51,7 @@ RESULT_DSAPI goiot::S7Driver::AsyncWrite(const std::vector<DataInfo>& data_info_
     {
         return ENOTCONN;
     }
-    driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
-    return 0;
+    return driver_worker_->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
 }
 
 RESULT_DSAPI goiot::S7Driver::AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id, 
