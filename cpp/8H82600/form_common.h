@@ -53,7 +53,9 @@ class FormCommon : public QWidget
     Q_OBJECT
 
 public:
-    explicit FormCommon(QWidget *parent = nullptr);
+    explicit FormCommon(QWidget *parent = nullptr,
+                        const QString& object_name = QString(),
+                        const QString& display_name = QString());
 
     virtual ~FormCommon()
     {
@@ -65,7 +67,7 @@ public:
     /// <returns>Display name</returns>
     virtual QString GetDisplayName()
     {
-        return QString::fromUtf8("void");
+        return display_name_;
     }
 
 
@@ -132,6 +134,8 @@ protected:
 
 protected:
     //std::unordered_map<QString/* ui name */, UiStateDef> ui_state_map_;
+    QString object_name_;
+    QString display_name_;
     std::unordered_map<QString/* pixmap path */, QPixmap> image_cache_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, const QString&/* value */)> write_data_func_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&, UiInfo&)> read_data_func_;

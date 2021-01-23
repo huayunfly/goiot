@@ -2,11 +2,10 @@
 #include "ui_form_liquidfeeda.h"
 
 FormLiquidFeedA::FormLiquidFeedA(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "liquidfeeda", QString::fromUtf8("进液1-8")),
     ui(new Ui::FormLiquidFeedA)
 {
     ui->setupUi(this);
-    this->setObjectName("liquidfeeda");
     InitUiState();
 }
 

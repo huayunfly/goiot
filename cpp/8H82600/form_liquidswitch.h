@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("原液切换");
-    }
-
 private:
     Ui::FormLiquidSwitch *ui;
 };

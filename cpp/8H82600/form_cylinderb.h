@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("注射进样9-16");
-    }
-
 private:
     Ui::FormCylinderB *ui;
 };

@@ -6,9 +6,11 @@
 #include "dialog_onoff.h"
 #include <QResource>
 
-FormCommon::FormCommon(QWidget *parent) : QWidget(parent)
+FormCommon::FormCommon(QWidget *parent, const QString& object_name,
+                       const QString& display_name) :
+    QWidget(parent), display_name_(display_name)
 {
-
+    this->setObjectName(object_name);
 }
 
 bool FormCommon::eventFilter(QObject* object, QEvent* event)

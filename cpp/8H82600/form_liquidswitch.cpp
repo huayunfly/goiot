@@ -2,11 +2,10 @@
 #include "ui_form_liquidswitch.h"
 
 FormLiquidSwitch::FormLiquidSwitch(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "liquidswitch", QString::fromUtf8("原液切换")),
     ui(new Ui::FormLiquidSwitch)
 {
     ui->setupUi(this);
-    this->setObjectName("liquidswitch");
     InitUiState();
 }
 

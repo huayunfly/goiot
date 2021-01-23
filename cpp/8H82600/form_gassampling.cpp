@@ -2,11 +2,10 @@
 #include "ui_form_gassampling.h"
 
 FormGasSampling::FormGasSampling(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "gassampling", QString::fromUtf8("采气/尾气")),
     ui(new Ui::FormGasSampling)
 {
     ui->setupUi(this);
-    this->setObjectName("gassampling");
     InitUiState();
 }
 

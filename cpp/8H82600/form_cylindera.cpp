@@ -2,11 +2,10 @@
 #include "ui_form_cylindera.h"
 
 FormCylinderA::FormCylinderA(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "cylindera", QString::fromUtf8("注射进样1-8")),
     ui(new Ui::FormCylinderA)
 {
     ui->setupUi(this);
-    this->setObjectName("cylindera");
     InitUiState();
 }
 

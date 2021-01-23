@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("进气");
-    }
-
 private:
     Ui::FormGasFeed *ui;
 };

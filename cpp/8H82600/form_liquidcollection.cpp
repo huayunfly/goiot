@@ -2,11 +2,10 @@
 #include "ui_form_liquidcollection.h"
 
 FormLiquidCollection::FormLiquidCollection(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "liquidcollection", QString::fromUtf8("液体收集")),
     ui(new Ui::FormLiquidCollection)
 {
     ui->setupUi(this);
-    this->setObjectName("liquidcollection");
     InitUiState();
 }
 

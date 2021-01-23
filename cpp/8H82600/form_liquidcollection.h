@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("液体收集");
-    }
-
 private:
     Ui::FormLiquidCollection *ui;
 };

@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     //bool ok = ui_->axWidget->setControl("{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"); // WorkflowComponent.WorkflowComponentCtrl.1
     //ui_->axWidget->show();
 
-    // Setup listview
+    // Setup listview pages
     QStandardItemModel* model = new QStandardItemModel(this);
     QList<QStandardItem*> list;
     QStandardItem* s1 = new QStandardItem(QIcon(ICON_CONTROL), QString("控制"));
@@ -80,8 +80,15 @@ MainWindow::MainWindow(QWidget *parent)
     //ui_->listView->setCurrentIndex(index_want);
 
     // Attach motor control widget
-    QWidget* motor_widget_16 = new FormMotorControl();
-    ui_->widget_motor->addTab(motor_widget_16, QString("1#-8#"));
+    std::vector<FormCommon*> motor_form_vec;
+    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_cylinder16", "1#-8#注射缸", MotorGroup::CYLINDER16));
+    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_cylinder32", "9#-16#注射缸", MotorGroup::CYLINDER32));
+    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_reactor", "1#-16#反应器", MotorGroup::REACTOR));
+    for (auto& entry : motor_form_vec)
+    {
+        entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        ui_->widget_motor->addTab(entry, entry->GetDisplayName());
+    }
 
     // Setup data model
     InitDataModel();
@@ -280,7 +287,7 @@ void MainWindow::InitDataModel()
     // EO/PO cylinder
     // block busy PO
     data_model_.SetDataToUiMap("cylinder16.1.busy", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
-                                                     UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+                                                     UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3102"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.5.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3103"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.7.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3104"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -290,7 +297,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.15.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3108"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // break_off PO
     data_model_.SetDataToUiMap("cylinder16.1.brk_off", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
-                                                        UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+                                                        UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3102_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.5.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3103_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.7.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3104_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -300,7 +307,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.15.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3108_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // alarm PO
     data_model_.SetDataToUiMap("cylinder16.1.alm", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3101_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
-                                                    UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+                                                    UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3102_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.5.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3103_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.7.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3104_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -310,7 +317,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.15.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3108_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // block busy EO
     data_model_.SetDataToUiMap("cylinder16.2.busy", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3501"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
-                                                     UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+                                                     UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.4.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3502"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.6.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3503"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.8.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3504"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -320,7 +327,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.16.busy", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3508"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // break_off EO
     data_model_.SetDataToUiMap("cylinder16.2.brk_off", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3501_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
-                                                        UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+                                                        UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("cylinder16.4.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3502_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.6.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3503_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("cylinder16.8.brk_off", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3504_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -339,7 +346,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("cylinder16.16.alm", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("label_FICA3508_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // multi_turn PO
     data_model_.SetDataToUiMap("cylinder16.1.multi_turn", {UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0),
-                                                           UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget_cylinder16"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0)});
+                                                           UiInfo(ui_->widget_motor->widget(0), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0)});
     data_model_.SetDataToUiMap("cylinder16.3.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3102"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
     data_model_.SetDataToUiMap("cylinder16.5.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3103"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
     data_model_.SetDataToUiMap("cylinder16.7.multi_turn", UiInfo(ui_->tabWidget->widget(4), QString::fromUtf8("textEdit_FICA3104"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::ML, 2, 100, 0));
@@ -1226,6 +1233,15 @@ void MainWindow::InitDataModel()
     // liquidsamplingb - TC
     data_model_.SetUiToDataMap("liquidsamplingb.label_TICA7503", DataDef("plc.1.temp55_pv", "plc.1.temp55_sv", "plc.1.temp55_sv"));
     data_model_.SetUiToDataMap("liquidsamplingb.label_TICA7504", DataDef("plc.1.temp56_pv", "plc.1.temp56_sv", "plc.1.temp56_sv"));
+    // motorcontrol - cylinder16 1-8
+    // cylinder16 1-8
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.button_1_enable", DataDef("cylinder16.1.srv_on", "cylinder16.1.srv_on", "cylinder16.1.srv_on"));
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.button_1_disable", DataDef("cylinder16.1.srv_on", "cylinder16.1.srv_on", "cylinder16.1.srv_on"));
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.button_1_alarm_clear", DataDef("cylinder16.1.a_clr", "cylinder16.1.a_clr", "cylinder16.1.a_clr"));
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.cell_1_speed", DataDef("cylinder16.1.block_v0", "cylinder16.1.block_v0", "cylinder16.1.block_v0"));
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.cell_1_sv", DataDef("cylinder16.1.block_data0", "cylinder16.1.block_data0", "cylinder16.1.block_data0"));
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.button_1_start", DataDef("cylinder16.1.stb", "cylinder16.1.stb", "cylinder16.1.stb"));
+    data_model_.SetUiToDataMap("motorcontrol_cylinder16.button_1_stop", DataDef("cylinder16.1.s_stop", "cylinder16.1.s_stop", "cylinder16.1.s_stop"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)
@@ -1452,13 +1468,13 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     }
 
     auto ui_info_list = data_model_.GetUiInfo(data_info.id, ok);
-    if (!ok)
+    // We need UiInfo.int_offset only.
+    UiInfo ui_info;
+    if (ok)
     {
-        assert(false);
-        return false;
+        ui_info = ui_info_list[0];
     }
 
-    UiInfo ui_info = ui_info_list[0]; // Get the first one only.
     double float_value = 0.0;
     uint8_t byte_value = 0;
     int int_value = 0;

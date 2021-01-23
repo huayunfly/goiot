@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("进液1-8");
-    }
-
 private:
     Ui::FormLiquidFeedA *ui;
 };

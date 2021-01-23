@@ -2,11 +2,10 @@
 #include "ui_form_liquidsamplinga.h"
 
 FormLiquidSamplingA::FormLiquidSamplingA(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "liquidsamplinga", QString::fromUtf8("采液1-8")),
     ui(new Ui::FormLiquidSamplingA)
 {
     ui->setupUi(this);
-    this->setObjectName("liquidsamplinga");
     InitUiState();
 }
 

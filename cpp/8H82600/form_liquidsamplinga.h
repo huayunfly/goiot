@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("采液1-8");
-    }
-
 private:
     Ui::FormLiquidSamplingA *ui;
 };

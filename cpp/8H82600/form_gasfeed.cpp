@@ -5,11 +5,10 @@
 #include "resourcedef.h"
 
 FormGasFeed::FormGasFeed(QWidget *parent) :
-    FormCommon(parent),
+    FormCommon(parent, "gasfeed", QString::fromUtf8("进气")),
     ui(new Ui::FormGasFeed)
 {
     ui->setupUi(this);
-    this->setObjectName("gasfeed");
     InitUiState();
 }
 

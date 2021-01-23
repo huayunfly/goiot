@@ -19,11 +19,6 @@ public:
 
     void InitUiState() override;
 
-    QString GetDisplayName() override
-    {
-        return QString::fromUtf8("采气/尾气");
-    }
-
 private:
     Ui::FormGasSampling *ui;
 };
