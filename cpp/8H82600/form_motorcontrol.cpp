@@ -24,7 +24,19 @@ FormMotorControl::FormMotorControl(QWidget *parent,
     labels.push_back("运行");
     labels.push_back("当前位置");
     labels.push_back("目标位置");
-    labels.push_back("速度ml/min");
+    if (group_ == MotorGroup::CYLINDER16 || group_ == MotorGroup::CYLINDER32)
+    {
+        labels.push_back("速度ml/m(0~40)");
+    }
+    else if (group_ == MotorGroup::REACTOR)
+    {
+        labels.push_back("速度rpm(0~600)");
+    }
+    else
+    {
+        throw std::invalid_argument("Unsupported Motor group");
+    }
+
     labels.push_back("移动");
     labels.push_back("停止");
     ui->tableWidget->setColumnCount(COL_COUNT);
@@ -65,6 +77,10 @@ FormMotorControl::FormMotorControl(QWidget *parent,
         {
             names.push_back(QString::number(i + 1) + "#反应器");
         }
+    }
+    else
+    {
+        throw std::invalid_argument("Unsupported Motor group");
     }
 
     for (int i = 0; i < ROW_COUNT; i++)
@@ -337,16 +353,40 @@ void FormMotorControl::on_cellChanged(int row, int column)
     bool ok = false;
     if (column == COL_SPEED)
     {
-        // Check value
+        // Check value: low limit
         float speed = ui->tableWidget->item(row, column)->text().toFloat(&ok);
-        if (!ok || speed > MAX_FLOWRATE || speed < 0.0f)
+        if (!ok || speed < 0.0f)
+        {
+            ui->tableWidget->item(row, column)->setText(QString::fromUtf8("无效"));
+            return;
+        }
+        // Check value: high limit
+        if ((group_ == MotorGroup::CYLINDER16 || group_ == MotorGroup::CYLINDER32)
+                && (speed > MAX_CYLINDER_FLOWRATE))
+        {
+            ui->tableWidget->item(row, column)->setText(QString::fromUtf8("无效"));
+            return;
+        }
+        if ((group_ == MotorGroup::REACTOR) && (speed > MAX_REACTOR_SPEED))
         {
             ui->tableWidget->item(row, column)->setText(QString::fromUtf8("无效"));
             return;
         }
 
         // calculate motor speed in rpm
-        int flowrate = speed / CYLINDER_VOLUME * TOTAL_TRAVEL / PITCH * REDUCTION_RATIO;
+        int flowrate = 0;
+        if (group_ == MotorGroup::CYLINDER16 || group_ == MotorGroup::CYLINDER32)
+        {
+            flowrate = speed / CYLINDER_VOLUME * TOTAL_TRAVEL / PITCH * REDUCTION_RATIO;
+        }
+        else if (group_ == MotorGroup::REACTOR)
+        {
+            flowrate = speed;
+        }
+        else
+        {
+            throw std::invalid_argument("Unsupported Motor group");
+        }
         // Write data
         cell_id += "speed";
         ok = write_data_func_(this->objectName(), cell_id, QString::number(flowrate));

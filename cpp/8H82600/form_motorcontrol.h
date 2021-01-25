@@ -56,7 +56,8 @@ private:
     const int COL_START = 10;
     const int COL_STOP = 11;
     // Cylinder motor specified parameters
-    const float MAX_FLOWRATE = 40.0f; /*mL/min*/
+    const float MAX_REACTOR_SPEED = 600.0f; /*rpm*/
+    const float MAX_CYLINDER_FLOWRATE = 40.0f; /*mL/min*/
     const float MAX_TARGET_IN_ML = 100.0f; /*mL*/
     const int BLOCK_NUM_MOVE = 0; // 缸活塞绝对量移动至指定位置Block number
     const float CYLINDER_VOLUME = 100; /*缸有效容积ml*/
