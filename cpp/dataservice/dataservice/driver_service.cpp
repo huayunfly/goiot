@@ -412,7 +412,7 @@ namespace goiot {
 #ifdef _DEBUG
 			double gap = std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0 - now;
-			std::cout << "refresh: " << gap << std::endl;
+			//std::cout << "redis refresh: " << gap << std::endl;
 #endif // _DEBUG
 			std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Avoid redis performance problem
 		}

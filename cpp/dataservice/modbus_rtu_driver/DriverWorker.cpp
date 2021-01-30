@@ -46,7 +46,7 @@ namespace goiot
 			[](modbus_t* p) { modbus_close(p);  modbus_free(p); std::cout << "free modbus ptr."; }
 		);
 #ifdef _DEBUG
-		modbus_set_debug(connection_manager_.get(), TRUE);
+		//modbus_set_debug(connection_manager_.get(), TRUE);
 #endif // _DEBUG
 
 		// For test
