@@ -83,6 +83,9 @@ bool FormCommon::event(QEvent *event)
                 case MeasurementUnit::MPA:
                     unit = "mpa";
                     break;
+                case MeasurementUnit::RPM:
+                    unit= "rpm";
+                    break;
                 default:
                     break;
                 }

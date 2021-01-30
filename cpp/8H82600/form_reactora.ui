@@ -2237,7 +2237,7 @@
     <string>HC4608</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3101_Alarm">
+  <widget class="QLabel" name="label_HC4101_Alarm">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -2256,7 +2256,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3102_Alarm">
+  <widget class="QLabel" name="label_HC4102_Alarm">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -2275,7 +2275,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3103_Alarm">
+  <widget class="QLabel" name="label_HC4103_Alarm">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -2294,7 +2294,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3104_Alarm">
+  <widget class="QLabel" name="label_HC4104_Alarm">
    <property name="geometry">
     <rect>
      <x>880</x>
@@ -2313,7 +2313,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3101_SrvOn">
+  <widget class="QLabel" name="label_HC4101_SrvOn">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -2332,7 +2332,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3102_SrvOn">
+  <widget class="QLabel" name="label_HC4102_SrvOn">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -2351,7 +2351,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3103_SrvOn">
+  <widget class="QLabel" name="label_HC4103_SrvOn">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -2370,7 +2370,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3104_SrvOn">
+  <widget class="QLabel" name="label_HC4104_SrvOn">
    <property name="geometry">
     <rect>
      <x>880</x>
@@ -2541,7 +2541,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/motor.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3105_SrvOn">
+  <widget class="QLabel" name="label_HC4105_SrvOn">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -2560,7 +2560,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3106_SrvOn">
+  <widget class="QLabel" name="label_HC4106_SrvOn">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -2579,7 +2579,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3107_SrvOn">
+  <widget class="QLabel" name="label_HC4107_SrvOn">
    <property name="geometry">
     <rect>
      <x>700</x>
@@ -2598,7 +2598,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3108_SrvOn">
+  <widget class="QLabel" name="label_HC4108_SrvOn">
    <property name="geometry">
     <rect>
      <x>960</x>
@@ -2617,7 +2617,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/srv_on.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3105_Alarm">
+  <widget class="QLabel" name="label_HC4105_Alarm">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -2636,7 +2636,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3106_Alarm">
+  <widget class="QLabel" name="label_HC4106_Alarm">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -2655,7 +2655,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3107_Alarm">
+  <widget class="QLabel" name="label_HC4107_Alarm">
    <property name="geometry">
     <rect>
      <x>700</x>
@@ -2674,7 +2674,7 @@
     <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/alarm.png</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="label_FICA3108_Alarm">
+  <widget class="QLabel" name="label_HC4108_Alarm">
    <property name="geometry">
     <rect>
      <x>960</x>
@@ -2990,22 +2990,22 @@
   <zorder>txt_label_HC4606</zorder>
   <zorder>txt_label_HC4607</zorder>
   <zorder>txt_label_HC4608</zorder>
-  <zorder>label_FICA3101_Alarm</zorder>
-  <zorder>label_FICA3102_Alarm</zorder>
-  <zorder>label_FICA3103_Alarm</zorder>
-  <zorder>label_FICA3104_Alarm</zorder>
-  <zorder>label_FICA3105_Alarm</zorder>
-  <zorder>label_FICA3106_Alarm</zorder>
-  <zorder>label_FICA3107_Alarm</zorder>
-  <zorder>label_FICA3108_Alarm</zorder>
-  <zorder>label_FICA3101_SrvOn</zorder>
-  <zorder>label_FICA3102_SrvOn</zorder>
-  <zorder>label_FICA3103_SrvOn</zorder>
-  <zorder>label_FICA3104_SrvOn</zorder>
-  <zorder>label_FICA3105_SrvOn</zorder>
-  <zorder>label_FICA3106_SrvOn</zorder>
-  <zorder>label_FICA3107_SrvOn</zorder>
-  <zorder>label_FICA3108_SrvOn</zorder>
+  <zorder>label_HC4101_Alarm</zorder>
+  <zorder>label_HC4102_Alarm</zorder>
+  <zorder>label_HC4103_Alarm</zorder>
+  <zorder>label_HC4104_Alarm</zorder>
+  <zorder>label_HC4105_Alarm</zorder>
+  <zorder>label_HC4106_Alarm</zorder>
+  <zorder>label_HC4107_Alarm</zorder>
+  <zorder>label_HC4108_Alarm</zorder>
+  <zorder>label_HC4101_SrvOn</zorder>
+  <zorder>label_HC4102_SrvOn</zorder>
+  <zorder>label_HC4103_SrvOn</zorder>
+  <zorder>label_HC4104_SrvOn</zorder>
+  <zorder>label_HC4105_SrvOn</zorder>
+  <zorder>label_HC4106_SrvOn</zorder>
+  <zorder>label_HC4107_SrvOn</zorder>
+  <zorder>label_HC4108_SrvOn</zorder>
   <zorder>label_HC4101</zorder>
   <zorder>label_HC4102</zorder>
   <zorder>label_HC4103</zorder>

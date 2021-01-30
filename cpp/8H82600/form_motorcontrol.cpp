@@ -255,6 +255,9 @@ bool FormMotorControl::event(QEvent *event)
                 case MeasurementUnit::MPA:
                     unit = "mpa";
                     break;
+                case MeasurementUnit::RPM:
+                    unit = "rpm";
+                    break;
                 default:
                     break;
                 }
@@ -377,11 +380,11 @@ void FormMotorControl::on_cellChanged(int row, int column)
         int flowrate = 0;
         if (group_ == MotorGroup::CYLINDER16 || group_ == MotorGroup::CYLINDER32)
         {
-            flowrate = speed / CYLINDER_VOLUME * TOTAL_TRAVEL / PITCH * REDUCTION_RATIO;
+            flowrate = speed / CYLINDER_VOLUME * TOTAL_TRAVEL / PITCH * CYLINDER_REDUCTION_RATIO;
         }
         else if (group_ == MotorGroup::REACTOR)
         {
-            flowrate = speed;
+            flowrate = speed * REACTOR_REDUCTION_RATIO;
         }
         else
         {

@@ -729,6 +729,74 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp38_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4606"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp39_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4607"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp40_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4608"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // reactorA-block busy
+    data_model_.SetDataToUiMap("reactor16.1.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4101"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.2.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4102"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.3.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4103"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.4.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4104"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.5.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4105"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.6.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4106"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.7.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4107"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.8.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4108"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // reactorA-break_off
+    data_model_.SetDataToUiMap("reactor16.1.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4101_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.2.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4102_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.3.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4103_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.4.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4104_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.5.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4105_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.6.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4106_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                         UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.7.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4107_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                         UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.8.brk_off", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4108_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                         UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // reactorA-alarm
+    data_model_.SetDataToUiMap("reactor16.1.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4101_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.2.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4102_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.3.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4103_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.4.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4104_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.5.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4105_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.6.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4106_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.7.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4107_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.8.alm", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4108_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // reactorA-speed
+    data_model_.SetDataToUiMap("reactor16.1.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.2.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4102"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.3.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4103"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.4.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4104"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.5.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4105"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.6.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4106"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.7.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4107"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.8.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4108"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
     // reactorB
     data_model_.SetDataToUiMap("plc.1.smc14_20", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4609"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc14_21", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4610"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -833,6 +901,74 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp46_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4614"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp47_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4615"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp48_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4616"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // reactorB-block busy
+    data_model_.SetDataToUiMap("reactor16.9.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4109"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.10.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4110"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.11.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4111"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.12.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4112"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.13.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4113"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.14.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4114"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.15.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4115"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.16.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4116"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // reactorB-break_off
+    data_model_.SetDataToUiMap("reactor16.9.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4109_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.10.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4110_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.11.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4111_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.12.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4112_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.13.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4113_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                        UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.14.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4114_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                         UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.15.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4115_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                         UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.16.brk_off", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4116_SrvOn"), RES_SRV_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                         UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // reactorB-alarm
+    data_model_.SetDataToUiMap("reactor16.9.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4109_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.10.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4110_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.11.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4111_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.12.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4112_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.13.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4113_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                    UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.14.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4114_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.15.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4115_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("reactor16.16.alm", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4116_Alarm"), RES_ALARM, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                     UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_ELECTRIC_CYLINDER, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // reactorB-speed
+    data_model_.SetDataToUiMap("reactor16.9.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4109"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.10.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4110"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.11.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4111"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.12.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4112"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.13.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4113"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                           UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.14.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4114"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.15.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4115"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    data_model_.SetDataToUiMap("reactor16.16.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4116"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
     // gassampling
     data_model_.SetDataToUiMap("plc.1.smc14_9", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4401"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc14_10", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4402"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));

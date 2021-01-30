@@ -57,12 +57,13 @@ private:
     const int COL_STOP = 11;
     // Cylinder motor specified parameters
     const float MAX_REACTOR_SPEED = 600.0f; /*rpm*/
+    const int REACTOR_REDUCTION_RATIO = 5; /*反应器伺服减速比*/
     const float MAX_CYLINDER_FLOWRATE = 40.0f; /*mL/min*/
     const float MAX_TARGET_IN_ML = 100.0f; /*mL*/
     const int BLOCK_NUM_MOVE = 0; // 缸活塞绝对量移动至指定位置Block number
     const float CYLINDER_VOLUME = 100; /*缸有效容积ml*/
     const float PITCH = 10.0f; /*缸螺距mm*/
-    const int REDUCTION_RATIO = 700; /*减速比*/
+    const int CYLINDER_REDUCTION_RATIO = 700; /*减速比*/
     const float TOTAL_TRAVEL = 98.244f; /*对应100mL总行程mm*/
     const int MOTOR_UNIT_PER_MILLIMETER = 1000000; /* 每毫米电机指令单位 */
 };
