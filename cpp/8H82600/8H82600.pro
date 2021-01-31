@@ -28,6 +28,7 @@ SOURCES += \
     form_gasfeed.cpp \
     form_gassampling.cpp \
     form_liquidcollection.cpp \
+    form_liquiddistributor.cpp \
     form_liquidfeeda.cpp \
     form_liquidfeedb.cpp \
     form_liquidsamplinga.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     form_gasfeed.h \
     form_gassampling.h \
     form_liquidcollection.h \
+    form_liquiddistributor.h \
     form_liquidfeeda.h \
     form_liquidfeedb.h \
     form_liquidsamplinga.h \
@@ -77,6 +79,7 @@ FORMS += \
     form_gasfeed.ui \
     form_gassampling.ui \
     form_liquidcollection.ui \
+    form_liquiddistributor.ui \
     form_liquidfeeda.ui \
     form_liquidfeedb.ui \
     form_liquidsamplinga.ui \

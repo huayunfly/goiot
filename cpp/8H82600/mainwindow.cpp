@@ -20,6 +20,7 @@
 #include "dialog_setposition.h"
 #include "dialog_onoff.h"
 #include "form_motorcontrol.h"
+#include "form_liquiddistributor.h"
 #include "resourcedef.h"
 
 
@@ -88,6 +89,16 @@ MainWindow::MainWindow(QWidget *parent)
     {
         entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         ui_->widget_motor->addTab(entry, entry->GetDisplayName());
+    }
+
+    // Attach liquid distributor widget
+    std::vector<FormCommon*> liquid_distributor_form_vec;
+    liquid_distributor_form_vec.push_back(new FormLiquidDistributor(nullptr, "distributor_sampling", "液体采样"));
+    liquid_distributor_form_vec.push_back(new FormLiquidDistributor(nullptr, "distributor_collection", "液体收集"));
+    for (auto& entry: liquid_distributor_form_vec)
+    {
+        entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        ui_->widget_distributor->addTab(entry, entry->GetDisplayName());
     }
 
     // Setup data model

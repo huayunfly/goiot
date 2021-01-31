@@ -178,11 +178,22 @@
      <string notr="true">background:#FFFFFF</string>
     </property>
    </widget>
+   <widget class="QTabWidget" name="widget_distributor">
+    <property name="geometry">
+     <rect>
+      <x>61</x>
+      <y>0</y>
+      <width>1200</width>
+      <height>1100</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>axWidget</zorder>
    <zorder>listView</zorder>
    <zorder>widget_trend</zorder>
    <zorder>widget_control</zorder>
    <zorder>widget_motor</zorder>
+   <zorder>widget_distributor</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
