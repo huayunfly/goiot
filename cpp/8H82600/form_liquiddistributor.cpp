@@ -15,8 +15,15 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
 
     QStringList labels;
 
-    for (int i = 0; i < 4; i++)
+    const int LINE_ITEMS = 5;
+    const int LINE_GROUPS = 4;
+    for (int i = 0; i < 5; i++)
     {
+        if (i == 2)
+        {
+            labels.push_back(""); // Seperator column
+            continue;
+        }
         labels.push_back("位号");
         labels.push_back("通道");
         labels.push_back("限流");
@@ -34,27 +41,62 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     ui->tableWidget->setAlternatingRowColors(true);
     ui->tableWidget->resize(1200, 1100);
 
-    const int LINE_COUNT = 4; // 4 lines group for liquid sampling
-    const int LINE_ITEMS = 5;
+    QColor seperator_color = QColor(72, 118, 255);
     for (int row = 0; row < ROW_COUNT; row++)
     {
-        for (int line = 0; line < LINE_COUNT; line++)
+        for (int col = 0; col < COL_COUNT; col++)
         {
-            auto pos = QString("#") + QString::number((ROW_COUNT - 1 - row) * LINE_COUNT + (line  + 1));
-            ui->tableWidget->setItem(row, line * LINE_ITEMS + COL_POS, new QTableWidgetItem(pos));
-            ui->tableWidget->item(row, line * LINE_ITEMS + COL_POS)->setFlags(Qt::NoItemFlags);
+            if (row == ROW_COUNT / 2 || col == COL_COUNT / 2)
+            {
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem(""));
+                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+                ui->tableWidget->item(row, col)->setBackground(seperator_color);
+                continue;
+            }
+            int row_positon = row;
+            int line = col % LINE_ITEMS;
+            int line_group = col / LINE_ITEMS;
+            if (row < ROW_COUNT / 2)
+            {
+                row_positon++;
+            }
+            if (col > COL_COUNT / 2)
+            {
+                line = (col - 1) % LINE_ITEMS;
+                line_group = (col - 1) / LINE_ITEMS;
+            }
 
-            ui->tableWidget->setItem(row, line * LINE_ITEMS + COL_CHANNEL, new QTableWidgetItem("a"));
-            ui->tableWidget->item(row, line * LINE_ITEMS + COL_CHANNEL)->setTextAlignment(Qt::AlignCenter);
-
-            QCheckBox *checkbox = new QCheckBox();
-            ui->tableWidget->setCellWidget(row, line * LINE_ITEMS + COL_FLOW_LIMIT, checkbox);
-
-            ui->tableWidget->setItem(row, line * LINE_ITEMS + COL_TIME, new QTableWidgetItem("1s"));
-            ui->tableWidget->item(row, line * LINE_ITEMS + COL_TIME)->setTextAlignment(Qt::AlignCenter);
-
-            ui->tableWidget->setItem(row, line * LINE_ITEMS + COL_PURGE, new QTableWidgetItem("d"));
-            ui->tableWidget->item(row, line * LINE_ITEMS + COL_PURGE)->setTextAlignment(Qt::AlignCenter);
+            if (line == COL_POS)
+            {
+                // Position
+                auto pos = QString("#") + QString::number((ROW_COUNT - 1 - row_positon) * LINE_GROUPS + line_group + 1);
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem(pos));
+                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+            }
+            else if (line == COL_CHANNEL)
+            {
+                // Channel
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem("ch"));
+                ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
+            }
+            else if (line == COL_FLOW_LIMIT)
+            {
+                // Flow limit?
+                QCheckBox *checkbox = new QCheckBox();
+                ui->tableWidget->setCellWidget(row, col, checkbox);
+            }
+            else if (line == COL_TIME)
+            {
+                // Sampling time in s
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem("1s"));
+                ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
+            }
+            else if (line == COL_PURGE)
+            {
+                // Purge?
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem("p"));
+                ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
+            }
         }
     }
 }

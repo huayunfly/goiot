@@ -29,8 +29,8 @@ private:
     Ui::FormLiquidDistributor *ui;
     LiquidDistributorGroup group_;
 
-    const int ROW_COUNT = 32;
-    const int COL_COUNT = 20;
+    const int ROW_COUNT = 32 + 1; // 1 seperator row
+    const int COL_COUNT = 20 + 1; // 1 seperator column
     const int COL_POS = 0;
     const int COL_CHANNEL = 1;
     const int COL_FLOW_LIMIT = 2;
