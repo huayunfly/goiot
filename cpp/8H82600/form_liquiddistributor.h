@@ -25,10 +25,19 @@ public:
                                    LiquidDistributorGroup group = LiquidDistributorGroup::SAMPLING);
     ~FormLiquidDistributor();
 
+private slots:
+    void on_pushButton_clicked();
+
+private:
+    void SaveLiquidSamplingProcedure();
+    void LoadLiquidSamplingProcedure();
+
 private:
     Ui::FormLiquidDistributor *ui;
     LiquidDistributorGroup group_;
 
+    const int LINE_GROUPS = 4; // Liquid sampling line group
+    const int LINE_ITEMS = 5;  // Liquid sampling line record items
     const int ROW_COUNT = 32 + 1; // 1 seperator row
     const int COL_COUNT = 20 + 1; // 1 seperator column
     const int COL_POS = 0;
