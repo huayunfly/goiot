@@ -1,6 +1,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <cassert>
 #include "form_liquiddistributor.h"
 #include "ui_form_liquiddistributor.h"
 
@@ -67,9 +68,15 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
                 line_group = (col - 1) / LINE_ITEMS;
             }
 
-            // Initialize channel number
+            // Initialize channel number, sampling_time, purge_time, solvent type
             QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
             QStringList channel_9_to_16({"", "9", "10", "11", "12", "13", "14", "15", "16"});
+            QStringList sampling_time;
+            for (int s = 1; s < 100; s++)
+            {
+                sampling_time.append(QString::number(s) + "s");
+            }
+            QStringList solvent_type({"L2", "L3", "L4", "L6", "L7", "L8"});
 
             if (line == COL_POS)
             {
@@ -91,7 +98,6 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
                     combobox->addItems(channel_9_to_16);
                 }
                 ui->tableWidget->setCellWidget(row, col, combobox);
-                //ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
             }
             else if (line == COL_FLOW_LIMIT)
             {
@@ -99,17 +105,21 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
                 QCheckBox *checkbox = new QCheckBox();
                 ui->tableWidget->setCellWidget(row, col, checkbox);
             }
-            else if (line == COL_TIME)
+            else if (line == COL_SAMPLING_TIME)
             {
                 // Sampling time in s
-                ui->tableWidget->setItem(row, col, new QTableWidgetItem("1s"));
-                ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
+                QComboBox *combobox = new QComboBox();
+                combobox->addItems(sampling_time);
+                ui->tableWidget->setCellWidget(row, col, combobox);
             }
-            else if (line == COL_PURGE)
+            else if (line == COL_SOLVENT_TYPE)
             {
-                // Purge?
-                ui->tableWidget->setItem(row, col, new QTableWidgetItem("p"));
-                ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
+                // Solvent type
+                QComboBox *combobox = new QComboBox();
+                combobox->addItems(solvent_type);
+                ui->tableWidget->setCellWidget(row, col, combobox);
+                //ui->tableWidget->setItem(row, col, new QTableWidgetItem("p"));
+                //ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
             }
         }
     }
@@ -120,7 +130,7 @@ FormLiquidDistributor::~FormLiquidDistributor()
     delete ui;
 }
 
-void FormLiquidDistributor::SaveLiquidSamplingProcedure()
+QString FormLiquidDistributor::SaveLiquidSamplingProcedure()
 {
     QString record;
     // Reversed search
@@ -162,28 +172,102 @@ void FormLiquidDistributor::SaveLiquidSamplingProcedure()
             {
                 flow_limit = 1;
             }
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+            int sampling_time = combobox->currentText().remove("s", Qt::CaseInsensitive).toUInt();
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+            int solvent_type = combobox->currentText().remove("L", Qt::CaseInsensitive).toUInt();
+            int purge_time = 2 * sampling_time;
             // Append record
             record.append(QString::number(pos));
             record.append(",");
             record.append(QString::number(channel));
             record.append(",");
             record.append(QString::number(flow_limit));
+            record.append(",");
+            record.append(QString::number(sampling_time));
+            record.append(",");
+            record.append(QString::number(solvent_type));
+            record.append(",");
+            record.append(QString::number(purge_time));
             record.append(";");
         }
     }
-    record.append("++");
+    return record;
 }
 
-void FormLiquidDistributor::LoadLiquidSamplingProcedure()
+std::list<std::vector<int>> FormLiquidDistributor::SamplingRecordToList(
+        const QString& record)
 {
+    auto list = std::list<std::vector<int>>();
+    QStringList records = record.split(";", Qt::SkipEmptyParts);
+    records.sort(); // Sort by the first position.
+    for (auto& sub : records)
+    {
+        QStringList sub_list = sub.split(",", Qt::SkipEmptyParts);
+        std::vector<int> vec;
+        for (auto& item : sub_list)
+        {
+            vec.push_back(item.toInt());
+        }
+        list.push_back(vec);
+    }
+    return list;
+}
 
-
-
-
-
+void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
+{
+    auto record_list = SamplingRecordToList(record);
+    for (auto& vec : record_list)
+    {
+        int pos = vec.at(COL_POS);
+        if (pos > MAX_SAMPLING_POS)
+        {
+            assert(false);
+            continue;
+        }
+        // Map position to QTable row, reversed order.
+        int row = (pos - 1) / LINE_GROUPS;
+        // Reverse
+        row = (MAX_SAMPLING_POS / LINE_GROUPS - 1) - row;
+        if (row > (MAX_SAMPLING_POS / LINE_GROUPS - 1) / 2)
+        {
+            row++; // jump seperator
+        }
+        int start_col = ((pos - 1) % LINE_GROUPS) * LINE_ITEMS;
+        if (start_col > LINE_GROUPS * LINE_ITEMS / 2 - 1)
+        {
+            start_col++; // jump seperator
+        }
+        QComboBox* combobox = static_cast<QComboBox*>(
+                ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
+        combobox->setCurrentText(QString::number(vec.at(COL_CHANNEL)));
+        QCheckBox* checkbox = static_cast<QCheckBox*>(
+                ui->tableWidget->cellWidget(row, start_col + COL_FLOW_LIMIT));
+        if (vec.at(COL_FLOW_LIMIT) > 0)
+        {
+            checkbox->setChecked(true);
+        }
+        else
+        {
+            checkbox->setChecked(false);
+        }
+        combobox = static_cast<QComboBox*>(
+                ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+        combobox->setCurrentText(QString::number(vec.at(COL_SAMPLING_TIME)) + "s");
+        combobox = static_cast<QComboBox*>(
+                ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+        combobox->setCurrentText(QString("L") + QString::number(vec.at(COL_SOLVENT_TYPE)));
+    }
 }
 
 void FormLiquidDistributor::on_pushButton_clicked()
 {
     SaveLiquidSamplingProcedure();
+}
+
+void FormLiquidDistributor::on_pushButton_2_clicked()
+{
+    LoadLiquidSamplingProcedure("23,1,1,10,2;24,9,1,11,3;128,10,1,12,6");
 }
