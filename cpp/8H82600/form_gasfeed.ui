@@ -1341,6 +1341,134 @@
     <string>乙二醇吹扫</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_PIA1110">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>180</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1110</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1120">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>270</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1120</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1130">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>360</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1130</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1140">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>450</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1140</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA3110">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>530</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA3110</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA3120">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>610</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA3120</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1010">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>20</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1010</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1020">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>70</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1020</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>textEdit_FICA1110</zorder>
   <zorder>label_HC1201</zorder>
@@ -1415,6 +1543,14 @@
   <zorder>txt_label_R4101_16</zorder>
   <zorder>txt_label_HC1020_EOPO</zorder>
   <zorder>txt_label_HC1020_EE</zorder>
+  <zorder>txt_label_PIA1110</zorder>
+  <zorder>txt_label_PIA1120</zorder>
+  <zorder>txt_label_PIA1130</zorder>
+  <zorder>txt_label_PIA1140</zorder>
+  <zorder>txt_label_PIA3110</zorder>
+  <zorder>txt_label_PIA3120</zorder>
+  <zorder>txt_label_PIA1010</zorder>
+  <zorder>txt_label_PIA1020</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

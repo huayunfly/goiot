@@ -2869,6 +2869,390 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_TICA4101">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>280</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4101</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4102">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>280</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4102</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4103">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>280</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4103</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4104">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>280</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4104</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4105">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>690</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4105</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4106">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>690</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4106</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4107">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>690</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4107</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4108">
+   <property name="geometry">
+    <rect>
+     <x>1040</x>
+     <y>690</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4108</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4121">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>190</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4121</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4122">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>190</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4122</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4123">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>190</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4123</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4124">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>190</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4124</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4125">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>600</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4125</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4126">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>600</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4126</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4127">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>600</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4127</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4128">
+   <property name="geometry">
+    <rect>
+     <x>1040</x>
+     <y>600</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4128</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4601">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>148</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4601</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4602">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>148</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4602</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4603">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>148</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4603</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4604">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>148</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4604</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4605">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>560</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4605</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4606">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>560</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4606</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4607">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>560</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4607</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA4608">
+   <property name="geometry">
+    <rect>
+     <x>1040</x>
+     <y>560</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA4608</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>label_PICA4301</zorder>
   <zorder>label_PICA4302</zorder>
@@ -3022,6 +3406,30 @@
   <zorder>textEdit_HC4106</zorder>
   <zorder>textEdit_HC4107</zorder>
   <zorder>textEdit_HC4108</zorder>
+  <zorder>txt_label_TICA4101</zorder>
+  <zorder>txt_label_TICA4102</zorder>
+  <zorder>txt_label_TICA4103</zorder>
+  <zorder>txt_label_TICA4104</zorder>
+  <zorder>txt_label_TICA4105</zorder>
+  <zorder>txt_label_TICA4106</zorder>
+  <zorder>txt_label_TICA4107</zorder>
+  <zorder>txt_label_TICA4108</zorder>
+  <zorder>txt_label_TICA4121</zorder>
+  <zorder>txt_label_TICA4122</zorder>
+  <zorder>txt_label_TICA4123</zorder>
+  <zorder>txt_label_TICA4124</zorder>
+  <zorder>txt_label_TICA4125</zorder>
+  <zorder>txt_label_TICA4126</zorder>
+  <zorder>txt_label_TICA4127</zorder>
+  <zorder>txt_label_TICA4128</zorder>
+  <zorder>txt_label_TICA4601</zorder>
+  <zorder>txt_label_TICA4602</zorder>
+  <zorder>txt_label_TICA4603</zorder>
+  <zorder>txt_label_TICA4604</zorder>
+  <zorder>txt_label_TICA4605</zorder>
+  <zorder>txt_label_TICA4606</zorder>
+  <zorder>txt_label_TICA4607</zorder>
+  <zorder>txt_label_TICA4608</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>
