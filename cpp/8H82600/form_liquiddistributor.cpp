@@ -1,6 +1,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <cassert>
 #include "form_liquiddistributor.h"
 #include "ui_form_liquiddistributor.h"
@@ -15,6 +17,71 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
 {
     ui->setupUi(this);
     InitUiState();
+
+    // position display
+    const int x_gap = 35;
+    const int y_gap = 35;
+    const int radius = 15;
+    std::vector<std::pair<double, double>> positions;
+    int number = 1;
+    double y_base = 0;
+    for (int y = 0; y < 32; y++)
+    {
+        if (y >= 8 && y < 16)
+        {
+            y_base = y_gap;
+        }
+        else if (y >= 16 && y < 24)
+        {
+            y_base = 2 * y_gap;
+        }
+        else if (y >= 24)
+        {
+            y_base = 3 * y_gap;
+        }
+        for (int x = 0; x < 4; x++)
+        {
+            auto item =
+                    std::make_shared<SamplingUIItem>(radius, number);
+            item->setPos(x * x_gap + radius, y_base + y * y_gap + radius);
+            sampling_ui_items.push_back(item);
+            number++;
+        }
+    }
+    // for sink positions
+    for (int y = 0; y < 2; y++)
+    {
+        if (y == 0)
+        {
+            y_base = 8 * y_gap;
+        }
+        else
+        {
+            y_base = 26 * y_gap;
+        }
+        for (int x = 0; x < 4; x++)
+        {
+            auto item = std::make_shared<SamplingUIItem>(
+                            radius,
+                            129,
+                            SamplingUIItem::SamplingUIItemStatus::Undischarge);
+            item->setPos(x * x_gap + radius, y_base + radius);
+            sampling_ui_items.push_back(item);
+        }
+    }
+
+    auto scene = new QGraphicsScene(0, 0, 300, 1200);
+    //scene->addRect(0, 0, 300, 800);
+    for (auto& item : sampling_ui_items)
+    {
+        scene->addItem(item.get());
+    }
+
+    auto view = new QGraphicsView(scene);
+    view->show();
+    ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
+
+    // table
 
     QStringList labels;
 
@@ -128,6 +195,16 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
 FormLiquidDistributor::~FormLiquidDistributor()
 {
     delete ui;
+}
+
+bool FormLiquidDistributor::event(QEvent *event)
+{
+    if (event == nullptr)
+    {
+        return false;
+    }
+
+    return FormCommon::event(event);
 }
 
 QString FormLiquidDistributor::SaveLiquidSamplingProcedure()
@@ -260,6 +337,11 @@ void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
                 ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
         combobox->setCurrentText(QString("L") + QString::number(vec.at(COL_SOLVENT_TYPE)));
     }
+}
+
+void FormLiquidDistributor::InitUiState()
+{
+    ui->verticalLayout->installEventFilter(this);
 }
 
 void FormLiquidDistributor::on_pushButton_clicked()

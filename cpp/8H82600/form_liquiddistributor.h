@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <form_common.h>
+#include "sampling_ui_item.h"
 
 namespace Ui {
 class FormLiquidDistributor;
@@ -24,6 +25,10 @@ public:
                                    const QString& display_name = QString(),
                                    LiquidDistributorGroup group = LiquidDistributorGroup::SAMPLING);
     ~FormLiquidDistributor();
+
+    bool event(QEvent *event) override;
+
+    void InitUiState() override;
 
 private slots:
     void on_pushButton_clicked();
@@ -50,6 +55,8 @@ private:
     const int COL_SAMPLING_TIME = 3;
     const int COL_SOLVENT_TYPE = 4;
     const int COL_PURGE_PORT = 5;
+
+    std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;
 };
 
 #endif // FORM_LIQUIDDISTRIBUTOR_H

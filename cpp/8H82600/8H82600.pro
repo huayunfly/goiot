@@ -39,7 +39,8 @@ SOURCES += \
     form_reactorb.cpp \
     form_trend.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    sampling_ui_item.cpp
 
 HEADERS += \
     ThreadSafeQueue.h \
@@ -68,7 +69,8 @@ HEADERS += \
     form_reactorb.h \
     form_trend.h \
     mainwindow.h \
-    resourcedef.h
+    resourcedef.h \
+    sampling_ui_item.h
 
 FORMS += \
     dialog_onoff.ui \
