@@ -35,10 +35,17 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_tableWidget_cellChanged(int row, int column);
+
 private:
     QString SaveLiquidSamplingProcedure();
     void LoadLiquidSamplingProcedure(const QString& record);
     std::list<std::vector<int>> SamplingRecordToList(const QString& record);
+
+    // Fill item setting table.
+    void FillTable(const std::list<std::vector<int>>& record_list);
+    // Fill status chart.
+    void FillStatusChart(const std::list<std::vector<int>>& record_list);
 
 private:
     Ui::FormLiquidDistributor *ui;

@@ -43,7 +43,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
         {
             auto item =
                     std::make_shared<SamplingUIItem>(radius, number);
-            item->setPos(x * x_gap + radius, y_base + y * y_gap + radius);
+            item->setPos(x * x_gap + 2 * x_gap, y_base + y * y_gap + radius);
             sampling_ui_items.push_back(item);
             number++;
         }
@@ -65,12 +65,12 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
                             radius,
                             129,
                             SamplingUIItem::SamplingUIItemStatus::Undischarge);
-            item->setPos(x * x_gap + radius, y_base + radius);
+            item->setPos(x * x_gap + 2 * x_gap, y_base + radius);
             sampling_ui_items.push_back(item);
         }
     }
 
-    auto scene = new QGraphicsScene(0, 0, 300, 1200);
+    auto scene = new QGraphicsScene(0, 0, 8 * x_gap, 35 * y_gap);
     //scene->addRect(0, 0, 300, 800);
     for (auto& item : sampling_ui_items)
     {
@@ -125,9 +125,9 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
             int row_positon = row;
             int line = col % LINE_ITEMS;
             int line_group = col / LINE_ITEMS;
-            if (row < ROW_COUNT / 2)
+            if (row > ROW_COUNT / 2)
             {
-                row_positon++;
+                row_positon--;
             }
             if (col > COL_COUNT / 2)
             {
@@ -148,9 +148,10 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
             if (line == COL_POS)
             {
                 // Position
-                auto pos = QString("#") + QString::number((ROW_COUNT - 1 - row_positon) * LINE_GROUPS + line_group + 1);
+                auto pos = QString("#") + QString::number(row_positon * LINE_GROUPS + line_group + 1);
                 ui->tableWidget->setItem(row, col, new QTableWidgetItem(pos));
                 ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+                ui->tableWidget->item(row, col)->setFont(QFont("arial", 9, QFont::Black));
             }
             else if (line == COL_CHANNEL)
             {
@@ -210,18 +211,18 @@ bool FormLiquidDistributor::event(QEvent *event)
 QString FormLiquidDistributor::SaveLiquidSamplingProcedure()
 {
     QString record;
-    // Reversed search
-    for (int row = ROW_COUNT - 1; row >= 0; row--)
+    // search
+    for (int row = 0; row < ROW_COUNT; row++)
     {
         if (row == ROW_COUNT / 2)
         {
             continue;
         }
 
-        int reversed_row = (ROW_COUNT - 1) - row;
-        if (row < ROW_COUNT / 2)
+        int valid_row = row;
+        if (row > ROW_COUNT / 2)
         {
-            reversed_row--;
+            valid_row--;
         }
         for (int group = 0; group < LINE_GROUPS; group++)
         {
@@ -230,7 +231,7 @@ QString FormLiquidDistributor::SaveLiquidSamplingProcedure()
             {
                 start_col += 1; // Jump seperator
             }
-            int pos = reversed_row * LINE_GROUPS + group + 1;
+            int pos = valid_row * LINE_GROUPS + group + 1;
             QComboBox* combobox = static_cast<QComboBox*>(
                     ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
             int channel = 0;
@@ -296,6 +297,45 @@ std::list<std::vector<int>> FormLiquidDistributor::SamplingRecordToList(
 void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
 {
     auto record_list = SamplingRecordToList(record);
+    FillTable(record_list);
+    FillStatusChart(record_list);
+}
+
+
+void FormLiquidDistributor::FillTable(const std::list<std::vector<int>>& record_list)
+{
+    // clear table first.
+    if (record_list.size() > 0)
+    {
+        for (int row = 0; row < ROW_COUNT; row++)
+        {
+            if (row == ROW_COUNT / 2)
+            {
+                continue;
+            }
+            for (int group = 0; group < LINE_GROUPS; group++)
+            {
+                int start_col = group * LINE_ITEMS;
+                if (group >= LINE_GROUPS / 2)
+                {
+                    start_col++; // jump seperator
+                }
+                QComboBox* combobox = static_cast<QComboBox*>(
+                        ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
+                combobox->setCurrentText(""); // empty channel
+                QCheckBox* checkbox = static_cast<QCheckBox*>(
+                        ui->tableWidget->cellWidget(row, start_col + COL_FLOW_LIMIT));
+                checkbox->setChecked(false); // default value
+                combobox = static_cast<QComboBox*>(
+                        ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+                combobox->setCurrentText("1s");
+                combobox = static_cast<QComboBox*>(
+                        ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+                combobox->setCurrentText("L2");
+            }
+        }
+    }
+    // fill table
     for (auto& vec : record_list)
     {
         int pos = vec.at(COL_POS);
@@ -306,8 +346,6 @@ void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
         }
         // Map position to QTable row, reversed order.
         int row = (pos - 1) / LINE_GROUPS;
-        // Reverse
-        row = (MAX_SAMPLING_POS / LINE_GROUPS - 1) - row;
         if (row > (MAX_SAMPLING_POS / LINE_GROUPS - 1) / 2)
         {
             row++; // jump seperator
@@ -339,6 +377,29 @@ void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
     }
 }
 
+void FormLiquidDistributor::FillStatusChart(const std::list<std::vector<int>>& record_list)
+{
+    if (record_list.size() > 0)
+    {
+        for (int i = 0; i < MAX_SAMPLING_POS; i++)
+        {
+            sampling_ui_items.at(i)->SetStatus(
+                        SamplingUIItem::SamplingUIItemStatus::Unsigned);
+        }
+        for (auto& vec : record_list)
+        {
+            int pos = vec.at(COL_POS);
+            if (pos > MAX_SAMPLING_POS)
+            {
+                assert(false);
+                continue;
+            }
+            sampling_ui_items.at(pos - 1)->SetStatus(
+                        SamplingUIItem::SamplingUIItemStatus::Waiting);
+        }
+    }
+}
+
 void FormLiquidDistributor::InitUiState()
 {
     ui->verticalLayout->installEventFilter(this);
@@ -352,4 +413,47 @@ void FormLiquidDistributor::on_pushButton_clicked()
 void FormLiquidDistributor::on_pushButton_2_clicked()
 {
     LoadLiquidSamplingProcedure("23,1,1,10,2;24,9,1,11,3;128,10,1,12,6");
+}
+
+void FormLiquidDistributor::on_tableWidget_cellChanged(int row, int column)
+{
+    if (row >= ROW_COUNT || column >= COL_COUNT)
+    {
+        assert(false);
+        return;
+    }
+    if (row == ROW_COUNT / 2)
+    {
+        return;
+    }
+    // detect channel changed.
+    if (((column < COL_COUNT / 2) && (column % LINE_ITEMS == 1)) ||
+            (column > COL_COUNT / 2 && ((column + 1) % LINE_ITEMS == 1)))
+
+    {
+        QComboBox* combobox = static_cast<QComboBox*>(
+                ui->tableWidget->cellWidget(row, column));
+        // calculate channel
+        int row_channel = row;
+        int col_channel = column;
+        if (row > ROW_COUNT / 2)
+        {
+            row_channel--; // jump seperator
+        }
+        if (column > COL_COUNT / 2)
+        {
+            col_channel--;  // jump seperator
+        }
+        int channel = row_channel * LINE_GROUPS + col_channel / LINE_ITEMS + 1; // base 1
+        if (combobox->currentText() == QString())
+        {
+            sampling_ui_items.at(channel - 1)->SetStatus(
+                        SamplingUIItem::SamplingUIItemStatus::Unsigned);
+        }
+        else
+        {
+            sampling_ui_items.at(channel - 1)->SetStatus(
+                        SamplingUIItem::SamplingUIItemStatus::Waiting);
+        }
+    }
 }

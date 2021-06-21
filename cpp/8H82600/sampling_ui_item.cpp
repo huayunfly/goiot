@@ -11,10 +11,10 @@ void SamplingUIItem::paint(QPainter *painter,
     switch (status_)
     {
     case SamplingUIItemStatus::Unsigned:
-        painter->setBrush(Qt::gray);
+        painter->setBrush(Qt::transparent);
         break;
     case SamplingUIItemStatus::Waiting:
-        painter->setBrush(Qt::darkRed);
+        painter->setBrush(Qt::lightGray);
         break;
     case SamplingUIItemStatus::Sampling:
         painter->setBrush(Qt::yellow);
