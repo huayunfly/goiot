@@ -616,17 +616,37 @@ namespace goiot
 
 	void DriverWorker::AssignRegisterValue(std::shared_ptr<DataInfo> data_info, std::shared_ptr<uint16_t> registers)
 	{
+		int32_t signed_dword = 0;
+		uint32_t unsigned_dword = 0;
+		int16_t signed_word = 0;
+		uint16_t unsigned_word = 0;
 		switch (data_info->data_type)
 		{
 		case DataType::DB:
+			switch (data_info->dword_decode)
+			{
+			case DWordDecode::ABCD:
+				signed_dword = (registers.get()[0] << 16) + registers.get()[1]/* * data_info->ratio*/;
+				data_info->int_value = static_cast<int>(signed_dword);
+				break;
+			case DWordDecode::CDAB:
+				signed_dword = registers.get()[0] + (registers.get()[1] << 16)/* * data_info->ratio*/;
+				data_info->int_value = static_cast<int>(signed_dword);
+				break;
+			default:
+				throw std::invalid_argument("Unsupported dword decode.");
+			}
+			break;
 		case DataType::DUB:
 			switch (data_info->dword_decode)
 			{
 			case DWordDecode::ABCD:
-				data_info->int_value = (registers.get()[0] << 16) + registers.get()[1]/* * data_info->ratio*/;
+				unsigned_dword = (registers.get()[0] << 16) + registers.get()[1]/* * data_info->ratio*/;
+				data_info->int_value = static_cast<int>(unsigned_dword);
 				break;
 			case DWordDecode::CDAB:
-				data_info->int_value = registers.get()[0] + (registers.get()[1] << 16)/* * data_info->ratio*/;
+				unsigned_dword = registers.get()[0] + (registers.get()[1] << 16)/* * data_info->ratio*/;
+				data_info->int_value = static_cast<int>(unsigned_dword);
 				break;
 			default:
 				throw std::invalid_argument("Unsupported dword decode.");
@@ -652,8 +672,12 @@ namespace goiot
 			}
 			break;
 		case DataType::WB:
+			signed_word = registers.get()[0]/* * data_info->ratio*/;
+			data_info->int_value = static_cast<int>(signed_word);
+			break;
 		case DataType::WUB:
-			data_info->int_value = registers.get()[0]/* * data_info->ratio*/;
+			unsigned_word = registers.get()[0]/* * data_info->ratio*/;
+			data_info->int_value = static_cast<int>(unsigned_word);
 			break;
 		default:
 			throw std::invalid_argument("Unsupported data type.");
@@ -680,20 +704,49 @@ namespace goiot
 			if (result == 0)
 			{
 				int int_value = 0;
+				int32_t signed_dword = 0;
+				uint32_t unsigned_dword = 0;
+				int16_t signed_word = 0;
+				uint16_t unsigned_word = 0;
 				float float_value = 0.0;
 				switch (data_pair.second.data_type)
 				{
 				case DataType::DB:
+					switch (data_pair.second.dword_decode)
+					{
+					case DWordDecode::ABCD:
+						signed_dword = ((registers.at(data_pair.first - register_start) << 16) +
+							registers.at(data_pair.first - register_start + 1))/* * data_pair.second.ratio*/;
+						int_value = static_cast<int>(signed_dword);
+						break;
+					case DWordDecode::CDAB:
+						signed_dword = (registers.at(data_pair.first - register_start) +
+							(registers.at(data_pair.first - register_start + 1) << 16))/* * data_pair.second.ratio*/;
+						int_value = static_cast<int>(signed_dword);
+						break;
+					default:
+						throw std::invalid_argument("Unsupported dword decode.");
+					}
+					rp_data_info_vec->emplace_back(data_pair.second.id,
+						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, int_value,
+						data_pair.second.float_value, data_pair.second.char_value,
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						0/* result */);
+					break;
 				case DataType::DUB:
 					switch (data_pair.second.dword_decode)
 					{
 					case DWordDecode::ABCD:
-						int_value = ((registers.at(data_pair.first - register_start) << 16) +
+						unsigned_dword = ((registers.at(data_pair.first - register_start) << 16) +
 							registers.at(data_pair.first - register_start + 1))/* * data_pair.second.ratio*/;
+						int_value = static_cast<int>(unsigned_dword);
 						break;
 					case DWordDecode::CDAB:
-						int_value = (registers.at(data_pair.first - register_start) +
+						unsigned_dword = (registers.at(data_pair.first - register_start) +
 							(registers.at(data_pair.first - register_start + 1) << 16))/* * data_pair.second.ratio*/;
+						int_value = static_cast<int>(unsigned_dword);
 						break;
 					default:
 						throw std::invalid_argument("Unsupported dword decode.");
@@ -733,8 +786,19 @@ namespace goiot
 						0/* result */);
 					break;
 				case DataType::WB:
+					signed_word = registers.at(data_pair.first - register_start)/* * data_pair.second.ratio*/;
+					int_value = static_cast<int>(signed_word);
+					rp_data_info_vec->emplace_back(data_pair.second.id,
+						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
+						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
+						data_pair.second.data_zone, data_pair.second.float_decode, data_pair.second.dword_decode, data_pair.second.byte_value, int_value,
+						data_pair.second.float_value, data_pair.second.char_value,
+						std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0,
+						0/* result */);
+					break;
 				case DataType::WUB:
-					int_value = registers.at(data_pair.first - register_start)/* * data_pair.second.ratio*/;
+					unsigned_word = registers.at(data_pair.first - register_start)/* * data_pair.second.ratio*/;
+					int_value = static_cast<int>(unsigned_word);
 					rp_data_info_vec->emplace_back(data_pair.second.id,
 						data_pair.second.name, data_pair.second.address, data_pair.second.register_address,
 						data_pair.second.read_write_priviledge, DataFlowType::READ_RETURN, data_pair.second.data_type,
@@ -810,22 +874,42 @@ namespace goiot
 	std::vector<uint16_t> DriverWorker::GetRegisterValue(const DataInfo& data_info)
 	{
 		std::vector<uint16_t> value(2, 0);
-		int int_value;
+		// overflow check!
+		int32_t signed_dword = 0;
+		uint32_t unsigned_dword = 0;
+		int16_t signed_word = 0;
+		uint16_t unsigned_word = 0;
 		switch (data_info.data_type)
 		{
 		case DataType::DB:
+			switch (data_info.dword_decode)
+			{
+			case DWordDecode::ABCD:
+				signed_dword = static_cast<int32_t>(data_info.int_value)/* / data_info.ratio*/;
+				value.at(0) = (signed_dword >> 16) & 0xFFFF;
+				value.at(1) = signed_dword & 0xFFFF;
+				break;
+			case DWordDecode::CDAB:
+				signed_dword = static_cast<int32_t>(data_info.int_value)/* / data_info.ratio*/;
+				value.at(0) = signed_dword & 0xFFFF;
+				value.at(1) = (signed_dword >> 16) & 0xFFFF;
+				break;
+			default:
+				throw std::invalid_argument("Unsupported dword decode.");
+			}
+			break;
 		case DataType::DUB:
 			switch (data_info.dword_decode)
 			{
 			case DWordDecode::ABCD:
-				int_value = data_info.int_value/* / data_info.ratio*/;
-				value.at(0) = (int_value >> 16) & 0xFFFF;
-				value.at(1) = int_value & 0xFFFF;
+				unsigned_dword = static_cast<uint32_t>(data_info.int_value)/* / data_info.ratio*/;
+				value.at(0) = (unsigned_dword >> 16) & 0xFFFF;
+				value.at(1) = unsigned_dword & 0xFFFF;
 				break;
 			case DWordDecode::CDAB:
-				int_value = data_info.int_value/* / data_info.ratio*/;
-				value.at(0) = int_value & 0xFFFF;
-				value.at(1) = (int_value >> 16) & 0xFFFF;
+				unsigned_dword = static_cast<uint32_t>(data_info.int_value)/* / data_info.ratio*/;
+				value.at(0) = unsigned_dword & 0xFFFF;
+				value.at(1) = (unsigned_dword >> 16) & 0xFFFF;
 				break;
 			default:
 				throw std::invalid_argument("Unsupported dword decode.");
@@ -851,10 +935,13 @@ namespace goiot
 			}
 			break;
 		case DataType::WB:
+			signed_word = static_cast<int16_t>(data_info.int_value)/* / data_info.ratio*/;
+			value.at(0) = signed_word;
+			value.pop_back();
 		case DataType::WUB:
 			//value.reset(new uint16_t[1], std::default_delete<uint16_t[]>()); // Calls delete[] as deleter
-			int_value = data_info.int_value/* / data_info.ratio*/;
-			value.at(0) = int_value & 0xFFFF;
+			unsigned_word = static_cast<uint16_t>(data_info.int_value)/* / data_info.ratio*/;
+			value.at(0) = unsigned_word;
 			value.pop_back();
 			break;
 		default:
@@ -870,6 +957,7 @@ namespace goiot
 
 	bool DriverWorker::DataInfoValueEqualsReadValue(const DataInfo& data_info, std::shared_ptr<uint16_t> registers)
 	{
+		// The function needs to be fixed for signed and unsigned.
 		switch (data_info.data_type)
 		{
 		case DataType::DB:
