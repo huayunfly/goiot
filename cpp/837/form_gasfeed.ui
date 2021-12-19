@@ -1,0 +1,1053 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormGasFeed</class>
+ <widget class="QWidget" name="FormGasFeed">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1180</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QTextEdit" name="textEdit_FICA1111">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>140</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_background">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1180</width>
+     <height>900</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::NoContextMenu</enum>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/Res/layout1.png</pixmap>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1111">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>174</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1111">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>210</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1111</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1121">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>241</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1121">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>275</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1131">
+   <property name="geometry">
+    <rect>
+     <x>286</x>
+     <y>376</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1141">
+   <property name="geometry">
+    <rect>
+     <x>286</x>
+     <y>477</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1151">
+   <property name="geometry">
+    <rect>
+     <x>286</x>
+     <y>578</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1131">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>342</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1141">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>443</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1151">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>544</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1121">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>311</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1121</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1131">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>412</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1131</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1141">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>513</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1141</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1151">
+   <property name="geometry">
+    <rect>
+     <x>285</x>
+     <y>614</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1151</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1511">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>219</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1521">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>320</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1531">
+   <property name="geometry">
+    <rect>
+     <x>795</x>
+     <y>421</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1541">
+   <property name="geometry">
+    <rect>
+     <x>795</x>
+     <y>522</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA1551">
+   <property name="geometry">
+    <rect>
+     <x>795</x>
+     <y>623</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1511">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>185</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1521">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>286</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1531">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>387</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1541">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>488</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA1551">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>589</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1511">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>255</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1511</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1521">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>356</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1521</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1531">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>457</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1531</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1541">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>558</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1541</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA1551">
+   <property name="geometry">
+    <rect>
+     <x>794</x>
+     <y>659</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>FICA1551</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1111">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>140</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1121">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>241</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1131">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>342</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1141">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>443</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1151">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>544</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1111">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>210</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1111</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1121">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>311</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1121</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1131">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>412</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1131</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1141">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>513</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1141</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1151">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>614</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1151</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1401">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>39</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1401">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>109</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1401</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1113">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>140</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1113">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>210</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1113</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA1513">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>185</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA1513">
+   <property name="geometry">
+    <rect>
+     <x>950</x>
+     <y>255</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>PIA1513</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_XISA1001">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>30</y>
+     <width>80</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_XISA1002">
+   <property name="geometry">
+    <rect>
+     <x>790</x>
+     <y>30</y>
+     <width>80</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_XISA1001">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>XISA1001</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_XISA1002">
+   <property name="geometry">
+    <rect>
+     <x>790</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>XISA1002</string>
+   </property>
+  </widget>
+  <zorder>label_background</zorder>
+  <zorder>textEdit_FICA1111</zorder>
+  <zorder>label_FICA1111</zorder>
+  <zorder>txt_label_FICA1111</zorder>
+  <zorder>textEdit_FICA1121</zorder>
+  <zorder>label_FICA1121</zorder>
+  <zorder>label_FICA1131</zorder>
+  <zorder>label_FICA1141</zorder>
+  <zorder>label_FICA1151</zorder>
+  <zorder>textEdit_FICA1131</zorder>
+  <zorder>textEdit_FICA1141</zorder>
+  <zorder>textEdit_FICA1151</zorder>
+  <zorder>txt_label_FICA1121</zorder>
+  <zorder>txt_label_FICA1131</zorder>
+  <zorder>txt_label_FICA1141</zorder>
+  <zorder>txt_label_FICA1151</zorder>
+  <zorder>label_FICA1511</zorder>
+  <zorder>label_FICA1521</zorder>
+  <zorder>label_FICA1531</zorder>
+  <zorder>label_FICA1541</zorder>
+  <zorder>label_FICA1551</zorder>
+  <zorder>textEdit_FICA1511</zorder>
+  <zorder>textEdit_FICA1521</zorder>
+  <zorder>textEdit_FICA1531</zorder>
+  <zorder>textEdit_FICA1541</zorder>
+  <zorder>textEdit_FICA1551</zorder>
+  <zorder>txt_label_FICA1511</zorder>
+  <zorder>txt_label_FICA1521</zorder>
+  <zorder>txt_label_FICA1531</zorder>
+  <zorder>txt_label_FICA1541</zorder>
+  <zorder>txt_label_FICA1551</zorder>
+  <zorder>textEdit_PIA1111</zorder>
+  <zorder>textEdit_PIA1121</zorder>
+  <zorder>textEdit_PIA1131</zorder>
+  <zorder>textEdit_PIA1141</zorder>
+  <zorder>textEdit_PIA1151</zorder>
+  <zorder>txt_label_PIA1111</zorder>
+  <zorder>txt_label_PIA1121</zorder>
+  <zorder>txt_label_PIA1131</zorder>
+  <zorder>txt_label_PIA1141</zorder>
+  <zorder>txt_label_PIA1151</zorder>
+  <zorder>textEdit_PIA1401</zorder>
+  <zorder>txt_label_PIA1401</zorder>
+  <zorder>textEdit_PIA1113</zorder>
+  <zorder>txt_label_PIA1113</zorder>
+  <zorder>textEdit_PIA1513</zorder>
+  <zorder>txt_label_PIA1513</zorder>
+  <zorder>textEdit_XISA1001</zorder>
+  <zorder>textEdit_XISA1002</zorder>
+  <zorder>txt_label_XISA1001</zorder>
+  <zorder>txt_label_XISA1002</zorder>
+ </widget>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

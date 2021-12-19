@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/ui_ctrls">
+        <file>UICtrls/Res/poweroff.bmp</file>
+        <file>UICtrls/Res/poweron.bmp</file>
+        <file>Res/layout1.png</file>
+        <file>Res/layout2.png</file>
+        <file>Res/layout3.png</file>
+        <file>UICtrls/Res/valve-gas.png</file>
+        <file>UICtrls/Res/mfc.png</file>
+        <file>UICtrls/Res/pfc.png</file>
+        <file>UICtrls/Res/valve-gas-left.png</file>
+        <file>UICtrls/Res/temperature_controller.png</file>
+        <file>UICtrls/Res/cylinder_up.png</file>
+        <file>UICtrls/Res/cylinder_down.png</file>
+        <file>UICtrls/Res/water_pump.png</file>
+        <file>UICtrls/Res/valve_electric.png</file>
+        <file>UICtrls/Res/gc.png</file>
+        <file>UICtrls/Res/mechanical_pump.png</file>
+        <file>UICtrls/Res/electric_cylinder.png</file>
+        <file>UICtrls/Res/alarm.png</file>
+        <file>UICtrls/Res/srv_on.png</file>
+        <file>UICtrls/Res/motor.png</file>
+        <file>Res/icon_control.png</file>
+        <file>Res/icon_distributor.png</file>
+        <file>Res/icon_history.png</file>
+        <file>Res/icon_motor.png</file>
+        <file>Res/icon_trend.png</file>
+        <file>Res/icon_workflow.png</file>
+        <file>Res/icon_device.png</file>
+        <file>UICtrls/Res/valve-gas-small.png</file>
+    </qresource>
+</RCC>
