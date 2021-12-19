@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <cassert>
+#include <algorithm>
 #include "form_liquiddistributor.h"
 #include "ui_form_liquiddistributor.h"
 
@@ -17,6 +18,26 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
 {
     ui->setupUi(this);
     InitUiState();
+
+    // Timer
+    connect(&video_timer_0, &QTimer::timeout,
+            this, &FormLiquidDistributor::UpdateImage);
+
+    // Video
+    video_cap_0.open(0);
+    // Check if camera opened successfully
+    if(video_cap_0.isOpened())
+    {
+        // Default resolutions of the frame are obtained.The default resolutions are system dependent.
+        int frame_height = video_cap_0.get(cv::CAP_PROP_FRAME_HEIGHT);
+        int frame_width = video_cap_0.get(cv::CAP_PROP_FRAME_WIDTH);
+        video_frame_0 = cv::Mat::zeros(frame_height, frame_width, CV_8UC3);
+        video_timer_0.start(66);
+    }
+    // Create image label
+    image_label_0 = new QLabel(this);
+    image_label_0->setScaledContents(true);
+    ui->verticalLayout_video->addWidget(image_label_0, 0, Qt::AlignTop | Qt::AlignLeft);
 
     // position display
     const int x_gap = 35;
@@ -196,6 +217,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
 FormLiquidDistributor::~FormLiquidDistributor()
 {
     delete ui;
+    video_cap_0.release();
 }
 
 bool FormLiquidDistributor::event(QEvent *event)
@@ -403,6 +425,73 @@ void FormLiquidDistributor::FillStatusChart(const std::list<std::vector<int>>& r
 void FormLiquidDistributor::InitUiState()
 {
     ui->verticalLayout->installEventFilter(this);
+}
+
+void FormLiquidDistributor::paintEvent(QPaintEvent *e)
+{
+    QImage img = QImage(static_cast<uchar*>(video_frame_0.data),
+                        video_frame_0.cols, video_frame_0.rows, QImage::Format_BGR888);
+    image_label_0->setPixmap(QPixmap::fromImage(img));
+    //image_label_0->resize(img.size());
+    image_label_0->show();
+    FormCommon::paintEvent(e);
+}
+
+void FormLiquidDistributor::UpdateImage()
+{
+    video_cap_0 >> video_frame_0;
+    if (video_frame_0.data != nullptr)
+    {
+        cv::Mat gray, edges;
+        std::vector<std::vector<cv::Point>> contours;
+        std::vector<cv::Vec4i> hierarchy;
+        cv::cvtColor(video_frame_0, gray, cv::COLOR_BGR2GRAY);
+        cv::Canny(gray, edges, 60, 360, 3/*apertureSize*/, true/*L2gradient*/);
+        cv::findContours(edges,
+                         contours,
+                         hierarchy,
+                         cv::RETR_LIST,
+                         cv::CHAIN_APPROX_SIMPLE);
+        std::vector<int> lines_idx;
+        for (std::size_t i = 0; i < contours.size(); i++)
+        {
+            // collect mid-length arc
+            int arc_len = cv::arcLength(contours.at(i), false);
+            if (arc_len > 80 && contours.at(i).size() < 300)
+            {
+                lines_idx.push_back(i);
+            }
+        }
+        std::vector<int> match_idx;
+        for (auto& idx : lines_idx)
+        {
+//            auto max = std::max_element(contours.at(idx).begin(),
+//                                        contours.at(idx).end(),
+//                                        [](cv::Point a, cv::Point b) {return a.y < b.y;});
+//            int max_idx = std::distance(contours.at(idx).begin(), max);
+//            auto min = std::min_element(contours.at(idx).begin(),
+//                                        contours.at(idx).end(),
+//                                        [](cv::Point a, cv::Point b) {return a.y > b.y;});
+//            int min_idx = std::distance(contours.at(idx).begin(), min);
+//            if (contours.at(idx).at(max_idx).y < 240 && contours.at(idx).at(min_idx).y > 100)
+//            {
+//                match_idx.push_back(idx);
+//            }
+            cv::Vec4f line;
+            // find the optimal line
+            cv::fitLine(contours.at(idx), line, cv::DIST_L2, 0, 0.01, 0.01);
+            if (line[3] < 240 && line[3] > 120)
+            {
+                match_idx.push_back(idx);
+            }
+        }
+        //cv::cvtColor(video_frame_0, video_frame_0, CV_BGR2RGB);
+        for (auto& i : match_idx)
+        {
+            cv::drawContours(video_frame_0, contours, i, cv::Scalar(255, 0, 0), 3);
+        }
+        this->update();
+    }
 }
 
 void FormLiquidDistributor::on_pushButton_clicked()

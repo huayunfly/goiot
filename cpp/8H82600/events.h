@@ -55,6 +55,7 @@ private:
     std::string data_info_id_;
 };
 
+// Refresh values
 class RefreshTextEvent : public RefreshEvent
 {
 public:

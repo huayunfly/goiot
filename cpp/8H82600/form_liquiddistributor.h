@@ -2,6 +2,10 @@
 #define FORM_LIQUIDDISTRIBUTOR_H
 
 #include <QWidget>
+#include <QTimer>
+#include <QLabel>
+#include <opencv2/opencv.hpp>
+#include <iostream>
 #include <form_common.h>
 #include "sampling_ui_item.h"
 
@@ -30,12 +34,18 @@ public:
 
     void InitUiState() override;
 
+protected:
+    void paintEvent(QPaintEvent* e) override;
+
 private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
     void on_tableWidget_cellChanged(int row, int column);
+
+    // Detect the image contoures
+    void UpdateImage();
 
 private:
     QString SaveLiquidSamplingProcedure();
@@ -64,6 +74,11 @@ private:
     const int COL_PURGE_PORT = 5;
 
     std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;
+
+    QLabel* image_label_0; // raw pointer!!
+    QTimer video_timer_0;
+    cv::VideoCapture video_cap_0;
+    cv::Mat video_frame_0;
 };
 
 #endif // FORM_LIQUIDDISTRIBUTOR_H

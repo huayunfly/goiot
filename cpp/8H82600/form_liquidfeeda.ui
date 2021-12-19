@@ -960,7 +960,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
-    <string>HC2407-1</string>
+    <string>HC2407-2</string>
    </property>
   </widget>
   <widget class="QLabel" name="txt_label_HC6101">

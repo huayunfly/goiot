@@ -424,6 +424,7 @@ void DataManager::RefreshDispatch()
                     auto data_info = data_info_cache_.FindEntry(data_info_id);
                     if (data_info.id.empty())
                     {
+                        std::cout << "DataManager::RefreshDispatch() '" << data_info_id << "' not found in data_info_cache.";
                         assert(false);
                         continue; // Throw exception
                     }

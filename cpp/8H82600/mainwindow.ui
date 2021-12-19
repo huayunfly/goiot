@@ -34,16 +34,16 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <widget class="QAxWidget" name="axWidget">
+   <widget class="QAxWidget" name="widget_workflow">
     <property name="enabled" stdset="0">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry" stdset="0">
      <rect>
-      <x>40</x>
-      <y>480</y>
-      <width>137</width>
-      <height>219</height>
+      <x>61</x>
+      <y>0</y>
+      <width>1200</width>
+      <height>1100</height>
      </rect>
     </property>
    </widget>
@@ -71,7 +71,7 @@
        <x>0</x>
        <y>0</y>
        <width>1200</width>
-       <height>900</height>
+       <height>1100</height>
       </rect>
      </property>
      <property name="minimumSize">
@@ -136,6 +136,9 @@
     <property name="textElideMode">
      <enum>Qt::ElideRight</enum>
     </property>
+    <property name="movement">
+     <enum>QListView::Static</enum>
+    </property>
     <property name="viewMode">
      <enum>QListView::IconMode</enum>
     </property>
@@ -188,7 +191,7 @@
      </rect>
     </property>
    </widget>
-   <zorder>axWidget</zorder>
+   <zorder>widget_workflow</zorder>
    <zorder>listView</zorder>
    <zorder>widget_trend</zorder>
    <zorder>widget_control</zorder>

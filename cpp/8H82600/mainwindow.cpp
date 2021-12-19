@@ -56,9 +56,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowState(Qt::WindowMaximized);
 
     // Setup Ocx
-    //ui_->tabWidget->hide();
-    //bool ok = ui_->axWidget->setControl("{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"); // WorkflowComponent.WorkflowComponentCtrl.1
-    //ui_->axWidget->show();
+    bool ok = ui_->widget_workflow->setControl("{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"); // WorkflowComponent.WorkflowComponentCtrl.1 "{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"
+    if (ok)
+    {
+        ui_->widget_workflow->show();
+    }
 
     // Setup listview pages
     QStandardItemModel* model = new QStandardItemModel(this);
