@@ -59,7 +59,7 @@ private:
     double max_time_range_; // in second
     double show_time_range_; // in second <= max_time_range
     int max_line_point_count_;
-    QPoint last_point_;
+    QPoint offset_;
     bool auto_scroll_chart_;
     std::unique_ptr<QGraphicsSimpleTextItem> coordinate_item_;
 };

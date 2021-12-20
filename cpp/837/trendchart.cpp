@@ -115,7 +115,13 @@ void TrendChart::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-        last_point_ = event->pos();
+        QCursor cursor;
+        cursor.setShape(Qt::ClosedHandCursor);
+        QApplication::setOverrideCursor(cursor);
+        QPoint p = pos();
+        QPoint gp = event->globalPos();
+        QPoint ep = event->pos();
+        offset_ = event->globalPos() - pos();
         auto_scroll_chart_ = false;
     }
     QChartView::mousePressEvent(event);
@@ -138,20 +144,21 @@ void TrendChart::mouseMoveEvent(QMouseEvent *event)
 
     if (event->buttons() & Qt::LeftButton)
     {
-        QPoint offset = current_pos - last_point_;
-        last_point_ = current_pos;
-        this->chart()->scroll(-offset.x(), offset.y());
+        QPoint temp;
+        temp = event->globalPos() - offset_;
+        this->chart()->scroll(offset_.x(), offset_.y());
     }
     QChartView::mouseMoveEvent(event);
 }
 
 void TrendChart::mouseReleaseEvent(QMouseEvent *event)
 {
+
+    QApplication::restoreOverrideCursor();
     if (event->button() == Qt::RightButton)
     {
         auto_scroll_chart_ = true;
     }
-    QChartView::mouseReleaseEvent(event);
 }
 
 void TrendChart::UpdateChart()
