@@ -93,7 +93,7 @@ void TrendChart::mousePressEvent(QMouseEvent *event)
         last_pos_ = event->pos();
         auto_scroll_chart_ = false;
     }
-    QChartView::mousePressEvent(event);
+    event->accept();
 }
 
 void TrendChart::mouseMoveEvent(QMouseEvent *event)
@@ -122,7 +122,24 @@ void TrendChart::mouseMoveEvent(QMouseEvent *event)
         double offset_second = offset_pos.x() * show_time_range_ / this->size().width();
         this->chart()->scroll(-offset_second, 0); // chart()->scroll(x, y), x/y is ratio
     }
-    QChartView::mouseMoveEvent(event);
+    event->accept();
+}
+
+void TrendChart::wheelEvent(QWheelEvent *event)
+{
+    // A positive value indicates that the wheel was rotated forwards away from the user;
+    // Most mouse types (Y-vertical) work in steps of 15 degrees, in which case the delta value is a multiple of 120; i.e., 120 units * 1/8 = 15 degrees.
+    auto_scroll_chart_ = false;
+    QPoint num_degrees = event->angleDelta() / 8;
+    double ratio = 1.0 - num_degrees.y() / 180.0;
+    QRectF plot_area = this->chart()->plotArea();
+    QPointF center =  plot_area.center();
+    plot_area.setWidth(plot_area.width() * ratio);
+    plot_area.setHeight(plot_area.height() * ratio);
+    QPointF new_center(2 * center - event->pos() - (center - event->pos()) / ratio);
+    plot_area.moveCenter(new_center); // keep mouse point nearly unmoved.
+    this->chart()->zoomIn(plot_area);
+    event->accept();
 }
 
 void TrendChart::mouseReleaseEvent(QMouseEvent *event)
@@ -131,8 +148,10 @@ void TrendChart::mouseReleaseEvent(QMouseEvent *event)
     QApplication::restoreOverrideCursor();
     if (event->button() == Qt::RightButton)
     {
+        this->chart()->zoomReset();
         auto_scroll_chart_ = true;
     }
+    event->accept();
 }
 
 void TrendChart::UpdateChart()

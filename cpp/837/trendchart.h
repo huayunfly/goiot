@@ -48,6 +48,8 @@ protected:
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 
+    void wheelEvent(QWheelEvent *event) override;
+
 private:
     void UpdateChart();
 
