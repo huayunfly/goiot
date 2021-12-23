@@ -27,15 +27,17 @@ class TrendChart : public QChartView
     Q_OBJECT
 public:
     TrendChart(QWidget *parent = nullptr, const std::vector<ChartLineDef>& line_defs = std::vector<ChartLineDef>(),
-               const QString& title = "", double interval = 5, double value_range = 400, double max_time_range = 36000,
+               const QString& title = "", double interval = 5, std::pair<double/*min*/, double/*max*/> value_range = std::make_pair(0, 400), double max_time_range = 36000,
                double show_time_range = 7200);
 
     TrendChart(TrendChart const& chart) = delete;
     TrendChart& operator=(TrendChart const& chart) = delete;
 
-    void SetRange(double value_range, double max_time_range, double show_time_range, double interval);
+    void SetRange(double interval, std::pair<double/*min*/, double/*max*/> value_range,
+                  double max_time_range, double show_time_range);
 
-    void AddOrUpdateData(const std::string& name, const std::pair<double/*value*/, double/*timestamp*/>& pair);
+    void AddOrUpdateData(const std::string& name,
+                         const std::pair<double/*value*/, double/*timestamp*/>& pair);
 
 protected:
 //    bool event(QEvent* event) override;
@@ -55,11 +57,11 @@ private:
     QTimer timer_;
     QString title_;
     double interval_; // in second
-    double max_value_range_;
+    std::pair<double, double> value_range_; // in second
     double max_time_range_; // in second
     double show_time_range_; // in second <= max_time_range
     int max_line_point_count_;
-    QPoint offset_;
+    QPoint last_pos_;
     bool auto_scroll_chart_;
     std::unique_ptr<QGraphicsSimpleTextItem> coordinate_item_;
 };

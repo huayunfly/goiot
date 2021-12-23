@@ -13,7 +13,7 @@ FormTrend::FormTrend(QWidget *parent) :
     line_defs.push_back(ChartLineDef("plc.1.temp4_pv", "TC2105", "固定床下热"));
 
     chart_reactor_ = new TrendChart(nullptr/* can not be *this FormTrend*/, line_defs,
-                                    QString("反应温度"), 5, 400, 360, 72);
+                                    QString("反应温度"), 5, std::make_pair<double, double>(0, 400.0), 36000, 7200);
     chart_reactor_->setObjectName(QString::fromUtf8("chart_reactor"));
     chart_reactor_->setMouseTracking(false);
     ui->horizontalLayout->addWidget(chart_reactor_);
