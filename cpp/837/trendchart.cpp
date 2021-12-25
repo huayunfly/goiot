@@ -3,12 +3,13 @@
 
 TrendChart::TrendChart(QWidget *parent,
                        const std::vector<ChartLineDef>& line_defs, const QString& title,
-                       double interval, std::pair<double, double> value_range, double max_time_range,
-                       double show_time_range) :
+                       double interval, std::pair<double, double> value_range, double value_segment,
+                       double max_time_range, double show_time_range) :
     QChartView(parent),
     title_(title),
     interval_(interval),
     value_range_(value_range),
+    value_segment_(value_segment),
     max_time_range_(max_time_range),
     show_time_range_(show_time_range),
     auto_scroll_chart_(true)
@@ -26,7 +27,11 @@ TrendChart::TrendChart(QWidget *parent,
     if (value_range_.first > value_range_.second)
     {
         value_range_.first = 0;
-        value_range_.second = 400.0;
+        value_range_.second = 100.0;
+    }
+    if (value_segment < 1e-3)
+    {
+        value_segment = 50;
     }
 
     QChart *chart = new QChart();
@@ -35,9 +40,9 @@ TrendChart::TrendChart(QWidget *parent,
 
     auto axis_value = new QValueAxis();
     axis_value->setRange(value_range_.first, value_range_.second);
-    int value_segment = 50;
     axis_value->setTickCount(
-                static_cast<int>((value_range_.second - value_range_.first) / value_segment) + 1);
+                static_cast<int>((value_range_.second - value_range_.first) / value_segment_) + 1);
+    axis_value->setLabelFormat("%3.1f");
 
     auto axis_time = new QDateTimeAxis();
     auto current = QDateTime::currentDateTime();
@@ -69,10 +74,12 @@ TrendChart::TrendChart(QWidget *parent,
     timer_.start(interval_ * 1000);
 }
 
-void TrendChart::SetRange(double interval, std::pair<double, double> value_range, double max_time_range, double show_time_range)
+void TrendChart::SetRange(double interval, std::pair<double, double> value_range,
+                          double value_segment, double max_time_range, double show_time_range)
 {
     interval_ = interval;
     value_range_ = value_range;
+    value_segment_ = value_segment;
     max_time_range_ = max_time_range;
     show_time_range_ = show_time_range;
 }

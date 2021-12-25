@@ -22,7 +22,8 @@ protected:
 
 private:
     Ui::FormTrend *ui;
-    TrendChart *chart_reactor_;
+    std::unique_ptr<TrendChart> chart_reactor_;
+    std::unique_ptr<TrendChart> chart_pg_;
 };
 
 #endif // FORM_TREND_H

@@ -183,8 +183,10 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp21_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2804"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
 
     // Reactor PG
-    data_model_.SetDataToUiMap("plc.1.pg_8", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2402"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
-    data_model_.SetDataToUiMap("plc.1.pg_9", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2802"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_8", {UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2402"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0),
+                                              UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0)});
+    data_model_.SetDataToUiMap("plc.1.pg_9", {UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2802"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0),
+                                              UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0)});
 
     // Reactor valves
     data_model_.SetDataToUiMap("plc.1.dq2_7", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2404"), RES_VALVE_GAS_SMALL, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));

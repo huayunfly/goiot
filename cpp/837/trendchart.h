@@ -27,13 +27,16 @@ class TrendChart : public QChartView
     Q_OBJECT
 public:
     TrendChart(QWidget *parent = nullptr, const std::vector<ChartLineDef>& line_defs = std::vector<ChartLineDef>(),
-               const QString& title = "", double interval = 5, std::pair<double/*min*/, double/*max*/> value_range = std::make_pair(0, 400), double max_time_range = 36000,
+               const QString& title = "", double interval = 5, std::pair<double/*min*/, double/*max*/> value_range = std::make_pair(0, 100),
+               double value_segment = 50,
+               double max_time_range = 36000,
                double show_time_range = 7200);
 
     TrendChart(TrendChart const& chart) = delete;
     TrendChart& operator=(TrendChart const& chart) = delete;
 
     void SetRange(double interval, std::pair<double/*min*/, double/*max*/> value_range,
+                  double value_segment,
                   double max_time_range, double show_time_range);
 
     void AddOrUpdateData(const std::string& name,
@@ -59,7 +62,8 @@ private:
     QTimer timer_;
     QString title_;
     double interval_; // in second
-    std::pair<double, double> value_range_; // in second
+    std::pair<double, double> value_range_; // (min, max)
+    double value_segment_; // Y-axis segment
     double max_time_range_; // in second
     double show_time_range_; // in second <= max_time_range
     int max_line_point_count_;
