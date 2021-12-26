@@ -1,5 +1,6 @@
 #include "form_trend.h"
 #include "ui_form_trend.h"
+#include "events.h"
 
 FormTrend::FormTrend(QWidget *parent) :
     QWidget(parent),

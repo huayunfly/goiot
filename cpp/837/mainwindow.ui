@@ -175,11 +175,22 @@
      </rect>
     </property>
    </widget>
+   <widget class="QWidget" name="widget_history" native="true">
+    <property name="geometry">
+     <rect>
+      <x>61</x>
+      <y>0</y>
+      <width>1200</width>
+      <height>1100</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>widget_workflow</zorder>
    <zorder>listView</zorder>
    <zorder>widget_trend</zorder>
    <zorder>widget_control</zorder>
    <zorder>widget_distributor</zorder>
+   <zorder>widget_history</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -187,7 +198,7 @@
      <x>0</x>
      <y>0</y>
      <width>1180</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

@@ -2,7 +2,6 @@
 #define FORM_TREND_H
 
 #include <QWidget>
-#include "form_common.h"
 #include "trendchart.h"
 
 namespace Ui {

@@ -2,6 +2,7 @@
 #define FORM_HISTORY_H
 
 #include <QWidget>
+#include "historychart.h"
 
 namespace Ui {
 class FormHistory;
@@ -17,6 +18,7 @@ public:
 
 private:
     Ui::FormHistory *ui;
+    std::unique_ptr<HistoryChart> chart_reactor_;
 };
 
 #endif // FORM_HISTORY_H

@@ -42,7 +42,7 @@ TrendChart::TrendChart(QWidget *parent,
     axis_value->setRange(value_range_.first, value_range_.second);
     axis_value->setTickCount(
                 static_cast<int>((value_range_.second - value_range_.first) / value_segment_) + 1);
-    axis_value->setLabelFormat("%3.1f");
+    axis_value->setLabelFormat("%3.0f");
 
     auto axis_time = new QDateTimeAxis();
     auto current = QDateTime::currentDateTime();

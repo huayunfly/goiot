@@ -6,6 +6,7 @@
 #include "form_reactor.h"
 #include "form_analysis.h"
 #include "form_trend.h"
+#include "form_history.h"
 #include "events.h"
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
@@ -48,6 +49,13 @@ MainWindow::MainWindow(QWidget *parent)
     form_trend->setGeometry(QRect(61, 0, 1200, 1100));
     form_trend->setAutoFillBackground(false);
     form_trend->setStyleSheet(QString::fromUtf8("background:#FFFFFF"));
+
+    // History
+    FormHistory* form_history = new FormHistory(ui_->widget_history);
+    form_history->setObjectName(QString::fromUtf8("widget_history"));
+    form_history->setGeometry(QRect(61, 0, 1200, 1100));
+    form_history->setAutoFillBackground(false);
+    form_history->setStyleSheet(QString::fromUtf8("background:#FFFFFF"));
 
     // Setup listview pages
     QStandardItemModel* model = new QStandardItemModel(this);
