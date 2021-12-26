@@ -53,7 +53,7 @@ class RedisConnector extends DBConnector {
     }
 
     close() {
-        console.log('redis_connector close()');
+        console.log('redis_connector closed()');
     }
 
     create_model() {
@@ -124,7 +124,7 @@ class PostgreSQLConnector extends DBConnector {
 
     close() {
         if (!this.db_) {
-            this.db_.close();
+            this.db_.end();
         }
     }
 

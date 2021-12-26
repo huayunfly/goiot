@@ -4,5 +4,10 @@ cd example-project
 npm init -y
 
 // Install
-npm i --save yargs
+npm install yargs --save
+npm install redis --save
+npm install pg --save
+
+// Update
+npm update -g package
 
