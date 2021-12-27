@@ -20,6 +20,7 @@ SOURCES += \
     data_model.cpp \
     dialog_onoff.cpp \
     dialog_setposition.cpp \
+    dialog_settimerange.cpp \
     dialog_setvalue.cpp \
     events.cpp \
     form_common.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     data_model.h \
     dialog_onoff.h \
     dialog_setposition.h \
+    dialog_settimerange.h \
     dialog_setvalue.h \
     driver_base.h \
     events.h \
@@ -58,6 +60,7 @@ HEADERS += \
 FORMS += \
     dialog_onoff.ui \
     dialog_setposition.ui \
+    dialog_settimerange.ui \
     dialog_setvalue.ui \
     form_analysis.ui \
     form_gasfeed.ui \
@@ -70,23 +73,23 @@ TRANSLATIONS += \
     837_zh_CN.ts
 
 INCLUDEPATH += \
-    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib
-    #$$PWD/../../../3rdLib
+    #C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib
+    $$PWD/../../../3rdLib
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient
-win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd
-win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32
-win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32d
+#win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient
+#win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd
+#win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32
+#win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32d
 
-#win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient
-#win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclientd
-#win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32
-#win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32d
+win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient
+win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclientd
+win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32
+win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32d
 
 DISTFILES += \
     drivers.json
