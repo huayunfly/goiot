@@ -193,12 +193,14 @@ void HistoryChart::mouseReleaseEvent(QMouseEvent *event)
 void HistoryChart::mouseDoubleClickEvent(QMouseEvent *event)
 {
     DialogSetTimeRange dlg_set_time = DialogSetTimeRange(this);
-    dlg_set_time.move(event->pos());
+    dlg_set_time.setWindowTitle("历史区间");
+    dlg_set_time.move(event->globalPos() - QPoint(50, 50));
     int result = dlg_set_time.exec();
     if (result == QDialog::Accepted)
     {
         QueryByTimeRange(dlg_set_time.Min(), dlg_set_time.Max());
     }
+    event->accept();
 }
 
 void HistoryChart::QueryByTimeRange(double min, double max)
