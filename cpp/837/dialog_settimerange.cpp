@@ -8,6 +8,7 @@ DialogSetTimeRange::DialogSetTimeRange(QWidget *parent) :
     ui->setupUi(this);
 
     // combobox time range
+    ui->comboBox_range->addItem("");
     ui->comboBox_range->addItem("过去1天");
     ui->comboBox_range->addItem("过去3天");
     ui->comboBox_range->addItem("过去7天");
@@ -60,18 +61,20 @@ void DialogSetTimeRange::on_comboBox_range_currentIndexChanged(int index)
     switch (index)
     {
     case 0:
-        max_time_ = now;
-        min_time_ = now - 24 * 3600;
         break;
     case 1:
         max_time_ = now;
-        min_time_ = now - 3 * 24 * 3600;
+        min_time_ = now - 24 * 3600;
         break;
     case 2:
         max_time_ = now;
-        min_time_ = now - 7 * 24 * 3600;
+        min_time_ = now - 3 * 24 * 3600;
         break;
     case 3:
+        max_time_ = now;
+        min_time_ = now - 7 * 24 * 3600;
+        break;
+    case 4:
         max_time_ = now;
         min_time_ = now - 30 * 24 * 3600;
         break;
