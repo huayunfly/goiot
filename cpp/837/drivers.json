@@ -1,26 +1,7 @@
-// modbus_rtu protocol
-// address: 1~128
-// data type: [1 zone] input(DISCRETE) coils 输入继电器, [0 zone] output coils 输出继电器, [3 zone] input registers 输入寄存器 and [4 zone] output(holding) registers 输出寄存器
-// wdec: word_decode, 单字解码顺序, with value 0, 1
-// dwdec: dword_decode, 双字解码顺序, with value 0(ABCD), 1, 2, 3(CDAB)
-// fdec: float_decode, 浮点解码顺序, with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
-// coil: only number 位仅以数字表示
-// register: driver-specified, R (readonly, 只读), W(writeonly, 只写), RW (readwrite, 读写)
-// register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
-// function code: [1 zone] read code 02, [0 zone] read code 01 write code 05 or 15(batch)
-//                [3 zone] read code 04, [4 zone] read code 03 write code 06 or 16(batch)
-// response_timeout_msec: response wait time in micro-second
-// -----------------------
-// s7 protocol
-// We need the client address (port) and optionally Rack and Slot
-// port: IP address,rack number,slot number
-// address: DB number
-// data block type: DBX, DBB, DBW, DBD => mapping to coil, none, WUB, DUB 暂不支持DB byte 类型
-// function code: default 0, PLC DataBlock
 {
-  "name": "goiot",
+  "name": "837",
   "redis": "127.0.0.1:6379",
-  "db": "127.0.0.1:5432:goiot:postgres:hello@123",
+  "db": "127.0.0.1:5432:837:postgres:hello@123",
   "drivers": [
     {
       "id": "mfc",

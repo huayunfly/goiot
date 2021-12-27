@@ -19,6 +19,7 @@ public:
 private:
     Ui::FormHistory *ui;
     std::unique_ptr<HistoryChart> chart_reactor_;
+    std::unique_ptr<HistoryChart> chart_pg_;
 };
 
 #endif // FORM_HISTORY_H

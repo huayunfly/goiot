@@ -109,7 +109,7 @@ void TrendChart::mouseMoveEvent(QMouseEvent *event)
     {
         coordinate_item_.reset(new QGraphicsSimpleTextItem(this->chart()));
         coordinate_item_->setZValue(5);
-        coordinate_item_->setPos(100, 60);
+        coordinate_item_->setPos(60, 60);
         coordinate_item_->show();
     }
 

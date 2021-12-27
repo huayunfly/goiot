@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
+#include "dialog_settimerange.h"
 
 HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& line_defs,
                            const QString& connection_path, const QString& title,
@@ -58,8 +59,8 @@ HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& l
     bool is_open = db_.open();
     if (!is_open)
     {
-        QMessageBox::critical(0, "Cannot open database",
-                              db_.lastError().text(), QMessageBox::Cancel);
+        QMessageBox::critical(0, "无法连接数据库",
+                              db_.lastError().text(), QMessageBox::Ignore);
     }
 
     QChart *chart = new QChart();
@@ -135,7 +136,7 @@ void HistoryChart::mouseMoveEvent(QMouseEvent *event)
     {
         coordinate_item_.reset(new QGraphicsSimpleTextItem(this->chart()));
         coordinate_item_->setZValue(5);
-        coordinate_item_->setPos(100, 60);
+        coordinate_item_->setPos(60, 60);
         coordinate_item_->show();
     }
 
@@ -185,6 +186,17 @@ void HistoryChart::mouseReleaseEvent(QMouseEvent *event)
         auto_scroll_chart_ = true;
     }
     event->accept();
+}
+
+void HistoryChart::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    DialogSetTimeRange dlg_set_time = DialogSetTimeRange(this);
+    dlg_set_time.move(event->pos());
+    int result = dlg_set_time.exec();
+    if (result == QDialog::Accepted)
+    {
+        QueryByTimeRange(dlg_set_time.Min(), dlg_set_time.Max());
+    }
 }
 
 void HistoryChart::QueryByTimeRange(double min, double max)
