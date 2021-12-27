@@ -22,10 +22,10 @@ FormHistory::FormHistory(QWidget *parent) :
     ui->horizontalLayout->addWidget(chart_reactor_.get());
 
     line_defs.clear();
-    line_defs.push_back(HistoryLineDef("plc.1.pg6", "PIA1113", "固定床前压力"));
-    line_defs.push_back(HistoryLineDef("plc.1.pg7", "PIA1513", "釜前压力"));
-    line_defs.push_back(HistoryLineDef("plc.1.pg8", "PIA2402", "固定床后压力"));
-    line_defs.push_back(HistoryLineDef("plc.1.pg9", "PIA2802", "釜后压力"));
+    line_defs.push_back(HistoryLineDef("plc.1.pg_6", "PIA1113", "固定床前压力"));
+    line_defs.push_back(HistoryLineDef("plc.1.pg_7", "PIA1513", "釜前压力"));
+    line_defs.push_back(HistoryLineDef("plc.1.pg_8", "PIA2402", "固定床后压力"));
+    line_defs.push_back(HistoryLineDef("plc.1.pg_9", "PIA2802", "釜后压力"));
 
     chart_pg_.reset(new HistoryChart(nullptr/* can not be *this form*/, line_defs,
                                           "QPSQL:127.0.0.1:5432:837:postgres:hello@123", QString("(历史)系统压力barG"), 5/*interval*/, std::make_pair<double, double>(0, 60.0), 10/*segment*/, 360000, 7200));

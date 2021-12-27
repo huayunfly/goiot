@@ -50,7 +50,9 @@ HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& l
         password_ = list[5];
     }
 
-    db_ = QSqlDatabase::addDatabase(dbdriver_);
+    // We must assign an unique connection name for addDatabase().
+    // For there are more than one HistoryChart instance.
+    db_ = QSqlDatabase::addDatabase(dbdriver_, title_);
     db_.setHostName(hostname_);
     db_.setPort(port_);
     db_.setDatabaseName(dbname_);
@@ -59,7 +61,7 @@ HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& l
     bool is_open = db_.open();
     if (!is_open)
     {
-        QMessageBox::critical(0, "无法连接数据库",
+        QMessageBox::critical(0, "连接数据库失败",
                               db_.lastError().text(), QMessageBox::Ignore);
     }
 
@@ -143,7 +145,7 @@ void HistoryChart::mouseMoveEvent(QMouseEvent *event)
     const QPoint current_pos = event->pos();
     QPointF current_value = this->chart()->mapToValue(QPointF(current_pos)); // map to X-axis in ms, Y-axis in vlue
     QString coordinate_string = QString("X = %1, Y = %2").
-            arg(QDateTime::fromMSecsSinceEpoch(current_value.x()).toString("dd日 hh:mm")).
+            arg(QDateTime::fromMSecsSinceEpoch(current_value.x()).toString("MM月dd日 hh:mm")).
             arg(QString::number(current_value.y(), 'f', 1));
     coordinate_item_->setText(coordinate_string);
 
@@ -248,6 +250,8 @@ HistoryChart::QueryData(QString table, std::vector<QString> columns,
 {
     if (!db_.isOpen())
     {
+        QMessageBox::critical(0, "查询数据失败",
+                              db_.lastError().text(), QMessageBox::Ignore);
         return std::vector<std::vector<std::tuple<double, double>>>();
     }
     QSqlQuery query(db_);
@@ -263,14 +267,16 @@ HistoryChart::QueryData(QString table, std::vector<QString> columns,
     query_string.append("from \"");
     query_string.append(table);
     query_string.append("\" where \"time\" >= ");
-    query_string.append(QString::number(time_range.first));
+    query_string.append(QString::number(time_range.first, 'f', 3));
     query_string.append(" and \"time\" <= ");
-    query_string.append(QString::number(time_range.second));
+    query_string.append(QString::number(time_range.second, 'f', 3));
     query_string.append(";");
 
     bool ok = query.exec(query_string);
     if (!ok)
     {
+        QMessageBox::critical(0, "查询数据失败",
+                              query.lastError().text(), QMessageBox::Ignore);
         return std::vector<std::vector<std::tuple<double, double>>>();
     }
 

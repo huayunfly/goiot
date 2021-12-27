@@ -116,7 +116,7 @@ void TrendChart::mouseMoveEvent(QMouseEvent *event)
     const QPoint current_pos = event->pos();
     QPointF current_value = this->chart()->mapToValue(QPointF(current_pos)); // map to X-axis in ms, Y-axis in vlue
     QString coordinate_string = QString("X = %1, Y = %2").
-            arg(QDateTime::fromMSecsSinceEpoch(current_value.x()).toString("dd日 hh:mm")).
+            arg(QDateTime::fromMSecsSinceEpoch(current_value.x()).toString("MM月dd日 hh:mm")).
             arg(QString::number(current_value.y(), 'f', 1));
     coordinate_item_->setText(coordinate_string);
 
