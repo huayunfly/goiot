@@ -127,9 +127,10 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.pg_3", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1131"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
     data_model_.SetDataToUiMap("plc.1.pg_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1141"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
     data_model_.SetDataToUiMap("plc.1.pg_5", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1151"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
-    data_model_.SetDataToUiMap("plc.1.pg_6", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1113"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
-    data_model_.SetDataToUiMap("plc.1.pg_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1513"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0));
-
+    data_model_.SetDataToUiMap("plc.1.pg_6", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1113"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0),
+                                              UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0)});
+    data_model_.SetDataToUiMap("plc.1.pg_7", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1513"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0),
+                                              UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARG, 1, 80, 0)});
     data_model_.SetDataToUiMap("plc.1.gas_1", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA1001"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::LEL, 1, 20, 0));
     data_model_.SetDataToUiMap("plc.1.gas_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA1002"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 1, 50, 0));
 
