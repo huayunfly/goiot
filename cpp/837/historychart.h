@@ -63,8 +63,7 @@ protected:
 private:
     void UpdateChart();
 
-    std::vector<std::vector<std::tuple<double/*value*/, double/*time*/>>>
-    QueryData(QString table, std::vector<QString> columns,
+    std::vector<QVector<QPointF>> QueryData(QString table, std::vector<QString> columns,
             std::pair<double, double> time_range);
 
 private:

@@ -228,7 +228,7 @@ void HistoryChart::QueryByTimeRange(double min, double max)
     for (auto& item : lines_map_)
     {
         columns.push_back(item.first); // Table column name is data_id, mfc.1.pv etc.
-        item.second->clear(); // Clear QLineSeries
+        // QLineSeries::clear() does not needed.
     }
 
     auto records = QueryData(table, columns, std::make_pair(min, max));
@@ -239,22 +239,19 @@ void HistoryChart::QueryByTimeRange(double min, double max)
     for (std::size_t i = 0; i < columns.size(); i++)
     {
         auto line = lines_map_.at(columns.at(i));
-        for (const auto& [value, time] : records.at(i))
-        {
-            line->append(time * 1000/*ms*/, value);
-        }
+        line->replace(records.at(i)); // QLineSeries::replace() is much fast than append().
     }
 }
 
-std::vector<std::vector<std::tuple<double/*value*/, double/*time*/>>>
-HistoryChart::QueryData(QString table, std::vector<QString> columns,
+std::vector<QVector<QPointF>> HistoryChart::QueryData(
+        QString table, std::vector<QString> columns,
         std::pair<double, double> time_range)
 {
     if (!db_.isOpen())
     {
         QMessageBox::critical(0, "查询数据失败",
                               db_.lastError().text(), QMessageBox::Ignore);
-        return std::vector<std::vector<std::tuple<double, double>>>();
+        return std::vector<QVector<QPointF>>();
     }
     QSqlQuery query(db_);
     QString query_string;
@@ -279,10 +276,10 @@ HistoryChart::QueryData(QString table, std::vector<QString> columns,
     {
         QMessageBox::critical(0, "查询数据失败",
                               query.lastError().text(), QMessageBox::Ignore);
-        return std::vector<std::vector<std::tuple<double, double>>>();
+        return std::vector<QVector<QPointF>>();
     }
 
-    auto records = std::vector<std::vector<std::tuple<double, double>>>(
+    auto records = std::vector<QVector<QPointF>>(
                 columns.size());
     while(query.next())
     {
@@ -295,11 +292,11 @@ HistoryChart::QueryData(QString table, std::vector<QString> columns,
                 double value = record.value(columns.at(i)).toDouble(&ok);
                 if (ok)
                 {
-                    records.at(i).push_back(std::make_pair(value, time));
+                    records.at(i).push_back(QPointF(time * 1000/*ms*/, value));
                 }
                 else
                 {
-                    records.at(i).push_back(std::make_pair(0, time)); // for NULL
+                    records.at(i).push_back(QPointF(time * 1000/*ms*/, 0)); // for NULL
                 }
             }
         }
