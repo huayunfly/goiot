@@ -98,9 +98,10 @@ TRANSLATIONS += \
     8H82600_zh_CN.ts
 
 INCLUDEPATH += \
-    #C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib
-    $$PWD/../../../3rdLib \
-    $$PWD/../../../3rdLib/opencv/v3_4_16/include
+    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib \
+    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib\opencv\v3_4_16\include
+    #$$PWD/../../../3rdLib \
+    #$$PWD/../../../3rdLib/opencv/v3_4_16/include
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -110,15 +111,26 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd
 
-win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient
+win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient
 
-win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclientd
+win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd
 
-win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32 \
-                                                                    -L$$PWD/../../../3rdLib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
+win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32 \
+                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
 
-win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32d \
-                                                                    -L$$PWD/../../../3rdLib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
+win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32d \
+                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
+
+
+#win32:contains(qt_arch, x86_64):config(release, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclient
+
+#win32:contains(qt_arch, x86_64):config(debug, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclientd
+
+#win32:contains(qt_arch, i386):config(release, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclient_32 \
+#                                                                    -l$$pwd/../../../3rdlib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
+
+#win32:contains(qt_arch, i386):config(debug, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclient_32d \
+#                                                                    -l$$pwd/../../../3rdlib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
 
 
 
