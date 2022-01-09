@@ -11,3 +11,8 @@ npm install pg --save
 // Update
 npm update -g package
 
+// pg
+dump to sqlfile: pgdump -U username -p port -f bkfile.pgsql dbname
+restore: psql -U username -p port -d dbname -f bkfile.pgsql
+
+
