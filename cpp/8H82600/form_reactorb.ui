@@ -3253,6 +3253,134 @@
     <string>TICA4616</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_TIA4149">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4149</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4150">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4150</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4151">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4151</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4152">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4152</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4153">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>470</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4153</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4154">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>470</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4154</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4155">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>470</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4155</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TIA4156">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>470</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TIA4156</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>label_PICA4309</zorder>
   <zorder>label_PICA4310</zorder>
@@ -3430,6 +3558,14 @@
   <zorder>txt_label_TICA4614</zorder>
   <zorder>txt_label_TICA4615</zorder>
   <zorder>txt_label_TICA4616</zorder>
+  <zorder>txt_label_TIA4149</zorder>
+  <zorder>txt_label_TIA4150</zorder>
+  <zorder>txt_label_TIA4151</zorder>
+  <zorder>txt_label_TIA4152</zorder>
+  <zorder>txt_label_TIA4153</zorder>
+  <zorder>txt_label_TIA4154</zorder>
+  <zorder>txt_label_TIA4155</zorder>
+  <zorder>txt_label_TIA4156</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>
