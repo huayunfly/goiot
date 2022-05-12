@@ -16,7 +16,7 @@ def roi_mask(img, vertices):
     masked_img = cv2.bitwise_and(img, mask)
     return masked_img
 
-img = cv2.imread('D:\WORK\goiot\py\water_level\sample1.jpg')
+img = cv2.imread('sample1.jpg')
 kernel = np.ones((5, 5), np.uint8)
 start_time = time.time()
 # convert the image to grayscale
