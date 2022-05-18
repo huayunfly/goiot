@@ -1,4 +1,4 @@
-QT       += core gui network axcontainer charts
+QT       += core gui network axcontainer charts sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -111,9 +111,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd
 
-win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient
+win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient \
+                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/x64/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
 
-win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd
+win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd \
+                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/x64/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
 
 win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32 \
                                                                     -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/ -lopencv_core3416.dll -lopencv_highgui3416.dll -lopencv_video3416.dll -lopencv_videoio3416.dll -lopencv_imgproc3416.dll
