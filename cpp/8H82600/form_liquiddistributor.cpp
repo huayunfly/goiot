@@ -5,23 +5,34 @@
 #include <QGraphicsView>
 #include <cassert>
 #include <algorithm>
+#include <QMessageBox>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QDateTime>
 #include "form_liquiddistributor.h"
 #include "ui_form_liquiddistributor.h"
+
 
 FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
                                              const QString& object_name,
                                              const QString& display_name,
-                                             LiquidDistributorGroup group) :
+                                             const QString& connection_path,
+                                             LiquidDistributorGroup group
+                                             ) :
     FormCommon(parent, object_name, display_name),
     ui(new Ui::FormLiquidDistributor),
-    group_(group)
+    group_(group),
+    db_ready_(false)
 {
     ui->setupUi(this);
     InitUiState();
 
+    // DB connection and table preparation
+    PrepareDB(connection_path, object_name);
+
     // Timer
-    connect(&video_timer_0, &QTimer::timeout,
-            this, &FormLiquidDistributor::UpdateImage);
+    connect(&video_timer_0, &QTimer::timeout, this, &FormLiquidDistributor::UpdateImage);
 
     // Video
     video_cap_0.open(0);
@@ -103,7 +114,6 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
 
     // table
-
     QStringList labels;
 
     const int LINE_SEPERATOR = 2;
@@ -164,7 +174,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
             {
                 sampling_time.append(QString::number(s) + "s");
             }
-            QStringList solvent_type({"L2", "L3", "L4", "L6", "L7", "L8"});
+            QStringList solvent_type({"", "L2", "L3", "L4", "L6", "L7", "L8"});
 
             if (line == COL_POS)
             {
@@ -178,7 +188,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
             {
                 // Channel
                 QComboBox *combobox = new QComboBox();
-                if (line_group % 2 == 0)
+                if (line_group < 2)
                 {
                     combobox->addItems(channel_1_to_8);
                 }
@@ -218,6 +228,10 @@ FormLiquidDistributor::~FormLiquidDistributor()
 {
     delete ui;
     video_cap_0.release();
+    if (db_.isOpen())
+    {
+       db_.close();
+    }
 }
 
 bool FormLiquidDistributor::event(QEvent *event)
@@ -297,6 +311,171 @@ QString FormLiquidDistributor::SaveLiquidSamplingProcedure()
     return record;
 }
 
+bool FormLiquidDistributor::SaveLiquidSamplingRecipe(const QString &recipe_name)
+{
+    std::vector<std::vector<QString>> values;
+
+    // search
+    for (int row = 0; row < ROW_COUNT; row++)
+    {
+        if (row == ROW_COUNT / 2)
+        {
+            continue;
+        }
+
+        int valid_row = row;
+        if (row > ROW_COUNT / 2)
+        {
+            valid_row--;
+        }
+        for (int group = 0; group < LINE_GROUPS / 2; group++)
+        {
+            // start point: collection |beam| sampling (1a, 2a, 3b, 4b)
+            //              collection |beam| sampling (5a, 6a, 7b, 8b)
+            int start_col_a = group * LINE_ITEMS;
+            int start_col_b = start_col_a + 2 * LINE_ITEMS + 1/*jump UI seperator*/;
+
+            // pos
+            int pos_a = valid_row * LINE_GROUPS + group + 1;
+            int pos_b = pos_a + 2;
+
+            // channel
+            QComboBox* combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_a + COL_CHANNEL));
+            int channel_a = 0;
+            if (!combobox->currentText().isEmpty())
+            {
+                channel_a = combobox->currentText().toInt();
+            }
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_b + COL_CHANNEL));
+            int channel_b = 0;
+            if (!combobox->currentText().isEmpty())
+            {
+                channel_b = combobox->currentText().toInt();
+            }
+            if (channel_a == 0 && channel_b == 0)
+            {
+                continue;
+            }
+
+            // flowlimit
+            QCheckBox* checkbox = static_cast<QCheckBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_a + COL_FLOW_LIMIT));
+            int flow_limit_a = checkbox->isChecked() ? 1 : 0;
+            checkbox = static_cast<QCheckBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_b + COL_FLOW_LIMIT));
+            int flow_limit_b = checkbox->isChecked() ? 1 : 0;
+
+            // sampling time in second unit
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_a + COL_SAMPLING_TIME));
+            int sampling_time_a = combobox->currentText().remove("s", Qt::CaseInsensitive).toUInt();
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_b + COL_SAMPLING_TIME));
+            int sampling_time_b = combobox->currentText().remove("s", Qt::CaseInsensitive).toUInt();
+
+            // solvent
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_a + COL_SOLVENT_TYPE));
+            int solvent_type_a = 0;
+            if (!combobox->currentText().isEmpty())
+            {
+                solvent_type_a = combobox->currentText().remove("L", Qt::CaseInsensitive).toUInt();
+            }
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col_b + COL_SOLVENT_TYPE));
+            int solvent_type_b = 0;
+            if (!combobox->currentText().isEmpty())
+            {
+                solvent_type_b = combobox->currentText().remove("L", Qt::CaseInsensitive).toUInt();
+            }
+
+            // sampling step
+            values.push_back(std::vector<QString>());
+            auto tail = values.rbegin();
+            QString r_name = recipe_name + "_" + QString::number(QDateTime::currentSecsSinceEpoch());
+            int type = TYPE_SAMPLING;
+            int x = valid_row + 1;
+            int y = group; // 0, 1
+            int run_a = channel_a > 0 ? 1 : 0;
+            int run_b = channel_b > 0 ? 1 : 0;
+            tail->push_back(r_name);
+            tail->push_back(QString::number(type));
+            tail->push_back(QString::number(channel_a));
+            tail->push_back(QString::number(channel_b));
+            tail->push_back(QString::number(x));
+            tail->push_back(QString::number(y));
+            tail->push_back(QString::number(pos_a));
+            tail->push_back(QString::number(pos_b));
+            tail->push_back(QString::number(flow_limit_a));
+            tail->push_back(QString::number(flow_limit_b));
+            tail->push_back(QString::number(solvent_type_a));
+            tail->push_back(QString::number(solvent_type_b));
+            tail->push_back(QString::number(sampling_time_a));
+            tail->push_back(QString::number(sampling_time_b));
+            tail->push_back(QString::number(run_a));
+            tail->push_back(QString::number(run_b));
+            int control_code = type + (channel_a << 2) +
+                    (channel_b << 7) + (x << 12) + (y << 18) +
+                    (flow_limit_a << 19) + (flow_limit_b << 20) +
+                    (solvent_type_a << 21) + (solvent_type_b << 25) +
+                    (run_a << 29) + (run_b << 30);
+            tail->push_back(QString::number(control_code));
+            // purge step
+            if (solvent_type_a != 0 || solvent_type_b != 0)
+            {
+                // Append value
+                values.push_back(std::vector<QString>());
+                tail = values.rbegin();
+                int type = TYPE_SAMPLING_PURGE;
+                int x = valid_row + 1;
+                int y = group; // 0, 1
+                int run_a = solvent_type_a > 0 ? 1 : 0;
+                int run_b = solvent_type_b > 0 ? 1 : 0;
+                tail->push_back(r_name);
+                tail->push_back(QString::number(type));
+                tail->push_back(QString::number(channel_a));
+                tail->push_back(QString::number(channel_b));
+                tail->push_back(QString::number(x));
+                tail->push_back(QString::number(y));
+                tail->push_back(QString::number(pos_a));
+                tail->push_back(QString::number(pos_b));
+                tail->push_back(QString::number(flow_limit_a));
+                tail->push_back(QString::number(flow_limit_b));
+                tail->push_back(QString::number(solvent_type_a));
+                tail->push_back(QString::number(solvent_type_b));
+                tail->push_back(QString::number(sampling_time_a));
+                tail->push_back(QString::number(sampling_time_b));
+                tail->push_back(QString::number(run_a));
+                tail->push_back(QString::number(run_b));
+                int control_code = type + (channel_a << 2) +
+                        (channel_b << 7) + (x << 12) + (y << 18) +
+                        (flow_limit_a << 19) + (flow_limit_b << 20) +
+                        (solvent_type_a << 21) + (solvent_type_b << 25) +
+                        (run_a << 29) + (run_b << 30);
+                tail->push_back(QString::number(control_code));
+            }
+        }
+    }
+    if (db_ready_)
+    {
+        QSqlQuery query(db_);
+        QString error_msg;
+        bool ok = WriteRecipeToDB(recipe_table_name_, table_columns_, values, query, error_msg);
+        if (!ok)
+        {
+            QMessageBox::critical(0, "保存配方失败", error_msg, QMessageBox::Ignore);
+        }
+        return ok;
+    }
+    else
+    {
+        QMessageBox::critical(0, "保存配方失败", "数据库未连接", QMessageBox::Ignore);
+        return false;
+    }
+}
+
 std::list<std::vector<int>> FormLiquidDistributor::SamplingRecordToList(
         const QString& record)
 {
@@ -321,6 +500,157 @@ void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
     auto record_list = SamplingRecordToList(record);
     FillTable(record_list);
     FillStatusChart(record_list);
+}
+
+void FormLiquidDistributor::ClearUITable()
+{
+    for (int row = 0; row < ROW_COUNT; row++)
+    {
+        if (row == ROW_COUNT / 2)
+        {
+            continue;
+        }
+        for (int group = 0; group < LINE_GROUPS; group++)
+        {
+            int start_col = group * LINE_ITEMS;
+            if (group >= LINE_GROUPS / 2)
+            {
+                start_col++; // jump seperator
+            }
+            QComboBox* combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
+            combobox->setCurrentText(""); // empty channel
+            QCheckBox* checkbox = static_cast<QCheckBox*>(
+                    ui->tableWidget->cellWidget(row, start_col + COL_FLOW_LIMIT));
+            checkbox->setChecked(false); // default value
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+            combobox->setCurrentText("1s");
+            combobox = static_cast<QComboBox*>(
+                    ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+            combobox->setCurrentText(""); // empty solvent type (port)
+        }
+    }
+}
+
+void FormLiquidDistributor::FillUITableChannelInfo(
+        int pos, int channel, int flowlimit, int duration, int cleanport)
+{
+    int row = (pos - 1) / LINE_GROUPS;
+    if (row > (MAX_SAMPLING_POS / LINE_GROUPS - 1) / 2)
+    {
+        row++; // jump seperator
+    }
+    int start_col = ((pos - 1) % LINE_GROUPS) * LINE_ITEMS;
+    if (start_col > LINE_GROUPS * LINE_ITEMS / 2 - 1)
+    {
+        start_col++; // jump seperator
+    }
+    QComboBox* combobox = static_cast<QComboBox*>(
+            ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
+    combobox->setCurrentText(QString::number(channel));
+    QCheckBox* checkbox = static_cast<QCheckBox*>(
+            ui->tableWidget->cellWidget(row, start_col + COL_FLOW_LIMIT));
+    if (flowlimit > 0)
+    {
+        checkbox->setChecked(true);
+    }
+    else
+    {
+        checkbox->setChecked(false);
+    }
+    combobox = static_cast<QComboBox*>(
+            ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+    combobox->setCurrentText(QString::number(duration) + "s");
+    combobox = static_cast<QComboBox*>(
+            ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+    combobox->setCurrentText(QString("L") + QString::number(cleanport));
+}
+
+bool FormLiquidDistributor::LoadLiquidSamplingRecipe(const QString &recipe_name)
+{
+    if (!db_ready_)
+    {
+        QMessageBox::critical(0, "加载配方失败", "数据库未连接", QMessageBox::Ignore);
+        return false;
+    }
+    QString error_msg;
+    std::vector<std::shared_ptr<std::vector<QString>>> value_list;
+    QSqlQuery query(db_);
+    bool ok = ReadRecipeFromDB(recipe_table_name_, recipe_name, table_columns_,
+                               query, value_list, error_msg);
+    if (!ok)
+    {
+        QMessageBox::critical(0, "加载配方失败", error_msg, QMessageBox::Ignore);
+        return false;
+    }
+
+    // clear table first.
+    if (value_list.size() > 0)
+    {
+        ClearUITable();
+    }
+    // fill table
+    for (auto& values : value_list)
+    {
+        bool is_ok;
+        int error_count = 0;
+        int type = values->at(INDEX_TYPE).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int channel_a = values->at(INDEX_CHANNEL_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int channel_b = values->at(INDEX_CHANNEL_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int pos_a = values->at(INDEX_POS_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int pos_b = values->at(INDEX_POS_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int flowlimit_a = values->at(INDEX_FLOWLIMIT_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int flowlimit_b = values->at(INDEX_FLOWLIMIT_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int cleanport_a = values->at(INDEX_CLEANPORT_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int cleanport_b = values->at(INDEX_CLEANPORT_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int duration_a = values->at(INDEX_DURATION_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int duration_b = values->at(INDEX_DURATION_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+
+        if (error_count > 0)
+        {
+            ClearUITable();
+            QMessageBox::critical(0, "加载配方失败", "数据格式错误", QMessageBox::Ignore);
+            return false;
+        }
+
+        if (type == TYPE_SAMPLING)
+        {
+            if (channel_a > 0)
+            {
+                if (pos_a > MAX_SAMPLING_POS)
+                {
+                    assert(false);
+                    continue;
+                }
+                FillUITableChannelInfo(
+                            pos_a, channel_a, flowlimit_a, duration_a, cleanport_a);
+            }
+            if (channel_b > 0)
+            {
+                if (pos_b > MAX_SAMPLING_POS)
+                {
+                    assert(false);
+                    continue;
+                }
+                FillUITableChannelInfo(
+                            pos_b, channel_b, flowlimit_b, duration_b, cleanport_b);
+
+            }
+        }
+    }
+    return true;
 }
 
 
@@ -496,12 +826,23 @@ void FormLiquidDistributor::UpdateImage()
 
 void FormLiquidDistributor::on_pushButton_clicked()
 {
-    SaveLiquidSamplingProcedure();
+    QString recipe_name = "xb";
+    bool ok = SaveLiquidSamplingRecipe(recipe_name);
+    if (ok)
+    {
+        QMessageBox::information(0, "保存成功", recipe_name, QMessageBox::Ok);
+    }
 }
 
 void FormLiquidDistributor::on_pushButton_2_clicked()
 {
-    LoadLiquidSamplingProcedure("23,1,1,10,2;24,9,1,11,3;128,10,1,12,6");
+    //LoadLiquidSamplingProcedure("23,1,1,10,2;24,9,1,11,3;128,10,1,12,6");
+    QString recipe_name = "xb_1652838895";
+    bool ok = LoadLiquidSamplingRecipe(recipe_name);
+    if (ok)
+    {
+        QMessageBox::information(0, "加载成功", recipe_name, QMessageBox::Ok);
+    }
 }
 
 void FormLiquidDistributor::on_tableWidget_cellChanged(int row, int column)
@@ -546,3 +887,205 @@ void FormLiquidDistributor::on_tableWidget_cellChanged(int row, int column)
         }
     }
 }
+
+void FormLiquidDistributor::PrepareDB(
+        const QString& connection_path, const QString& instance_name)
+{
+    QStringList list = connection_path.split(":", Qt::SkipEmptyParts);
+    if (list.length() == 6)
+    {
+        dbdriver_ = list[0];
+        hostname_ = list[1];
+        port_ = list[2].toInt();
+        dbname_ = list[3];
+        username_ = list[4];
+        password_ = list[5];
+    }
+
+    // We must assign an unique connection name for addDatabase().
+    // For there are more than one (sampling and collection) instance.
+    db_ = QSqlDatabase::addDatabase(dbdriver_, instance_name);
+    db_.setHostName(hostname_);
+    db_.setPort(port_);
+    db_.setDatabaseName(dbname_);
+    db_.setUserName(username_);
+    db_.setPassword(password_);
+    bool is_open = db_.open();
+    if (!is_open)
+    {
+        QMessageBox::critical(0, "连接数据库失败",
+                              db_.lastError().text(), QMessageBox::Ignore);
+    }
+    else
+    {
+        // Create tables
+        table_columns_ = {"recipe_name", "type", "channel_a", "channel_b",
+                          "x", "y", "pos_a", "pos_b", "flowlimit_a",
+                          "flowlimit_b", "cleanport_a", "cleanport_b",
+                          "duration_a", "duration_b", "run_a", "run_b", "control_code"};
+        QString error_message_1;
+        QString error_message_2;
+        bool ok1 = CreateDBTable(db_, recipe_table_name_, table_columns_, error_message_1);
+        bool ok2 = CreateDBTable(db_, runtime_table_name_, table_columns_, error_message_2);
+        if (!ok1 || !ok2)
+        {
+            QMessageBox::critical(0, "创建数据表失败",
+                                  error_message_1 + "\n" + error_message_2, QMessageBox::Ignore);
+        }
+        else
+        {
+            db_ready_ = true;
+        }
+    }
+}
+
+bool FormLiquidDistributor::CreateDBTable(const QSqlDatabase& db,
+                                          const QString& table_name,
+                                          const std::vector<QString> columns,
+                                          QString& error_message)
+{
+    if (!db.isValid() || !db.isOpen())
+    {
+        error_message = QString("数据库无效或未连接");
+        return false;
+    }
+    QSqlQuery query(db);
+    QString query_string;
+    query_string.append("CREATE TABLE IF NOT EXISTS ");
+    query_string.append(table_name);
+    query_string.append(" (id SERIAL primary key, ");
+    for (auto& column : columns)
+    {
+        query_string.append("\"");
+        query_string.append(column);
+        query_string.append("\" TEXT,");
+    }
+    query_string.append("time DOUBLE PRECISION, createtime TIMESTAMP WITH TIME ZONE not null default localtimestamp(0));");
+    bool ok = query.exec(query_string);
+    if (!ok)
+    {
+        error_message = query.lastError().text();
+    }
+    else
+    {
+        error_message = QString();
+    }
+    return ok;
+}
+
+bool FormLiquidDistributor::ReadRecipeFromDB(
+        const QString& tablename, const QString& recipe_name,
+        const std::vector<QString> columns, QSqlQuery& query,
+        std::vector<std::shared_ptr<std::vector<QString>>>& value_list,
+        QString& error_message)
+{
+    value_list.clear();
+
+    QString query_string("select ");
+    for (auto& column : columns)
+    {
+        query_string.append("\"");
+        query_string.append(column);
+        query_string.append("\", ");
+    }
+    if (query_string.endsWith(", "))
+    {
+        query_string.remove(query_string.size() - 2, 1); // remove the tail ","
+    }
+    query_string.append(" from ");
+    query_string.append(tablename);
+    query_string.append(" where \"recipe_name\"=\'");
+    query_string.append(recipe_name);
+    query_string.append("\';");
+    bool ok = query.exec(query_string);
+    if (!ok)
+    {
+        error_message = query.lastError().text();
+        return false;
+    }
+    while (query.next())
+    {
+        auto values = std::make_shared<std::vector<QString>>();
+        const QSqlRecord& record = query.record();
+        for (auto& column : columns)
+        {
+            values->push_back(record.value(column).toString());
+        }
+        value_list.push_back(values);
+    }
+    return true;
+}
+
+bool FormLiquidDistributor::WriteRecipeStepToDB(
+        const QString& tablename,const std::vector<QString> columns,
+        const std::vector<QString> values, QSqlQuery& query, QString& error_message)
+{
+    QString query_string("insert into ");
+    query_string.append(tablename);
+    query_string.append(" (");
+    for (auto& column : columns)
+    {
+        query_string.append("\"");
+        query_string.append(column);
+        query_string.append("\", ");
+    }
+    query_string.append("\"time\") VALUES (");
+    for (auto& value : values)
+    {
+        query_string.append("'");
+        query_string.append(value);
+        query_string.append("', ");
+    }
+    query_string.append(
+                QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch()));
+    query_string.append(");");
+    bool ok = query.exec(query_string);
+    if (!ok)
+    {
+        error_message = query.lastError().text();
+    }
+    return ok;
+}
+
+// Write to recipe table.
+bool FormLiquidDistributor::WriteRecipeToDB(const QString& tablename,
+                                const std::vector<QString> columns,
+                                const std::vector<std::vector<QString>> value_list,
+                                QSqlQuery& query, QString& error_message)
+{
+    if (value_list.size() == 0 || columns.size() != value_list.at(0).size())
+    {
+        error_message = QString("配方为空");
+        return false;
+    }
+    QString query_string;
+    for (auto& values : value_list)
+    {
+        query_string.append("insert into ");
+        query_string.append(tablename);
+        query_string.append(" (");
+        for (auto& column : columns)
+        {
+            query_string.append("\"");
+            query_string.append(column);
+            query_string.append("\", ");
+        }
+        query_string.append("\"time\") VALUES (");
+        for (auto& value : values)
+        {
+            query_string.append("'");
+            query_string.append(value);
+            query_string.append("', ");
+        }
+        query_string.append(
+                    QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch()));
+        query_string.append(");");
+    }
+    bool ok = query.exec(query_string);
+    if (!ok)
+    {
+        error_message = query.lastError().text();
+    }
+    return ok;
+}
+
