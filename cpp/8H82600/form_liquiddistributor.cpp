@@ -50,7 +50,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     image_label_0->setScaledContents(true);
     ui->verticalLayout_video->addWidget(image_label_0, 0, Qt::AlignTop | Qt::AlignLeft);
 
-    // position display
+    // For the recipe runtime view
     const int x_gap = 35;
     const int y_gap = 35;
     const int radius = 15;
@@ -113,7 +113,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     view->show();
     ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
 
-    // table
+    // For the recipe setting table
     QStringList labels;
 
     const int LINE_SEPERATOR = 2;
@@ -396,7 +396,7 @@ bool FormLiquidDistributor::SaveLiquidSamplingRecipe(const QString &recipe_name)
             auto tail = values.rbegin();
             QString r_name = recipe_name + "_" + QString::number(QDateTime::currentSecsSinceEpoch());
             int type = TYPE_SAMPLING;
-            int x = valid_row + 1;
+            int x = valid_row + 1/*start 1*/;
             int y = group; // 0, 1
             int run_a = channel_a > 0 ? 1 : 0;
             int run_b = channel_b > 0 ? 1 : 0;
@@ -429,7 +429,8 @@ bool FormLiquidDistributor::SaveLiquidSamplingRecipe(const QString &recipe_name)
                 values.push_back(std::vector<QString>());
                 tail = values.rbegin();
                 int type = TYPE_SAMPLING_PURGE;
-                int x = valid_row + 1;
+                int x = valid_row + 1/*start 1*/;
+                x = x > 16 ? 34 : 33; // purge x (1-16)33, (17-32)34
                 int y = group; // 0, 1
                 int run_a = solvent_type_a > 0 ? 1 : 0;
                 int run_b = solvent_type_b > 0 ? 1 : 0;
@@ -653,6 +654,118 @@ bool FormLiquidDistributor::LoadLiquidSamplingRecipe(const QString &recipe_name)
     return true;
 }
 
+bool FormLiquidDistributor::RunRecipe(const QString& recipe_name)
+{
+    if (!db_ready_)
+    {
+        QMessageBox::critical(0, "加载配方失败", "数据库未连接", QMessageBox::Ignore);
+        return false;
+    }
+    QString error_msg;
+    std::vector<std::shared_ptr<std::vector<QString>>> value_list;
+    QSqlQuery query(db_);
+    bool ok = ReadRecipeFromDB(recipe_table_name_, recipe_name, table_columns_,
+                               query, value_list, error_msg);
+    if (!ok)
+    {
+        QMessageBox::critical(0, "加载配方失败", error_msg, QMessageBox::Ignore);
+        return false;
+    }
+
+    for (auto& values : value_list)
+    {
+        bool is_ok;
+        int error_count = 0;
+        int type = values->at(INDEX_TYPE).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int duration_a = values->at(INDEX_DURATION_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int duration_b = values->at(INDEX_DURATION_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int run_a = values->at(INDEX_RUN_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int run_b = values->at(INDEX_RUN_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int control_code = values->at(INDEX_CONTROL_CODE).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        if (error_count > 0)
+        {
+            // Do something to stop recipe runtime on plc.
+            QMessageBox::critical(0, "加载配方失败", "数据格式错误", QMessageBox::Ignore);
+            return false;
+        }
+        // Adjust purge duration
+        if (type == TYPE_SAMPLING_PURGE)
+        {
+            duration_a *= 2;
+            duration_b *= 2;
+        }
+        // Make plc command run
+        //ok = write_data_func_(this->objectname(), control_code_name_,
+                              //qstring::number(control_code));
+        //assert(ok);
+        // Write a runtime record
+        ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
+                                 *values, query, error_msg);
+        assert(ok);
+
+        // Wait sampling or do liquid level detection, send stop command to plc.
+        std::future<qint64> check_a, check_b;
+        if (run_a)
+        {
+            check_a = std::async(
+                        &FormLiquidDistributor::SamplingStatusCheckByTime, this,
+                       duration_a, StatusCheckGroup::A);
+        }
+        if (run_b)
+        {
+            check_b = std::async(
+                        &FormLiquidDistributor::SamplingStatusCheckByTime, this,
+                       duration_b, StatusCheckGroup::B);
+        }
+
+        // Write a runtime record
+        if (run_a)
+        {
+            qint64 stoptime = check_a.get();
+            values->at(INDEX_RUN_A) = QString::number(0);
+            ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
+                                     *values, query, error_msg, stoptime);
+            assert(ok);
+        }
+        if (run_b)
+        {
+            qint64 stoptime = check_b.get();
+            values->at(INDEX_RUN_B) = QString::number(0);
+            ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
+                                     *values, query, error_msg, stoptime);
+            assert(ok);
+        }
+    }
+    return ok;
+}
+
+qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
+        int second, StatusCheckGroup status)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(second));
+    {
+         std::lock_guard<std::mutex> lk(mut);
+         if (status == StatusCheckGroup::A)
+         {
+             channel_a_run_ = false;
+             //bool ok = write_data_func_(this->objectName(), channel_a_run_name_,
+                         //QString::number(0)); // no result check here
+         }
+         else if (status == StatusCheckGroup::B)
+         {
+             channel_b_run_ = false;
+             //bool ok = write_data_func_(this->objectName(), channel_b_run_name_,
+                         //QString::number(0)); // no result check here
+         }
+    }
+    return QDateTime::currentDateTime().toMSecsSinceEpoch();
+}
 
 void FormLiquidDistributor::FillTable(const std::list<std::vector<int>>& record_list)
 {
@@ -1013,13 +1126,24 @@ bool FormLiquidDistributor::ReadRecipeFromDB(
         }
         value_list.push_back(values);
     }
+    if (value_list.empty())
+    {
+        error_message = "空数据";
+        return false;
+    }
     return true;
 }
 
-bool FormLiquidDistributor::WriteRecipeStepToDB(
-        const QString& tablename,const std::vector<QString> columns,
-        const std::vector<QString> values, QSqlQuery& query, QString& error_message)
+bool FormLiquidDistributor::WriteRecipeStepToDB(const QString& tablename, const std::vector<QString> columns,
+        const std::vector<QString> values, QSqlQuery& query, QString& error_message, qint64 msecs)
 {
+    if (columns.empty() || values.empty() || columns.size() != values.size())
+    {
+        error_message = QString("输入数据格式错误");
+        return false;
+    }
+    QString time = msecs > 0 ? QString::number(msecs) : QString::number(
+                                   QDateTime::currentDateTime().toMSecsSinceEpoch());
     QString query_string("insert into ");
     query_string.append(tablename);
     query_string.append(" (");
@@ -1036,8 +1160,7 @@ bool FormLiquidDistributor::WriteRecipeStepToDB(
         query_string.append(value);
         query_string.append("', ");
     }
-    query_string.append(
-                QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch()));
+    query_string.append(time);
     query_string.append(");");
     bool ok = query.exec(query_string);
     if (!ok)
@@ -1089,3 +1212,13 @@ bool FormLiquidDistributor::WriteRecipeToDB(const QString& tablename,
     return ok;
 }
 
+
+void FormLiquidDistributor::on_pushButton_3_clicked()
+{
+    QString recipe_name = "xb_1652838895";
+    bool ok = RunRecipe(recipe_name);
+    if (ok)
+    {
+        QMessageBox::information(0, "运行成功", recipe_name, QMessageBox::Ok);
+    }
+}

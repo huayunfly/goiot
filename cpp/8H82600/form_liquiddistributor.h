@@ -4,11 +4,15 @@
 #include <QWidget>
 #include <QTimer>
 #include <QLabel>
+#include <QSqlDatabase>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <thread>
+#include <mutex>
+#include <future>
 #include <form_common.h>
 #include "sampling_ui_item.h"
-#include <QSqlDatabase>
+
 
 // For QPSQL driver, copy PostgreSQL 64bit or 32bit DLLs to the execute folder:
 // libcrypto-1_1-x64.dll, libiconv-2.dll, libintl-8.dll, libpq.dll, libssl-1_1-x64.dll
@@ -26,6 +30,12 @@ enum class LiquidDistributorGroup
 class FormLiquidDistributor : public FormCommon
 {
     Q_OBJECT
+
+    enum class StatusCheckGroup
+    {
+        A = 0,
+        B = 1
+    };
 
 public:
     explicit FormLiquidDistributor(QWidget *parent = nullptr,
@@ -53,21 +63,32 @@ private slots:
     // Detect the image contoures
     void UpdateImage();
 
+    void on_pushButton_3_clicked();
+
 private:
-    // Save the procedure parameter to a record string.
+    //(Deprecated) Save the procedure parameter to a record string.
     QString SaveLiquidSamplingProcedure();
+    //(Deprecated) Load procedure from a record string.
+    void LoadLiquidSamplingProcedure(const QString& record);
 
     // Save the liquid sampling recipe to DB.
     bool SaveLiquidSamplingRecipe(const QString& recipe_name);
 
-    // Load procedure from a record string.
-    void LoadLiquidSamplingProcedure(const QString& record);
-
     // Load the liquid sampling recipe from DB.
     bool LoadLiquidSamplingRecipe(const QString& recipe_name);
 
-    // Unpack the record string to the parameter list.
+    // (Deprecated) Unpack the record string to the parameter list.
     std::list<std::vector<int>> SamplingRecordToList(const QString& record);
+
+    // Recipe runtime. Read a recipe from DB, send a command to PLC, and append
+    // a record to recipe-runtime in DB.
+    bool RunRecipe(const QString& recipe_name);
+
+    // Liquid sampling status check task A, using timeout
+    qint64 SamplingStatusCheckByTime(int second, StatusCheckGroup status);
+
+    // Liquid sampling status check task B, using liquid image recognition.
+    void SamplingStatusCheckByImageDetection(const cv::VideoCapture& v_cap);
 
     // Fill item setting table.
     void FillTable(const std::list<std::vector<int>>& record_list);
@@ -101,7 +122,8 @@ private:
     // Every row in the recipe-runtime table will generate two steps in the runtime table:
     // 'run' column = 1 or 0
     bool WriteRecipeStepToDB(const QString& tablename, const std::vector<QString> columns,
-                             const std::vector<QString> values, QSqlQuery& query, QString& error_message);
+                             const std::vector<QString> values, QSqlQuery& query, QString& error_message,
+                             qint64 msecs = 0);
 
     // Write to recipe table.
     bool WriteRecipeToDB(const QString& tablename, const std::vector<QString> columns,
@@ -125,22 +147,13 @@ private:
     std::vector<QString> table_columns_;
     const QString recipe_table_name_ = "liquid_distribute_recipe";
     const QString runtime_table_name_ = "liquid_distribute_runtime";
+    const QString control_code_name_ = "control_code";
+    const QString channel_a_run_name_ = "channel_a_run";
+    const QString channel_b_run_name_ = "channel_b_run";
     const int TYPE_SAMPLING = 0;
     const int TYPE_SAMPLING_PURGE = 1;
     const int TYPE_COLLECTION = 2;
     const int TYPE_COLLECTION_PURGE = 3;
-
-    const int MAX_SAMPLING_POS = 128; // Max. sampling tube positions
-    const int LINE_GROUPS = 4; // Liquid sampling line group
-    const int LINE_ITEMS = 5;  // Liquid sampling line record items
-    const int ROW_COUNT = 32 + 1; // 1 seperator row
-    const int COL_COUNT = 20 + 1; // 1 seperator column
-    const int COL_POS = 0;
-    const int COL_CHANNEL = 1;
-    const int COL_FLOW_LIMIT = 2;
-    const int COL_SAMPLING_TIME = 3;
-    const int COL_SOLVENT_TYPE = 4;
-
     const int INDEX_TYPE = 1;
     const int INDEX_CHANNEL_A = 2;
     const int INDEX_CHANNEL_B = 3;
@@ -152,10 +165,35 @@ private:
     const int INDEX_CLEANPORT_B = 11;
     const int INDEX_DURATION_A = 12;
     const int INDEX_DURATION_B = 13;
+    const int INDEX_RUN_A = 14;
+    const int INDEX_RUN_B = 15;
     const int INDEX_CONTROL_CODE = 16;
+    const int CHANNEL_A_STOP_AND_MASK = 0xdfffffff;
+    const int CHANNEL_B_STOP_AND_MASK = 0xbfffffff;
 
+    // sampling setting UI group
+    const int MAX_SAMPLING_POS = 128; // Max. sampling tube positions
+    const int LINE_GROUPS = 4; // Liquid sampling line group
+    const int LINE_ITEMS = 5;  // Liquid sampling line record items
+    const int ROW_COUNT = 32 + 1; // 1 seperator row
+    const int COL_COUNT = 20 + 1; // 1 seperator column
+    const int COL_POS = 0;
+    const int COL_CHANNEL = 1;
+    const int COL_FLOW_LIMIT = 2;
+    const int COL_SAMPLING_TIME = 3;
+    const int COL_SOLVENT_TYPE = 4;
+
+    // sampling runtime UI group
     std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;
 
+    // runtime
+    bool channel_a_run_;
+    bool channel_b_run_;
+    qint64 stoptime_channel_a_;
+    qint64 stoptime_channel_b_;
+    std::mutex mut;
+
+    // opencv
     QLabel* image_label_0; // raw pointer!!
     QTimer video_timer_0;
     cv::VideoCapture video_cap_0;
