@@ -39,6 +39,7 @@ SOURCES += \
     form_reactora.cpp \
     form_reactorb.cpp \
     form_trend.cpp \
+    log.cpp \
     main.cpp \
     mainwindow.cpp \
     sampling_ui_item.cpp
@@ -69,6 +70,7 @@ HEADERS += \
     form_reactora.h \
     form_reactorb.h \
     form_trend.h \
+    log.h \
     mainwindow.h \
     resourcedef.h \
     sampling_ui_item.h

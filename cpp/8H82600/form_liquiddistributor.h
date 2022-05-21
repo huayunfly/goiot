@@ -11,8 +11,8 @@
 #include <mutex>
 #include <future>
 #include <form_common.h>
+#include "ThreadSafeQueue.h"
 #include "sampling_ui_item.h"
-
 
 // For QPSQL driver, copy PostgreSQL 64bit or 32bit DLLs to the execute folder:
 // libcrypto-1_1-x64.dll, libiconv-2.dll, libintl-8.dll, libpq.dll, libssl-1_1-x64.dll
@@ -25,6 +25,48 @@ enum class LiquidDistributorGroup
 {
     SAMPLING = 0,
     COLLECTION = 1
+};
+
+struct RecipeTaskEntity
+{
+    QString recipe_name;
+    int type;
+    int channel_a;
+    int channel_b;
+    int x;
+    int y;
+    int pos_a;
+    int pos_b;
+    int flowlimit_a;
+    int flowlimit_b;
+    int cleanport_a;
+    int cleanport_b;
+    int duration_a;
+    int duration_b;
+    bool run_a;
+    bool run_b;
+    uint control_code;
+
+    std::vector<QString> ToValues()
+    {
+        return std::vector<QString>({recipe_name,
+                                     QString::number(type),
+                                     QString::number(channel_a),
+                                     QString::number(channel_b),
+                                     QString::number(x),
+                                     QString::number(y),
+                                     QString::number(pos_a),
+                                     QString::number(pos_b),
+                                     QString::number(flowlimit_a),
+                                     QString::number(flowlimit_b),
+                                     QString::number(cleanport_a),
+                                     QString::number(cleanport_b),
+                                     QString::number(duration_a),
+                                     QString::number(duration_b),
+                                     QString::number(run_a),
+                                     QString::number(run_b),
+                                     QString::number(control_code),});
+    }
 };
 
 class FormLiquidDistributor : public FormCommon
@@ -70,6 +112,8 @@ private:
     QString SaveLiquidSamplingProcedure();
     //(Deprecated) Load procedure from a record string.
     void LoadLiquidSamplingProcedure(const QString& record);
+    // (Deprecated) Unpack the record string to the parameter list.
+    std::list<std::vector<int>> SamplingRecordToList(const QString& record);
 
     // Save the liquid sampling recipe to DB.
     bool SaveLiquidSamplingRecipe(const QString& recipe_name);
@@ -77,12 +121,11 @@ private:
     // Load the liquid sampling recipe from DB.
     bool LoadLiquidSamplingRecipe(const QString& recipe_name);
 
-    // (Deprecated) Unpack the record string to the parameter list.
-    std::list<std::vector<int>> SamplingRecordToList(const QString& record);
+    // Read a recipe from DB and dispatch recipe task to queue.
+    bool DispatchRecipeTask(const QString& recipe_name);
 
-    // Recipe runtime. Read a recipe from DB, send a command to PLC, and append
-    // a record to recipe-runtime in DB.
-    bool RunRecipe(const QString& recipe_name);
+    // Run recipe backend thread.
+    void RunRecipeWorker();
 
     // Liquid sampling status check task A, using timeout
     qint64 SamplingStatusCheckByTime(int second, StatusCheckGroup status);
@@ -154,9 +197,12 @@ private:
     const int TYPE_SAMPLING_PURGE = 1;
     const int TYPE_COLLECTION = 2;
     const int TYPE_COLLECTION_PURGE = 3;
+    const int INDEX_RECIPE_NAME = 0;
     const int INDEX_TYPE = 1;
     const int INDEX_CHANNEL_A = 2;
     const int INDEX_CHANNEL_B = 3;
+    const int INDEX_X = 4;
+    const int INDEX_Y = 5;
     const int INDEX_POS_A = 6;
     const int INDEX_POS_B = 7;
     const int INDEX_FLOWLIMIT_A = 8;
@@ -187,11 +233,9 @@ private:
     std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;
 
     // runtime
-    bool channel_a_run_;
-    bool channel_b_run_;
-    qint64 stoptime_channel_a_;
-    qint64 stoptime_channel_b_;
     std::mutex mut;
+    std::vector<std::thread> threads_;
+    goiot::ThreadSafeQueue<std::shared_ptr<std::vector<RecipeTaskEntity>>> recipe_task_queue_;
 
     // opencv
     QLabel* image_label_0; // raw pointer!!

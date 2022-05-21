@@ -5326,6 +5326,21 @@
               "name": "pump2_pressure",
               "register": "RW5WUB0784",
               "ratio": 0.1
+            },
+            {
+              "id": "dist_command",
+              "name": "distributor_command",
+              "register": "W5DUB1064"
+            },
+            {
+              "id": "dist_a_run",
+              "name": "distributor_channel_a_run",
+              "register": "RW5BT8528"
+            },
+            {
+              "id": "dist_b_run",
+              "name": "distributor_channel_a_run",
+              "register": "RW5BT8529"
             }
           ]
         }

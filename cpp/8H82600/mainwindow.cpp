@@ -1892,6 +1892,10 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("motorcontrol_reactor16.cell_16_sv", DataDef("reactor16.16.block_data0", "reactor16.16.block_data0", "reactor16.16.block_data0"));
     data_model_.SetUiToDataMap("motorcontrol_reactor16.button_16_start", DataDef("reactor16.16.stb", "reactor16.16.stb", "reactor16.16.stb"));
     data_model_.SetUiToDataMap("motorcontrol_reactor16.button_16_stop", DataDef("reactor16.16.s_stop", "reactor16.16.s_stop", "reactor16.16.s_stop"));
+    // liquid distributor
+    data_model_.SetUiToDataMap("distributor_sampling.control_code", DataDef("plc.1.dist_command", "plc.1.dist_command", "plc.1.dist_command"));
+    data_model_.SetUiToDataMap("distributor_sampling.channel_a_run", DataDef("plc.1.dist_a_run", "plc.1.dist_a_run", "plc.1.dist_a_run"));
+    data_model_.SetUiToDataMap("distributor_sampling.channel_b_run", DataDef("plc.1.dist_b_run", "plc.1.dist_b_run", "plc.1.dist_b_run"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)

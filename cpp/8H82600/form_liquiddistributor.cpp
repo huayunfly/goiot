@@ -23,7 +23,8 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     FormCommon(parent, object_name, display_name),
     ui(new Ui::FormLiquidDistributor),
     group_(group),
-    db_ready_(false)
+    db_ready_(false),
+    recipe_task_queue_(1)
 {
     ui->setupUi(this);
     InitUiState();
@@ -222,6 +223,8 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
             }
         }
     }
+    // thread
+    threads_.emplace_back(std::thread(&FormLiquidDistributor::RunRecipeWorker, this));
 }
 
 FormLiquidDistributor::~FormLiquidDistributor()
@@ -231,6 +234,11 @@ FormLiquidDistributor::~FormLiquidDistributor()
     if (db_.isOpen())
     {
        db_.close();
+    }
+    recipe_task_queue_.Close();
+    for (auto& entry : threads_)
+    {
+        entry.join();
     }
 }
 
@@ -647,14 +655,13 @@ bool FormLiquidDistributor::LoadLiquidSamplingRecipe(const QString &recipe_name)
                 }
                 FillUITableChannelInfo(
                             pos_b, channel_b, flowlimit_b, duration_b, cleanport_b);
-
             }
         }
     }
     return true;
 }
 
-bool FormLiquidDistributor::RunRecipe(const QString& recipe_name)
+bool FormLiquidDistributor::DispatchRecipeTask(const QString& recipe_name)
 {
     if (!db_ready_)
     {
@@ -672,77 +679,156 @@ bool FormLiquidDistributor::RunRecipe(const QString& recipe_name)
         return false;
     }
 
+    std::shared_ptr<std::vector<RecipeTaskEntity>> task =
+            std::make_shared<std::vector<RecipeTaskEntity>>();
     for (auto& values : value_list)
     {
+        RecipeTaskEntity entity;
         bool is_ok;
         int error_count = 0;
-        int type = values->at(INDEX_TYPE).toInt(&is_ok);
+        entity.recipe_name = values->at(INDEX_RECIPE_NAME);
+        entity.type = values->at(INDEX_TYPE).toInt(&is_ok);
         if (!is_ok) error_count++;
-        int duration_a = values->at(INDEX_DURATION_A).toInt(&is_ok);
+        entity.channel_a = values->at(INDEX_CHANNEL_A).toInt(&is_ok);
         if (!is_ok) error_count++;
-        int duration_b = values->at(INDEX_DURATION_B).toInt(&is_ok);
+        entity.channel_b = values->at(INDEX_CHANNEL_B).toInt(&is_ok);
         if (!is_ok) error_count++;
-        int run_a = values->at(INDEX_RUN_A).toInt(&is_ok);
+        entity.x = values->at(INDEX_X).toInt(&is_ok);
         if (!is_ok) error_count++;
-        int run_b = values->at(INDEX_RUN_B).toInt(&is_ok);
+        entity.y = values->at(INDEX_Y).toInt(&is_ok);
         if (!is_ok) error_count++;
-        int control_code = values->at(INDEX_CONTROL_CODE).toInt(&is_ok);
+        entity.pos_a = values->at(INDEX_POS_A).toInt(&is_ok);
         if (!is_ok) error_count++;
+        entity.pos_b = values->at(INDEX_POS_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.flowlimit_a = values->at(INDEX_FLOWLIMIT_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.flowlimit_b = values->at(INDEX_FLOWLIMIT_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.cleanport_a = values->at(INDEX_CLEANPORT_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.cleanport_b = values->at(INDEX_CLEANPORT_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.duration_a = values->at(INDEX_DURATION_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.duration_b = values->at(INDEX_DURATION_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.run_a = values->at(INDEX_RUN_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.run_b = values->at(INDEX_RUN_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        entity.control_code = values->at(INDEX_CONTROL_CODE).toUInt(&is_ok);
         if (error_count > 0)
         {
             // Do something to stop recipe runtime on plc.
             QMessageBox::critical(0, "加载配方失败", "数据格式错误", QMessageBox::Ignore);
             return false;
         }
-        // Adjust purge duration
-        if (type == TYPE_SAMPLING_PURGE)
-        {
-            duration_a *= 2;
-            duration_b *= 2;
-        }
-        // Make plc command run
-        //ok = write_data_func_(this->objectname(), control_code_name_,
-                              //qstring::number(control_code));
-        //assert(ok);
-        // Write a runtime record
-        ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
-                                 *values, query, error_msg);
-        assert(ok);
+        task->push_back(entity);
+    }
+    recipe_task_queue_.Put(task);
+    return true;
+}
 
-        // Wait sampling or do liquid level detection, send stop command to plc.
-        std::future<qint64> check_a, check_b;
-        if (run_a)
+void FormLiquidDistributor::RunRecipeWorker()
+{
+    QString error_msg;
+    QSqlQuery query(db_);
+    while (true)
+    {
+        std::shared_ptr<std::vector<RecipeTaskEntity>> task;
+        recipe_task_queue_.Get(task);
+        if (task == nullptr) // Improve for a robust SENTINEL
         {
-            check_a = std::async(
-                        &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                       duration_a, StatusCheckGroup::A);
-        }
-        if (run_b)
-        {
-            check_b = std::async(
-                        &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                       duration_b, StatusCheckGroup::B);
+            break; // Exit
         }
 
-        // Write a runtime record
-        if (run_a)
+        for (auto& entity : *task)
         {
-            qint64 stoptime = check_a.get();
-            values->at(INDEX_RUN_A) = QString::number(0);
-            ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
-                                     *values, query, error_msg, stoptime);
+            // Adjust purge duration
+            int run_a = entity.run_a;
+            int run_b = entity.run_b;
+            int duration_a = entity.duration_a;
+            int duration_b = entity.duration_b;
+            if (entity.type == TYPE_SAMPLING_PURGE)
+            {
+                duration_a *= 2;
+                duration_b *= 2;
+            }
+            std::vector<QString> values = entity.ToValues();
+            // Make plc command run
+            bool ok = write_data_func_(this->objectName(), control_code_name_,
+                                  QString::number(entity.control_code));
             assert(ok);
-        }
-        if (run_b)
-        {
-            qint64 stoptime = check_b.get();
-            values->at(INDEX_RUN_B) = QString::number(0);
-            ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
-                                     *values, query, error_msg, stoptime);
-            assert(ok);
+            if (!ok)
+            {
+                qCritical("write_data_func_ QFull error in RunRecipeWorker()");
+            }
+            // Write a runtime record
+            if (db_ready_)
+            {
+                ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
+                                             values, query, error_msg);
+                assert(ok);
+                if (!ok)
+                {
+                    qCritical("WriteRecipeStepToDB failed in RunRecipeWorker(), %s",
+                              error_msg.toLatin1().constData());
+                }
+            }
+
+            // Wait sampling or do liquid level detection, send stop command to plc.
+            std::future<qint64> check_a, check_b;
+            if (run_a)
+            {
+                check_a = std::async(
+                            &FormLiquidDistributor::SamplingStatusCheckByTime, this,
+                            duration_a, StatusCheckGroup::A);
+            }
+            if (run_b)
+            {
+                check_b = std::async(
+                            &FormLiquidDistributor::SamplingStatusCheckByTime, this,
+                            duration_b, StatusCheckGroup::B);
+            }
+
+            // Write a runtime record
+            if (run_a)
+            {
+                qint64 stoptime = check_a.get();
+                values.at(INDEX_RUN_A) = QString::number(0);
+
+                if (db_ready_)
+                {
+                    ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
+                                             values, query, error_msg, stoptime);
+                    assert(ok);
+                    if (!ok)
+                    {
+                        qCritical("WriteRecipeStepToDB failed in RunRecipeWorker(), %s",
+                                  error_msg.toLatin1().constData());
+                    }
+                }
+            }
+            if (run_b)
+            {
+                qint64 stoptime = check_b.get();
+                values.at(INDEX_RUN_B) = QString::number(0);
+
+                if (db_ready_)
+                {
+                    ok = WriteRecipeStepToDB(runtime_table_name_, table_columns_,
+                                             values, query, error_msg, stoptime);
+                    assert(ok);
+                    if (!ok)
+                    {
+                        qCritical("WriteRecipeStepToDB failed in RunRecipeWorker(), %s",
+                                  error_msg.toLatin1().constData());
+                    }
+                }
+            }
         }
     }
-    return ok;
 }
 
 qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
@@ -753,15 +839,23 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
          std::lock_guard<std::mutex> lk(mut);
          if (status == StatusCheckGroup::A)
          {
-             channel_a_run_ = false;
-             //bool ok = write_data_func_(this->objectName(), channel_a_run_name_,
-                         //QString::number(0)); // no result check here
+             bool ok = write_data_func_(this->objectName(), channel_a_run_name_,
+                         QString::number(0)); // no result check here
+             assert(ok);
+             if (!ok)
+             {
+                 qCritical("write_data_func_ QFull error in SamplingStatusCheckByTime()");
+             }
          }
          else if (status == StatusCheckGroup::B)
          {
-             channel_b_run_ = false;
-             //bool ok = write_data_func_(this->objectName(), channel_b_run_name_,
-                         //QString::number(0)); // no result check here
+             bool ok = write_data_func_(this->objectName(), channel_b_run_name_,
+                         QString::number(0)); // no result check here
+             assert(ok);
+             if (!ok)
+             {
+                 qCritical("write_data_func_ QFull error in SamplingStatusCheckByTime()");
+             }
          }
     }
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -1216,9 +1310,9 @@ bool FormLiquidDistributor::WriteRecipeToDB(const QString& tablename,
 void FormLiquidDistributor::on_pushButton_3_clicked()
 {
     QString recipe_name = "xb_1652838895";
-    bool ok = RunRecipe(recipe_name);
+    bool ok = DispatchRecipeTask(recipe_name);
     if (ok)
     {
-        QMessageBox::information(0, "运行成功", recipe_name, QMessageBox::Ok);
+        QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
     }
 }
