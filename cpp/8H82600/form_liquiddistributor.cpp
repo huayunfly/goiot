@@ -12,6 +12,7 @@
 #include <QDateTime>
 #include "form_liquiddistributor.h"
 #include "ui_form_liquiddistributor.h"
+#include "qrcode_generator.h"
 
 
 FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
@@ -1315,4 +1316,11 @@ void FormLiquidDistributor::on_pushButton_3_clicked()
     {
         QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
     }
+}
+
+void FormLiquidDistributor::on_pushButton_4_clicked()
+{
+    QRCodeGenerator encoder;
+    auto code = encoder.Encode("https://bing.com");
+    this->ui->label_qr->setPixmap(encoder.ToQPixmap(code, "yashen"));
 }
