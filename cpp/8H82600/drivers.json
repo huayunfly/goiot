@@ -5328,19 +5328,29 @@
               "ratio": 0.1
             },
             {
-              "id": "dist_command",
-              "name": "distributor_command",
-              "register": "W5DUB1064"
+              "id": "dist_controlcode",
+              "name": "distributor_controlcode",
+              "register": "W5DUB1066"
             },
             {
-              "id": "dist_a_run",
-              "name": "distributor_channel_a_run",
-              "register": "RW5BT8528"
+              "id": "dist_a_run_sv",
+              "name": "distributor_a_run_sv",
+              "register": "RW5BT8560"
             },
             {
-              "id": "dist_b_run",
-              "name": "distributor_channel_a_run",
-              "register": "RW5BT8529"
+              "id": "dist_b_run_sv",
+              "name": "distributor_b_run_sv",
+              "register": "RW5BT8561"
+            },
+            {
+              "id": "dist_a_run_pv",
+              "name": "distributor_a_run_pv",
+              "register": "R5BT8562"
+            },
+            {
+              "id": "dist_b_run_pv",
+              "name": "distributor_b_run_pv",
+              "register": "R5BT8563"
             }
           ]
         }
