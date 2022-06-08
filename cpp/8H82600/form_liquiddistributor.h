@@ -103,7 +103,7 @@ private slots:
     void on_tableWidget_cellChanged(int row, int column);
 
     // Detect the image contoures
-    void UpdateImage();
+    void UpdateImage(int index);
 
     void on_pushButton_3_clicked();
 
@@ -116,6 +116,15 @@ private:
     void LoadLiquidSamplingProcedure(const QString& record);
     // (Deprecated) Unpack the record string to the parameter list.
     std::list<std::vector<int>> SamplingRecordToList(const QString& record);
+
+    // Initialize video captrues.
+    void InitVideoCaps();
+
+    // Initialize recipe runtime view.
+    void InitRecipeRuntimeView();
+
+    // Initialize recipe setting table.
+    void InitRecipeSettingTable();
 
     // Save the liquid sampling recipe to DB.
     bool SaveLiquidSamplingRecipe(const QString& recipe_name);
@@ -239,11 +248,11 @@ private:
     std::vector<std::thread> threads_;
     goiot::ThreadSafeQueue<std::shared_ptr<std::vector<RecipeTaskEntity>>> recipe_task_queue_;
 
-    // opencv
-    QLabel* image_label_0; // raw pointer!!
-    QTimer video_timer_0;
-    cv::VideoCapture video_cap_0;
-    cv::Mat video_frame_0;
+    // video captures
+    std::vector<cv::VideoCapture> vcaps_;
+    std::vector<cv::Mat> vframes_;
+    std::vector<QTimer> timers_;
+    std::vector<QLabel*> image_labels_;
 };
 
 #endif // FORM_LIQUIDDISTRIBUTOR_H

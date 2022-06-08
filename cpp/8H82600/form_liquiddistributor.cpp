@@ -25,7 +25,8 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     ui(new Ui::FormLiquidDistributor),
     group_(group),
     db_ready_(false),
-    recipe_task_queue_(1)
+    recipe_task_queue_(1),
+    timers_(2)
 {
     ui->setupUi(this);
     InitUiState();
@@ -33,205 +34,26 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     // DB connection and table preparation
     PrepareDB(connection_path, object_name);
 
-    // Timer
-    connect(&video_timer_0, &QTimer::timeout, this, &FormLiquidDistributor::UpdateImage);
-
-    // Video
-    video_cap_0.open(0);
-    // Check if camera opened successfully
-    if(video_cap_0.isOpened())
+    if (group == LiquidDistributorGroup::SAMPLING)
     {
-        // Default resolutions of the frame are obtained.The default resolutions are system dependent.
-        int frame_height = video_cap_0.get(cv::CAP_PROP_FRAME_HEIGHT);
-        int frame_width = video_cap_0.get(cv::CAP_PROP_FRAME_WIDTH);
-        video_frame_0 = cv::Mat::zeros(frame_height, frame_width, CV_8UC3);
-        video_timer_0.start(66);
+        InitVideoCaps();
     }
-    // Create image label
-    image_label_0 = new QLabel(this);
-    image_label_0->setScaledContents(true);
-    ui->verticalLayout_video->addWidget(image_label_0, 0, Qt::AlignTop | Qt::AlignLeft);
 
     // For the recipe runtime view
-    const int x_gap = 35;
-    const int y_gap = 35;
-    const int radius = 15;
-    std::vector<std::pair<double, double>> positions;
-    int number = 1;
-    double y_base = 0;
-    for (int y = 0; y < 32; y++)
-    {
-        if (y >= 8 && y < 16)
-        {
-            y_base = y_gap;
-        }
-        else if (y >= 16 && y < 24)
-        {
-            y_base = 2 * y_gap;
-        }
-        else if (y >= 24)
-        {
-            y_base = 3 * y_gap;
-        }
-        for (int x = 0; x < 4; x++)
-        {
-            auto item =
-                    std::make_shared<SamplingUIItem>(radius, number);
-            item->setPos(x * x_gap + 2 * x_gap, y_base + y * y_gap + radius);
-            sampling_ui_items.push_back(item);
-            number++;
-        }
-    }
-    // for sink positions
-    for (int y = 0; y < 2; y++)
-    {
-        if (y == 0)
-        {
-            y_base = 8 * y_gap;
-        }
-        else
-        {
-            y_base = 26 * y_gap;
-        }
-        for (int x = 0; x < 4; x++)
-        {
-            auto item = std::make_shared<SamplingUIItem>(
-                            radius,
-                            129,
-                            SamplingUIItem::SamplingUIItemStatus::Undischarge);
-            item->setPos(x * x_gap + 2 * x_gap, y_base + radius);
-            sampling_ui_items.push_back(item);
-        }
-    }
-
-    auto scene = new QGraphicsScene(0, 0, 8 * x_gap, 35 * y_gap);
-    //scene->addRect(0, 0, 300, 800);
-    for (auto& item : sampling_ui_items)
-    {
-        scene->addItem(item.get());
-    }
-
-    auto view = new QGraphicsView(scene);
-    view->show();
-    ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
-
+    InitRecipeRuntimeView();
     // For the recipe setting table
-    QStringList labels;
-
-    const int LINE_SEPERATOR = 2;
-    for (int group = 0; group < LINE_GROUPS + 1; group++)
-    {
-        if (group == LINE_SEPERATOR)
-        {
-            labels.push_back(""); // Seperator column
-            continue;
-        }
-        labels.push_back("位号");
-        labels.push_back("通道");
-        labels.push_back("限流");
-        labels.push_back("时间");
-        labels.push_back("清洗");
-    }
-
-    ui->tableWidget->setColumnCount(COL_COUNT);
-    ui->tableWidget->setRowCount(ROW_COUNT);
-    ui->tableWidget->setHorizontalHeaderLabels(labels);
-    ui->tableWidget->horizontalHeader()->setVisible(true);
-    ui->tableWidget->verticalHeader()->setVisible(false);
-    ui->tableWidget->horizontalHeader()->setDefaultSectionSize(40);
-    ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
-    ui->tableWidget->setAlternatingRowColors(true);
-    ui->tableWidget->resize(1200, 1100);
-
-    QColor seperator_color = QColor(72, 118, 255);
-    for (int row = 0; row < ROW_COUNT; row++)
-    {
-        for (int col = 0; col < COL_COUNT; col++)
-        {
-            if (row == ROW_COUNT / 2 || col == COL_COUNT / 2)
-            {
-                ui->tableWidget->setItem(row, col, new QTableWidgetItem(""));
-                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
-                ui->tableWidget->item(row, col)->setBackground(seperator_color);
-                continue;
-            }
-            int row_positon = row;
-            int line = col % LINE_ITEMS;
-            int line_group = col / LINE_ITEMS;
-            if (row > ROW_COUNT / 2)
-            {
-                row_positon--;
-            }
-            if (col > COL_COUNT / 2)
-            {
-                line = (col - 1) % LINE_ITEMS;
-                line_group = (col - 1) / LINE_ITEMS;
-            }
-
-            // Initialize channel number, sampling_time, purge_time, solvent type
-            QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
-            QStringList channel_9_to_16({"", "9", "10", "11", "12", "13", "14", "15", "16"});
-            QStringList sampling_time;
-            for (int s = 1; s < 100; s++)
-            {
-                sampling_time.append(QString::number(s) + "s");
-            }
-            QStringList solvent_type({"", "L2", "L3", "L4", "L6", "L7", "L8"});
-
-            if (line == COL_POS)
-            {
-                // Position
-                auto pos = QString("#") + QString::number(row_positon * LINE_GROUPS + line_group + 1);
-                ui->tableWidget->setItem(row, col, new QTableWidgetItem(pos));
-                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
-                ui->tableWidget->item(row, col)->setFont(QFont("arial", 9, QFont::Black));
-            }
-            else if (line == COL_CHANNEL)
-            {
-                // Channel
-                QComboBox *combobox = new QComboBox();
-                if (line_group < 2)
-                {
-                    combobox->addItems(channel_1_to_8);
-                }
-                else
-                {
-                    combobox->addItems(channel_9_to_16);
-                }
-                ui->tableWidget->setCellWidget(row, col, combobox);
-            }
-            else if (line == COL_FLOW_LIMIT)
-            {
-                // Flow limit?
-                QCheckBox *checkbox = new QCheckBox();
-                ui->tableWidget->setCellWidget(row, col, checkbox);
-            }
-            else if (line == COL_SAMPLING_TIME)
-            {
-                // Sampling time in s
-                QComboBox *combobox = new QComboBox();
-                combobox->addItems(sampling_time);
-                ui->tableWidget->setCellWidget(row, col, combobox);
-            }
-            else if (line == COL_SOLVENT_TYPE)
-            {
-                // Solvent type
-                QComboBox *combobox = new QComboBox();
-                combobox->addItems(solvent_type);
-                ui->tableWidget->setCellWidget(row, col, combobox);
-                //ui->tableWidget->setItem(row, col, new QTableWidgetItem("p"));
-                //ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
-            }
-        }
-    }
-    // thread
+    InitRecipeSettingTable();
+    // thread worker
     threads_.emplace_back(std::thread(&FormLiquidDistributor::RunRecipeWorker, this));
 }
 
 FormLiquidDistributor::~FormLiquidDistributor()
 {
     delete ui;
-    video_cap_0.release();
+    for (auto& cap : vcaps_)
+    {
+        cap.release();
+    }
     if (db_.isOpen())
     {
        db_.close();
@@ -510,6 +332,224 @@ void FormLiquidDistributor::LoadLiquidSamplingProcedure(const QString& record)
     auto record_list = SamplingRecordToList(record);
     FillTable(record_list);
     FillStatusChart(record_list);
+}
+
+void FormLiquidDistributor::InitVideoCaps()
+{
+    vcaps_.resize(2);
+    vframes_.resize(2);
+    image_labels_.push_back(new QLabel(this));
+    image_labels_.push_back(new QLabel(this));
+    std::vector<QVBoxLayout*> boxes {ui->verticalLayout_video,
+                                    ui->verticalLayout_video_2};
+    // Timer
+    for (int i = 0; i < 2; i++)
+    {
+        connect(&timers_.at(i), &QTimer::timeout, this, [=] () { UpdateImage(i);});
+    }
+
+    // Video
+    for (int i = 0; i < 2; i++)
+    {
+        // Check if camera opened successfully
+        vcaps_.at(i).open(i);
+        if (vcaps_.at(i).isOpened())
+        {
+            // Default resolutions of the frame are obtained.The default resolutions are system dependent.
+            int frame_height = vcaps_.at(i).get(cv::CAP_PROP_FRAME_HEIGHT);
+            int frame_width = vcaps_.at(i).get(cv::CAP_PROP_FRAME_WIDTH);
+            vframes_.at(i) = cv::Mat::zeros(frame_height, frame_width, CV_8UC3);
+            timers_.at(i).start(66);
+        }
+        // Create image label
+        image_labels_.at(i)->setScaledContents(true);
+        boxes.at(i)->addWidget(image_labels_.at(i), 0, Qt::AlignTop | Qt::AlignLeft);
+    }
+}
+
+void FormLiquidDistributor::InitRecipeRuntimeView()
+{
+    const int x_gap = 35;
+    const int y_gap = 35;
+    const int radius = 15;
+    std::vector<std::pair<double, double>> positions;
+    int number = 1;
+    double y_base = 0;
+    for (int y = 0; y < 32; y++)
+    {
+        if (y >= 8 && y < 16)
+        {
+            y_base = y_gap;
+        }
+        else if (y >= 16 && y < 24)
+        {
+            y_base = 2 * y_gap;
+        }
+        else if (y >= 24)
+        {
+            y_base = 3 * y_gap;
+        }
+        for (int x = 0; x < 4; x++)
+        {
+            auto item =
+                    std::make_shared<SamplingUIItem>(radius, number);
+            item->setPos(x * x_gap + 2 * x_gap, y_base + y * y_gap + radius);
+            sampling_ui_items.push_back(item);
+            number++;
+        }
+    }
+    // for sink positions
+    for (int y = 0; y < 2; y++)
+    {
+        if (y == 0)
+        {
+            y_base = 8 * y_gap;
+        }
+        else
+        {
+            y_base = 26 * y_gap;
+        }
+        for (int x = 0; x < 4; x++)
+        {
+            auto item = std::make_shared<SamplingUIItem>(
+                            radius,
+                            129,
+                            SamplingUIItem::SamplingUIItemStatus::Undischarge);
+            item->setPos(x * x_gap + 2 * x_gap, y_base + radius);
+            sampling_ui_items.push_back(item);
+        }
+    }
+
+    auto scene = new QGraphicsScene(0, 0, 8 * x_gap, 35 * y_gap);
+    //scene->addRect(0, 0, 300, 800);
+    for (auto& item : sampling_ui_items)
+    {
+        scene->addItem(item.get());
+    }
+
+    auto view = new QGraphicsView(scene);
+    view->show();
+    ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
+}
+
+void FormLiquidDistributor::InitRecipeSettingTable()
+{
+    QStringList labels;
+
+    const int LINE_SEPERATOR = 2;
+    for (int group = 0; group < LINE_GROUPS + 1; group++)
+    {
+        if (group == LINE_SEPERATOR)
+        {
+            labels.push_back(""); // Seperator column
+            continue;
+        }
+        labels.push_back("位号");
+        labels.push_back("通道");
+        labels.push_back("限流");
+        labels.push_back("时间");
+        labels.push_back("清洗");
+    }
+
+    ui->tableWidget->setColumnCount(COL_COUNT);
+    ui->tableWidget->setRowCount(ROW_COUNT);
+    ui->tableWidget->setHorizontalHeaderLabels(labels);
+    ui->tableWidget->horizontalHeader()->setVisible(true);
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->horizontalHeader()->setDefaultSectionSize(40);
+    ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
+    ui->tableWidget->setAlternatingRowColors(true);
+    ui->tableWidget->resize(1200, 1100);
+
+    QColor seperator_color = QColor(72, 118, 255);
+    for (int row = 0; row < ROW_COUNT; row++)
+    {
+        for (int col = 0; col < COL_COUNT; col++)
+        {
+            if (row == ROW_COUNT / 2 || col == COL_COUNT / 2)
+            {
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem(""));
+                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+                ui->tableWidget->item(row, col)->setBackground(seperator_color);
+                continue;
+            }
+            int row_positon = row;
+            int line = col % LINE_ITEMS;
+            int line_group = col / LINE_ITEMS;
+            if (row > ROW_COUNT / 2)
+            {
+                row_positon--;
+            }
+            if (col > COL_COUNT / 2)
+            {
+                line = (col - 1) % LINE_ITEMS;
+                line_group = (col - 1) / LINE_ITEMS;
+            }
+
+            // Initialize channel number, sampling_time, purge_time, solvent type
+            QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
+            QStringList channel_9_to_16({"", "9", "10", "11", "12", "13", "14", "15", "16"});
+            QStringList sampling_time;
+            for (int s = 1; s < 100; s++)
+            {
+                sampling_time.append(QString::number(s) + "s");
+            }
+
+            QStringList solvent_type_a({"", "L2", "L3", "L4"});
+            QStringList solvent_type_b({"", "L6", "L7", "L8"});
+            if (line == COL_POS)
+            {
+                // Position
+                auto pos = QString("#") + QString::number(row_positon * LINE_GROUPS + line_group + 1);
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem(pos));
+                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+                ui->tableWidget->item(row, col)->setFont(QFont("arial", 9, QFont::Black));
+            }
+            else if (line == COL_CHANNEL)
+            {
+                // Channel
+                QComboBox *combobox = new QComboBox();
+                if (line_group < 2)
+                {
+                    combobox->addItems(channel_1_to_8);
+                }
+                else
+                {
+                    combobox->addItems(channel_9_to_16);
+                }
+                ui->tableWidget->setCellWidget(row, col, combobox);
+            }
+            else if (line == COL_FLOW_LIMIT)
+            {
+                // Flow limit?
+                QCheckBox *checkbox = new QCheckBox();
+                ui->tableWidget->setCellWidget(row, col, checkbox);
+            }
+            else if (line == COL_SAMPLING_TIME)
+            {
+                // Sampling time in s
+                QComboBox *combobox = new QComboBox();
+                combobox->addItems(sampling_time);
+                ui->tableWidget->setCellWidget(row, col, combobox);
+            }
+            else if (line == COL_SOLVENT_TYPE)
+            {
+                // Solvent type
+                QComboBox *combobox = new QComboBox();
+                if (line_group < 2)
+                {
+                    combobox->addItems(solvent_type_a);
+                }
+                else
+                {
+                    combobox->addItems(solvent_type_b);
+                }
+                ui->tableWidget->setCellWidget(row, col, combobox);
+                //ui->tableWidget->setItem(row, col, new QTableWidgetItem("p"));
+                //ui->tableWidget->item(row, col)->setTextAlignment(Qt::AlignCenter);
+            }
+        }
+    }
 }
 
 void FormLiquidDistributor::ClearUITable()
@@ -888,10 +928,10 @@ void FormLiquidDistributor::FillTable(const std::list<std::vector<int>>& record_
                 checkbox->setChecked(false); // default value
                 combobox = static_cast<QComboBox*>(
                         ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
-                combobox->setCurrentText("1s");
+                combobox->setCurrentText("5s");
                 combobox = static_cast<QComboBox*>(
                         ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
-                combobox->setCurrentText("L2");
+                combobox->setCurrentText("");
             }
         }
     }
@@ -967,23 +1007,29 @@ void FormLiquidDistributor::InitUiState()
 
 void FormLiquidDistributor::paintEvent(QPaintEvent *e)
 {
-    QImage img = QImage(static_cast<uchar*>(video_frame_0.data),
-                        video_frame_0.cols, video_frame_0.rows, QImage::Format_BGR888);
-    image_label_0->setPixmap(QPixmap::fromImage(img));
-    //image_label_0->resize(img.size());
-    image_label_0->show();
+    if (group_ == LiquidDistributorGroup::SAMPLING)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            QImage img = QImage(static_cast<uchar*>(vframes_.at(i).data),
+                                vframes_.at(i).cols, vframes_.at(i).rows, QImage::Format_BGR888);
+            image_labels_.at(i)->setPixmap(QPixmap::fromImage(img));
+            //image_label_0->resize(img.size());
+            image_labels_.at(i)->show();
+        }
+    }
     FormCommon::paintEvent(e);
 }
 
-void FormLiquidDistributor::UpdateImage()
+void FormLiquidDistributor::UpdateImage(int index)
 {
-    video_cap_0 >> video_frame_0;
-    if (video_frame_0.data != nullptr)
+    vcaps_.at(index) >> vframes_.at(index);
+    if (vframes_.at(index).data != nullptr)
     {
         cv::Mat gray, edges;
         std::vector<std::vector<cv::Point>> contours;
         std::vector<cv::Vec4i> hierarchy;
-        cv::cvtColor(video_frame_0, gray, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(vframes_.at(index), gray, cv::COLOR_BGR2GRAY);
         cv::Canny(gray, edges, 60, 360, 3/*apertureSize*/, true/*L2gradient*/);
         cv::findContours(edges,
                          contours,
@@ -1003,18 +1049,18 @@ void FormLiquidDistributor::UpdateImage()
         std::vector<int> match_idx;
         for (auto& idx : lines_idx)
         {
-//            auto max = std::max_element(contours.at(idx).begin(),
-//                                        contours.at(idx).end(),
-//                                        [](cv::Point a, cv::Point b) {return a.y < b.y;});
-//            int max_idx = std::distance(contours.at(idx).begin(), max);
-//            auto min = std::min_element(contours.at(idx).begin(),
-//                                        contours.at(idx).end(),
-//                                        [](cv::Point a, cv::Point b) {return a.y > b.y;});
-//            int min_idx = std::distance(contours.at(idx).begin(), min);
-//            if (contours.at(idx).at(max_idx).y < 240 && contours.at(idx).at(min_idx).y > 100)
-//            {
-//                match_idx.push_back(idx);
-//            }
+            //            auto max = std::max_element(contours.at(idx).begin(),
+            //                                        contours.at(idx).end(),
+            //                                        [](cv::Point a, cv::Point b) {return a.y < b.y;});
+            //            int max_idx = std::distance(contours.at(idx).begin(), max);
+            //            auto min = std::min_element(contours.at(idx).begin(),
+            //                                        contours.at(idx).end(),
+            //                                        [](cv::Point a, cv::Point b) {return a.y > b.y;});
+            //            int min_idx = std::distance(contours.at(idx).begin(), min);
+            //            if (contours.at(idx).at(max_idx).y < 240 && contours.at(idx).at(min_idx).y > 100)
+            //            {
+            //                match_idx.push_back(idx);
+            //            }
             cv::Vec4f line;
             // find the optimal line
             cv::fitLine(contours.at(idx), line, cv::DIST_L2, 0, 0.01, 0.01);
@@ -1026,7 +1072,7 @@ void FormLiquidDistributor::UpdateImage()
         //cv::cvtColor(video_frame_0, video_frame_0, CV_BGR2RGB);
         for (auto& i : match_idx)
         {
-            cv::drawContours(video_frame_0, contours, i, cv::Scalar(255, 0, 0), 3);
+            cv::drawContours(vframes_.at(index), contours, i, cv::Scalar(255, 0, 0), 3);
         }
         this->update();
     }
