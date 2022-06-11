@@ -19,11 +19,11 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
                                              const QString& object_name,
                                              const QString& display_name,
                                              const QString& connection_path,
-                                             LiquidDistributorGroup group
+                                             LiquidDistributorCategory category
                                              ) :
     FormCommon(parent, object_name, display_name),
     ui(new Ui::FormLiquidDistributor),
-    group_(group),
+    category_(category),
     db_ready_(false),
     recipe_task_queue_(1),
     timers_(2)
@@ -34,15 +34,15 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     // DB connection and table preparation
     PrepareDB(connection_path, object_name);
 
-    if (group == LiquidDistributorGroup::SAMPLING)
+    if (category == LiquidDistributorCategory::SAMPLING)
     {
         InitVideoCaps();
     }
 
-    // For the recipe runtime view
-    InitRecipeRuntimeView();
     // For the recipe setting table
-    InitRecipeSettingTable();
+    InitRecipeSettingTable(category);
+    // For the recipe runtime view
+    InitRecipeRuntimeView(category);
     // thread worker
     threads_.emplace_back(std::thread(&FormLiquidDistributor::RunRecipeWorker, this));
 }
@@ -367,6 +367,82 @@ void FormLiquidDistributor::InitVideoCaps()
     }
 }
 
+void FormLiquidDistributor::InitRecipeRuntimeView(LiquidDistributorCategory group)
+{
+    if (group == LiquidDistributorCategory::SAMPLING)
+    {
+        InitRecipeRuntimeView(35, 35, 15, 4, 32, 8);
+    }
+    else if (group == LiquidDistributorCategory::COLLECTION)
+    {
+        InitRecipeRuntimeView(65, 65, 30, 2, 8, 2);
+    }
+}
+
+void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, int radius,
+                                                  int x_count, int y_count, int y_section)
+{
+    std::vector<std::pair<double, double>> positions;
+    int number = 1;
+    double y_base = 0;
+    for (int y = 0; y < y_count; y++)
+    {
+        if (y >= y_section && y < 2 * y_section)
+        {
+            y_base = y_gap;
+        }
+        else if (y >= 2 * y_section && y < 3 * y_section)
+        {
+            y_base = 2 * y_gap;
+        }
+        else if (y >= 3 * y_section)
+        {
+            y_base = 3 * y_gap;
+        }
+        for (int x = 0; x < x_count; x++)
+        {
+            auto item =
+                    std::make_shared<SamplingUIItem>(radius, number);
+            item->setPos(x * x_gap + 2 * x_gap, y_base + y * y_gap + radius);
+            sampling_ui_items.push_back(item);
+            number++;
+        }
+    }
+    // for 2 sink positions
+    for (int y = 0; y < 2; y++)
+    {
+        if (y == 0)
+        {
+            y_base = y_section * y_gap;
+        }
+        else
+        {
+            y_base = (3 * y_section + 2) * y_gap;
+        }
+        for (int x = 0; x < x_count; x++)
+        {
+            auto item = std::make_shared<SamplingUIItem>(
+                            radius,
+                            129,
+                            SamplingUIItem::SamplingUIItemStatus::Undischarge);
+            item->setPos(x * x_gap + 2 * x_gap, y_base + radius);
+            sampling_ui_items.push_back(item);
+            number++;
+        }
+    }
+
+    auto scene = new QGraphicsScene(0, 0, x_count * (2 * x_gap), (y_count + 3) * y_gap);
+    //scene->addRect(0, 0, 300, 800);
+    for (auto& item : sampling_ui_items)
+    {
+        scene->addItem(item.get());
+    }
+
+    auto view = new QGraphicsView(scene);
+    view->show();
+    ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
+}
+
 void FormLiquidDistributor::InitRecipeRuntimeView()
 {
     const int x_gap = 35;
@@ -552,32 +628,226 @@ void FormLiquidDistributor::InitRecipeSettingTable()
     }
 }
 
-void FormLiquidDistributor::ClearUITable()
+void FormLiquidDistributor::InitRecipeSettingTable(LiquidDistributorCategory category)
 {
-    for (int row = 0; row < ROW_COUNT; row++)
+    if (category == LiquidDistributorCategory::SAMPLING)
     {
-        if (row == ROW_COUNT / 2)
+        QStringList heads {"位号", "通道", "限流", "时间", "清洗"};
+        int channel_groups = 4;
+        InitRecipeSettingTable(2, channel_groups,
+                               channel_groups * heads.count() + 1/*seperator*/,
+                               128 / channel_groups + 1/*seperator*/, heads);
+    }
+    else if (category == LiquidDistributorCategory::COLLECTION)
+    {
+        QStringList heads {"位号", "通道", "时间", "清洗"};
+        int channel_groups = 2;
+        InitRecipeSettingTable(1, channel_groups,
+                               channel_groups * heads.count() + 1/*seperator*/,
+                               16 / channel_groups + 1/*seperator*/, heads);
+    }
+}
+
+void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
+                                                       int channel_groups,
+                                                       int col_count,
+                                                       int row_count,
+                                                       const QStringList& heads)
+{
+    int line_items = heads.count();
+    QStringList labels;
+
+    for (int group = 0; group < channel_groups + 1; group++)
+    {
+        if (group == line_seperator)
+        {
+            labels.push_back(""); // Seperator column
+            continue;
+        }
+        labels.append(heads);
+    }
+
+    ui->tableWidget->setColumnCount(col_count);
+    ui->tableWidget->setRowCount(row_count);
+    ui->tableWidget->setHorizontalHeaderLabels(labels);
+    ui->tableWidget->horizontalHeader()->setVisible(true);
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->horizontalHeader()->setDefaultSectionSize(50);
+    ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
+    ui->tableWidget->setAlternatingRowColors(true);
+    ui->tableWidget->resize(1200, 1100);
+    QColor seperator_color = QColor(72, 118, 255);
+
+    // Initialize channel number, sampling_time, purge_time, solvent type
+    QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
+    QStringList channel_9_to_16({"", "9", "10", "11", "12", "13", "14", "15", "16"});
+    QStringList sampling_time;
+    for (int s = 1; s < 100; s++)
+    {
+        sampling_time.append(QString::number(s) + "s");
+    }
+    QStringList solvent_type_a({"", "L2", "L3", "L4"});
+    QStringList solvent_type_b({"", "L6", "L7", "L8"});
+
+    for (int row = 0; row < row_count; row++)
+    {
+        if (row == row_count / 2)
+        {
+            for (int col = 0; col < col_count; col++)
+            {
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem(""));
+                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+                ui->tableWidget->item(row, col)->setBackground(seperator_color);
+            }
+            continue;
+        }
+        for (int col = 0; col < col_count;)
+        {
+            if (col == col_count / 2)
+            {
+                ui->tableWidget->setItem(row, col, new QTableWidgetItem(""));
+                ui->tableWidget->item(row, col)->setFlags(Qt::NoItemFlags);
+                ui->tableWidget->item(row, col)->setBackground(seperator_color);
+                col++;
+                continue;
+            }
+            int row_position = row;
+            int line_group = col / line_items;
+            if (row > row_count / 2)
+            {
+                row_position--;
+            }
+            int offset = 0;
+
+            // Position
+            auto pos = QString("#") + QString::number(row_position * channel_groups + line_group + 1);
+            ui->tableWidget->setItem(row, col + offset, new QTableWidgetItem(pos));
+            ui->tableWidget->item(row, col + offset)->setFlags(Qt::NoItemFlags);
+            ui->tableWidget->item(row, col + offset)->setFont(QFont("arial", 9, QFont::Black));
+            offset++;
+
+            // Channel
+            QComboBox *combobox = new QComboBox();
+            if (line_group < channel_groups / 2)
+            {
+                combobox->addItems(channel_1_to_8);
+            }
+            else
+            {
+                combobox->addItems(channel_9_to_16);
+            }
+            ui->tableWidget->setCellWidget(row, col + offset, combobox);
+            offset++;
+
+            // Flow limit
+            if (category_ == LiquidDistributorCategory::SAMPLING)
+            {
+                QCheckBox *checkbox = new QCheckBox();
+                ui->tableWidget->setCellWidget(row, col + offset, checkbox);
+                offset++;
+            }
+
+            // Sampling time in s
+            QComboBox *combobox_t = new QComboBox();
+            combobox_t->addItems(sampling_time);
+            ui->tableWidget->setCellWidget(row, col + offset, combobox_t);
+            offset++;
+
+            // Solvent type
+            QComboBox *combobox_s = new QComboBox();
+            if (line_group < channel_groups / 2)
+            {
+                combobox_s->addItems(solvent_type_a);
+            }
+            else
+            {
+                combobox_s->addItems(solvent_type_b);
+            }
+            ui->tableWidget->setCellWidget(row, col + offset, combobox_s);
+
+            // next group
+            col += line_items;
+        }
+    }
+}
+
+//void FormLiquidDistributor::ClearUITable()
+//{
+//    for (int row = 0; row < ROW_COUNT; row++)
+//    {
+//        if (row == ROW_COUNT / 2)
+//        {
+//            continue;
+//        }
+//        for (int group = 0; group < LINE_GROUPS; group++)
+//        {
+//            int start_col = group * LINE_ITEMS;
+//            if (group >= LINE_GROUPS / 2)
+//            {
+//                start_col++; // jump seperator
+//            }
+//            QComboBox* combobox = static_cast<QComboBox*>(
+//                    ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
+//            combobox->setCurrentText(""); // empty channel
+//            QCheckBox* checkbox = static_cast<QCheckBox*>(
+//                    ui->tableWidget->cellWidget(row, start_col + COL_FLOW_LIMIT));
+//            checkbox->setChecked(false); // default value
+//            combobox = static_cast<QComboBox*>(
+//                    ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+//            combobox->setCurrentText("1s");
+//            combobox = static_cast<QComboBox*>(
+//                    ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+//            combobox->setCurrentText(""); // empty solvent type (port)
+//        }
+//    }
+//}
+
+void FormLiquidDistributor::ClearUITable(LiquidDistributorCategory category)
+{
+    if (category == LiquidDistributorCategory::SAMPLING)
+    {
+        ClearUITable(32, 4, 5, category);
+    }
+    else if (category == LiquidDistributorCategory::COLLECTION)
+    {
+        ClearUITable(8, 2, 4, category);
+    }
+}
+
+void FormLiquidDistributor::ClearUITable(int row_count, int channel_groups,
+                                         int line_items, LiquidDistributorCategory category)
+{
+    for (int row = 0; row < row_count; row++)
+    {
+        if (row == row_count / 2)
         {
             continue;
         }
-        for (int group = 0; group < LINE_GROUPS; group++)
+        for (int group = 0; group < channel_groups; group++)
         {
-            int start_col = group * LINE_ITEMS;
-            if (group >= LINE_GROUPS / 2)
+            int offset = 1;
+            int start_col = group * line_items;
+            if (group >= channel_groups / 2)
             {
                 start_col++; // jump seperator
             }
             QComboBox* combobox = static_cast<QComboBox*>(
-                    ui->tableWidget->cellWidget(row, start_col + COL_CHANNEL));
+                    ui->tableWidget->cellWidget(row, start_col + offset));
             combobox->setCurrentText(""); // empty channel
-            QCheckBox* checkbox = static_cast<QCheckBox*>(
-                    ui->tableWidget->cellWidget(row, start_col + COL_FLOW_LIMIT));
-            checkbox->setChecked(false); // default value
+            offset += 1;
+            if (category == LiquidDistributorCategory::SAMPLING)
+            {
+                QCheckBox* checkbox = static_cast<QCheckBox*>(
+                        ui->tableWidget->cellWidget(row, start_col + offset));
+                checkbox->setChecked(false); // default value
+                offset += 1;
+            }
             combobox = static_cast<QComboBox*>(
-                    ui->tableWidget->cellWidget(row, start_col + COL_SAMPLING_TIME));
+                    ui->tableWidget->cellWidget(row, start_col + offset));
             combobox->setCurrentText("1s");
+            offset += 1;
             combobox = static_cast<QComboBox*>(
-                    ui->tableWidget->cellWidget(row, start_col + COL_SOLVENT_TYPE));
+                    ui->tableWidget->cellWidget(row, start_col + offset));
             combobox->setCurrentText(""); // empty solvent type (port)
         }
     }
@@ -638,7 +908,7 @@ bool FormLiquidDistributor::LoadLiquidSamplingRecipe(const QString &recipe_name)
     // clear table first.
     if (value_list.size() > 0)
     {
-        ClearUITable();
+        ClearUITable(category_);
     }
     // fill table
     for (auto& values : value_list)
@@ -670,7 +940,7 @@ bool FormLiquidDistributor::LoadLiquidSamplingRecipe(const QString &recipe_name)
 
         if (error_count > 0)
         {
-            ClearUITable();
+            ClearUITable(category_);
             QMessageBox::critical(0, "加载配方失败", "数据格式错误", QMessageBox::Ignore);
             return false;
         }
@@ -1007,7 +1277,7 @@ void FormLiquidDistributor::InitUiState()
 
 void FormLiquidDistributor::paintEvent(QPaintEvent *e)
 {
-    if (group_ == LiquidDistributorGroup::SAMPLING)
+    if (category_ == LiquidDistributorCategory::SAMPLING)
     {
         for (int i = 0; i < 2; i++)
         {
@@ -1101,6 +1371,7 @@ void FormLiquidDistributor::on_pushButton_2_clicked()
 
 void FormLiquidDistributor::on_tableWidget_cellChanged(int row, int column)
 {
+    return;
     if (row >= ROW_COUNT || column >= COL_COUNT)
     {
         assert(false);

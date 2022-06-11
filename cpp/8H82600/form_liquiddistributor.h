@@ -21,7 +21,7 @@ namespace Ui {
 class FormLiquidDistributor;
 }
 
-enum class LiquidDistributorGroup
+enum class LiquidDistributorCategory
 {
     SAMPLING = 0,
     COLLECTION = 1
@@ -84,7 +84,7 @@ public:
                                    const QString& object_name = QString(),
                                    const QString& display_name = QString(),
                                    const QString& connection_path = QString(),
-                                   LiquidDistributorGroup group = LiquidDistributorGroup::SAMPLING
+                                   LiquidDistributorCategory group = LiquidDistributorCategory::SAMPLING
                                    );
     ~FormLiquidDistributor();
 
@@ -123,8 +123,37 @@ private:
     // Initialize recipe runtime view.
     void InitRecipeRuntimeView();
 
+    // Initialize recipe runtime view.
+    void InitRecipeRuntimeView(LiquidDistributorCategory category);
+
+    // Initialize recipe runtime view, with circles representing the sampling status.
+    // @param <x_gap>: circle gap in x.
+    // @param <y_gap>: circle gap in y.
+    // @param <radius>: circle radius.
+    // @Param <x_count>: circle count in x.
+    // @param <y_count>: circle count in y.
+    // @param <y_section>: circle section for sink positions in y.
+    void InitRecipeRuntimeView(int x_gap, int y_gap,
+                               int radius, int x_count, int y_count, int y_section);
+
     // Initialize recipe setting table.
     void InitRecipeSettingTable();
+
+    // Initialize recipe setting table by category.
+    void InitRecipeSettingTable(LiquidDistributorCategory category);
+
+    // Initialize recipe setting table.
+    // @param <line_seperator>: UI seperator
+    // @param <channel_groups>: liquid sampling and collection group numbers
+    // @param <col_count>: column number
+    // @param <row_count>: row number
+    // @param <line_items>: UI line (column) containing cell items
+    // @param <heads>: UI table head names
+    void InitRecipeSettingTable(int line_seperator,
+                                int channel_groups,
+                                int col_count,
+                                int row_count,
+                                const QStringList& heads);
 
     // Save the liquid sampling recipe to DB.
     bool SaveLiquidSamplingRecipe(const QString& recipe_name);
@@ -150,8 +179,12 @@ private:
     // Fill status chart.
     void FillStatusChart(const std::list<std::vector<int>>& record_list);
 
-    // Clear the liquid sampling UI table.
-    void ClearUITable();
+    // Clear the UI setting table by category
+    void ClearUITable(LiquidDistributorCategory category);
+
+    // Clear the recipe setting table.
+    void ClearUITable(int row_count, int channel_groups, int line_items,
+                      LiquidDistributorCategory category);
 
     // Fill channel information in the liquid sampling UI table.
     void FillUITableChannelInfo(int pos, int channel, int flowlimit,
@@ -186,7 +219,7 @@ private:
 
 private:
     Ui::FormLiquidDistributor *ui;
-    LiquidDistributorGroup group_;
+    LiquidDistributorCategory category_;
 
     // DB variables
     QSqlDatabase db_;
@@ -234,6 +267,13 @@ private:
     const int LINE_ITEMS = 5;  // Liquid sampling line record items
     const int ROW_COUNT = 32 + 1; // 1 seperator row
     const int COL_COUNT = 20 + 1; // 1 seperator column
+
+    const int MAX_COLLECTION_POS = 16; // Max. collection vessel positions
+    const int LINE_GROUPS_COLLECTION = 2; // Liquid collection line group
+    const int LINE_ITEMS_COLLECTION = 5;  // Liquid collection line record items
+    const int ROW_COUNT_COLLECTION = 16 + 1; // 1 seperator row
+    const int COL_COUNT_COLLECTION = 10 + 1; // 1 seperator column
+
     const int COL_POS = 0;
     const int COL_CHANNEL = 1;
     const int COL_FLOW_LIMIT = 2;

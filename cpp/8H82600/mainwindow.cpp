@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Attach liquid distributor widget
     std::vector<FormCommon*> liquid_distributor_form_vec;
     liquid_distributor_form_vec.push_back(new FormLiquidDistributor(nullptr, "distributor_sampling", "液体采样", "QPSQL:127.0.0.1:5432:8H82600:postgres:hello@123"));
-    liquid_distributor_form_vec.push_back(new FormLiquidDistributor(nullptr, "distributor_collection", "液体收集", "QPSQL:127.0.0.1:5432:8H82600:postgres:hello@123", LiquidDistributorGroup::COLLECTION));
+    liquid_distributor_form_vec.push_back(new FormLiquidDistributor(nullptr, "distributor_collection", "液体收集", "QPSQL:127.0.0.1:5432:8H82600:postgres:hello@123", LiquidDistributorCategory::COLLECTION));
     for (auto& entry: liquid_distributor_form_vec)
     {
         entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
