@@ -69,6 +69,19 @@ struct RecipeTaskEntity
     }
 };
 
+struct RecipeUITableSetting
+{
+    RecipeUITableSetting(int rows, int cols, int ch_groups, int ln_items):
+        row_count(rows), col_count(cols),
+        channel_groups(ch_groups), line_items(ln_items)
+    {
+    }
+    int row_count;
+    int col_count;
+    int channel_groups; // Liquid sampling line group
+    int line_items;
+};
+
 class FormLiquidDistributor : public FormCommon
 {
     Q_OBJECT
@@ -100,8 +113,6 @@ private slots:
 
     void on_pushButton_2_clicked();
 
-    void on_tableWidget_cellChanged(int row, int column);
-
     // Detect the image contoures
     void UpdateImage(int index);
 
@@ -117,14 +128,14 @@ private:
     // (Deprecated) Unpack the record string to the parameter list.
     std::list<std::vector<int>> SamplingRecordToList(const QString& record);
 
+    // Get the setting for the recipe table
+    RecipeUITableSetting GetRecipeUITableSetting();
+
     // Initialize video captrues.
     void InitVideoCaps();
 
     // Initialize recipe runtime view.
     void InitRecipeRuntimeView();
-
-    // Initialize recipe runtime view.
-    void InitRecipeRuntimeView(LiquidDistributorCategory category);
 
     // Initialize recipe runtime view, with circles representing the sampling status.
     // @param <x_gap>: circle gap in x.
@@ -134,13 +145,10 @@ private:
     // @param <y_count>: circle count in y.
     // @param <y_section>: circle section for sink positions in y.
     void InitRecipeRuntimeView(int x_gap, int y_gap,
-                               int radius, int x_count, int y_count, int y_section);
+                               double radius, int x_count, int y_count, int y_section);
 
     // Initialize recipe setting table.
     void InitRecipeSettingTable();
-
-    // Initialize recipe setting table by category.
-    void InitRecipeSettingTable(LiquidDistributorCategory category);
 
     // Initialize recipe setting table.
     // @param <line_seperator>: UI seperator
@@ -155,8 +163,17 @@ private:
                                 int row_count,
                                 const QStringList& heads);
 
+    // Recipe setting table's channel selection changed.
+    // Display channel No. on the runtime view.
+    // @param <row>: QTable row
+    // @param <col>: QTable column
+    void SelectChannelChanged(const QString& text);
+
     // Save the liquid sampling recipe to DB.
     bool SaveLiquidSamplingRecipe(const QString& recipe_name);
+
+    // Save the liquid sampling recipe to DB.
+    bool SaveRecipe(const QString& recipe_name);
 
     // Load the liquid sampling recipe from DB.
     bool LoadLiquidSamplingRecipe(const QString& recipe_name);
@@ -263,16 +280,6 @@ private:
 
     // sampling setting UI group
     const int MAX_SAMPLING_POS = 128; // Max. sampling tube positions
-    const int LINE_GROUPS = 4; // Liquid sampling line group
-    const int LINE_ITEMS = 5;  // Liquid sampling line record items
-    const int ROW_COUNT = 32 + 1; // 1 seperator row
-    const int COL_COUNT = 20 + 1; // 1 seperator column
-
-    const int MAX_COLLECTION_POS = 16; // Max. collection vessel positions
-    const int LINE_GROUPS_COLLECTION = 2; // Liquid collection line group
-    const int LINE_ITEMS_COLLECTION = 5;  // Liquid collection line record items
-    const int ROW_COUNT_COLLECTION = 16 + 1; // 1 seperator row
-    const int COL_COUNT_COLLECTION = 10 + 1; // 1 seperator column
 
     const int COL_POS = 0;
     const int COL_CHANNEL = 1;

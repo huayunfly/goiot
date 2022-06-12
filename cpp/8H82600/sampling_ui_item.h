@@ -23,9 +23,9 @@ public:
     };
 
 public:
-    SamplingUIItem(double radius, int number = 0,
+    SamplingUIItem(double radius, int number = 0, int channel = 0,
                    SamplingUIItemStatus status = SamplingUIItemStatus::Unsigned) :
-        radius_(radius), number_(number), status_(status)
+        radius_(radius), number_(number), channel_(channel), status_(status)
     {
         setFlags(QGraphicsItem::ItemIsSelectable
                  | QGraphicsItem::ItemIsFocusable);
@@ -47,7 +47,7 @@ public:
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void SetStatus(SamplingUIItemStatus status);
+    void SetStatus(SamplingUIItemStatus status, int channel);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -58,7 +58,8 @@ private:
     const int MAX_SAMPLING = 128;
     double radius_;
     int number_;
-    SamplingUIItemStatus status_; // 0: gray unsigned, 1: red waiting, 2: yellow sampling, 3: green finished.
+    int channel_;
+    SamplingUIItemStatus status_; // 0: transparent unsigned, 1: grey waiting, 2: yellow sampling, 3: green finished.
 };
 
 #endif // SAMPLINGUIITEM_H

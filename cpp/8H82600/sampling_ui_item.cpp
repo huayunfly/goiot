@@ -6,7 +6,8 @@
 void SamplingUIItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    widget = nullptr;
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
     switch (status_)
     {
@@ -33,20 +34,35 @@ void SamplingUIItem::paint(QPainter *painter,
     }
 
     painter->drawEllipse(QPointF(0, 0), radius_, radius_);
+    // position
+    QFont font;
+    font.setPointSize(6);
+    painter->setFont(font);
     if (number_ > 0 && number_ <= MAX_SAMPLING)
     {
-        painter->drawText(QPointF(0, 0), QString::number(number_));
+        painter->drawText(QPointF(10, -10), QString::number(number_));
     }
     else if (number_ > MAX_SAMPLING)
     {
-        painter->drawText(QPointF(0, 0), "sink");
+        painter->drawText(QPointF(10, -10), "sink");
     }
-
+    // channel
+    font.setPointSize(10);
+    painter->setFont(font);
+    if (channel_ > 0 && channel_ <= 16)
+    {
+        painter->drawText(QPointF(-10, 10), QString::number(channel_));
+    }
+    else
+    {
+        painter->drawText(QPointF(-10, 10), "");
+    }
 }
 
-void SamplingUIItem::SetStatus(SamplingUIItemStatus status)
+void SamplingUIItem::SetStatus(SamplingUIItemStatus status, int channel)
 {
     status_ = status;
+    channel_ = channel;
     update();
 }
 
