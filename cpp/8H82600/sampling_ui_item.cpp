@@ -36,7 +36,7 @@ void SamplingUIItem::paint(QPainter *painter,
     painter->drawEllipse(QPointF(0, 0), radius_, radius_);
     // position
     QFont font;
-    font.setPointSize(6);
+    font.setPointSize(7);
     painter->setFont(font);
     if (number_ > 0 && number_ <= MAX_SAMPLING)
     {

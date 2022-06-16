@@ -71,15 +71,16 @@ struct RecipeTaskEntity
 
 struct RecipeUITableSetting
 {
-    RecipeUITableSetting(int rows, int cols, int ch_groups, int ln_items):
+    RecipeUITableSetting(int rows, int cols, int ch_groups, int ln_items, int pos_num):
         row_count(rows), col_count(cols),
-        channel_groups(ch_groups), line_items(ln_items)
+        channel_groups(ch_groups), line_items(ln_items), work_positions(pos_num)
     {
     }
     int row_count;
     int col_count;
     int channel_groups; // Liquid sampling line group
     int line_items;
+    int work_positions;
 };
 
 class FormLiquidDistributor : public FormCommon
@@ -108,6 +109,8 @@ public:
 protected:
     void paintEvent(QPaintEvent* e) override;
 
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+
 private slots:
     void on_pushButton_clicked();
 
@@ -125,7 +128,7 @@ private:
     QString SaveLiquidSamplingProcedure();
     //(Deprecated) Load procedure from a record string.
     void LoadLiquidSamplingProcedure(const QString& record);
-    // (Deprecated) Unpack the record string to the parameter list.
+    //(Deprecated) Unpack the record string to the parameter list.
     std::list<std::vector<int>> SamplingRecordToList(const QString& record);
 
     // Get the setting for the recipe table
@@ -146,6 +149,9 @@ private:
     // @param <y_section>: circle section for sink positions in y.
     void InitRecipeRuntimeView(int x_gap, int y_gap,
                                double radius, int x_count, int y_count, int y_section);
+
+    // Set the recipe runtime item to unsigned states.
+    void ClearRecipeRuntimeView();
 
     // Initialize recipe setting table.
     void InitRecipeSettingTable();
@@ -172,11 +178,14 @@ private:
     // Save the liquid sampling recipe to DB.
     bool SaveLiquidSamplingRecipe(const QString& recipe_name);
 
-    // Save the liquid sampling recipe to DB.
+    // Save the liquid sampling or collection recipe to DB.
     bool SaveRecipe(const QString& recipe_name);
 
     // Load the liquid sampling recipe from DB.
     bool LoadLiquidSamplingRecipe(const QString& recipe_name);
+
+    // Load the liquid sampling or collection recipe from DB.
+    bool LoadRecipe(const QString& recipe_name);
 
     // Read a recipe from DB and dispatch recipe task to queue.
     bool DispatchRecipeTask(const QString& recipe_name);
@@ -197,11 +206,7 @@ private:
     void FillStatusChart(const std::list<std::vector<int>>& record_list);
 
     // Clear the UI setting table by category
-    void ClearUITable(LiquidDistributorCategory category);
-
-    // Clear the recipe setting table.
-    void ClearUITable(int row_count, int channel_groups, int line_items,
-                      LiquidDistributorCategory category);
+    void ClearUITable();
 
     // Fill channel information in the liquid sampling UI table.
     void FillUITableChannelInfo(int pos, int channel, int flowlimit,
@@ -233,6 +238,9 @@ private:
     bool WriteRecipeToDB(const QString& tablename, const std::vector<QString> columns,
                                     const std::vector<std::vector<QString>> value_list,
                                     QSqlQuery& query, QString& error_message);
+
+    // Read recipe name list from table by 'sampling' or 'collection'
+    bool ReadRecipeNames(std::vector<QString>& recipe_names, QString& error_message);
 
 private:
     Ui::FormLiquidDistributor *ui;
