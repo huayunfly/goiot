@@ -20,6 +20,7 @@ SOURCES += \
     data_manager.cpp \
     data_model.cpp \
     dialog_onoff.cpp \
+    dialog_recipe_mgr.cpp \
     dialog_setposition.cpp \
     dialog_setvalue.cpp \
     events.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     data_manager.h \
     data_model.h \
     dialog_onoff.h \
+    dialog_recipe_mgr.h \
     dialog_setposition.h \
     dialog_setvalue.h \
     driver_base.h \
@@ -79,6 +81,7 @@ HEADERS += \
 
 FORMS += \
     dialog_onoff.ui \
+    dialog_recipe_mgr.ui \
     dialog_setposition.ui \
     dialog_setvalue.ui \
     form_cylindera.ui \
