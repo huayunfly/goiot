@@ -175,17 +175,14 @@ private:
     // @param <col>: QTable column
     void SelectChannelChanged(const QString& text);
 
-    // Save the liquid sampling recipe to DB.
-    bool SaveLiquidSamplingRecipe(const QString& recipe_name);
-
     // Save the liquid sampling or collection recipe to DB.
     bool SaveRecipe(const QString& recipe_name);
 
-    // Load the liquid sampling recipe from DB.
-    bool LoadLiquidSamplingRecipe(const QString& recipe_name);
-
     // Load the liquid sampling or collection recipe from DB.
     bool LoadRecipe(const QString& recipe_name);
+
+    // Delete recipe from DB.
+    bool DeleteRecipe(const QString& recipe_name);
 
     // Read a recipe from DB and dispatch recipe task to queue.
     bool DispatchRecipeTask(const QString& recipe_name);
@@ -198,12 +195,6 @@ private:
 
     // Liquid sampling status check task B, using liquid image recognition.
     void SamplingStatusCheckByImageDetection(const cv::VideoCapture& v_cap);
-
-    // Fill item setting table.
-    void FillTable(const std::list<std::vector<int>>& record_list);
-
-    // Fill status chart.
-    void FillStatusChart(const std::list<std::vector<int>>& record_list);
 
     // Clear the UI setting table by category
     void ClearUITable();
@@ -240,7 +231,11 @@ private:
                                     QSqlQuery& query, QString& error_message);
 
     // Read recipe name list from table by 'sampling' or 'collection'
-    bool ReadRecipeNames(std::vector<QString>& recipe_names, QString& error_message);
+    bool ReadRecipeNamesFromDB(std::vector<QString>& recipe_names, QString& error_message);
+
+    // Delete recipe
+    bool DeleteRecipeFromDB(const QString& tablename, const QString& recipe_name,
+                            QString& error_message);
 
 private:
     Ui::FormLiquidDistributor *ui;
@@ -283,17 +278,9 @@ private:
     const int INDEX_RUN_A = 14;
     const int INDEX_RUN_B = 15;
     const int INDEX_CONTROL_CODE = 16;
-    const int CHANNEL_A_STOP_AND_MASK = 0xdfffffff;
-    const int CHANNEL_B_STOP_AND_MASK = 0xbfffffff;
 
-    // sampling setting UI group
-    const int MAX_SAMPLING_POS = 128; // Max. sampling tube positions
-
-    const int COL_POS = 0;
-    const int COL_CHANNEL = 1;
-    const int COL_FLOW_LIMIT = 2;
-    const int COL_SAMPLING_TIME = 3;
-    const int COL_SOLVENT_TYPE = 4;
+    // Loaded
+    QString loaded_recipe_name_;
 
     // sampling runtime UI group
     std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;

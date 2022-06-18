@@ -6,7 +6,7 @@
 
 DialogRecipeMgr::DialogRecipeMgr(QWidget *parent, const std::vector<QString>& recipe_names) :
     QDialog(parent), recipe_names_(recipe_names),
-    ui(new Ui::DialogRecipeMgr)
+    ui(new Ui::DialogRecipeMgr), action_(RecipeAction::NONE)
 {
     ui->setupUi(this);
     InitRecipeTable();
@@ -20,11 +20,11 @@ DialogRecipeMgr::~DialogRecipeMgr()
 void DialogRecipeMgr::InitRecipeTable()
 {
     ui->tableWidgetRecipe->setColumnCount(2);
-    ui->tableWidgetRecipe->setRowCount(20);
+    ui->tableWidgetRecipe->setRowCount(recipe_names_.size());
     ui->tableWidgetRecipe->setHorizontalHeaderLabels(QStringList({"名称", "时间"}));
     ui->tableWidgetRecipe->horizontalHeader()->setVisible(true);
     ui->tableWidgetRecipe->verticalHeader()->setVisible(false);
-    ui->tableWidgetRecipe->horizontalHeader()->setDefaultSectionSize(150);
+    ui->tableWidgetRecipe->horizontalHeader()->setDefaultSectionSize(180);
     ui->tableWidgetRecipe->verticalHeader()->setDefaultSectionSize(25);
     ui->tableWidgetRecipe->setAlternatingRowColors(true);
     int index = 0;
@@ -46,4 +46,39 @@ void DialogRecipeMgr::InitRecipeTable()
         ui->tableWidgetRecipe->item(index, 1)->setFont(QFont("tahoma", 9, QFont::Normal));
         index++;
     }
+}
+
+void DialogRecipeMgr::on_pushButtonLoad_clicked()
+{
+    if (ui->tableWidgetRecipe->currentItem() &&
+            ui->tableWidgetRecipe->currentItem()->text().isEmpty())
+    {
+        return;
+    }
+    acting_recipe_name_ = ui->tableWidgetRecipe->currentItem()->text();
+    action_ = RecipeAction::LOAD;
+    this->close();
+}
+
+void DialogRecipeMgr::on_pushButtonSave_clicked()
+{
+    if (ui->lineEditSave->text().isEmpty() || ui->lineEditSave->text().length() > 20)
+    {
+        return;
+    }
+    acting_recipe_name_ = ui->lineEditSave->text().toLower();
+    action_ = RecipeAction::SAVE;
+    this->close();
+}
+
+void DialogRecipeMgr::on_pushButtonDelete_clicked()
+{
+    if (ui->tableWidgetRecipe->currentItem() &&
+            ui->tableWidgetRecipe->currentItem()->text().isEmpty())
+    {
+        return;
+    }
+    acting_recipe_name_ = ui->tableWidgetRecipe->currentItem()->text();
+    action_ = RecipeAction::DELETE;
+    this->close();
 }
