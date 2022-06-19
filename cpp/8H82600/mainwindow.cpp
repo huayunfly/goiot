@@ -1089,6 +1089,11 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp56_sv", UiInfo(ui_->tabWidget->widget(11), QString::fromUtf8("label_TICA7504"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp55_pv", UiInfo(ui_->tabWidget->widget(11), QString::fromUtf8("textEdit_TICA7503"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp56_pv", UiInfo(ui_->tabWidget->widget(11), QString::fromUtf8("textEdit_TICA7504"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // liquid distributor
+    data_model_.SetDataToUiMap("plc.1.dist_a_run_pv", {UiInfo(ui_->widget_distributor->widget(0), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                       UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.dist_b_run_pv", {UiInfo(ui_->widget_distributor->widget(0), QString::fromUtf8("label_dist_b_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
+                                                       UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_b_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
 
     // ui_to_data
     //data_model_.SetUiToDataMap("gasfeed.svlabel", DataDef("plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0"));
@@ -1896,6 +1901,9 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("distributor_sampling.control_code", DataDef("plc.1.dist_controlcode", "plc.1.dist_controlcode", "plc.1.dist_controlcode"));
     data_model_.SetUiToDataMap("distributor_sampling.channel_a_run", DataDef("plc.1.dist_a_run_pv", "plc.1.dist_a_run_sv", "plc.1.dist_a_run_sv"));
     data_model_.SetUiToDataMap("distributor_sampling.channel_b_run", DataDef("plc.1.dist_b_run_pv", "plc.1.dist_b_run_sv", "plc.1.dist_b_run_sv"));
+    data_model_.SetUiToDataMap("distributor_collection.control_code", DataDef("plc.1.dist_controlcode", "plc.1.dist_controlcode", "plc.1.dist_controlcode"));
+    data_model_.SetUiToDataMap("distributor_collection.channel_a_run", DataDef("plc.1.dist_a_run_pv", "plc.1.dist_a_run_sv", "plc.1.dist_a_run_sv"));
+    data_model_.SetUiToDataMap("distributor_collection.channel_b_run", DataDef("plc.1.dist_b_run_pv", "plc.1.dist_b_run_sv", "plc.1.dist_b_run_sv"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)

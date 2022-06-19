@@ -27,6 +27,9 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     category_(category),
     db_ready_(false),
     recipe_task_queue_(1),
+    recipe_running_(false),
+    dist_a_run_(false),
+    dist_b_run_(false),
     timers_(2)
 {
     ui->setupUi(this);
@@ -71,6 +74,27 @@ bool FormLiquidDistributor::event(QEvent *event)
     if (event == nullptr)
     {
         return false;
+    }
+
+    if (event->type() == Ui::RefreshStateEvent::myType)
+    {
+        Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);
+        if (e->Name().compare("label_dist_a_run", Qt::CaseInsensitive) == 0)
+        {
+            {
+                std::lock_guard<std::mutex> lk(mut);
+                dist_a_run_ = (e->State() > 0) ? true : false;
+            }
+            recipe_run_cond_.notify_one();
+        }
+        else if (e->Name().compare("label_dist_b_run", Qt::CaseInsensitive) == 0)
+        {
+            {
+                std::lock_guard<std::mutex> lk(mut);
+                dist_b_run_ = (e->State() > 0) ? true : false;
+            }
+            recipe_run_cond_.notify_one();
+        }
     }
 
     return FormCommon::event(event);
@@ -854,6 +878,11 @@ void FormLiquidDistributor::RunRecipeWorker()
             break; // Exit
         }
 
+        // running...
+        {
+            std::unique_lock<std::mutex> lk(mut);
+            recipe_running_ = true;
+        }
         for (auto& entity : *task)
         {
             // Adjust purge duration
@@ -861,13 +890,14 @@ void FormLiquidDistributor::RunRecipeWorker()
             int run_b = entity.run_b;
             int duration_a = entity.duration_a;
             int duration_b = entity.duration_b;
-            if (entity.type == TYPE_SAMPLING_PURGE)
+            if (entity.type == TYPE_SAMPLING_PURGE ||
+                    entity.type == TYPE_COLLECTION_PURGE)
             {
                 duration_a *= 2;
                 duration_b *= 2;
             }
             std::vector<QString> values = entity.ToValues();
-            // Make plc command run
+            // Send plc command run
             bool ok = write_data_func_(this->objectName(), control_code_name_,
                                   QString::number(entity.control_code));
             assert(ok);
@@ -887,6 +917,36 @@ void FormLiquidDistributor::RunRecipeWorker()
                               error_msg.toLatin1().constData());
                 }
             }
+            // Wait for PLC feedback
+            std::unique_lock<std::mutex> lk(mut);
+            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(5), [&] {
+                        return (run_a == dist_a_run_) && (run_b == dist_b_run_); })
+                    )
+            {
+                qCritical("RunRecipeWorker() failed, %s", "No PLC feedback.");
+                bool ok1 = StopTakingLiquidCmd(StatusCheckGroup::A);
+                bool ok2 = StopTakingLiquidCmd(StatusCheckGroup::B);
+                assert(ok1 && ok2);
+                if (!ok1 || !ok2)
+                {
+                    //break;
+                }
+            }
+            lk.unlock();
+            // Runtime view displaying
+            if (entity.type == TYPE_SAMPLING || entity.type == TYPE_COLLECTION)
+            {
+                if (run_a)
+                {
+                    sampling_ui_items.at(entity.pos_a - 1)->SetStatus(
+                                SamplingUIItem::SamplingUIItemStatus::Sampling, entity.channel_a);
+                }
+                if (run_b)
+                {
+                    sampling_ui_items.at(entity.pos_b - 1)->SetStatus(
+                                SamplingUIItem::SamplingUIItemStatus::Sampling, entity.channel_b);
+                }
+            }
 
             // Wait sampling or do liquid level detection, send stop command to plc.
             std::future<qint64> check_a, check_b;
@@ -894,16 +954,16 @@ void FormLiquidDistributor::RunRecipeWorker()
             {
                 check_a = std::async(
                             &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                            duration_a, StatusCheckGroup::A);
+                            StatusCheckGroup::A, duration_a);
             }
             if (run_b)
             {
                 check_b = std::async(
                             &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                            duration_b, StatusCheckGroup::B);
+                            StatusCheckGroup::B, duration_b);
             }
 
-            // Write a runtime record
+            // Write a step stop record
             if (run_a)
             {
                 qint64 stoptime = check_a.get();
@@ -938,38 +998,137 @@ void FormLiquidDistributor::RunRecipeWorker()
                     }
                 }
             }
+            // Wait for PLC feedback
+            lk.lock();
+            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(5), [&] {
+                        return (0 == dist_a_run_) && (0 == dist_b_run_); })
+                    )
+            {
+                //break;
+            }
+            lk.unlock();
+            // Runtime view displaying
+            if (entity.type == TYPE_SAMPLING || entity.type == TYPE_COLLECTION)
+            {
+                if (run_a)
+                {
+                    sampling_ui_items.at(entity.pos_a - 1)->SetStatus(
+                                SamplingUIItem::SamplingUIItemStatus::Finished, entity.channel_a);
+                }
+                if (run_b)
+                {
+                    sampling_ui_items.at(entity.pos_b - 1)->SetStatus(
+                                SamplingUIItem::SamplingUIItemStatus::Finished, entity.channel_b);
+                }
+            }
+        }
+        // stopped
+        {
+            std::unique_lock<std::mutex> lk(mut);
+            recipe_running_ = false;
         }
     }
 }
 
-qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
-        int second, StatusCheckGroup status)
+bool FormLiquidDistributor::StopTakingLiquidCmd(StatusCheckGroup group)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(second));
+    bool ok = false;
+    if (StatusCheckGroup::A == group)
     {
-         std::lock_guard<std::mutex> lk(mut);
-         if (status == StatusCheckGroup::A)
-         {
-             bool ok = write_data_func_(this->objectName(), channel_a_run_name_,
-                         QString::number(0)); // no result check here
-             assert(ok);
-             if (!ok)
-             {
-                 qCritical("write_data_func_ QFull error in SamplingStatusCheckByTime()");
-             }
-         }
-         else if (status == StatusCheckGroup::B)
-         {
-             bool ok = write_data_func_(this->objectName(), channel_b_run_name_,
-                         QString::number(0)); // no result check here
-             assert(ok);
-             if (!ok)
-             {
-                 qCritical("write_data_func_ QFull error in SamplingStatusCheckByTime()");
-             }
-         }
+        ok = write_data_func_(this->objectName(), channel_a_run_name_,
+                    QString::number(0)); // no result check here
+        assert(ok);
+        if (!ok)
+        {
+            qCritical("write_data_func_ QFull error in StopTakingLiquidCmd()");
+        }
+    }
+    else if (StatusCheckGroup::B == group)
+    {
+        ok = write_data_func_(this->objectName(), channel_b_run_name_,
+                    QString::number(0)); // no result check here
+        assert(ok);
+        if (!ok)
+        {
+            qCritical("write_data_func_ QFull error in StopTakingLiquidCmd()");
+        }
+    }
+    return ok;
+}
+
+qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
+        StatusCheckGroup group, int timeout_secs)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(timeout_secs));
+    StopTakingLiquidCmd(group);
+    return QDateTime::currentDateTime().toMSecsSinceEpoch();
+}
+
+qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
+        StatusCheckGroup group, int timeout_sec)
+{
+    std::size_t index = (StatusCheckGroup::B == group) ? 1 : 0;
+    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
+    while (std::chrono::system_clock::now() < timeout)
+    {
+        if (DetectImage(index))
+        {
+            StopTakingLiquidCmd(group);
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
+}
+
+bool FormLiquidDistributor::DetectImage(int index)
+{
+    bool ok = false;
+    vcaps_.at(index) >> vframes_.at(index);
+    if (vframes_.at(index).data != nullptr)
+    {
+        cv::Mat gray, edges;
+        std::vector<std::vector<cv::Point>> contours;
+        std::vector<cv::Vec4i> hierarchy;
+        cv::cvtColor(vframes_.at(index), gray, cv::COLOR_BGR2GRAY);
+        cv::Canny(gray, edges, 60, 360, 3/*apertureSize*/, true/*L2gradient*/);
+        cv::findContours(edges,
+                         contours,
+                         hierarchy,
+                         cv::RETR_LIST,
+                         cv::CHAIN_APPROX_SIMPLE);
+        std::vector<int> lines_idx;
+        for (std::size_t i = 0; i < contours.size(); i++)
+        {
+            // collect mid-length arc
+            int arc_len = cv::arcLength(contours.at(i), false);
+            if (arc_len > 80 && contours.at(i).size() < 300)
+            {
+                lines_idx.push_back(i);
+            }
+        }
+        std::vector<int> match_idx;
+        for (auto& idx : lines_idx)
+        {
+            cv::Vec4f line;
+            // find the optimal line
+            cv::fitLine(contours.at(idx), line, cv::DIST_L2, 0, 0.01, 0.01);
+            if (line[3] < 240 && line[3] > 120)
+            {
+                match_idx.push_back(idx);
+            }
+        }
+        if (match_idx.size() > 0)
+        {
+            ok = true;
+        }
+        for (auto& i : match_idx)
+        {
+            cv::drawContours(vframes_.at(index), contours, i, cv::Scalar(255, 0, 0), 3);
+        }
+        this->update();
+    }
+    return ok;
 }
 
 void FormLiquidDistributor::InitUiState()
@@ -1004,35 +1163,52 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
         return;
     }
     DialogRecipeMgr dlg_recipe_mgr = DialogRecipeMgr(this, recipe_names);
-    dlg_recipe_mgr.setWindowTitle("配方管理");
+    QString title = "配方管理 -> " + loaded_recipe_name_;
+    dlg_recipe_mgr.setWindowTitle(title);
     dlg_recipe_mgr.move(event->globalPos() - QPoint(50, 50));
-    int result = dlg_recipe_mgr.exec();
+    dlg_recipe_mgr.exec();
     QString recipe_name = dlg_recipe_mgr.GetActingRecipeName();
-    if (DialogRecipeMgr::RecipeAction::LOAD == dlg_recipe_mgr.GetRecipeAction())
+    DialogRecipeMgr::RecipeAction act = dlg_recipe_mgr.GetRecipeAction();
+    if (DialogRecipeMgr::RecipeAction::NONE != act && recipe_running_)
     {
-        bool ok = LoadRecipe(recipe_name);
-        if (ok)
+        QMessageBox::critical(0, "任务正在运行",
+                              loaded_recipe_name_, QMessageBox::Ignore);
+    }
+    else
+    {
+        if (DialogRecipeMgr::RecipeAction::LOAD == act)
         {
-            QMessageBox::information(0, "加载成功", recipe_name, QMessageBox::Ok);
+            bool ok = LoadRecipe(recipe_name);
+            if (ok)
+            {
+                QMessageBox::information(0, "加载成功", recipe_name, QMessageBox::Ok);
+            }
+        }
+        else if (DialogRecipeMgr::RecipeAction::SAVE == act)
+        {
+            bool ok = SaveRecipe(recipe_name);
+            if (ok)
+            {
+                QMessageBox::information(0, "保存成功", recipe_name, QMessageBox::Ok);
+            }
+        }
+        else if (DialogRecipeMgr::RecipeAction::DELETE == act)
+        {
+            bool ok = DeleteRecipe(recipe_name);
+            if (ok)
+            {
+                QMessageBox::information(0, "删除成功", recipe_name, QMessageBox::Ok);
+            }
+        }
+        else if (DialogRecipeMgr::RecipeAction::RUN == act)
+        {
+            bool ok = DispatchRecipeTask(recipe_name);
+            if (ok)
+            {
+                QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
+            }
         }
     }
-    else if (DialogRecipeMgr::RecipeAction::SAVE == dlg_recipe_mgr.GetRecipeAction())
-    {
-        bool ok = SaveRecipe(recipe_name);
-        if (ok)
-        {
-            QMessageBox::information(0, "保存成功", recipe_name, QMessageBox::Ok);
-        }
-    }
-    else if (DialogRecipeMgr::RecipeAction::DELETE == dlg_recipe_mgr.GetRecipeAction())
-    {
-        bool ok = DeleteRecipe(recipe_name);
-        if (ok)
-        {
-            QMessageBox::information(0, "删除成功", recipe_name, QMessageBox::Ok);
-        }
-    }
-
     event->accept();
 }
 

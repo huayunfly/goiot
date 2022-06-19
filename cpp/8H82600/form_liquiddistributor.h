@@ -190,11 +190,17 @@ private:
     // Run recipe backend thread.
     void RunRecipeWorker();
 
+    // Send PLC command to stop taking liquid.
+    bool StopTakingLiquidCmd(StatusCheckGroup group);
+
     // Liquid sampling status check task A, using timeout
-    qint64 SamplingStatusCheckByTime(int second, StatusCheckGroup status);
+    qint64 SamplingStatusCheckByTime(StatusCheckGroup group, int timeout_secs);
 
     // Liquid sampling status check task B, using liquid image recognition.
-    void SamplingStatusCheckByImageDetection(const cv::VideoCapture& v_cap);
+    qint64 SamplingStatusCheckByImageDetection(StatusCheckGroup group, int timeout_sec);
+
+    // Detect liquid level in image. Return true if it succeeded.
+    bool DetectImage(int index);
 
     // Clear the UI setting table by category
     void ClearUITable();
@@ -287,8 +293,12 @@ private:
 
     // runtime
     std::mutex mut;
+    std::condition_variable recipe_run_cond_;
     std::vector<std::thread> threads_;
     goiot::ThreadSafeQueue<std::shared_ptr<std::vector<RecipeTaskEntity>>> recipe_task_queue_;
+    bool recipe_running_; // recipe run status
+    bool dist_a_run_; // PLC feedback a group
+    bool dist_b_run_; // PLC feedback b group
 
     // video captures
     std::vector<cv::VideoCapture> vcaps_;
