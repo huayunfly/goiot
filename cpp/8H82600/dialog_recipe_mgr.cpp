@@ -82,3 +82,27 @@ void DialogRecipeMgr::on_pushButtonDelete_clicked()
     action_ = RecipeAction::DELETE;
     this->close();
 }
+
+void DialogRecipeMgr::on_pushButtonRun_clicked()
+{
+    if (ui->tableWidgetRecipe->currentItem() &&
+            ui->tableWidgetRecipe->currentItem()->text().isEmpty())
+    {
+        return;
+    }
+    acting_recipe_name_ = ui->tableWidgetRecipe->currentItem()->text();
+    action_ = RecipeAction::RUN;
+    this->close();
+}
+
+void DialogRecipeMgr::on_pushButtonStop_clicked()
+{
+    if (ui->tableWidgetRecipe->currentItem() &&
+            ui->tableWidgetRecipe->currentItem()->text().isEmpty())
+    {
+        return;
+    }
+    acting_recipe_name_ = ui->tableWidgetRecipe->currentItem()->text();
+    action_ = RecipeAction::STOP;
+    this->close();
+}

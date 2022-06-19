@@ -21,7 +21,9 @@ public:
         NONE = 0,
         LOAD = 1,
         SAVE = 2,
-        DELETE = 3
+        DELETE = 3,
+        RUN = 4,
+        STOP = 5
     };
 
     RecipeAction GetRecipeAction()
@@ -40,6 +42,10 @@ private slots:
     void on_pushButtonSave_clicked();
 
     void on_pushButtonDelete_clicked();
+
+    void on_pushButtonRun_clicked();
+
+    void on_pushButtonStop_clicked();
 
 private:
     void InitRecipeTable();
