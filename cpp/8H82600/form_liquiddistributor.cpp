@@ -919,34 +919,21 @@ void FormLiquidDistributor::RunRecipeWorker()
             }
             // Wait for PLC feedback
             std::unique_lock<std::mutex> lk(mut);
-            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(5), [&] {
+            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
                         return (run_a == dist_a_run_) && (run_b == dist_b_run_); })
                     )
             {
                 qCritical("RunRecipeWorker() failed, %s", "No PLC feedback.");
-                bool ok1 = StopTakingLiquidCmd(StatusCheckGroup::A);
-                bool ok2 = StopTakingLiquidCmd(StatusCheckGroup::B);
-                assert(ok1 && ok2);
-                if (!ok1 || !ok2)
-                {
-                    //break;
-                }
+                StopTakingLiquidCmd(StatusCheckGroup::A);
+                StopTakingLiquidCmd(StatusCheckGroup::B);
+                //UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
+                //                   SamplingUIItem::SamplingUIItemStatus::Error);
+                //break; // no lk.unlock() needed.
             }
             lk.unlock();
             // Runtime view displaying
-            if (entity.type == TYPE_SAMPLING || entity.type == TYPE_COLLECTION)
-            {
-                if (run_a)
-                {
-                    sampling_ui_items.at(entity.pos_a - 1)->SetStatus(
-                                SamplingUIItem::SamplingUIItemStatus::Sampling, entity.channel_a);
-                }
-                if (run_b)
-                {
-                    sampling_ui_items.at(entity.pos_b - 1)->SetStatus(
-                                SamplingUIItem::SamplingUIItemStatus::Sampling, entity.channel_b);
-                }
-            }
+            UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Sampling,
+                               SamplingUIItem::SamplingUIItemStatus::Discharge);
 
             // Wait sampling or do liquid level detection, send stop command to plc.
             std::future<qint64> check_a, check_b;
@@ -1000,32 +987,70 @@ void FormLiquidDistributor::RunRecipeWorker()
             }
             // Wait for PLC feedback
             lk.lock();
-            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(5), [&] {
+            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
                         return (0 == dist_a_run_) && (0 == dist_b_run_); })
                     )
             {
+                //UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
+                //                   SamplingUIItem::SamplingUIItemStatus::Error);
                 //break;
             }
             lk.unlock();
             // Runtime view displaying
-            if (entity.type == TYPE_SAMPLING || entity.type == TYPE_COLLECTION)
-            {
-                if (run_a)
-                {
-                    sampling_ui_items.at(entity.pos_a - 1)->SetStatus(
-                                SamplingUIItem::SamplingUIItemStatus::Finished, entity.channel_a);
-                }
-                if (run_b)
-                {
-                    sampling_ui_items.at(entity.pos_b - 1)->SetStatus(
-                                SamplingUIItem::SamplingUIItemStatus::Finished, entity.channel_b);
-                }
-            }
+            UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Finished,
+                               SamplingUIItem::SamplingUIItemStatus::Undischarge);
         }
         // stopped
         {
             std::unique_lock<std::mutex> lk(mut);
             recipe_running_ = false;
+        }
+    }
+}
+
+void FormLiquidDistributor::UpdateRuntimeView(const RecipeTaskEntity& entity, bool run_a, bool run_b,
+                                               SamplingUIItem::SamplingUIItemStatus sampling_status,
+                                               SamplingUIItem::SamplingUIItemStatus purge_status)
+{
+    if (entity.type == TYPE_SAMPLING || entity.type == TYPE_COLLECTION)
+    {
+        if (run_a)
+        {
+            sampling_ui_items.at(entity.pos_a - 1)->SetStatus(sampling_status, entity.channel_a);
+        }
+        if (run_b)
+        {
+            sampling_ui_items.at(entity.pos_b - 1)->SetStatus(sampling_status, entity.channel_b);
+        }
+    }
+    else if (entity.type == TYPE_SAMPLING_PURGE)
+    {
+        if (run_a)
+        {
+            int purge_index = (entity.pos_a > 64) ? (((entity.pos_a - 1) % 4) + 128 + 4) :
+                                           (((entity.pos_a - 1) % 4) + 128);
+            sampling_ui_items.at(purge_index)->SetStatus(purge_status, 0);
+        }
+        if (run_b)
+        {
+            int purge_index = (entity.pos_b > 64) ? (((entity.pos_b - 1) % 4) + 128 + 4) :
+                                           (((entity.pos_b - 1) % 4) + 128);
+            sampling_ui_items.at(purge_index)->SetStatus(purge_status, 0);
+        }
+    }
+    else if (entity.type == TYPE_COLLECTION_PURGE)
+    {
+        if (run_a)
+        {
+            int purge_index = (entity.pos_a > 8) ? (((entity.pos_a - 1) % 2) + 16 + 2) :
+                                           (((entity.pos_a - 1) % 2) + 16);
+            sampling_ui_items.at(purge_index)->SetStatus(purge_status, 0);
+        }
+        if (run_b)
+        {
+            int purge_index = (entity.pos_b > 8) ? (((entity.pos_b - 1) % 2) + 16 + 2) :
+                                           (((entity.pos_b - 1) % 2) + 16);
+            sampling_ui_items.at(purge_index)->SetStatus(purge_status, 0);
         }
     }
 }
@@ -1202,10 +1227,17 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
         }
         else if (DialogRecipeMgr::RecipeAction::RUN == act)
         {
-            bool ok = DispatchRecipeTask(recipe_name);
-            if (ok)
+            if (recipe_name.compare(loaded_recipe_name_, Qt::CaseInsensitive) == 0)
             {
-                QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
+                bool ok = DispatchRecipeTask(recipe_name);
+                if (ok)
+                {
+                    QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
+                }
+            }
+            else
+            {
+                QMessageBox::critical(0, "任务未加载", recipe_name, QMessageBox::Ignore);
             }
         }
     }

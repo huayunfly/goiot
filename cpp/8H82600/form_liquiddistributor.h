@@ -190,6 +190,12 @@ private:
     // Run recipe backend thread.
     void RunRecipeWorker();
 
+    // Update the runtime view while running the recipe.
+    // Call by RunRecipeWorker();
+    void UpdateRuntimeView(const RecipeTaskEntity& entity, bool run_a, bool run_b,
+                            SamplingUIItem::SamplingUIItemStatus sampling_status,
+                            SamplingUIItem::SamplingUIItemStatus purge_status);
+
     // Send PLC command to stop taking liquid.
     bool StopTakingLiquidCmd(StatusCheckGroup group);
 
