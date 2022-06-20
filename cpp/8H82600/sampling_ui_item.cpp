@@ -24,10 +24,13 @@ void SamplingUIItem::paint(QPainter *painter,
         painter->setBrush(Qt::green);
         break;
     case SamplingUIItemStatus::Discharge:
-        painter->setBrush(Qt::black);
+        painter->setBrush(Qt::blue);
         break;
     case SamplingUIItemStatus::Undischarge:
         painter->setBrush(Qt::white);
+        break;
+    case SamplingUIItemStatus::Error:
+        painter->setBrush(Qt::red);
         break;
     default:
         throw std::invalid_argument("undefined sampling item status.");

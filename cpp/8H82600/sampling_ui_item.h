@@ -19,7 +19,8 @@ public:
         Sampling,
         Finished,
         Discharge,
-        Undischarge
+        Undischarge,
+        Error
     };
 
 public:
