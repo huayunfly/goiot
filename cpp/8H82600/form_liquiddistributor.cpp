@@ -27,7 +27,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     category_(category),
     db_ready_(false),
     recipe_task_queue_(1),
-    recipe_running_(false),
+    task_running_(false),
     dist_a_run_(false),
     dist_b_run_(false),
     timers_(2)
@@ -62,6 +62,7 @@ FormLiquidDistributor::~FormLiquidDistributor()
     {
        db_.close();
     }
+    task_running_ = false; // Stop current task
     recipe_task_queue_.Close();
     for (auto& entry : threads_)
     {
@@ -81,19 +82,14 @@ bool FormLiquidDistributor::event(QEvent *event)
         Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);
         if (e->Name().compare("label_dist_a_run", Qt::CaseInsensitive) == 0)
         {
-            {
-                std::lock_guard<std::mutex> lk(mut);
-                dist_a_run_ = (e->State() > 0) ? true : false;
-            }
-            recipe_run_cond_.notify_one();
+
+            dist_a_run_ = (e->State() > 0) ? true : false;
+            task_run_cond_.notify_one();
         }
         else if (e->Name().compare("label_dist_b_run", Qt::CaseInsensitive) == 0)
         {
-            {
-                std::lock_guard<std::mutex> lk(mut);
-                dist_b_run_ = (e->State() > 0) ? true : false;
-            }
-            recipe_run_cond_.notify_one();
+            dist_b_run_ = (e->State() > 0) ? true : false;
+            task_run_cond_.notify_one();
         }
     }
 
@@ -878,16 +874,14 @@ void FormLiquidDistributor::RunRecipeWorker()
             break; // Exit
         }
 
-        // running...
-        {
-            std::unique_lock<std::mutex> lk(mut);
-            recipe_running_ = true;
-        }
+        // running, atomic sign
+        QString recipe_name = task->size() > 0 ? task->at(0).recipe_name : "None";
+        task_running_ = true;
         for (auto& entity : *task)
         {
             // Adjust purge duration
-            int run_a = entity.run_a;
-            int run_b = entity.run_b;
+            bool run_a = entity.run_a;
+            bool run_b = entity.run_b;
             int duration_a = entity.duration_a;
             int duration_b = entity.duration_b;
             if (entity.type == TYPE_SAMPLING_PURGE ||
@@ -917,9 +911,9 @@ void FormLiquidDistributor::RunRecipeWorker()
                               error_msg.toLatin1().constData());
                 }
             }
-            // Wait for PLC feedback
+            // Wait for PLC step run feedback
             std::unique_lock<std::mutex> lk(mut);
-            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
+            if (!task_running_ || !task_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
                         return (run_a == dist_a_run_) && (run_b == dist_b_run_); })
                     )
             {
@@ -929,6 +923,10 @@ void FormLiquidDistributor::RunRecipeWorker()
                 //UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                 //                   SamplingUIItem::SamplingUIItemStatus::Error);
                 //break; // no lk.unlock() needed.
+                if (!task_running_) // test code
+                {
+                    break;
+                }
             }
             lk.unlock();
             // Runtime view displaying
@@ -950,7 +948,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                             StatusCheckGroup::B, duration_b);
             }
 
-            // Write a step stop record
+            // Write a step stopped record
             if (run_a)
             {
                 qint64 stoptime = check_a.get();
@@ -985,26 +983,29 @@ void FormLiquidDistributor::RunRecipeWorker()
                     }
                 }
             }
-            // Wait for PLC feedback
+            // Wait for PLC step stopped feedback
             lk.lock();
-            if (!recipe_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
+            if (!task_running_ || !task_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
                         return (0 == dist_a_run_) && (0 == dist_b_run_); })
                     )
             {
                 //UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                 //                   SamplingUIItem::SamplingUIItemStatus::Error);
                 //break;
+                if (!task_running_) // test code
+                {
+                    break;
+                }
             }
             lk.unlock();
             // Runtime view displaying
             UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Finished,
                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
         }
-        // stopped
-        {
-            std::unique_lock<std::mutex> lk(mut);
-            recipe_running_ = false;
-        }
+        // Stop
+        task_running_ = false;
+        qInfo("recipe task [%s] finished", recipe_name.toLatin1().constData());
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
@@ -1084,7 +1085,11 @@ bool FormLiquidDistributor::StopTakingLiquidCmd(StatusCheckGroup group)
 qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
         StatusCheckGroup group, int timeout_secs)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(timeout_secs));
+    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_secs);
+    while (task_running_ && std::chrono::system_clock::now() < timeout)
+    {
+        std::this_thread::yield();
+    }
     StopTakingLiquidCmd(group);
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
@@ -1094,15 +1099,15 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
 {
     std::size_t index = (StatusCheckGroup::B == group) ? 1 : 0;
     auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
-    while (std::chrono::system_clock::now() < timeout)
+    while (task_running_ && std::chrono::system_clock::now() < timeout)
     {
         if (DetectImage(index))
         {
-            StopTakingLiquidCmd(group);
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
+    StopTakingLiquidCmd(group);
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
@@ -1194,7 +1199,8 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
     dlg_recipe_mgr.exec();
     QString recipe_name = dlg_recipe_mgr.GetActingRecipeName();
     DialogRecipeMgr::RecipeAction act = dlg_recipe_mgr.GetRecipeAction();
-    if (DialogRecipeMgr::RecipeAction::NONE != act && recipe_running_)
+    if ((DialogRecipeMgr::RecipeAction::NONE != act &&
+          DialogRecipeMgr::RecipeAction::STOP != act)  && task_running_)
     {
         QMessageBox::critical(0, "任务正在运行",
                               loaded_recipe_name_, QMessageBox::Ignore);
@@ -1238,6 +1244,18 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
             else
             {
                 QMessageBox::critical(0, "任务未加载", recipe_name, QMessageBox::Ignore);
+            }
+        }
+        else if (DialogRecipeMgr::RecipeAction::STOP == act)
+        {
+            if (task_running_)
+            {
+                task_running_ = false;
+                QMessageBox::information(0, "结束任务。。。", recipe_name, QMessageBox::Ok);
+            }
+            else
+            {
+                QMessageBox::critical(0, "任务未运行", recipe_name, QMessageBox::Ignore);
             }
         }
     }

@@ -10,6 +10,7 @@
 #include <thread>
 #include <mutex>
 #include <future>
+#include <atomic>
 #include <form_common.h>
 #include "ThreadSafeQueue.h"
 #include "sampling_ui_item.h"
@@ -200,9 +201,11 @@ private:
     bool StopTakingLiquidCmd(StatusCheckGroup group);
 
     // Liquid sampling status check task A, using timeout
+    // The thread will exit if the recipe does not run.
     qint64 SamplingStatusCheckByTime(StatusCheckGroup group, int timeout_secs);
 
     // Liquid sampling status check task B, using liquid image recognition.
+    // The thread will exit if the recipe does not run.
     qint64 SamplingStatusCheckByImageDetection(StatusCheckGroup group, int timeout_sec);
 
     // Detect liquid level in image. Return true if it succeeded.
@@ -299,12 +302,12 @@ private:
 
     // runtime
     std::mutex mut;
-    std::condition_variable recipe_run_cond_;
+    std::condition_variable task_run_cond_;
     std::vector<std::thread> threads_;
     goiot::ThreadSafeQueue<std::shared_ptr<std::vector<RecipeTaskEntity>>> recipe_task_queue_;
-    bool recipe_running_; // recipe run status
-    bool dist_a_run_; // PLC feedback a group
-    bool dist_b_run_; // PLC feedback b group
+    std::atomic<bool> task_running_; // recipe run status
+    std::atomic<bool> dist_a_run_; // PLC feedback a group
+    std::atomic<bool> dist_b_run_; // PLC feedback b group
 
     // video captures
     std::vector<cv::VideoCapture> vcaps_;
