@@ -104,13 +104,14 @@ FORMS += \
 TRANSLATIONS += \
     8H82600_zh_CN.ts
 
+THIRDLIB += \
+    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib
+
 INCLUDEPATH += \
-    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib \
-    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib\opencv\v4_5_4\include \
-    C:\Users\huayu\Documents\HUAYUN\YASHEN\EccpHome\CPlusPlus\3rdLib\libqrencode\v4_1_1\include
+    $${THIRDLIB} \
+    $${THIRDLIB}\opencv\v4_5_4\include \
+    $${THIRDLIB}\libqrencode\v4_1_1\include
     #$$PWD/../../../3rdLib \
-    #$$PWD/../../../3rdLib/opencv/v3_4_16/include \
-    #$$PWD/../../../3rdLib\libqrencode\v4_1_1\include
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -118,36 +119,21 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 
-win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v4_5_4/lib/x64/mingw/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/libqrencode/v4_1_1/lib/x64/ -lqrencode.dll
+win32:contains(QT_ARCH, x86_64):CONFIG(release, debug|release): LIBS += -L$${THIRDLIB}/qredisclient/lib/ -lqredisclient \
+                                                                    -L$${THIRDLIB}/opencv/v4_5_4/lib/x64/mingw/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
+                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/x64/ -lqrencode.dll
 
-win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclientd \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v4_5_4/lib/x64/mingw/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/libqrencode/v4_1_1/lib/x64/ -lqrencode.dll
+win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$${THIRDLIB}/qredisclient/lib/ -lqredisclientd \
+                                                                    -L$${THIRDLIB}/opencv/v4_5_4/lib/x64/mingw/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
+                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/x64/ -lqrencode.dll
 
-win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32 \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/libqrencode/v4_1_1/lib/ -lqrencode.dll
+win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$${THIRDLIB}/qredisclient/lib/ -lqredisclient_32 \
+                                                                    -L$${THIRDLIB}/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
+                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/ -lqrencode.dll
 
-win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/qredisclient/lib/ -lqredisclient_32d \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
-                                                                    -L$$PWD/../../../../YASHEN/EccpHome/CPlusPlus/3rdLib/libqrencode/v4_1_1/lib/ -lqrencode.dll
-
-
-#win32:contains(qt_arch, x86_64):config(release, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclient
-
-#win32:contains(qt_arch, x86_64):config(debug, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclientd
-
-#win32:contains(qt_arch, i386):config(release, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclient_32 \
-#                                                                    -l$$pwd/../../../3rdlib/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll
-
-#win32:contains(qt_arch, i386):config(debug, debug|release): libs += -l$$pwd/../../../3rdlib/qredisclient/lib/ -lqredisclient_32d \
-#                                                                    -l$$pwd/../../../3rdlib/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll
-
-
-
-
+win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$${THIRDLIB}/qredisclient/lib/ -lqredisclient_32d \
+                                                                    -L$${THIRDLIB}/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
+                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/ -lqrencode.dll
 
 DISTFILES += \
     drivers.json
