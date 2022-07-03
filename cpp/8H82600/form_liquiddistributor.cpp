@@ -383,20 +383,21 @@ void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double r
 {
     std::vector<std::pair<double, double>> positions;
     int number = 1;
-    double y_base = 0;
+    int y_margin = 10;
+    double y_base = y_margin;
     for (int y = 0; y < y_count; y++)
     {
         if (y >= y_section && y < 2 * y_section)
         {
-            y_base = y_gap;
+            y_base = y_gap + y_margin;
         }
         else if (y >= 2 * y_section && y < 3 * y_section)
         {
-            y_base = 2 * y_gap;
+            y_base = 2 * y_gap + y_margin;
         }
         else if (y >= 3 * y_section)
         {
-            y_base = 3 * y_gap;
+            y_base = 3 * y_gap + y_margin;
         }
         for (int x = 0; x < x_count; x++)
         {
@@ -412,11 +413,11 @@ void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double r
     {
         if (y == 0)
         {
-            y_base = y_section * y_gap;
+            y_base = y_section * y_gap + y_margin;
         }
         else
         {
-            y_base = (3 * y_section + 2) * y_gap;
+            y_base = (3 * y_section + 2) * y_gap + y_margin;
         }
         for (int x = 0; x < x_count; x++)
         {
@@ -431,7 +432,7 @@ void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double r
         }
     }
 
-    auto scene = new QGraphicsScene(0, 0, x_count * (2 * x_gap), (y_count + 3) * y_gap);
+    auto scene = new QGraphicsScene(0, 0, x_count * (2 * x_gap), (y_count + 3) * y_gap + y_margin);
     //scene->addRect(0, 0, 300, 800);
     for (auto& item : sampling_ui_items)
     {
@@ -497,7 +498,7 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
     ui->tableWidget->setHorizontalHeaderLabels(labels);
     ui->tableWidget->horizontalHeader()->setVisible(true);
     ui->tableWidget->verticalHeader()->setVisible(false);
-    ui->tableWidget->horizontalHeader()->setDefaultSectionSize(50);
+    ui->tableWidget->horizontalHeader()->setDefaultSectionSize(40);
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
     ui->tableWidget->setAlternatingRowColors(true);
     ui->tableWidget->resize(1200, 1100);
