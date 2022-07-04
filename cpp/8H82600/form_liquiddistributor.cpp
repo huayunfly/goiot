@@ -47,6 +47,8 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     InitRecipeSettingTable();
     // For the recipe runtime view
     InitRecipeRuntimeView();
+    // For log window
+    InitLogWindow();
     // thread worker
     threads_.emplace_back(std::thread(&FormLiquidDistributor::RunRecipeWorker, this));
 }
@@ -598,6 +600,11 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
     }
 }
 
+void FormLiquidDistributor::InitLogWindow()
+{
+    ui->textEdit_log->document()->setMaximumBlockCount(160);
+}
+
 void FormLiquidDistributor::ClearUITable()
 {
     RecipeUITableSetting tbl = GetRecipeUITableSetting();
@@ -679,6 +686,34 @@ void FormLiquidDistributor::FillUITableChannelInfo(
     combobox = static_cast<QComboBox*>(
             ui->tableWidget->cellWidget(row, start_col + index));
     combobox->setCurrentText(QString("L") + QString::number(cleanport));
+}
+
+// Log to text window.
+void FormLiquidDistributor::Log2Window(
+        const QString& recipe_name, const QString& status)
+{
+    ui->textEdit_log->append(
+                QDateTime::currentDateTime().toString("MM月dd日 hh:mm:ss ")
+                + "[" + recipe_name + "]: " + status);
+}
+
+void FormLiquidDistributor::LogTaskStep(const RecipeTaskEntity& entity)
+{
+    QString info = (entity.type == 0 || entity.type == 2) ? "取液->" : "清洗->";
+    info.append("位置a[");
+    info.append(QString::number(entity.pos_a));
+    info.append("] 通道[");
+    info.append(QString::number(entity.channel_a));
+    info.append("] ");
+    info.append(QString::number(entity.run_a));
+    info.append(", ");
+    info.append("位置b[");
+    info.append(QString::number(entity.pos_b));
+    info.append("] 通道[");
+    info.append(QString::number(entity.channel_b));
+    info.append("] ");
+    info.append(QString::number(entity.run_b));
+    Log2Window(entity.recipe_name, info);
 }
 
 bool FormLiquidDistributor::LoadRecipe(const QString& recipe_name)
@@ -875,9 +910,11 @@ void FormLiquidDistributor::RunRecipeWorker()
             break; // Exit
         }
 
-        // running, atomic sign
+        // Clear
+        ClearRecipeRuntimeView();
+        // Running
         QString recipe_name = task->size() > 0 ? task->at(0).recipe_name : "None";
-        task_running_ = true;
+        Log2Window(recipe_name, "任务启动");
         for (auto& entity : *task)
         {
             // Adjust purge duration
@@ -933,6 +970,7 @@ void FormLiquidDistributor::RunRecipeWorker()
             // Runtime view displaying
             UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Sampling,
                                SamplingUIItem::SamplingUIItemStatus::Discharge);
+            LogTaskStep(entity);
 
             // Wait sampling or do liquid level detection, send stop command to plc.
             std::future<qint64> check_a, check_b;
@@ -1004,8 +1042,12 @@ void FormLiquidDistributor::RunRecipeWorker()
                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
         }
         // Stop
-        task_running_ = false;
+        if (task_running_)
+        {
+            task_running_ = false;
+        }
         qInfo("recipe task [%s] finished", recipe_name.toLatin1().constData());
+        Log2Window(recipe_name, "任务结束");
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
@@ -1234,11 +1276,13 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
         }
         else if (DialogRecipeMgr::RecipeAction::RUN == act)
         {
-            if (recipe_name.compare(loaded_recipe_name_, Qt::CaseInsensitive) == 0)
+            if (recipe_name.compare(loaded_recipe_name_, Qt::CaseInsensitive) == 0 &&
+                    !task_running_)
             {
                 bool ok = DispatchRecipeTask(recipe_name);
                 if (ok)
                 {
+                    task_running_ = true;
                     QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
                 }
             }

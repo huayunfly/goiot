@@ -170,6 +170,9 @@ private:
                                 int row_count,
                                 const QStringList& heads);
 
+    // Initialize log window document's max lines.
+    void InitLogWindow();
+
     // Recipe setting table's channel selection changed.
     // Display channel No. on the runtime view.
     // @param <row>: QTable row
@@ -217,6 +220,12 @@ private:
     // Fill channel information in the liquid sampling UI table.
     void FillUITableChannelInfo(int pos, int channel, int flowlimit,
                                 int duration, int cleanport);
+
+    // Log to text window.
+    void Log2Window(const QString& recipe_name, const QString& status);
+
+    // Log task running step by calling Log2Window.
+    void LogTaskStep(const RecipeTaskEntity& entity);
 
     // Prepare DB environment.
     void PrepareDB(const QString& connection_path, const QString& instance_name);
@@ -314,6 +323,7 @@ private:
     std::vector<cv::Mat> vframes_;
     std::vector<QTimer> timers_;
     std::vector<QLabel*> image_labels_;
+    void LogTaskStep();
 };
 
 #endif // FORM_LIQUIDDISTRIBUTOR_H
