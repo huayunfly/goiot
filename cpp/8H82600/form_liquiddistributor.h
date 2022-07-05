@@ -173,6 +173,11 @@ private:
     // Initialize log window document's max lines.
     void InitLogWindow();
 
+    // Enable/disable the setting table edit mode.
+    // Call after InitRecipeSettingTable()
+    // @param <enable>: editable
+    void EnableRecipeSettingTable(bool enable);
+
     // Recipe setting table's channel selection changed.
     // Display channel No. on the runtime view.
     // @param <row>: QTable row

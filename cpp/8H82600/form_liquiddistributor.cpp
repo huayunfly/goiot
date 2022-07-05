@@ -605,6 +605,32 @@ void FormLiquidDistributor::InitLogWindow()
     ui->textEdit_log->document()->setMaximumBlockCount(160);
 }
 
+void FormLiquidDistributor::EnableRecipeSettingTable(bool enable)
+{
+    RecipeUITableSetting tbl = GetRecipeUITableSetting();
+    int row_sep = tbl.row_count / 2;
+    int col_sep = tbl.col_count / 2;
+    for (int row = 0; row < tbl.row_count; row++)
+    {
+        if (row == row_sep)
+        {
+            continue;
+        }
+        for (int grp = 0; grp < tbl.channel_groups; grp++)
+        {
+            for (int i = 1; i < tbl.line_items; i++)
+            {
+                int col = grp * tbl.line_items + i;
+                if (col >= col_sep)
+                {
+                    col++;
+                }
+                ui->tableWidget->cellWidget(row, col)->setEnabled(enable);
+            }
+        }
+    }
+}
+
 void FormLiquidDistributor::ClearUITable()
 {
     RecipeUITableSetting tbl = GetRecipeUITableSetting();
@@ -912,6 +938,8 @@ void FormLiquidDistributor::RunRecipeWorker()
 
         // Clear
         ClearRecipeRuntimeView();
+        // No edit
+        EnableRecipeSettingTable(false);
         // Running
         QString recipe_name = task->size() > 0 ? task->at(0).recipe_name : "None";
         Log2Window(recipe_name, "任务启动");
@@ -1048,6 +1076,7 @@ void FormLiquidDistributor::RunRecipeWorker()
         }
         qInfo("recipe task [%s] finished", recipe_name.toLatin1().constData());
         Log2Window(recipe_name, "任务结束");
+        EnableRecipeSettingTable(true);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
