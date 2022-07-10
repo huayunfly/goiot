@@ -3,6 +3,8 @@
 #include <QHBoxLayout>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QMenu>
+#include <QAction>
 #include <cassert>
 #include <algorithm>
 #include <QMessageBox>
@@ -602,7 +604,19 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
 
 void FormLiquidDistributor::InitLogWindow()
 {
+    ui->textEdit_log->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->textEdit_log, &QTextEdit::customContextMenuRequested, this,
+            &FormLiquidDistributor::LogWindowShowMenu);
     ui->textEdit_log->document()->setMaximumBlockCount(160);
+}
+
+void FormLiquidDistributor::LogWindowShowMenu()
+{
+    log_menu = std::make_shared<QMenu>("");
+    auto action_clear = log_menu->addAction("清除");
+    connect(action_clear, &QAction::triggered, this, [&] () { ui->textEdit_log->clear(); });
+    log_menu->move(this->cursor().pos());
+    log_menu->show();
 }
 
 void FormLiquidDistributor::EnableRecipeSettingTable(bool enable)
@@ -1284,6 +1298,7 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
             bool ok = LoadRecipe(recipe_name);
             if (ok)
             {
+                Log2Window(recipe_name, "加载成功");
                 QMessageBox::information(0, "加载成功", recipe_name, QMessageBox::Ok);
             }
         }
@@ -1292,15 +1307,21 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
             bool ok = SaveRecipe(recipe_name);
             if (ok)
             {
+                Log2Window(recipe_name, "保存成功");
                 QMessageBox::information(0, "保存成功", recipe_name, QMessageBox::Ok);
             }
         }
         else if (DialogRecipeMgr::RecipeAction::DELETE == act)
         {
-            bool ok = DeleteRecipe(recipe_name);
-            if (ok)
+            auto ret = QMessageBox::question(0, "删除配方", recipe_name, QMessageBox::Yes | QMessageBox::No);
+            if (ret == QMessageBox::Yes)
             {
-                QMessageBox::information(0, "删除成功", recipe_name, QMessageBox::Ok);
+                bool ok = DeleteRecipe(recipe_name);
+                if (ok)
+                {
+                    Log2Window(recipe_name, "删除成功");
+                    QMessageBox::information(0, "删除成功", recipe_name, QMessageBox::Ok);
+                }
             }
         }
         else if (DialogRecipeMgr::RecipeAction::RUN == act)
@@ -1322,14 +1343,19 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
         }
         else if (DialogRecipeMgr::RecipeAction::STOP == act)
         {
-            if (task_running_)
+            auto ret = QMessageBox::question(0, "结束任务", recipe_name, QMessageBox::Yes | QMessageBox::No);
+            if (ret == QMessageBox::Yes &&
+                    QString::compare(recipe_name, loaded_recipe_name_, Qt::CaseInsensitive) == 0)
             {
-                task_running_ = false;
-                QMessageBox::information(0, "结束任务。。。", recipe_name, QMessageBox::Ok);
-            }
-            else
-            {
-                QMessageBox::critical(0, "任务未运行", recipe_name, QMessageBox::Ignore);
+                if (task_running_)
+                {
+                    task_running_ = false;
+                    QMessageBox::information(0, "结束任务。。。", recipe_name, QMessageBox::Ok);
+                }
+                else
+                {
+                    QMessageBox::critical(0, "任务未运行", recipe_name, QMessageBox::Ignore);
+                }
             }
         }
     }

@@ -173,6 +173,9 @@ private:
     // Initialize log window document's max lines.
     void InitLogWindow();
 
+    // Show menu.
+    void LogWindowShowMenu();
+
     // Enable/disable the setting table edit mode.
     // Call after InitRecipeSettingTable()
     // @param <enable>: editable
@@ -329,6 +332,9 @@ private:
     std::vector<QTimer> timers_;
     std::vector<QLabel*> image_labels_;
     void LogTaskStep();
+
+    // UI
+    std::shared_ptr<QMenu> log_menu;
 };
 
 #endif // FORM_LIQUIDDISTRIBUTOR_H

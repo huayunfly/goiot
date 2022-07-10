@@ -46,6 +46,8 @@ void DialogRecipeMgr::InitRecipeTable()
         ui->tableWidgetRecipe->item(index, 1)->setFont(QFont("tahoma", 9, QFont::Normal));
         index++;
     }
+    connect(ui->tableWidgetRecipe, &QTableWidget::itemClicked, this,
+            [&] () {this->setWindowTitle(QString("配方管理 -> ") + ui->tableWidgetRecipe->currentItem()->text());});
 }
 
 void DialogRecipeMgr::on_pushButtonLoad_clicked()
