@@ -128,12 +128,12 @@ win32:contains(QT_ARCH, x86_64):CONFIG(debug, debug|release): LIBS += -L$${THIRD
                                                                     -L$${THIRDLIB}/libqrencode/v4_1_1/lib/x64/ -lqrencode.dll
 
 win32:contains(QT_ARCH, i386):CONFIG(release, debug|release): LIBS += -L$${THIRDLIB}/qredisclient/lib/ -lqredisclient_32 \
-                                                                    -L$${THIRDLIB}/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
-                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/ -lqrencode.dll
+                                                                    -L$${THIRDLIB}/opencv/v4_5_4/lib/x86/mingw/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
+                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/x86/ -lqrencode.dll
 
 win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$${THIRDLIB}/qredisclient/lib/ -lqredisclient_32d \
-                                                                    -L$${THIRDLIB}/opencv/v3_4_16/lib/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
-                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/ -lqrencode.dll
+                                                                    -L$${THIRDLIB}/opencv/v4_5_4/lib/x86/mingw/ -lopencv_core454.dll -lopencv_highgui454.dll -lopencv_video454.dll -lopencv_videoio454.dll -lopencv_imgproc454.dll \
+                                                                    -L$${THIRDLIB}/libqrencode/v4_1_1/lib/x86/ -lqrencode.dll
 
 DISTFILES += \
     drivers.json
