@@ -192,6 +192,15 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.pump2_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_FICA2405"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MLM, 2, 100, 0));
     data_model_.SetDataToUiMap("plc.1.pump1_pressure", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MPA, 1, 10, 0));
     data_model_.SetDataToUiMap("plc.1.pump2_pressure", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_PIA2405"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::MPA, 1, 10, 0));
+    // liquidswitch - balance
+    data_model_.SetDataToUiMap("balance.1.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.2.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2102"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.3.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2103"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.4.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2104"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.5.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2201"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.6.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2202"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.7.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2203"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
+    data_model_.SetDataToUiMap("balance.8.pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_WIA2204"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::G, 0, 6000, 0));
 
     // liquidfeed
     data_model_.SetDataToUiMap("plc.1.smc9_2", UiInfo(ui_->tabWidget->widget(2), QString::fromUtf8("label_HC2306"), RES_SVALVE_5, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));

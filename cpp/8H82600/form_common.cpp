@@ -92,6 +92,12 @@ bool FormCommon::event(QEvent *event)
                 case MeasurementUnit::PPM:
                     unit = "ppm";
                     break;
+                case MeasurementUnit::G:
+                    unit = "g";
+                    break;
+                case MeasurementUnit::KG:
+                    unit = "kg";
+                    break;
                 default:
                     break;
                 }

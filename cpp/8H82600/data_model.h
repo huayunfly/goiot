@@ -20,7 +20,9 @@ enum class MeasurementUnit
     MPA = 8,
     RPM = 9,
     LEL = 10,
-    PPM = 11
+    PPM = 11,
+    G = 12,
+    KG = 13
 };
 
 enum class WidgetType
