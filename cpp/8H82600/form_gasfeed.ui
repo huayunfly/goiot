@@ -1773,6 +1773,127 @@
     <string>Vent</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_HC1401">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>720</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mechanical_pump.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC1403">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>840</y>
+     <width>33</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/valve_electric.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC1403">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>870</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC1403</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC1400">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>800</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC1400</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC1401">
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>770</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC1401</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC1406">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>750</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mechanical_pump.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_HC1406">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>800</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>HC1406</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>textEdit_FICA1110</zorder>
   <zorder>label_HC1201</zorder>
@@ -1874,6 +1995,13 @@
   <zorder>txt_label_Vent_14</zorder>
   <zorder>txt_label_Vent_15</zorder>
   <zorder>txt_label_Vent_16</zorder>
+  <zorder>label_HC1401</zorder>
+  <zorder>label_HC1403</zorder>
+  <zorder>txt_label_HC1403</zorder>
+  <zorder>txt_label_HC1400</zorder>
+  <zorder>txt_label_HC1401</zorder>
+  <zorder>label_HC1406</zorder>
+  <zorder>txt_label_HC1406</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

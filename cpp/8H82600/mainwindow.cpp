@@ -169,7 +169,10 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.pg_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA3120"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 5, 0));
     // gasfeed - pump,electric valve
     data_model_.SetDataToUiMap("plc.1.dq3_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1400"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dq3_3", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1401"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dq3_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1406"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dq3_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1402"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dp3_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1403"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
 
     // liquidswitch
     data_model_.SetDataToUiMap("plc.1.mvalve1_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2301"), RES_SVALVE_1, WidgetType::NONE, MeasurementUnit::NONE, 0, 4, 1));
@@ -1133,7 +1136,10 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("gasfeed.label_FICA1140", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
     // gasfeed - pump,electric valve
     data_model_.SetUiToDataMap("gasfeed.label_HC1400", DataDef("plc.1.dq3_2", "plc.1.dq3_2", "plc.1.dq3_2"));
+    data_model_.SetUiToDataMap("gasfeed.label_HC1401", DataDef("plc.1.dq3_3", "plc.1.dq3_3", "plc.1.dq3_3"));
+    data_model_.SetUiToDataMap("gasfeed.label_HC1406", DataDef("plc.1.dq3_4", "plc.1.dq3_4", "plc.1.dq3_4"));
     data_model_.SetUiToDataMap("gasfeed.label_HC1402", DataDef("plc.1.dq3_7", "plc.1.dq3_7", "plc.1.dq3_7"));
+    data_model_.SetUiToDataMap("gasfeed.label_HC1403", DataDef("plc.1.dq3_8", "plc.1.dq3_8", "plc.1.dq3_8"));
 
     // liquidswitch
     data_model_.SetUiToDataMap("liquidswitch.label_HC2301", DataDef("plc.1.mvalve1_pv", "plc.1.mvalve1_pv", "plc.1.mvalve1_sv"));
