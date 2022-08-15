@@ -39,6 +39,7 @@ SOURCES += \
     form_motorcontrol.cpp \
     form_reactora.cpp \
     form_reactorb.cpp \
+    form_safety.cpp \
     form_trend.cpp \
     log.cpp \
     main.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     form_motorcontrol.h \
     form_reactora.h \
     form_reactorb.h \
+    form_safety.h \
     form_trend.h \
     log.h \
     mainwindow.h \
@@ -98,6 +100,7 @@ FORMS += \
     form_motorcontrol.ui \
     form_reactora.ui \
     form_reactorb.ui \
+    form_safety.ui \
     form_trend.ui \
     mainwindow.ui
 

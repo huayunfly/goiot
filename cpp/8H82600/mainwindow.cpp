@@ -14,6 +14,7 @@
 #include "form_liquidcollection.h"
 #include "form_liquidsamplinga.h"
 #include "form_liquidsamplingb.h"
+#include "form_safety.h"
 #include "form_trend.h"
 #include "events.h"
 #include "dialog_setvalue.h"
@@ -44,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     form_vec.push_back(new FormLiquidCollection);
     form_vec.push_back(new FormLiquidSamplingA);
     form_vec.push_back(new FormLiquidSamplingB);
+    form_vec.push_back(new FormSafety);
 
     for (auto& entry : form_vec)
     {
@@ -172,7 +174,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.dq3_3", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1401"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dq3_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1406"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dq3_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1402"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
-    data_model_.SetDataToUiMap("plc.1.dp3_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1403"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dq3_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1403"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
 
     // liquidswitch
     data_model_.SetDataToUiMap("plc.1.mvalve1_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2301"), RES_SVALVE_1, WidgetType::NONE, MeasurementUnit::NONE, 0, 4, 1));
@@ -1106,6 +1108,23 @@ void MainWindow::InitDataModel()
                                                        UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("plc.1.dist_b_run_pv", {UiInfo(ui_->widget_distributor->widget(0), QString::fromUtf8("label_dist_b_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
                                                        UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_b_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    // safety and experiment status
+    data_model_.SetDataToUiMap("plc.1.reactor_1_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_2_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_3_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_4_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_5_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_6_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_7_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_8_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_9_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_10_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_11_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_12_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_13_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_14_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_15_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_16_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
 
     // ui_to_data
     //data_model_.SetUiToDataMap("gasfeed.svlabel", DataDef("plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0"));
@@ -1912,6 +1931,41 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("motorcontrol_reactor16.cell_16_sv", DataDef("reactor16.16.block_data0", "reactor16.16.block_data0", "reactor16.16.block_data0"));
     data_model_.SetUiToDataMap("motorcontrol_reactor16.button_16_start", DataDef("reactor16.16.stb", "reactor16.16.stb", "reactor16.16.stb"));
     data_model_.SetUiToDataMap("motorcontrol_reactor16.button_16_stop", DataDef("reactor16.16.s_stop", "reactor16.16.s_stop", "reactor16.16.s_stop"));
+    // safety and experiment status
+    data_model_.SetUiToDataMap("safety.button_reactor_1_run", DataDef("plc.1.reactor_1_run", "plc.1.reactor_1_run", "plc.1.reactor_1_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_2_run", DataDef("plc.1.reactor_2_run", "plc.1.reactor_2_run", "plc.1.reactor_2_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_3_run", DataDef("plc.1.reactor_3_run", "plc.1.reactor_3_run", "plc.1.reactor_3_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_4_run", DataDef("plc.1.reactor_4_run", "plc.1.reactor_4_run", "plc.1.reactor_4_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_5_run", DataDef("plc.1.reactor_5_run", "plc.1.reactor_5_run", "plc.1.reactor_5_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_6_run", DataDef("plc.1.reactor_6_run", "plc.1.reactor_6_run", "plc.1.reactor_6_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_7_run", DataDef("plc.1.reactor_7_run", "plc.1.reactor_7_run", "plc.1.reactor_7_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_8_run", DataDef("plc.1.reactor_8_run", "plc.1.reactor_8_run", "plc.1.reactor_8_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_9_run", DataDef("plc.1.reactor_9_run", "plc.1.reactor_9_run", "plc.1.reactor_9_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_10_run", DataDef("plc.1.reactor_10_run", "plc.1.reactor_10_run", "plc.1.reactor_10_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_11_run", DataDef("plc.1.reactor_11_run", "plc.1.reactor_11_run", "plc.1.reactor_11_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_12_run", DataDef("plc.1.reactor_12_run", "plc.1.reactor_12_run", "plc.1.reactor_12_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_13_run", DataDef("plc.1.reactor_13_run", "plc.1.reactor_13_run", "plc.1.reactor_13_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_14_run", DataDef("plc.1.reactor_14_run", "plc.1.reactor_14_run", "plc.1.reactor_14_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_15_run", DataDef("plc.1.reactor_15_run", "plc.1.reactor_15_run", "plc.1.reactor_15_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_16_run", DataDef("plc.1.reactor_16_run", "plc.1.reactor_16_run", "plc.1.reactor_16_run"));
+    // status stop
+    data_model_.SetUiToDataMap("safety.button_reactor_1_stop", DataDef("plc.1.reactor_1_run", "plc.1.reactor_1_run", "plc.1.reactor_1_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_2_stop", DataDef("plc.1.reactor_2_run", "plc.1.reactor_2_run", "plc.1.reactor_2_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_3_stop", DataDef("plc.1.reactor_3_run", "plc.1.reactor_3_run", "plc.1.reactor_3_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_4_stop", DataDef("plc.1.reactor_4_run", "plc.1.reactor_4_run", "plc.1.reactor_4_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_5_stop", DataDef("plc.1.reactor_5_run", "plc.1.reactor_5_run", "plc.1.reactor_5_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_6_stop", DataDef("plc.1.reactor_6_run", "plc.1.reactor_6_run", "plc.1.reactor_6_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_7_stop", DataDef("plc.1.reactor_7_run", "plc.1.reactor_7_run", "plc.1.reactor_7_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_8_stop", DataDef("plc.1.reactor_8_run", "plc.1.reactor_8_run", "plc.1.reactor_8_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_9_stop", DataDef("plc.1.reactor_9_run", "plc.1.reactor_9_run", "plc.1.reactor_9_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_10_stop", DataDef("plc.1.reactor_10_run", "plc.1.reactor_10_run", "plc.1.reactor_10_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_11_stop", DataDef("plc.1.reactor_11_run", "plc.1.reactor_11_run", "plc.1.reactor_11_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_12_stop", DataDef("plc.1.reactor_12_run", "plc.1.reactor_12_run", "plc.1.reactor_12_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_13_stop", DataDef("plc.1.reactor_13_run", "plc.1.reactor_13_run", "plc.1.reactor_13_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_14_stop", DataDef("plc.1.reactor_14_run", "plc.1.reactor_14_run", "plc.1.reactor_14_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_15_stop", DataDef("plc.1.reactor_15_run", "plc.1.reactor_15_run", "plc.1.reactor_15_run"));
+    data_model_.SetUiToDataMap("safety.button_reactor_16_stop", DataDef("plc.1.reactor_16_run", "plc.1.reactor_16_run", "plc.1.reactor_16_run"));
+
     // liquid distributor
     data_model_.SetUiToDataMap("distributor_sampling.control_code", DataDef("plc.1.dist_controlcode", "plc.1.dist_controlcode", "plc.1.dist_controlcode"));
     data_model_.SetUiToDataMap("distributor_sampling.channel_a_run", DataDef("plc.1.dist_a_run_pv", "plc.1.dist_a_run_sv", "plc.1.dist_a_run_sv"));
