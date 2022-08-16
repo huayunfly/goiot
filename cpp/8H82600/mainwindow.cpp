@@ -16,6 +16,7 @@
 #include "form_liquidsamplingb.h"
 #include "form_safety.h"
 #include "form_trend.h"
+#include "form_history.h"
 #include "events.h"
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
@@ -63,6 +64,20 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui_->widget_workflow->show();
     }
+
+    // Trend
+    FormTrend* form_trend = new FormTrend(ui_->widget_trend);
+    form_trend->setObjectName(QString::fromUtf8("widget_trend"));
+    form_trend->setGeometry(QRect(61, 0, 1200, 1100));
+    form_trend->setAutoFillBackground(false);
+    form_trend->setStyleSheet(QString::fromUtf8("background:#FFFFFF"));
+
+    // History
+    FormHistory* form_history = new FormHistory(ui_->widget_history);
+    form_history->setObjectName(QString::fromUtf8("widget_history"));
+    form_history->setGeometry(QRect(61, 0, 1200, 1100));
+    form_history->setAutoFillBackground(false);
+    form_history->setStyleSheet(QString::fromUtf8("background:#FFFFFF"));
 
     // Setup listview pages
     QStandardItemModel* model = new QStandardItemModel(this);
@@ -689,14 +704,22 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("mfcpfc.16.sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_PICA4306"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
     data_model_.SetDataToUiMap("mfcpfc.17.sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_PICA4307"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
     data_model_.SetDataToUiMap("mfcpfc.18.sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_PICA4308"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.11.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4301"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.12.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4302"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.13.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4303"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.14.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4304"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.15.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.16.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4306"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.17.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4307"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.18.pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4308"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
+    data_model_.SetDataToUiMap("mfcpfc.11.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4301"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.12.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4302"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.13.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4303"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.14.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4304"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.15.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.16.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4306"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.17.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4307"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.18.pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_PICA4308"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
     // reactorA-bottom TC
     data_model_.SetDataToUiMap("plc.1.temp1_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4101"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 200, 0));
     data_model_.SetDataToUiMap("plc.1.temp2_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4102"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 200, 0));
@@ -732,14 +755,22 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp23_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4127"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
     data_model_.SetDataToUiMap("plc.1.temp24_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4128"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
     // reactorA-inner TI
-    data_model_.SetDataToUiMap("plc.1.temp101_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4141"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp102_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4142"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp103_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4143"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp104_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4144"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp105_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4145"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp106_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4146"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp107_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4147"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp108_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4148"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
+    data_model_.SetDataToUiMap("plc.1.temp101_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4141"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp102_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4142"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp103_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4143"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp104_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4144"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp105_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4145"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp106_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4146"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp107_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4147"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp108_pv", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TIA4148"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
     // reactorA-pipe TC
     data_model_.SetDataToUiMap("plc.1.temp33_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4601"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp34_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4602"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
@@ -861,14 +892,22 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("mfcpfc.24.sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_PICA4314"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
     data_model_.SetDataToUiMap("mfcpfc.25.sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_PICA4315"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
     data_model_.SetDataToUiMap("mfcpfc.26.sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_PICA4316"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.19.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4309"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.20.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4310"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.21.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4311"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.22.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4312"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.23.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4313"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.24.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4314"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.25.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4315"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
-    data_model_.SetDataToUiMap("mfcpfc.26.pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4316"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0));
+    data_model_.SetDataToUiMap("mfcpfc.19.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4309"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.20.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4310"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.21.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4311"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.22.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4312"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.23.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4313"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.24.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4314"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.25.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4315"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
+    data_model_.SetDataToUiMap("mfcpfc.26.pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_PICA4316"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0),
+                                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_pg"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 50, 0)});
     // reactorB-bottom TC
     data_model_.SetDataToUiMap("plc.1.temp9_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4109"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 200, 0));
     data_model_.SetDataToUiMap("plc.1.temp10_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4110"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 200, 0));
@@ -904,14 +943,22 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp31_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4135"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
     data_model_.SetDataToUiMap("plc.1.temp32_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4136"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
     // reactorB-inner TI
-    data_model_.SetDataToUiMap("plc.1.temp109_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4149"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp110_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4150"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp111_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4151"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp112_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4152"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp113_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4153"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp114_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4154"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp115_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4155"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
-    data_model_.SetDataToUiMap("plc.1.temp116_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4156"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0));
+    data_model_.SetDataToUiMap("plc.1.temp109_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4149"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp110_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4150"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp111_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4151"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp112_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4152"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp113_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4153"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp114_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4154"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp115_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4155"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
+    data_model_.SetDataToUiMap("plc.1.temp116_pv", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TIA4156"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0),
+                                                    UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 200, 0)});
     // reactorB-pipe TC
     data_model_.SetDataToUiMap("plc.1.temp41_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4609"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp42_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4610"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
@@ -2029,15 +2076,15 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
                     QEvent* event = nullptr;
                     if (ui_info.type == WidgetType::TEXT)
                     {
-                        event = new Ui::RefreshTextEvent(ui_info.ui_name, status, ui_info, data_info.id, value);
+                        event = new Ui::RefreshTextEvent(ui_info.ui_name, status, ui_info, data_info.id, data_info.timestamp, value);
                     }
                     else if (ui_info.type == WidgetType::ONOFF || ui_info.type == WidgetType::STATE)
                     {
-                        event = new Ui::RefreshStateEvent(ui_info.ui_name, status, ui_info, data_info.id, value.toInt());
+                        event = new Ui::RefreshStateEvent(ui_info.ui_name, status, ui_info, data_info.id, data_info.timestamp, value.toInt());
                     }
                     else if (ui_info.type == WidgetType::PROCESS_VALUE)
                     {
-                        event = new Ui::ProcessValueEvent(ui_info.ui_name, status, ui_info, data_info.id);
+                        event = new Ui::ProcessValueEvent(ui_info.ui_name, status, ui_info, data_info.id, data_info.timestamp);
                     }
                     else if (ui_info.type == WidgetType::NONE)
                     {
@@ -2058,7 +2105,7 @@ void MainWindow::on_pushButton_clicked()
 {
     QWidget* sender = static_cast<QWidget*>(this->sender());
     QApplication::sendEvent(ui_->tabWidget->widget(0),
-                            new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, UiInfo(), "mockid", "xxyy"));
+                            new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, UiInfo(), "mockid", 0.0, "xxyy"));
     DialogSetValue set_value_dialog(sender, "34.5", MeasurementUnit::DEGREE);
 
     // convert the widget position to the screen position.

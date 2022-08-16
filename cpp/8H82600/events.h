@@ -17,8 +17,8 @@ class RefreshEvent : public QEvent
 {
 public:
     explicit RefreshEvent(QEvent::Type type, const QString& name, ControlStatus status,
-                          const UiInfo& ui_info, const std::string& data_info_id) :
-        QEvent (type), name_(name), status_(status), ui_info_(ui_info), data_info_id_(data_info_id)
+                          const UiInfo& ui_info, const std::string& data_info_id, double timestamp) :
+        QEvent (type), name_(name), status_(status), ui_info_(ui_info), data_info_id_(data_info_id), timestamp_(timestamp)
     {
 
     }
@@ -48,22 +48,27 @@ public:
         return data_info_id_;
     }
 
+    double GetTimestamp() const
+    {
+        return timestamp_;
+    }
+
 private:
     QString name_;
     ControlStatus status_;
     UiInfo ui_info_;
     std::string data_info_id_;
+    double timestamp_;
 };
 
-// Refresh values
 class RefreshTextEvent : public RefreshEvent
 {
 public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1001);
 
     explicit RefreshTextEvent(const QString& name, ControlStatus status, const UiInfo& ui_info,
-                              const std::string& data_info_id, const QString& text) :
-        RefreshEvent (myType, name, status, ui_info, data_info_id), text_(text)
+                              const std::string& data_info_id, double timestamp, const QString& text) :
+        RefreshEvent (myType, name, status, ui_info, data_info_id, timestamp), text_(text)
     {
 
     }
@@ -84,8 +89,8 @@ public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1002);
 
     explicit RefreshStateEvent(const QString& name, ControlStatus status, const UiInfo& ui_info,
-                               const std::string& data_info_id, int state) :
-        RefreshEvent (myType, name, status, ui_info, data_info_id), state_(state)
+                               const std::string& data_info_id, double timestamp, int state) :
+        RefreshEvent (myType, name, status, ui_info, data_info_id, timestamp), state_(state)
     {
 
     }
@@ -106,8 +111,8 @@ public:
     static const QEvent::Type myType = static_cast<QEvent::Type>(QEvent::User + 1003);
 
     explicit ProcessValueEvent(const QString& name, ControlStatus status, const UiInfo& ui_info,
-                               const std::string& data_info_id) :
-        RefreshEvent (myType, name, status, ui_info, data_info_id)
+                               const std::string& data_info_id, double timestamp) :
+        RefreshEvent (myType, name, status, ui_info, data_info_id, timestamp)
     {
 
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FormTrend</class>
- <widget class="QWidget" name="FormTrend">
+ <class>FormHistory</class>
+ <widget class="QWidget" name="FormHistory">
   <property name="geometry">
    <rect>
     <x>0</x>

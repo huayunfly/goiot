@@ -72,7 +72,7 @@ bool FormSafety::event(QEvent *event)
         auto tableWidget = this->findChild<QTableWidget*>(e->Name());
         // Parse data id, such as plc.1.reactor_1_run
         const std::string& data_info_id = e->GetDataInfoId();
-        std::size_t pos = data_info_id.find("plc.1.reactor_");
+        std::size_t pos = data_info_id.find("_");
         if (pos == std::string::npos)
         {
             return false;

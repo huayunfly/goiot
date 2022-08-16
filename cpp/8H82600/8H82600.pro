@@ -22,6 +22,7 @@ SOURCES += \
     dialog_onoff.cpp \
     dialog_recipe_mgr.cpp \
     dialog_setposition.cpp \
+    dialog_settimerange.cpp \
     dialog_setvalue.cpp \
     events.cpp \
     form_common.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     form_cylinderb.cpp \
     form_gasfeed.cpp \
     form_gassampling.cpp \
+    form_history.cpp \
     form_liquidcollection.cpp \
     form_liquiddistributor.cpp \
     form_liquidfeeda.cpp \
@@ -41,11 +43,13 @@ SOURCES += \
     form_reactorb.cpp \
     form_safety.cpp \
     form_trend.cpp \
+    historychart.cpp \
     log.cpp \
     main.cpp \
     mainwindow.cpp \
     qrcode_generator.cpp \
-    sampling_ui_item.cpp
+    sampling_ui_item.cpp \
+    trendchart.cpp
 
 HEADERS += \
     ThreadSafeQueue.h \
@@ -55,6 +59,7 @@ HEADERS += \
     dialog_onoff.h \
     dialog_recipe_mgr.h \
     dialog_setposition.h \
+    dialog_settimerange.h \
     dialog_setvalue.h \
     driver_base.h \
     events.h \
@@ -63,6 +68,7 @@ HEADERS += \
     form_cylinderb.h \
     form_gasfeed.h \
     form_gassampling.h \
+    form_history.h \
     form_liquidcollection.h \
     form_liquiddistributor.h \
     form_liquidfeeda.h \
@@ -75,21 +81,26 @@ HEADERS += \
     form_reactorb.h \
     form_safety.h \
     form_trend.h \
+    historychart.h \
     log.h \
     mainwindow.h \
     qrcode_generator.h \
     resourcedef.h \
-    sampling_ui_item.h
+    sampling_ui_item.h \
+    threadsafe_lookup_table.h \
+    trendchart.h
 
 FORMS += \
     dialog_onoff.ui \
     dialog_recipe_mgr.ui \
     dialog_setposition.ui \
+    dialog_settimerange.ui \
     dialog_setvalue.ui \
     form_cylindera.ui \
     form_cylinderb.ui \
     form_gasfeed.ui \
     form_gassampling.ui \
+    form_history.ui \
     form_liquidcollection.ui \
     form_liquiddistributor.ui \
     form_liquidfeeda.ui \

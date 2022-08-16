@@ -2,7 +2,7 @@
 #define FORM_TREND_H
 
 #include <QWidget>
-#include <QtCharts>
+#include "trendchart.h"
 
 namespace Ui {
 class FormTrend;
@@ -16,8 +16,13 @@ public:
     explicit FormTrend(QWidget *parent = nullptr);
     ~FormTrend();
 
+protected:
+    bool event(QEvent *event) override;
+
 private:
     Ui::FormTrend *ui;
+    std::unique_ptr<TrendChart> chart_reactor_;
+    std::unique_ptr<TrendChart> chart_pg_;
 };
 
 #endif // FORM_TREND_H
