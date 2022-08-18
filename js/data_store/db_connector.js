@@ -43,7 +43,7 @@ class RedisConnector extends DBConnector {
         // the Redis client will attempt to retry the connection.
         this.db_.on('connect', () => console.log('Redis client connected to server.'));
 
-        this.db_.on('ready', () => { 
+        this.db_.on('ready', () => {
             console.log('Redis server is ready.');
             setInterval(this.refresh_data, 5000, this);
         });
@@ -64,15 +64,22 @@ class RedisConnector extends DBConnector {
         for (const driver of this.data_config_.drivers) {
             const driver_id = driver.id;
             const data_array = [];
+            const ratio_array = [];
             for (const node of driver.nodes) {
                 const address = node.address;
                 for (const data of node.data) {
                     if (!data.register.toUpperCase().startsWith('W')) {
+                        let ratio = null;
+                        let fvalue = parseFloat(data.ratio);
+                        if (!isNaN(fvalue)) {
+                            ratio = fvalue;
+                        }
                         data_array.push([driver_id, address, data.id].join('.'));
+                        ratio_array.push(ratio);
                     }
                 }
             }
-            this.model_.push({driver_id: driver_id, data_array: data_array });
+            this.model_.push({ driver_id: driver_id, data_array: data_array, ratio_array: ratio_array });
         }
         this.sqldb_.create_tables(this.model_);
     }
@@ -91,7 +98,14 @@ class RedisConnector extends DBConnector {
                     return;
                 }
                 // Value is valid if Result is '0'. 
-                obj.sqldb_.insert(table_name, table.data_array, replies.map(n => Number(n[1]) == 0 ? n[0] : 'NULL'));
+                let data_index = 0;
+                // Raw value * ratio, then round to 2 decimals
+                obj.sqldb_.insert(table_name, table.data_array,
+                    replies.map(n => {
+                        let ratio = table.ratio_array[data_index++];
+                        return Number(n[1]) == 0 ? (ratio == null ? n[0] : Math.round(Number(n[0]) * ratio * 100) / 100) : 'NULL';
+                    })
+                );
             });
         }
     }
@@ -112,8 +126,10 @@ class PostgreSQLConnector extends DBConnector {
         const database = vars[2];
         const user = vars[3];
         const password = vars[4];
-        this.db_ = new pg.Client({ host: host, port: port, 
-            database: database, user: user, password: password });
+        this.db_ = new pg.Client({
+            host: host, port: port,
+            database: database, user: user, password: password
+        });
         this.db_.connect((err) => {
             if (err) {
                 throw err;
@@ -132,7 +148,7 @@ class PostgreSQLConnector extends DBConnector {
     create_tables(model) {
         if (!model) {
             throw 'Model is null.';
-        }  
+        }
         // Create table with special column name wrapped with "", like "mfcpfc.4.pv"    
         for (const item of model) {
             this.db_.query(`
@@ -154,11 +170,11 @@ class PostgreSQLConnector extends DBConnector {
         if (!this.table_created_) {
             console.log(`Table "${table}" is not existed.`);
             return;
-        }   
+        }
         // Insert table with special column name wrapped with "", like "mfcpfc.4.pv"     
         this.db_.query(`
  INSERT INTO ${table} (${names.map(n => '"' + n + '"').join(',')}, time) VALUES (
- ${data_array.map(n => '\'' + n.toString() + '\'').join(',')}, ${Date.now()/1000}
+ ${data_array.map(n => '\'' + n.toString() + '\'').join(',')}, ${Date.now() / 1000}
  ) RETURNING id;
 `, (err, result) => {
             if (err) {
