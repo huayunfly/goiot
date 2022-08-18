@@ -86,15 +86,36 @@ HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& l
     chart->addAxis(axis_time, Qt::AlignBottom);
     chart->addAxis(axis_value, Qt::AlignLeft);
 
+    // Color list
+    std::vector<QColor> colors = {Qt::black,
+                                  Qt::darkGray,
+                                  Qt::gray,
+                                  Qt::lightGray,
+                                  Qt::red,
+                                  Qt::green,
+                                  Qt::blue,
+                                  Qt::cyan,
+                                  Qt::magenta,
+                                  Qt::yellow,
+                                  Qt::darkRed,
+                                  Qt::darkGreen,
+                                  Qt::darkBlue,
+                                  Qt::darkCyan,
+                                  Qt::darkMagenta,
+                                  Qt::darkYellow};
+
     // Initialize the graphic lines
+    int color_index = 0;
     for (auto& item : line_defs)
     {
         auto line_series = std::make_shared<QLineSeries>();
         line_series->setName(item.pid_code + "_" + item.show_name);
+        line_series->setColor(colors.at(color_index % colors.size()));
         chart->addSeries(line_series.get());
         line_series->attachAxis(axis_value);
         line_series->attachAxis(axis_time);
         lines_map_.insert(std::make_pair(item.driver_id, line_series));
+        color_index++;
     }
 
     this->setChart(chart);
