@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>400</height>
+     <height>450</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout"/>
@@ -28,9 +28,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>410</y>
+     <y>460</y>
      <width>1000</width>
-     <height>400</height>
+     <height>450</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2"/>

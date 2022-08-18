@@ -36,7 +36,7 @@ TrendChart::TrendChart(QWidget *parent,
 
     QChart *chart = new QChart();
     chart->legend()->show();
-    chart->legend()->setAlignment(Qt::AlignTop);
+    chart->legend()->setAlignment(Qt::AlignRight);
 
     auto axis_value = new QValueAxis();
     axis_value->setRange(value_range_.first, value_range_.second);
