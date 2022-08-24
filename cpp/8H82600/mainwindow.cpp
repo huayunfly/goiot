@@ -695,6 +695,15 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.smc3_20", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4206"), RES_CYLINDER_UP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc4_19", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4207"), RES_CYLINDER_UP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc4_20", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4208"), RES_CYLINDER_UP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    // reactorA-support cylinder, proximity switch signal 接近开关
+    data_model_.SetDataToUiMap("plc.1.di1_17", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4201_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_18", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4202_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_19", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4203_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_20", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4204_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_21", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4205_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_22", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4206_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_23", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4207_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_24", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4208_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // reactorA-PFC
     data_model_.SetDataToUiMap("mfcpfc.11.sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_PICA4301"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
     data_model_.SetDataToUiMap("mfcpfc.12.sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_PICA4302"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
@@ -883,6 +892,15 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.smc7_20", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4214"), RES_CYLINDER_UP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc8_19", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4215"), RES_CYLINDER_UP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc8_20", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4216"), RES_CYLINDER_UP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    // reactorB-support cylinder, proximity switch signal 接近开关
+    data_model_.SetDataToUiMap("plc.1.di1_25", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4209_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_26", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4210_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_27", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4211_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_28", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4212_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_29", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4213_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_30", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4214_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_31", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4215_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_32", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4216_JiejinOn"), RES_JIEJIN_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // reactorB-PFC
     data_model_.SetDataToUiMap("mfcpfc.19.sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_PICA4309"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));
     data_model_.SetDataToUiMap("mfcpfc.20.sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_PICA4310"), RES_PFC, WidgetType::PROCESS_VALUE, MeasurementUnit::BARA, 1, 50, 0));

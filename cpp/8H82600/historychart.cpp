@@ -67,7 +67,7 @@ HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& l
 
     QChart *chart = new QChart();
     chart->legend()->show();
-    chart->legend()->setAlignment(Qt::AlignTop);
+    chart->legend()->setAlignment(Qt::AlignRight);
 
     auto axis_value = new QValueAxis();
     axis_value->setRange(value_range_.first, value_range_.second);
@@ -87,22 +87,22 @@ HistoryChart::HistoryChart(QWidget *parent, const std::vector<HistoryLineDef>& l
     chart->addAxis(axis_value, Qt::AlignLeft);
 
     // Color list
-    std::vector<QColor> colors = {Qt::black,
-                                  Qt::darkGray,
-                                  Qt::gray,
-                                  Qt::lightGray,
-                                  Qt::red,
-                                  Qt::green,
-                                  Qt::blue,
-                                  Qt::cyan,
-                                  Qt::magenta,
-                                  Qt::yellow,
-                                  Qt::darkRed,
-                                  Qt::darkGreen,
-                                  Qt::darkBlue,
-                                  Qt::darkCyan,
-                                  Qt::darkMagenta,
-                                  Qt::darkYellow};
+    std::vector<QColor> colors = {QColor(255, 0, 0),
+                                  QColor(255, 255, 0),
+                                  QColor(0, 255, 64),
+                                  QColor(0, 255, 255),
+                                  QColor(0, 128, 192),
+                                  QColor(128, 128, 192),
+                                  QColor(255, 0, 255),
+                                  QColor(128, 0, 0),
+                                  QColor(255, 128, 0),
+                                  QColor(0, 128, 0),
+                                  QColor(0, 0, 255),
+                                  QColor(0, 0, 160),
+                                  QColor(128, 0, 128),
+                                  QColor(128, 0, 255),
+                                  QColor(64, 0, 0),
+                                  QColor(64, 128, 128)};
 
     // Initialize the graphic lines
     int color_index = 0;

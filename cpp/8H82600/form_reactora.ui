@@ -2247,7 +2247,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2266,7 +2266,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2285,7 +2285,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2304,7 +2304,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2323,7 +2323,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2342,7 +2342,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2361,7 +2361,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2380,7 +2380,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2551,7 +2551,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2570,7 +2570,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2589,7 +2589,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2608,7 +2608,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2627,7 +2627,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2646,7 +2646,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2665,7 +2665,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -2684,7 +2684,7 @@
     </rect>
    </property>
    <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
+    <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
     <string/>
@@ -3381,6 +3381,158 @@
     <string>TIA4148</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_HC4201_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>330</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4202_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>330</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4203_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>330</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4204_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>330</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4205_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>740</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4206_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>740</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4207_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>740</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_HC4208_JiejinOn">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>740</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/jiejin_on.png</pixmap>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>label_PICA4301</zorder>
   <zorder>label_PICA4302</zorder>
@@ -3566,6 +3718,14 @@
   <zorder>txt_label_TIA4146</zorder>
   <zorder>txt_label_TIA4147</zorder>
   <zorder>txt_label_TIA4148</zorder>
+  <zorder>label_HC4201_JiejinOn</zorder>
+  <zorder>label_HC4202_JiejinOn</zorder>
+  <zorder>label_HC4203_JiejinOn</zorder>
+  <zorder>label_HC4204_JiejinOn</zorder>
+  <zorder>label_HC4205_JiejinOn</zorder>
+  <zorder>label_HC4206_JiejinOn</zorder>
+  <zorder>label_HC4207_JiejinOn</zorder>
+  <zorder>label_HC4208_JiejinOn</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

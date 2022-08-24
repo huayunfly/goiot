@@ -44,5 +44,6 @@
         <file>Res/icon_trend.png</file>
         <file>Res/icon_workflow.png</file>
         <file>Res/icon_device.png</file>
+        <file>UICtrls/Res/jiejin_on.png</file>
     </qresource>
 </RCC>

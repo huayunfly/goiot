@@ -6,6 +6,7 @@
 #include "data_model.h"
 #include "data_manager.h"
 #include "events.h"
+#include "safety_policy.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -64,5 +65,6 @@ private:
     Ui::MainWindow *ui_;
     DataModel data_model_;
     goiot::DataManager data_manager_;
+    SafetyPolicy safety_;
 };
 #endif // MAINWINDOW_H
