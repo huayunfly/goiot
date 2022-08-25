@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStandardItem>
+#include <QTimer>
 #include "data_model.h"
 #include "data_manager.h"
 #include "events.h"
@@ -50,6 +51,11 @@ private:
     /// <returns>True if it gets the data. otherwise false.</returns>
     bool ReadData(const QString& parent_ui_name, const QString& ui_name, QString& value, Ui::ControlStatus& status, UiInfo& ui_info);
 
+    /// <summary>
+    /// Add check safety tasks to SafetyPolicy.
+    /// </summary>
+    void CheckSafety();
+
 public:
     /// <summary>
     /// Write data into the data_manager queue. It catches the queue exceptions.
@@ -66,5 +72,6 @@ private:
     DataModel data_model_;
     goiot::DataManager data_manager_;
     SafetyPolicy safety_;
+    QTimer safe_timer_;
 };
 #endif // MAINWINDOW_H

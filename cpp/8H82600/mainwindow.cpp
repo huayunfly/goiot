@@ -28,7 +28,8 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui_(new Ui::MainWindow), data_manager_(QApplication::applicationDirPath().toStdString() )
+    , ui_(new Ui::MainWindow), data_manager_(QApplication::applicationDirPath().toStdString() ),
+      safety_(data_manager_), safe_timer_()
 {
     ui_->setupUi(this);
 
@@ -127,10 +128,16 @@ MainWindow::MainWindow(QWidget *parent)
     data_manager_.LoadJsonConfig();
     data_manager_.RegisterRefreshFunc(std::bind(&MainWindow::RefreshUi, this, std::placeholders::_1)); // lambda [this](int i){classB::handle(i);}
     data_manager_.Start();
+
+    // Safety timer
+    safety_.Start();
+    connect(&safe_timer_, &QTimer::timeout, this, &MainWindow::CheckSafety);
+    safe_timer_.start(5000);
 }
 
 MainWindow::~MainWindow()
 {
+    safety_.Stop();
     data_manager_.Stop();
     delete ui_;
 }
@@ -2368,4 +2375,10 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
             child->setVisible(false);
         }
     }
+}
+
+void MainWindow::CheckSafety()
+{
+    safety_.PostTask(
+                std::bind(&SafetyPolicy::TaskCheckExperimentState, &safety_));
 }
