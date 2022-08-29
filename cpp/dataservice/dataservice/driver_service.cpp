@@ -282,7 +282,10 @@ namespace goiot {
 
 		for (auto& entry : threads_)
 		{
-			entry.join();
+			if (entry.joinable())
+			{
+				entry.join();
+			}
 		}
 		redis_refresh_.reset();
 		redis_poll_.reset();
