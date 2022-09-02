@@ -1,5 +1,7 @@
 #include "safety_policy.h"
+#include <chrono>
 #include <qlogging.h>
+
 
 SafetyPolicy::SafetyPolicy(goiot::DataManager& data_manager) :
     run_(true), data_manager_(data_manager)
@@ -115,7 +117,7 @@ void SafetyPolicy::TaskCheckExperimentState()
         {
             continue;
         }
-        double fvalue = pfc.float_value * pfc.ratio;
+        double fvalue = pfc.int_value * pfc.ratio;
         uint8_t state = sensor.byte_value;
         if (fvalue > PFC_HHIGH_LIMIT)
         {
@@ -133,7 +135,7 @@ void SafetyPolicy::TaskCheckExperimentState()
             pfc_alm_high_list.at(0).byte_value = 1;
             write_data_list.push_back(pfc_alm_high_list.at(0));
         }
-        else if (fvalue > PFC_EXPERIMENT_RUN_LIMIT && state == 0)
+        else if (fvalue > PFC_EXPERIMENT_RUN_LIMIT && state == 1)
         {
             std::vector<goiot::DataInfo> run_list = data_manager_.ReadDataCache(
                         std::vector<std::string> {experiment_run_ids.at(i)});
@@ -145,5 +147,15 @@ void SafetyPolicy::TaskCheckExperimentState()
             }
         }
     }
-    data_manager_.WriteDataAsync(write_data_list);
+    if (write_data_list.size() > 0)
+    {
+        for (auto& data_info : write_data_list)
+        {
+            data_info.data_flow_type = goiot::DataFlowType::ASYNC_WRITE;
+            data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+            data_info.result = 0;
+        }
+        data_manager_.WriteDataAsync(write_data_list);
+    }
 }
