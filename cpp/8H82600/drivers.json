@@ -7789,6 +7789,246 @@
               "id": "reactor_16_run",
               "name": "reactor_16_run",
               "register": "RW5BT8575"
+            },
+            {
+              "id": "alm_temp_high_a",
+              "name": "alm_temp_high_a",
+              "register": "R5DUB1072"
+            },
+            {
+              "id": "alm_temp_hhigh_a",
+              "name": "alm_temp_hhigh_a",
+              "register": "R5DUB1076"
+            },
+            {
+              "id": "alm_temp_break_a",
+              "name": "alm_temp_break_a",
+              "register": "R5DUB1080"
+            },
+            {
+              "id": "alm_temp_high_b",
+              "name": "alm_temp_high_b",
+              "register": "R5WUB1084"
+            },
+            {
+              "id": "alm_temp_hhigh_b",
+              "name": "alm_temp_hhigh_b",
+              "register": "R5WUB1086"
+            },
+            {
+              "id": "alm_temp_break_b",
+              "name": "alm_temp_break_b",
+              "register": "R5WUB1088"
+            },
+            {
+              "id": "alm_temp_high_c",
+              "name": "alm_temp_high_c",
+              "register": "R5DUB1090"
+            },
+            {
+              "id": "alm_temp_hhigh_c",
+              "name": "alm_temp_hhigh_c",
+              "register": "R5DUB1094"
+            },
+            {
+              "id": "alm_temp_break_c",
+              "name": "alm_temp_break_c",
+              "register": "R5DUB1098"
+            },
+            {
+              "id": "alm_temp_high_d",
+              "name": "alm_temp_high_d",
+              "register": "R5DUB1102"
+            },
+            {
+              "id": "alm_temp_hhigh_d",
+              "name": "alm_temp_hhigh_d",
+              "register": "R5DUB1106"
+            },
+            {
+              "id": "alm_temp_break_d",
+              "name": "alm_temp_break_d",
+              "register": "R5DUB1110"
+            },
+            {
+              "id": "alm_pg_high",
+              "name": "alm_pg_high",
+              "register": "R5WUB1114"
+            },
+            {
+              "id": "alm_pg_hhigh",
+              "name": "alm_pg_hhigh",
+              "register": "R5WUB1116"
+            },
+            {
+              "id": "alm_gas_high",
+              "name": "alm_gas_high",
+              "register": "R5WUB1118"
+            },
+            {
+              "id": "alm_gas_hhigh",
+              "name": "alm_gas_hhigh",
+              "register": "R5WUB1120"
+            },
+            {
+              "id": "alm_pfc_1_high",
+              "name": "alm_pfc_1_high",
+              "register": "W5BT8976"
+            },
+            {
+              "id": "alm_pfc_2_high",
+              "name": "alm_pfc_2_high",
+              "register": "W5BT8977"
+            },
+            {
+              "id": "alm_pfc_3_high",
+              "name": "alm_pfc_3_high",
+              "register": "W5BT8978"
+            },
+            {
+              "id": "alm_pfc_4_high",
+              "name": "alm_pfc_4_high",
+              "register": "W5BT8979"
+            },
+            {
+              "id": "alm_pfc_5_high",
+              "name": "alm_pfc_5_high",
+              "register": "W5BT8980"
+            },
+            {
+              "id": "alm_pfc_6_high",
+              "name": "alm_pfc_6_high",
+              "register": "W5BT8981"
+            },
+            {
+              "id": "alm_pfc_7_high",
+              "name": "alm_pfc_7_high",
+              "register": "W5BT8982"
+            },
+            {
+              "id": "alm_pfc_8_high",
+              "name": "alm_pfc_8_high",
+              "register": "W5BT8983"
+            },
+            {
+              "id": "alm_pfc_9_high",
+              "name": "alm_pfc_9_high",
+              "register": "W5BT8984"
+            },
+            {
+              "id": "alm_pfc_10_high",
+              "name": "alm_pfc_10_high",
+              "register": "W5BT8985"
+            },
+            {
+              "id": "alm_pfc_11_high",
+              "name": "alm_pfc_11_high",
+              "register": "W5BT8986"
+            },
+            {
+              "id": "alm_pfc_12_high",
+              "name": "alm_pfc_12_high",
+              "register": "W5BT8987"
+            },
+            {
+              "id": "alm_pfc_13_high",
+              "name": "alm_pfc_13_high",
+              "register": "W5BT8988"
+            },
+            {
+              "id": "alm_pfc_14_high",
+              "name": "alm_pfc_14_high",
+              "register": "W5BT8989"
+            },
+            {
+              "id": "alm_pfc_15_high",
+              "name": "alm_pfc_15_high",
+              "register": "W5BT8990"
+            },
+            {
+              "id": "alm_pfc_16_high",
+              "name": "alm_pfc_16_high",
+              "register": "W5BT8991"
+            },
+            {
+              "id": "alm_pfc_1_hhigh",
+              "name": "alm_pfc_1_hhigh",
+              "register": "W5BT8992"
+            },
+            {
+              "id": "alm_pfc_2_hhigh",
+              "name": "alm_pfc_2_hhigh",
+              "register": "W5BT8993"
+            },
+            {
+              "id": "alm_pfc_3_hhigh",
+              "name": "alm_pfc_3_hhigh",
+              "register": "W5BT8994"
+            },
+            {
+              "id": "alm_pfc_4_hhigh",
+              "name": "alm_pfc_4_hhigh",
+              "register": "W5BT8995"
+            },
+            {
+              "id": "alm_pfc_5_hhigh",
+              "name": "alm_pfc_5_hhigh",
+              "register": "W5BT8996"
+            },
+            {
+              "id": "alm_pfc_6_hhigh",
+              "name": "alm_pfc_6_hhigh",
+              "register": "W5BT8997"
+            },
+            {
+              "id": "alm_pfc_7_hhigh",
+              "name": "alm_pfc_7_hhigh",
+              "register": "W5BT8998"
+            },
+            {
+              "id": "alm_pfc_8_hhigh",
+              "name": "alm_pfc_8_hhigh",
+              "register": "W5BT8999"
+            },
+            {
+              "id": "alm_pfc_9_hhigh",
+              "name": "alm_pfc_9_hhigh",
+              "register": "W5BT9000"
+            },
+            {
+              "id": "alm_pfc_10_hhigh",
+              "name": "alm_pfc_10_hhigh",
+              "register": "W5BT9001"
+            },
+            {
+              "id": "alm_pfc_11_hhigh",
+              "name": "alm_pfc_11_hhigh",
+              "register": "W5BT9002"
+            },
+            {
+              "id": "alm_pfc_12_hhigh",
+              "name": "alm_pfc_12_hhigh",
+              "register": "W5BT9003"
+            },
+            {
+              "id": "alm_pfc_13_hhigh",
+              "name": "alm_pfc_13_hhigh",
+              "register": "W5BT9004"
+            },
+            {
+              "id": "alm_pfc_14_hhigh",
+              "name": "alm_pfc_14_hhigh",
+              "register": "W5BT9005"
+            },
+            {
+              "id": "alm_pfc_15_hhigh",
+              "name": "alm_pfc_15_hhigh",
+              "register": "W5BT9006"
+            },
+            {
+              "id": "alm_pfc_16_hhigh",
+              "name": "alm_pfc_16_hhigh",
+              "register": "W5BT9007"
             }
           ]
         }
