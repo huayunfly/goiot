@@ -76,9 +76,10 @@ void SamplingUIItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void SamplingUIItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    status_ = SamplingUIItemStatus::Finished;
+    // TEST code.
+    //status_ = SamplingUIItemStatus::Finished;
+    //update();
     QGraphicsItem::mouseDoubleClickEvent(event);
-    update();
 }
 
 
