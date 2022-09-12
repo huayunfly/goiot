@@ -66,7 +66,7 @@ FormLiquidDistributor::~FormLiquidDistributor()
     {
        db_.close();
     }
-    task_running_ = false; // Stop current task
+    task_running_.store(false); // Stop current task
     recipe_task_queue_.Close();
     for (auto& entry : threads_)
     {
@@ -86,13 +86,26 @@ bool FormLiquidDistributor::event(QEvent *event)
         Ui::RefreshStateEvent* e = static_cast<Ui::RefreshStateEvent*>(event);
         if (e->Name().compare("label_dist_a_run", Qt::CaseInsensitive) == 0)
         {
-
-            dist_a_run_ = (e->State() > 0) ? true : false;
+            if (e->State() > 0)
+            {
+                dist_a_run_.store(true);
+            }
+            else
+            {
+                dist_a_run_.store(false);
+            }
             task_run_cond_.notify_one();
         }
         else if (e->Name().compare("label_dist_b_run", Qt::CaseInsensitive) == 0)
         {
-            dist_b_run_ = (e->State() > 0) ? true : false;
+            if (e->State() > 0)
+            {
+                dist_b_run_.store(true);
+            }
+            else
+            {
+                dist_b_run_.store(false);
+            }
             task_run_cond_.notify_one();
         }
     }
@@ -105,36 +118,37 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
     std::vector<std::vector<QString>> values;
     RecipeUITableSetting tbl = GetRecipeUITableSetting();
 
-    // search
-    for (int row = 0; row < tbl.row_count; row++)
+    int port_distance;
+    if (category_ == LiquidDistributorCategory::SAMPLING)
     {
-        if (row == tbl.row_count / 2)
-        {
-            continue;
-        }
+        port_distance = 2;
 
-        int valid_row = row;
-        if (row > tbl.row_count / 2)
+    }
+    else if (category_ == LiquidDistributorCategory::COLLECTION)
+    {
+        port_distance = 1;
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid category");
+    }
+    // search by row, then by column
+    QString r_name = recipe_name + "_" + QString::number(QDateTime::currentSecsSinceEpoch());
+    for (int group = 0; group < tbl.channel_groups / 2; group++)
+    {
+        for (int row = 0; row < tbl.row_count; row++)
         {
-            valid_row--;
-        }
-        int port_distance;
-        if (category_ == LiquidDistributorCategory::SAMPLING)
-        {
-            port_distance = 2;
+            if (row == tbl.row_count / 2)
+            {
+                continue;
+            }
 
-        }
-        else if (category_ == LiquidDistributorCategory::COLLECTION)
-        {
-            port_distance = 1;
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid category");
-        }
+            int valid_row = row;
+            if (row > tbl.row_count / 2)
+            {
+                valid_row--;
+            }
 
-        for (int group = 0; group < tbl.channel_groups / 2; group++)
-        {
             // start point: (1a 2b) collection |beam| sampling (1a, 2a, 3b, 4b)
             //              (3a 4b) collection |beam| sampling (5a, 6a, 7b, 8b)
             int start_col_a = group * tbl.line_items;
@@ -209,7 +223,6 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
             // sampling or collection step
             values.push_back(std::vector<QString>());
             auto tail = values.rbegin();
-            QString r_name = recipe_name + "_" + QString::number(QDateTime::currentSecsSinceEpoch());
             int type = (category_ == LiquidDistributorCategory::SAMPLING) ?
                         TYPE_SAMPLING : TYPE_COLLECTION;
             int x = group/*0, 1 or only 0*/;
@@ -283,6 +296,50 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
                 tail->push_back(QString::number(control_code));
             }
         }
+    }
+    // End step.
+    if (values.size() > 0)
+    {
+        values.push_back(std::vector<QString>());
+        auto tail = values.rbegin();
+        int type = (category_ == LiquidDistributorCategory::SAMPLING) ?
+                    TYPE_SAMPLING : TYPE_COLLECTION;
+        int channel_a = 1; // placehold
+        int channel_b = 9; // placehold
+        int x = 0;
+        int y = 45; // to center position
+        int pos_a = 0; // placehold
+        int pos_b = 0; // placehold
+        int flow_limit_a = 0; // placehold
+        int flow_limit_b = 0; // placehold
+        int solvent_type_a = 0; // placehold
+        int solvent_type_b = 0; // placehold
+        int sampling_time_a = 0; // placehold
+        int sampling_time_b = 0; // placehold
+        int run_a = 0; // KEY parameter
+        int run_b = 0; // KEY parameter
+        tail->push_back(r_name);
+        tail->push_back(QString::number(type));
+        tail->push_back(QString::number(channel_a));
+        tail->push_back(QString::number(channel_b));
+        tail->push_back(QString::number(x));
+        tail->push_back(QString::number(y));
+        tail->push_back(QString::number(pos_a));
+        tail->push_back(QString::number(pos_b));
+        tail->push_back(QString::number(flow_limit_a));
+        tail->push_back(QString::number(flow_limit_b));
+        tail->push_back(QString::number(solvent_type_a));
+        tail->push_back(QString::number(solvent_type_b));
+        tail->push_back(QString::number(sampling_time_a));
+        tail->push_back(QString::number(sampling_time_b));
+        tail->push_back(QString::number(run_a));
+        tail->push_back(QString::number(run_b));
+        uint control_code = type + (channel_a << 2) +
+                (channel_b << 7) + (x << 12) + (y << 13) +
+                (flow_limit_a << 19) + (flow_limit_b << 20) +
+                (solvent_type_a << 21) + (solvent_type_b << 25) +
+                (run_a << 29) + (run_b << 30);
+        tail->push_back(QString::number(control_code));
     }
     if (db_ready_)
     {
@@ -809,12 +866,22 @@ bool FormLiquidDistributor::LoadRecipe(const QString& recipe_name)
         if (!is_ok) error_count++;
         int duration_b = values->at(INDEX_DURATION_B).toInt(&is_ok);
         if (!is_ok) error_count++;
+        int run_a = values->at(INDEX_RUN_A).toInt(&is_ok);
+        if (!is_ok) error_count++;
+        int run_b = values->at(INDEX_RUN_B).toInt(&is_ok);
+        if (!is_ok) error_count++;
 
         if (error_count > 0)
         {
             ClearUITable();
             QMessageBox::critical(0, "加载配方失败", "数据格式错误", QMessageBox::Ignore);
             return false;
+        }
+
+        // Skip the move-only step.
+        if (run_a == 0 && run_b == 0)
+        {
+            continue;
         }
 
         if ((type == TYPE_SAMPLING && category_ == LiquidDistributorCategory::SAMPLING) ||
@@ -960,8 +1027,8 @@ void FormLiquidDistributor::RunRecipeWorker()
         for (auto& entity : *task)
         {
             // Adjust purge duration
-            bool run_a = entity.run_a;
-            bool run_b = entity.run_b;
+            bool volatile run_a = entity.run_a;
+            bool volatile run_b = entity.run_b;
             int duration_a = entity.duration_a;
             int duration_b = entity.duration_b;
             if (entity.type == TYPE_SAMPLING_PURGE ||
@@ -991,22 +1058,30 @@ void FormLiquidDistributor::RunRecipeWorker()
                               error_msg.toLatin1().constData());
                 }
             }
+            // Abort task execution if run_a == run_b == 0 step,
+            // This kind of step always used for the end of the task:
+            // the distributor stops at a specifed position.
+            if (run_a == 0 && run_b == 0)
+            {
+                LogTaskStep(entity);
+                break;
+            }
             // Wait for PLC step run feedback
-            std::unique_lock<std::mutex> lk(mut);
-            if (!task_running_ || !task_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
+            std::unique_lock<std::mutex> lk(mut_);
+            if (!task_running_ || !task_run_cond_.wait_for(lk, std::chrono::seconds(60), [&] {
                         return (run_a == dist_a_run_) && (run_b == dist_b_run_); })
                     )
             {
-                qCritical("RunRecipeWorker() failed, %s", "No PLC feedback.");
+                qCritical("RunRecipeWorker() failed, %s", "No PLC step run feedback.");
                 StopTakingLiquidCmd(StatusCheckGroup::A);
                 StopTakingLiquidCmd(StatusCheckGroup::B);
-                //UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
-                //                   SamplingUIItem::SamplingUIItemStatus::Error);
-                //break; // no lk.unlock() needed.
-                if (!task_running_) // test code
-                {
-                    break;
-                }
+                UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
+                                   SamplingUIItem::SamplingUIItemStatus::Error);
+                break; // no lk.unlock() needed.
+//                if (!task_running_) // test code
+//                {
+//                    break;
+//                }
             }
             lk.unlock();
             // Runtime view displaying
@@ -1066,27 +1141,30 @@ void FormLiquidDistributor::RunRecipeWorker()
             }
             // Wait for PLC step stopped feedback
             lk.lock();
-            if (!task_running_ || !task_run_cond_.wait_for(lk, std::chrono::seconds(1), [&] {
+            if (!task_running_ || !task_run_cond_.wait_for(lk, std::chrono::seconds(20), [&] {
                         return (0 == dist_a_run_) && (0 == dist_b_run_); })
                     )
             {
-                //UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
-                //                   SamplingUIItem::SamplingUIItemStatus::Error);
-                //break;
-                if (!task_running_) // test code
-                {
-                    break;
-                }
+                qCritical("RunRecipeWorker() failed, %s", "No PLC step stopped feedback.");
+                UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
+                                   SamplingUIItem::SamplingUIItemStatus::Error);
+                break;
+//                if (!task_running_) // test code
+//                {
+//                    break;
+//                }
             }
             lk.unlock();
             // Runtime view displaying
             UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Finished,
                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
+            // Sleep seconds between send dist_run_a = 0 and next loop dist_run_a = 1
+            std::this_thread::sleep_for(std::chrono::seconds(10));
         }
         // Stop
         if (task_running_)
         {
-            task_running_ = false;
+            task_running_.store(false);
         }
         qInfo("recipe task [%s] finished", recipe_name.toLatin1().constData());
         Log2Window(recipe_name, "任务结束");

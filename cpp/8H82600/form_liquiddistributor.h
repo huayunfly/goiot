@@ -318,7 +318,7 @@ private:
     std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;
 
     // runtime
-    std::mutex mut;
+    std::mutex mut_;
     std::condition_variable task_run_cond_;
     std::vector<std::thread> threads_;
     goiot::ThreadSafeQueue<std::shared_ptr<std::vector<RecipeTaskEntity>>> recipe_task_queue_;
