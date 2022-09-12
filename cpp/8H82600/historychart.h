@@ -60,8 +60,12 @@ protected:
 
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
+    void handleMarkerClicked();
+
 private:
     void UpdateChart();
+
+    void ConnectMarkers(const QChart* chart);
 
     std::vector<QVector<QPointF>> QueryData(QString table, std::vector<QString> columns,
             std::pair<double, double> time_range);

@@ -1,5 +1,6 @@
 #include "trendchart.h"
 #include "events.h"
+#include <QtCharts/QLegendMarker>
 
 TrendChart::TrendChart(QWidget *parent,
                        const std::vector<ChartLineDef>& line_defs, const QString& title,
@@ -35,8 +36,6 @@ TrendChart::TrendChart(QWidget *parent,
     }
 
     QChart *chart = new QChart();
-    chart->legend()->show();
-    chart->legend()->setAlignment(Qt::AlignRight);
 
     auto axis_value = new QValueAxis();
     axis_value->setRange(value_range_.first, value_range_.second);
@@ -51,7 +50,6 @@ TrendChart::TrendChart(QWidget *parent,
     axis_time->setFormat("HH:mm");
     axis_time->setTickCount(11);
 
-    chart->setTitle(title_);
     chart->addAxis(axis_time, Qt::AlignBottom);
     chart->addAxis(axis_value, Qt::AlignLeft);
 
@@ -87,6 +85,12 @@ TrendChart::TrendChart(QWidget *parent,
         color_index++;
     }
 
+    ConnectMarkers(chart);
+
+    chart->setTitle(title_);
+    chart->legend()->show();
+    chart->legend()->setAlignment(Qt::AlignRight);
+
     this->setChart(chart);
     this->setRenderHint(QPainter::Antialiasing);
 
@@ -113,15 +117,19 @@ void TrendChart::AddOrUpdateData(const std::string& name,
 
 void TrendChart::mousePressEvent(QMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton)
+    int current_pos_x = event->pos().x();
+    qreal legend_x = this->chart()->legend()->pos().x();
+    if (event->button() == Qt::LeftButton && current_pos_x < legend_x)
     {
         QCursor cursor;
         cursor.setShape(Qt::ClosedHandCursor);
         QApplication::setOverrideCursor(cursor);
         last_pos_ = event->pos();
         auto_scroll_chart_ = false;
+        event->accept();
+        return;
     }
-    event->accept();
+    QChartView::mousePressEvent(event); // For QLegendMarker clicked.
 }
 
 void TrendChart::mouseMoveEvent(QMouseEvent *event)
@@ -172,14 +180,68 @@ void TrendChart::wheelEvent(QWheelEvent *event)
 
 void TrendChart::mouseReleaseEvent(QMouseEvent *event)
 {
-
     QApplication::restoreOverrideCursor();
-    if (event->button() == Qt::RightButton)
+    int current_pos_x = event->pos().x();
+    qreal legend_x = this->chart()->legend()->pos().x();
+    if (event->button() == Qt::RightButton && current_pos_x < legend_x)
     {
         this->chart()->zoomReset();
         auto_scroll_chart_ = true;
+        event->accept();
+        return;
     }
-    event->accept();
+    QChartView::mouseReleaseEvent(event); // For QLegendMarker clicked.
+}
+
+void TrendChart::handleMarkerClicked()
+{
+    QLegendMarker* marker = qobject_cast<QLegendMarker*> (sender());
+    Q_ASSERT(marker);
+
+    switch (marker->type())
+    {
+    case QLegendMarker::LegendMarkerTypeXY:
+    {
+        // Toggle visibility of series
+        marker->series()->setVisible(!marker->series()->isVisible());
+
+        // Turn legend marker back to visible, since hiding series also hides the marker
+        // and we don't want it to happen now.
+        marker->setVisible(true);
+
+        // Dim the marker, if series is not visible
+        qreal alpha = 1.0;
+
+        if (!marker->series()->isVisible())
+            alpha = 0.5;
+
+        QColor color;
+        QBrush brush = marker->labelBrush();
+        color = brush.color();
+        color.setAlphaF(alpha);
+        brush.setColor(color);
+        marker->setLabelBrush(brush);
+
+        brush = marker->brush();
+        color = brush.color();
+        color.setAlphaF(alpha);
+        brush.setColor(color);
+        marker->setBrush(brush);
+
+        QPen pen = marker->pen();
+        color = pen.color();
+        color.setAlphaF(alpha);
+        pen.setColor(color);
+        marker->setPen(pen);
+
+        break;
+    }
+    default:
+    {
+        qDebug() << "Unknown marker type";
+        break;
+    }
+    }
 }
 
 void TrendChart::UpdateChart()
@@ -221,5 +283,18 @@ void TrendChart::UpdateChart()
         {
             line->append(now_ms, value_pair.first);
         }
+    }
+}
+
+void TrendChart::ConnectMarkers(const QChart* chart)
+{
+    // Connect all markers to handler
+    const auto markers = chart->legend()->markers();
+    for (QLegendMarker *marker : markers)
+    {
+        // Disconnect possible existing connection to avoid multiple connections
+        QObject::disconnect(marker, &QLegendMarker::clicked,
+                            this, &TrendChart::handleMarkerClicked);
+        QObject::connect(marker, &QLegendMarker::clicked, this, &TrendChart::handleMarkerClicked);
     }
 }

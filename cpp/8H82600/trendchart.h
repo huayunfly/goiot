@@ -53,8 +53,12 @@ protected:
 
     void wheelEvent(QWheelEvent *event) override;
 
+    void handleMarkerClicked();
+
 private:
     void UpdateChart();
+
+    void ConnectMarkers(const QChart* chart);
 
 private:
     ThreadSafeLookupTable<std::string, std::pair<double/*value*/, double/*timestamp*/> > data_table_;
