@@ -16,40 +16,70 @@ def roi_mask(img, vertices):
     masked_img = cv2.bitwise_and(img, mask)
     return masked_img
 
-img = cv2.imread('sample1.jpg')
+img = cv2.imread('sample3.jpg')
 kernel = np.ones((5, 5), np.uint8)
 start_time = time.time()
 # convert the image to grayscale
 imgray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-#canny 
-# 1. 使用高斯模糊，去除噪音点（cv2.GaussianBlur）    
-# 2. 灰度转换（cv2.cvtColor）    
-# 3. 使用sobel算子，计算出每个点的梯度大小和梯度方向    
-# 4. 使用非极大值抑制(只有最大的保留)，消除边缘检测带来的杂散效应    
-# 5. 应用双阈值，来确定真实和潜在的边缘    
-# 6. 通过抑制弱边缘来完成最终的边缘检测
-edges = cv2.Canny(imgray, 60, 360, apertureSize=3, L2gradient=True)
+imgray_contours = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 #roi_vtx = np.array([[(0, img.shape[0]), (100, 100), (300, 300), (img.shape[1], img.shape[0])]])
-side_len = 80
-start_x = 110
-start_y = 220
+side_len = 250
+start_x = 100
+start_y = 200
 roi_vtx = np.array([[(start_x, start_y), (start_x + side_len, start_y), (start_x + side_len, start_y + side_len), (start_x, start_y + side_len)]])
-roi_edges = roi_mask(edges, roi_vtx)
+roi_mask_edges = roi_mask(imgray, roi_vtx)
+roi_edges = imgray[start_y: start_y + side_len, start_x: start_x + side_len]
 # For each and every pixel having value 1 in box 1, find a pixel having a value 1 in box 2.
 value1 = np.where(roi_edges == 255)
 average_distance = np.average(start_y - value1[1])
 
+# Canny edge detector [Canny86]
+# 1. 使用高斯模糊，去除噪音点（cv2.GaussianBlur）    
+# 2. 灰度转换（cv2.cvtColor）    
+# 3. 使用sobel算子(设置apertureSize)，计算出每个点的x,y向梯度大小，组合成4个方向导数    
+# 4. 保留局部方向导数最大值点（非极大值抑制），消除边缘检测带来的杂散效应    
+# 5. 应用双阈值，推荐2：1到3：1，梯度>大值，视作边缘候选点。梯度<小值，丢弃。小值<梯度<大值，与大值边缘点连接的，保留。    
+# 6. 将边缘候选点组装为轮廓。
+# 7. 最后一个参数指示计算方向梯度算法，true: L2-norm = sqrt((dI/dx)^2 + (dI/dy)^2)
+#    false: L1-norm = abs(dI/dx) + abs(dI/dy)
+lower_threshold = 15
+upper_threshold = 30
+edges = cv2.Canny(roi_edges, lower_threshold, upper_threshold, apertureSize=3, L2gradient=True)
+
+# Find contours
+contours_and_hierarchy = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+# Filter nearly horizontal lines
+horizon_line_idx = []
+direction = np.tan(np.pi * (15 / 180))
+min_line_pixels = 30
+for i in range(0, len(contours_and_hierarchy[0])):
+    if len(contours_and_hierarchy[0][i]) < min_line_pixels:
+        continue
+    line = cv2.fitLine(contours_and_hierarchy[0][i], cv2.DIST_L2, 0, 0.01, 0.01)
+    # line structure: (vx, vy, x0, y0)
+    if abs(line[1] / line[0]) < direction:
+        horizon_line_idx.append(i)
+for i in horizon_line_idx:
+    # Add ROI x-y offset
+    for k in range(0, len(contours_and_hierarchy[0][i])):
+        contours_and_hierarchy[0][i][k][0][0] += start_x
+        contours_and_hierarchy[0][i][k][0][1] += start_y
+    cv2.drawContours(imgray_contours, contours_and_hierarchy[0], i, (0, 0, 255), 2)
+# Last: draw ROI border
+cv2.drawContours(imgray_contours, [roi_vtx], 0, (255, 0, 0), 2)
+
 end_time = time.time()
 time_cost = end_time - start_time
-print('time cost %0.5f sec' %time_cost)
+print('time cost %0.3f sec' %time_cost)
 
 # Plot
-plt.subplot(131), plt.imshow(img, cmap='gray')
+plt.subplot(141), plt.imshow(img, cmap='gray')
 plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-plt.subplot(132), plt.imshow(edges, cmap='gray')
-plt.title('Canny'), plt.xticks([]), plt.yticks([])
-plt.subplot(133), plt.imshow(roi_edges, cmap='gray')
+plt.subplot(142), plt.imshow(roi_mask_edges, cmap='gray')
 plt.title('ROI'), plt.xticks([]), plt.yticks([])
+plt.subplot(143), plt.imshow(edges, cmap='gray')
+plt.title('Canny'), plt.xticks([]), plt.yticks([])
+plt.subplot(144), plt.imshow(imgray_contours, cmap='gray')
+plt.title('Contours'), plt.xticks([]), plt.yticks([])
 plt.show()
