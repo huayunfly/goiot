@@ -4,12 +4,15 @@
 #include <QFont>
 
 
-DialogRecipeMgr::DialogRecipeMgr(QWidget *parent, const std::vector<QString>& recipe_names) :
+DialogRecipeMgr::DialogRecipeMgr(QWidget *parent, const std::vector<QString>& recipe_names,
+                                 const std::vector<std::vector<int>>& params_value) :
     QDialog(parent), recipe_names_(recipe_names),
-    ui(new Ui::DialogRecipeMgr), action_(RecipeAction::NONE)
+    ui(new Ui::DialogRecipeMgr), action_(RecipeAction::NONE),
+    image_param_values_(params_value)
 {
     ui->setupUi(this);
     InitRecipeTable();
+    InitImageParamsTable();
 }
 
 DialogRecipeMgr::~DialogRecipeMgr()
@@ -48,6 +51,43 @@ void DialogRecipeMgr::InitRecipeTable()
     }
     connect(ui->tableWidgetRecipe, &QTableWidget::itemClicked, this,
             [&] () {this->setWindowTitle(QString("配方管理 -> ") + ui->tableWidgetRecipe->currentItem()->text());});
+}
+
+void DialogRecipeMgr::InitImageParamsTable()
+{
+    std::vector<QString> param_names = {"ROI_X", "ROI_Y", "ROI_SIDE", "LOWER_THRESHOLD",
+                                       "UPPER_THRESHOLD", "DIRECTION", "MIN_LEN", "MIN_COUNT", "MIN_RATIO"};
+
+    if (image_param_values_.empty())
+    {
+        image_param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 80},
+                               {200, 100, 280, 15, 30, 15, 10, 10, 80}};
+    }
+
+    ui->tableWidgetParams->setColumnCount(3);
+    ui->tableWidgetParams->setRowCount(param_names.size());
+    ui->tableWidgetParams->setHorizontalHeaderLabels(QStringList({"名称", "V1值", "V2值"}));
+    ui->tableWidgetParams->horizontalHeader()->setVisible(true);
+    ui->tableWidgetParams->verticalHeader()->setVisible(false);
+    ui->tableWidgetParams->horizontalHeader()->setDefaultSectionSize(180);
+    ui->tableWidgetParams->verticalHeader()->setDefaultSectionSize(25);
+    ui->tableWidgetParams->setAlternatingRowColors(true);
+
+    int index = 0;
+    for (auto& name : param_names)
+    {
+        ui->tableWidgetParams->setItem(index, 0, new QTableWidgetItem(name));
+        ui->tableWidgetParams->item(index, 0)->setFont(QFont("tahoma", 9, QFont::Black));
+        ui->tableWidgetParams->item(index, 0)->setFlags(Qt::ItemIsEnabled);
+
+        ui->tableWidgetParams->setItem(index, 1, new QTableWidgetItem(
+                                           QString::number(image_param_values_.at(0).at(index))));
+        ui->tableWidgetParams->item(index, 1)->setFont(QFont("tahoma", 9, QFont::Normal));
+        ui->tableWidgetParams->setItem(index, 2, new QTableWidgetItem(
+                                           QString::number(image_param_values_.at(1).at(index))));
+        ui->tableWidgetParams->item(index, 2)->setFont(QFont("tahoma", 9, QFont::Normal));
+        index++;
+    }
 }
 
 void DialogRecipeMgr::on_pushButtonLoad_clicked()
@@ -106,5 +146,30 @@ void DialogRecipeMgr::on_pushButtonStop_clicked()
     }
     acting_recipe_name_ = ui->tableWidgetRecipe->currentItem()->text();
     action_ = RecipeAction::STOP;
+    this->close();
+}
+
+void DialogRecipeMgr::on_pushButtonUpdateParams_clicked()
+{
+    image_param_values_.clear();
+    image_param_values_.resize(2);
+
+    for (int i = 0; i < ui->tableWidgetParams->rowCount(); i++)
+    {
+        bool ok1, ok2;
+        int v1 = ui->tableWidgetParams->item(i, 1)->text().toInt(&ok1);
+        int v2 = ui->tableWidgetParams->item(i, 2)->text().toInt(&ok2);
+        if (ok1 && ok2)
+        {
+            image_param_values_.at(0).push_back(v1);
+            image_param_values_.at(1).push_back(v2);
+        }
+        else
+        {
+            image_param_values_.at(0).push_back(0);
+            image_param_values_.at(1).push_back(0);
+        }
+    }
+    action_ = RecipeAction::UPDATE_PARAMS;
     this->close();
 }

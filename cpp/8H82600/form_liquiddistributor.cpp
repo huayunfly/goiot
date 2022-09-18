@@ -7,6 +7,7 @@
 #include <QAction>
 #include <cassert>
 #include <algorithm>
+#include <cmath>
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -32,7 +33,8 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     task_running_(false),
     dist_a_run_(false),
     dist_b_run_(false),
-    timers_(2)
+    timers_(2),
+    image_params_(2)
 {
     ui->setupUi(this);
     InitUiState();
@@ -563,7 +565,7 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(25);
     ui->tableWidget->setAlternatingRowColors(true);
     ui->tableWidget->resize(1200, 1100);
-    QColor seperator_color = QColor(72, 118, 255);
+    QColor seperator_color = Qt::darkGray;
 
     // Initialize channel number, sampling_time, purge_time, solvent type
     QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
@@ -1346,7 +1348,7 @@ void FormLiquidDistributor::paintEvent(QPaintEvent *e)
     FormCommon::paintEvent(e);
 }
 
-void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
+void FormLiquidDistributor::LoadManagementWindow()
 {
     std::vector<QString> recipe_names;
     QString error_msg;
@@ -1359,7 +1361,6 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
     DialogRecipeMgr dlg_recipe_mgr = DialogRecipeMgr(this, recipe_names);
     QString title = "配方管理 -> " + loaded_recipe_name_;
     dlg_recipe_mgr.setWindowTitle(title);
-    dlg_recipe_mgr.move(event->globalPos() - QPoint(50, 50));
     dlg_recipe_mgr.exec();
     QString recipe_name = dlg_recipe_mgr.GetActingRecipeName();
     DialogRecipeMgr::RecipeAction act = dlg_recipe_mgr.GetRecipeAction();
@@ -1436,8 +1437,26 @@ void FormLiquidDistributor::mouseDoubleClickEvent(QMouseEvent *event)
                 }
             }
         }
+        else if (DialogRecipeMgr::RecipeAction::UPDATE_PARAMS == act)
+        {
+            std::vector<std::vector<int>> params = dlg_recipe_mgr.GetImageParams();
+            {
+                std::lock_guard<std::shared_mutex> lk(shared_mut_);
+                for (std::size_t i = 0; i < params.size(); i++)
+                {
+                    image_params_.at(i).roi_x = params.at(i).at(0);
+                    image_params_.at(i).roi_y = params.at(i).at(1);
+                    image_params_.at(i).roi_side = params.at(i).at(2);
+                    image_params_.at(i).canny_lower_threshold = params.at(i).at(3);
+                    image_params_.at(i).canny_upper_threshold = params.at(i).at(4);
+                    image_params_.at(i).fit_line_degree = params.at(i).at(5);
+                    image_params_.at(i).min_contour_len = params.at(i).at(6);
+                    image_params_.at(i).min_line_count = params.at(i).at(7);
+                    image_params_.at(i).min_ratio = params.at(i).at(8) / 100.0;
+                }
+            }
+        }
     }
-    event->accept();
 }
 
 void FormLiquidDistributor::UpdateImage(int index)
@@ -1445,54 +1464,116 @@ void FormLiquidDistributor::UpdateImage(int index)
     vcaps_.at(index) >> vframes_.at(index);
     if (vframes_.at(index).data != nullptr)
     {
-        cv::Mat gray, edges;
+        cv::Mat gray, roi, edges;
         std::vector<std::vector<cv::Point>> contours;
         std::vector<cv::Vec4i> hierarchy;
         cv::cvtColor(vframes_.at(index), gray, cv::COLOR_BGR2GRAY);
-        cv::Canny(gray, edges, 60, 360, 3/*apertureSize*/, true/*L2gradient*/);
+
+        // Prepare params
+        std::shared_lock<std::shared_mutex> lk(shared_mut_);
+        double canny_lower_threshold = image_params_.at(index).canny_lower_threshold;
+        double canny_upper_threshold = image_params_.at(index).canny_upper_threshold;
+        int canny_aperture_size = image_params_.at(index).canny_aperture_size;
+        int roi_x = image_params_.at(index).roi_x;
+        int roi_y = image_params_.at(index).roi_y;
+        int roi_side = image_params_.at(index).roi_side;
+        double fit_line_degree = image_params_.at(index).fit_line_degree;
+        int min_contour_len = image_params_.at(index).min_contour_len;
+        int min_line_count = image_params_.at(index).min_line_count;
+        double min_ratio = image_params_.at(index).min_ratio;
+        lk.unlock();
+
+        // Detect
+        if (min_ratio > 1.0)
+        {
+            min_ratio = 1.0;
+        }
+        if (roi_y < gray.size[0] && roi_x < gray.size[1] &&
+                roi_y + roi_side < gray.size[0] && roi_x + roi_side < gray.size[1])
+        {
+            roi = gray(cv::Range(roi_y, roi_y + roi_side),
+                       cv::Range(roi_x, roi_x + roi_side));
+        }
+        else
+        {
+            roi = gray;
+        }
+
+        cv::Canny(roi, edges, canny_lower_threshold, canny_upper_threshold,
+                  canny_aperture_size, true/*L2gradient*/);
         cv::findContours(edges,
                          contours,
                          hierarchy,
                          cv::RETR_LIST,
                          cv::CHAIN_APPROX_SIMPLE);
         std::vector<int> lines_idx;
+        double direction = std::tan(M_PI * (std::abs(fit_line_degree) / 180.0));
+        int section_num = 4;
+        std::vector<int> lines_in_section(section_num);
         for (std::size_t i = 0; i < contours.size(); i++)
         {
-            // collect mid-length arc
+            // Omit short arcs
             int arc_len = cv::arcLength(contours.at(i), false);
-            if (arc_len > 80 && contours.at(i).size() < 300)
+            if (arc_len < min_contour_len)
+            {
+                continue;
+            }
+            // line structure: (vx, vy, x0, y0)
+            cv::Vec4f line;
+            cv::fitLine(contours.at(i), line, cv::DIST_L2, 0, 0.01, 0.01);
+            if (std::abs(line[1] / line[0]) < direction)
             {
                 lines_idx.push_back(i);
-            }
-        }
-        std::vector<int> match_idx;
-        for (auto& idx : lines_idx)
-        {
-            //            auto max = std::max_element(contours.at(idx).begin(),
-            //                                        contours.at(idx).end(),
-            //                                        [](cv::Point a, cv::Point b) {return a.y < b.y;});
-            //            int max_idx = std::distance(contours.at(idx).begin(), max);
-            //            auto min = std::min_element(contours.at(idx).begin(),
-            //                                        contours.at(idx).end(),
-            //                                        [](cv::Point a, cv::Point b) {return a.y > b.y;});
-            //            int min_idx = std::distance(contours.at(idx).begin(), min);
-            //            if (contours.at(idx).at(max_idx).y < 240 && contours.at(idx).at(min_idx).y > 100)
-            //            {
-            //                match_idx.push_back(idx);
-            //            }
-            cv::Vec4f line;
-            // find the optimal line
-            cv::fitLine(contours.at(idx), line, cv::DIST_L2, 0, 0.01, 0.01);
-            if (line[3] < 240 && line[3] > 120)
-            {
-                match_idx.push_back(idx);
+                // Map the fitted line to different ROI section by y0
+                lines_in_section.at(int(line[3] / (roi_side / section_num))) += 1;
             }
         }
         //cv::cvtColor(video_frame_0, video_frame_0, CV_BGR2RGB);
-        for (auto& i : match_idx)
+
+        // Draw liquid level
+        if (lines_idx.size() > static_cast<std::size_t>(min_line_count))
         {
-            cv::drawContours(vframes_.at(index), contours, i, cv::Scalar(255, 0, 0), 3);
+            std::vector<double> ratio_in_section(section_num);
+            std::transform(lines_in_section.begin(), lines_in_section.end(),
+                           ratio_in_section.begin(), [=](int i) {
+                                    return double(i) / lines_idx.size(); } );
+            for (int i = 0; i < section_num; i++)
+            {
+                ratio_in_section.at(i) = lines_in_section.at(i) / double(lines_idx.size());
+            }
+            auto max_iter = std::max_element(ratio_in_section.begin(),
+                                                ratio_in_section.end());
+            std::size_t max_index = std::distance(ratio_in_section.begin(),
+                                                  max_iter);
+            if (*max_iter > min_ratio)
+            {
+                int level_y = static_cast<int>(
+                            roi_y + max_index * roi_side / section_num + roi_side / section_num / 2);
+                cv::line(vframes_.at(index), cv::Point(roi_x, level_y),
+                         cv::Point(roi_x + roi_side, level_y), cv::Scalar(0, 255, 0), 2);
+//                if (max_index == 0)
+//                {
+//                    found_level = true;
+//                }
+            }
         }
+
+        for (auto i : lines_idx)
+        {
+            for (auto& p : contours[i])
+            {
+                p.x += roi_x;
+                p.y += roi_y;
+            }
+            cv::drawContours(vframes_.at(index), contours, i, cv::Scalar(255, 0, 0), 2);
+        }
+        // Draw ROI
+        std::vector<std::vector<cv::Point>> roi_contours = {{cv::Point(roi_x, roi_y),
+                                                             cv::Point(roi_x + roi_side, roi_y),
+                                                             cv::Point(roi_x + roi_side, roi_y + roi_side),
+                                                             cv::Point(roi_x, roi_y + roi_side)}};
+        cv::drawContours(vframes_.at(index), roi_contours, 0, cv::Scalar(0, 255, 255), 2);
+
         this->update();
     }
 }
@@ -1860,4 +1941,9 @@ void FormLiquidDistributor::on_pushButton_4_clicked()
     QRCodeGenerator encoder;
     auto code = encoder.Encode("https://bing.com");
     this->ui->label_qr->setPixmap(encoder.ToQPixmap(code, "yashen"));
+}
+
+void FormLiquidDistributor::on_pushButtonManage_clicked()
+{
+    LoadManagementWindow();
 }

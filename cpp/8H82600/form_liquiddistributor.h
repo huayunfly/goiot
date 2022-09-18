@@ -9,6 +9,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <future>
 #include <atomic>
 #include <form_common.h>
@@ -84,6 +85,37 @@ struct RecipeUITableSetting
     int work_positions;
 };
 
+struct ImageParams
+{
+    ImageParams(double lower_threshold = 15,
+                double upper_threshold = 30,
+                int aperture_size = 3,
+                int x = 200,
+                int y = 100,
+                int side = 280,
+                double line_degree = 15,
+                int min_len = 30,
+                int min_count = 10,
+                double ratio = 0.8) :
+        canny_lower_threshold(lower_threshold), canny_upper_threshold(upper_threshold),
+        canny_aperture_size(aperture_size), roi_x(x), roi_y(y), roi_side(side),
+        fit_line_degree(line_degree), min_contour_len(min_len), min_line_count(min_count),
+        min_ratio(ratio)
+    {
+
+    }
+    double canny_lower_threshold;
+    double canny_upper_threshold;
+    int canny_aperture_size;
+    int roi_x;
+    int roi_y;
+    int roi_side;
+    double fit_line_degree;
+    int min_contour_len;
+    int min_line_count;
+    double min_ratio;
+};
+
 class FormLiquidDistributor : public FormCommon
 {
     Q_OBJECT
@@ -110,8 +142,6 @@ public:
 protected:
     void paintEvent(QPaintEvent* e) override;
 
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-
 private slots:
     void on_pushButton_clicked();
 
@@ -124,6 +154,8 @@ private slots:
 
     void on_pushButton_4_clicked();
 
+    void on_pushButtonManage_clicked();
+
 private:
     //(Deprecated) Save the procedure parameter to a record string.
     QString SaveLiquidSamplingProcedure();
@@ -131,6 +163,9 @@ private:
     void LoadLiquidSamplingProcedure(const QString& record);
     //(Deprecated) Unpack the record string to the parameter list.
     std::list<std::vector<int>> SamplingRecordToList(const QString& record);
+
+    // Load flow management form.
+    void LoadManagementWindow();
 
     // Get the setting for the recipe table
     RecipeUITableSetting GetRecipeUITableSetting();
@@ -269,6 +304,9 @@ private:
     bool DeleteRecipeFromDB(const QString& tablename, const QString& recipe_name,
                             QString& error_message);
 
+    // Log to UI window
+    void LogTaskStep();
+
 private:
     Ui::FormLiquidDistributor *ui;
     LiquidDistributorCategory category_;
@@ -319,6 +357,7 @@ private:
 
     // runtime
     std::mutex mut_;
+    std::shared_mutex shared_mut_;
     std::condition_variable task_run_cond_;
     std::vector<std::thread> threads_;
     goiot::ThreadSafeQueue<std::shared_ptr<std::vector<RecipeTaskEntity>>> recipe_task_queue_;
@@ -331,7 +370,9 @@ private:
     std::vector<cv::Mat> vframes_;
     std::vector<QTimer> timers_;
     std::vector<QLabel*> image_labels_;
-    void LogTaskStep();
+
+    // image processing parameters
+    std::vector<ImageParams> image_params_;
 
     // UI
     std::shared_ptr<QMenu> log_menu;

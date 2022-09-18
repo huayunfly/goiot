@@ -13,7 +13,8 @@ class DialogRecipeMgr : public QDialog
 
 public:
     explicit DialogRecipeMgr(QWidget *parent = nullptr,
-                             const std::vector<QString>& recipe_names = {});
+                             const std::vector<QString>& recipe_names = {},
+                             const std::vector<std::vector<int>>& params_value = {});
     ~DialogRecipeMgr();
 
     enum class RecipeAction
@@ -23,7 +24,8 @@ public:
         SAVE = 2,
         DELETE = 3,
         RUN = 4,
-        STOP = 5
+        STOP = 5,
+        UPDATE_PARAMS = 6
     };
 
     RecipeAction GetRecipeAction()
@@ -34,6 +36,11 @@ public:
     QString GetActingRecipeName()
     {
         return acting_recipe_name_;
+    }
+
+    std::vector<std::vector<int>> GetImageParams()
+    {
+        return image_param_values_;
     }
 
 private slots:
@@ -47,14 +54,19 @@ private slots:
 
     void on_pushButtonStop_clicked();
 
+    void on_pushButtonUpdateParams_clicked();
+
 private:
     void InitRecipeTable();
+
+    void InitImageParamsTable();
 
 private:
     std::vector<QString> recipe_names_;
     Ui::DialogRecipeMgr *ui;
     RecipeAction action_;
     QString acting_recipe_name_;
+    std::vector<std::vector<int>> image_param_values_;
 };
 
 #endif // DIALOG_RECIPE_MGR_H
