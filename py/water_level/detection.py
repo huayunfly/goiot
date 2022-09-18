@@ -52,20 +52,39 @@ contours_and_hierarchy = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX
 # Filter nearly horizontal lines
 horizon_line_idx = []
 direction = np.tan(np.pi * (15 / 180))
-min_line_pixels = 30
+min_line_len = 30
+# Section
+section_num = 4
+lines_in_section = [0] * section_num
 for i in range(0, len(contours_and_hierarchy[0])):
-    if len(contours_and_hierarchy[0][i]) < min_line_pixels:
+    if len(contours_and_hierarchy[0][i]) < min_line_len:
         continue
     line = cv2.fitLine(contours_and_hierarchy[0][i], cv2.DIST_L2, 0, 0.01, 0.01)
     # line structure: (vx, vy, x0, y0)
     if abs(line[1] / line[0]) < direction:
         horizon_line_idx.append(i)
+        lines_in_section[int(line[3] / (side_len / section_num))] += 1
 for i in horizon_line_idx:
     # Add ROI x-y offset
     for k in range(0, len(contours_and_hierarchy[0][i])):
         contours_and_hierarchy[0][i][k][0][0] += start_x
         contours_and_hierarchy[0][i][k][0][1] += start_y
     cv2.drawContours(imgray_contours, contours_and_hierarchy[0], i, (0, 0, 255), 2)
+
+MIN_LINES = 5
+MIN_RATIO = 0.7
+if len(horizon_line_idx) > MIN_LINES:
+    # Get the max fitted lines ratio in ROI sections
+    ratio_in_section = list(map(lambda i : i / len(horizon_line_idx), lines_in_section))
+    max_ratio = max(ratio_in_section)
+    max_index = ratio_in_section.index(max_ratio)
+    print('max fitted line at index[%d] with ratio %.1f' %(max_index, max_ratio))
+    
+    if max_ratio > MIN_RATIO:
+        # Draw liquid level (the middle line of the section)
+        level_y = int(start_y + max_index * side_len / section_num + side_len / section_num / 2)
+        cv2.line(imgray_contours, (start_x, level_y), (start_x + side_len, level_y), (0, 255, 0), 2)
+
 # Last: draw ROI border
 cv2.drawContours(imgray_contours, [roi_vtx], 0, (255, 0, 0), 2)
 
