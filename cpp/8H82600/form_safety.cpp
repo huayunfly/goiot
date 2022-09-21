@@ -23,7 +23,7 @@ FormSafety::FormSafety(QWidget *parent) :
     ui->expStatusTableWidget->verticalHeader()->setVisible(false);
     ui->expStatusTableWidget->horizontalHeader()->setDefaultSectionSize(80);
     ui->expStatusTableWidget->setAlternatingRowColors(true);
-    ui->expStatusTableWidget->resize(500, 1200);
+    ui->expStatusTableWidget->resize(320, 800);
 
     std::vector<QString> names;
     for (int i = 0; i < 16; i++)

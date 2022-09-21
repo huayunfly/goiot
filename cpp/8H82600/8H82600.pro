@@ -49,6 +49,7 @@ SOURCES += \
     mainwindow.cpp \
     qrcode_generator.cpp \
     safety_policy.cpp \
+    safety_ui_item.cpp \
     sampling_ui_item.cpp \
     trendchart.cpp
 
@@ -88,6 +89,7 @@ HEADERS += \
     qrcode_generator.h \
     resourcedef.h \
     safety_policy.h \
+    safety_ui_item.h \
     sampling_ui_item.h \
     threadsafe_lookup_table.h \
     trendchart.h
