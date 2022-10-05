@@ -45,6 +45,7 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     if (category == LiquidDistributorCategory::SAMPLING)
     {
         InitVideoCaps();
+        LoadImageParams();
     }
 
     // For the recipe setting table
@@ -359,6 +360,99 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
         QMessageBox::critical(0, "保存配方失败", "数据库未连接", QMessageBox::Ignore);
         return false;
     }
+}
+
+bool FormLiquidDistributor::SaveImageParams()
+{
+    std::shared_lock<std::shared_mutex> lk(shared_mut_);
+    std::vector<std::vector<QString>> values({image_params_.at(0).toValue(0),
+                                             image_params_.at(1).toValue(1)});
+    lk.unlock();
+
+    if (db_ready_)
+    {
+        QSqlQuery query(db_);
+        QString error_msg;
+        bool ok = UpdateImageParamsToDB(image_params_table_name_, image_param_columns_,
+                    QString("name"), values, query, error_msg);
+        if (!ok)
+        {
+            QMessageBox::critical(0, "保存图像参数失败", error_msg, QMessageBox::Ignore);
+        }
+        return ok;
+    }
+    else
+    {
+        QMessageBox::critical(0, "保存图像参数失败", "数据库未连接", QMessageBox::Ignore);
+        return false;
+    }
+}
+
+bool FormLiquidDistributor::LoadImageParams()
+{
+    if (!db_ready_)
+    {
+        QMessageBox::critical(0, "加载图像失败", "数据库未连接", QMessageBox::Ignore);
+        return false;
+    }
+    QString error_msg;
+    std::vector<std::shared_ptr<std::vector<QString>>> value_list;
+    QSqlQuery query(db_);
+    std::vector<QString> image_names {"V0", "V1"};
+    for (std::size_t i = 0; i < image_names.size(); i++)
+    {
+        bool ok = ReadRecordsFromDB(image_params_table_name_, QString("name"),
+                                    image_names.at(i), image_param_columns_,
+                                    query, value_list, error_msg);
+        if (!ok)
+        {
+            QMessageBox::critical(0, "加载图像参数失败", error_msg, QMessageBox::Ignore);
+            return false;
+        }
+        int index = 1; // jump 'name'
+        for (auto& values : value_list)
+        {
+            bool is_ok;
+            int error_count = 0;
+            int roi_x = values->at(index++).toInt(&is_ok);
+            if (!is_ok) error_count++;
+            int roi_y = values->at(index++).toInt(&is_ok);
+            if (!is_ok) error_count++;
+            int roi_side = values->at(index++).toInt(&is_ok);
+            if (!is_ok) error_count++;
+            double lower_threshold = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
+            double upper_threshold = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
+            double direction = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
+            int min_len = values->at(index++).toInt(&is_ok);
+            if (!is_ok) error_count++;
+            int min_count = values->at(index++).toInt(&is_ok);
+            if (!is_ok) error_count++;
+            double min_ratio = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
+            if (error_count > 0)
+            {
+                QMessageBox::critical(0, "加载图像参数失败", "数据格式错误", QMessageBox::Ignore);
+                return false;
+            }
+            else
+            {
+                std::lock_guard<std::shared_mutex> lk(shared_mut_);
+                image_params_.at(i).roi_x = roi_x;
+                image_params_.at(i).roi_y = roi_y;
+                image_params_.at(i).roi_side = roi_side;
+                image_params_.at(i).canny_lower_threshold = lower_threshold;
+                image_params_.at(i).canny_upper_threshold = upper_threshold;
+                image_params_.at(i).fit_line_degree = direction;
+                image_params_.at(i).min_contour_len = min_len;
+                image_params_.at(i).min_line_count = min_count;
+                image_params_.at(i).min_ratio = min_ratio;
+            }
+        }
+    }
+    return true;
 }
 
 std::list<std::vector<int>> FormLiquidDistributor::SamplingRecordToList(
@@ -825,8 +919,9 @@ bool FormLiquidDistributor::LoadRecipe(const QString& recipe_name)
     QString error_msg;
     std::vector<std::shared_ptr<std::vector<QString>>> value_list;
     QSqlQuery query(db_);
-    bool ok = ReadRecipeFromDB(recipe_table_name_, recipe_name, table_columns_,
-                               query, value_list, error_msg);
+    bool ok = ReadRecordsFromDB(recipe_table_name_, QString("recipe_name"),
+                                recipe_name, table_columns_, query,
+                                value_list, error_msg);
     if (!ok)
     {
         QMessageBox::critical(0, "加载配方失败", error_msg, QMessageBox::Ignore);
@@ -947,7 +1042,8 @@ bool FormLiquidDistributor::DispatchRecipeTask(const QString& recipe_name)
     QString error_msg;
     std::vector<std::shared_ptr<std::vector<QString>>> value_list;
     QSqlQuery query(db_);
-    bool ok = ReadRecipeFromDB(recipe_table_name_, recipe_name, table_columns_,
+    bool ok = ReadRecordsFromDB(recipe_table_name_, QString("recipe_name"),
+                               recipe_name, table_columns_,
                                query, value_list, error_msg);
     if (!ok)
     {
@@ -1039,7 +1135,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 duration_a *= 2;
                 duration_b *= 2;
             }
-            std::vector<QString> values = entity.ToValues();
+            std::vector<QString> values = entity.ToValue();
             // Send plc command run
             bool ok = write_data_func_(this->objectName(), control_code_name_,
                                   QString::number(entity.control_code));
@@ -1425,10 +1521,17 @@ void FormLiquidDistributor::LoadManagementWindow()
         QMessageBox::critical(0, "配方管理", error_msg, QMessageBox::Ignore);
         return;
     }
-    DialogRecipeMgr dlg_recipe_mgr = DialogRecipeMgr(this, recipe_names);
+    // Get image parameters.
+    std::shared_lock<std::shared_mutex> lk(shared_mut_);
+    std::vector<std::vector<double>> image_params {image_params_.at(0).toDoubleValue(),
+                                               image_params_.at(1).toDoubleValue()};
+    lk.unlock();
+    // Call the dialog.
+    DialogRecipeMgr dlg_recipe_mgr = DialogRecipeMgr(this, recipe_names, image_params);
     QString title = "配方管理 -> " + loaded_recipe_name_;
     dlg_recipe_mgr.setWindowTitle(title);
     dlg_recipe_mgr.exec();
+    // Dialog closed.
     QString recipe_name = dlg_recipe_mgr.GetActingRecipeName();
     DialogRecipeMgr::RecipeAction act = dlg_recipe_mgr.GetRecipeAction();
     if ((DialogRecipeMgr::RecipeAction::NONE != act &&
@@ -1506,7 +1609,7 @@ void FormLiquidDistributor::LoadManagementWindow()
         }
         else if (DialogRecipeMgr::RecipeAction::UPDATE_PARAMS == act)
         {
-            std::vector<std::vector<int>> params = dlg_recipe_mgr.GetImageParams();
+            std::vector<std::vector<double>> params = dlg_recipe_mgr.GetImageParams();
             {
                 std::lock_guard<std::shared_mutex> lk(shared_mut_);
                 for (std::size_t i = 0; i < params.size(); i++)
@@ -1519,9 +1622,10 @@ void FormLiquidDistributor::LoadManagementWindow()
                     image_params_.at(i).fit_line_degree = params.at(i).at(5);
                     image_params_.at(i).min_contour_len = params.at(i).at(6);
                     image_params_.at(i).min_line_count = params.at(i).at(7);
-                    image_params_.at(i).min_ratio = params.at(i).at(8) / 100.0;
+                    image_params_.at(i).min_ratio = params.at(i).at(8);
                 }
             }
+            SaveImageParams();
         }
     }
 }
@@ -1531,124 +1635,118 @@ void FormLiquidDistributor::UpdateImage(int index)
     if (!task_running_.load())
     {
         vcaps_.at(index) >> vframes_.at(index);
-        this->update();
-        return;
-    }
-
-    vcaps_.at(index) >> vframes_.at(index);
-    if (vframes_.at(index).data != nullptr)
-    {
-        cv::Mat gray, roi, edges;
-        std::vector<std::vector<cv::Point>> contours;
-        std::vector<cv::Vec4i> hierarchy;
-        cv::cvtColor(vframes_.at(index), gray, cv::COLOR_BGR2GRAY);
-
-        // Prepare params
-        std::shared_lock<std::shared_mutex> lk(shared_mut_);
-        double canny_lower_threshold = image_params_.at(index).canny_lower_threshold;
-        double canny_upper_threshold = image_params_.at(index).canny_upper_threshold;
-        int canny_aperture_size = image_params_.at(index).canny_aperture_size;
-        int roi_x = image_params_.at(index).roi_x;
-        int roi_y = image_params_.at(index).roi_y;
-        int roi_side = image_params_.at(index).roi_side;
-        double fit_line_degree = image_params_.at(index).fit_line_degree;
-        int min_contour_len = image_params_.at(index).min_contour_len;
-        int min_line_count = image_params_.at(index).min_line_count;
-        double min_ratio = image_params_.at(index).min_ratio;
-        lk.unlock();
-
-        // Detect
-        if (min_ratio > 1.0)
+        if (vframes_.at(index).data != nullptr)
         {
-            min_ratio = 1.0;
-        }
-        if (roi_y < gray.size[0] && roi_x < gray.size[1] &&
-                roi_y + roi_side < gray.size[0] && roi_x + roi_side < gray.size[1])
-        {
-            roi = gray(cv::Range(roi_y, roi_y + roi_side),
-                       cv::Range(roi_x, roi_x + roi_side));
-        }
-        else
-        {
-            roi = gray;
-        }
+            cv::Mat gray, roi, edges;
+            std::vector<std::vector<cv::Point>> contours;
+            std::vector<cv::Vec4i> hierarchy;
+            cv::cvtColor(vframes_.at(index), gray, cv::COLOR_BGR2GRAY);
 
-        cv::Canny(roi, edges, canny_lower_threshold, canny_upper_threshold,
-                  canny_aperture_size, true/*L2gradient*/);
-        cv::findContours(edges,
-                         contours,
-                         hierarchy,
-                         cv::RETR_LIST,
-                         cv::CHAIN_APPROX_SIMPLE);
-        std::vector<int> lines_idx;
-        double direction = std::tan(M_PI * (std::abs(fit_line_degree) / 180.0));
-        int section_num = 4;
-        std::vector<int> lines_in_section(section_num);
-        for (std::size_t i = 0; i < contours.size(); i++)
-        {
-            // Omit short arcs
-            int arc_len = cv::arcLength(contours.at(i), false);
-            if (arc_len < min_contour_len)
+            // Prepare params
+            std::shared_lock<std::shared_mutex> lk(shared_mut_);
+            double canny_lower_threshold = image_params_.at(index).canny_lower_threshold;
+            double canny_upper_threshold = image_params_.at(index).canny_upper_threshold;
+            int canny_aperture_size = image_params_.at(index).canny_aperture_size;
+            int roi_x = image_params_.at(index).roi_x;
+            int roi_y = image_params_.at(index).roi_y;
+            int roi_side = image_params_.at(index).roi_side;
+            double fit_line_degree = image_params_.at(index).fit_line_degree;
+            int min_contour_len = image_params_.at(index).min_contour_len;
+            int min_line_count = image_params_.at(index).min_line_count;
+            double min_ratio = image_params_.at(index).min_ratio;
+            lk.unlock();
+
+            // Detect
+            if (min_ratio > 1.0)
             {
-                continue;
+                min_ratio = 1.0;
             }
-            // line structure: (vx, vy, x0, y0)
-            cv::Vec4f line;
-            cv::fitLine(contours.at(i), line, cv::DIST_L2, 0, 0.01, 0.01);
-            if (std::abs(line[1] / line[0]) < direction)
+            if (roi_y < gray.size[0] && roi_x < gray.size[1] &&
+                    roi_y + roi_side < gray.size[0] && roi_x + roi_side < gray.size[1])
             {
-                lines_idx.push_back(i);
-                // Map the fitted line to different ROI section by y0
-                lines_in_section.at(int(line[3] / (roi_side / section_num))) += 1;
+                roi = gray(cv::Range(roi_y, roi_y + roi_side),
+                           cv::Range(roi_x, roi_x + roi_side));
             }
-        }
-        //cv::cvtColor(video_frame_0, video_frame_0, CV_BGR2RGB);
+            else
+            {
+                roi = gray;
+            }
 
-        // Draw liquid level
-        if (lines_idx.size() > static_cast<std::size_t>(min_line_count))
-        {
-            std::vector<double> ratio_in_section(section_num);
-            std::transform(lines_in_section.begin(), lines_in_section.end(),
-                           ratio_in_section.begin(), [=](int i) {
-                                    return double(i) / lines_idx.size(); } );
-            for (int i = 0; i < section_num; i++)
+            cv::Canny(roi, edges, canny_lower_threshold, canny_upper_threshold,
+                      canny_aperture_size, true/*L2gradient*/);
+            cv::findContours(edges,
+                             contours,
+                             hierarchy,
+                             cv::RETR_LIST,
+                             cv::CHAIN_APPROX_SIMPLE);
+            std::vector<int> lines_idx;
+            double direction = std::tan(M_PI * (std::abs(fit_line_degree) / 180.0));
+            int section_num = 4;
+            std::vector<int> lines_in_section(section_num);
+            for (std::size_t i = 0; i < contours.size(); i++)
             {
-                ratio_in_section.at(i) = lines_in_section.at(i) / double(lines_idx.size());
+                // Omit short arcs
+                int arc_len = cv::arcLength(contours.at(i), false);
+                if (arc_len < min_contour_len)
+                {
+                    continue;
+                }
+                // line structure: (vx, vy, x0, y0)
+                cv::Vec4f line;
+                cv::fitLine(contours.at(i), line, cv::DIST_L2, 0, 0.01, 0.01);
+                if (std::abs(line[1] / line[0]) < direction)
+                {
+                    lines_idx.push_back(i);
+                    // Map the fitted line to different ROI section by y0
+                    lines_in_section.at(int(line[3] / (roi_side / section_num))) += 1;
+                }
             }
-            auto max_iter = std::max_element(ratio_in_section.begin(),
-                                                ratio_in_section.end());
-            std::size_t max_index = std::distance(ratio_in_section.begin(),
-                                                  max_iter);
-            if (*max_iter > min_ratio)
+            // Draw liquid level
+            if (lines_idx.size() > static_cast<std::size_t>(min_line_count))
             {
-                int level_y = static_cast<int>(
-                            roi_y + max_index * roi_side / section_num + roi_side / section_num / 2);
-                cv::line(vframes_.at(index), cv::Point(roi_x, level_y),
-                         cv::Point(roi_x + roi_side, level_y), cv::Scalar(0, 255, 0), 2);
-//                if (max_index == 0)
-//                {
-//                    found_level = true;
-//                }
+                std::vector<double> ratio_in_section(section_num);
+                std::transform(lines_in_section.begin(), lines_in_section.end(),
+                               ratio_in_section.begin(), [=](int i) {
+                    return double(i) / lines_idx.size(); } );
+                for (int i = 0; i < section_num; i++)
+                {
+                    ratio_in_section.at(i) = lines_in_section.at(i) / double(lines_idx.size());
+                }
+                auto max_iter = std::max_element(ratio_in_section.begin(),
+                                                 ratio_in_section.end());
+                std::size_t max_index = std::distance(ratio_in_section.begin(),
+                                                      max_iter);
+                if (*max_iter > min_ratio)
+                {
+                    int level_y = static_cast<int>(
+                                roi_y + max_index * roi_side / section_num + roi_side / section_num / 2);
+                    cv::line(vframes_.at(index), cv::Point(roi_x, level_y),
+                             cv::Point(roi_x + roi_side, level_y), cv::Scalar(0, 255, 0), 2);
+                    //                if (max_index == 0)
+                    //                {
+                    //                    found_level = true;
+                    //                }
+                }
             }
-        }
+            // Draw contours, time cost!!!
+            for (auto i : lines_idx)
+            {
+                for (auto& p : contours[i])
+                {
+                    p.x += roi_x;
+                    p.y += roi_y;
+                }
+                cv::drawContours(vframes_.at(index), contours, i, cv::Scalar(255, 0, 0), 2);
+            }
+            // Draw ROI
+            std::vector<std::vector<cv::Point>> roi_contours = {{cv::Point(roi_x, roi_y),
+                                                                 cv::Point(roi_x + roi_side, roi_y),
+                                                                 cv::Point(roi_x + roi_side, roi_y + roi_side),
+                                                                 cv::Point(roi_x, roi_y + roi_side)}};
+            cv::drawContours(vframes_.at(index), roi_contours, 0, cv::Scalar(0, 255, 255), 2);
 
-        for (auto i : lines_idx)
-        {
-            for (auto& p : contours[i])
-            {
-                p.x += roi_x;
-                p.y += roi_y;
-            }
-            cv::drawContours(vframes_.at(index), contours, i, cv::Scalar(255, 0, 0), 2);
+            this->update();
         }
-        // Draw ROI
-        std::vector<std::vector<cv::Point>> roi_contours = {{cv::Point(roi_x, roi_y),
-                                                             cv::Point(roi_x + roi_side, roi_y),
-                                                             cv::Point(roi_x + roi_side, roi_y + roi_side),
-                                                             cv::Point(roi_x, roi_y + roi_side)}};
-        cv::drawContours(vframes_.at(index), roi_contours, 0, cv::Scalar(0, 255, 255), 2);
-
-        this->update();
     }
 }
 
@@ -1751,14 +1849,20 @@ void FormLiquidDistributor::PrepareDB(
                           "x", "y", "pos_a", "pos_b", "flowlimit_a",
                           "flowlimit_b", "cleanport_a", "cleanport_b",
                           "duration_a", "duration_b", "run_a", "run_b", "control_code"};
+        image_param_columns_ = {"name", "roi_x", "roi_y", "roi_side", "lower_threshold",
+                         "upper_threshold", "direction", "min_len", "min_count", "min_ratio"};
         QString error_message_1;
         QString error_message_2;
-        bool ok1 = CreateDBTable(db_, recipe_table_name_, table_columns_, error_message_1);
-        bool ok2 = CreateDBTable(db_, runtime_table_name_, table_columns_, error_message_2);
-        if (!ok1 || !ok2)
+        QString error_message_3;
+        std::vector<QString> default_primary_keys;
+        std::vector<QString> primary_keys {"name"};
+        bool ok1 = CreateDBTable(db_, recipe_table_name_, table_columns_, default_primary_keys, error_message_1);
+        bool ok2 = CreateDBTable(db_, runtime_table_name_, table_columns_, default_primary_keys, error_message_2);
+        bool ok3 = CreateDBTable(db_, image_params_table_name_, image_param_columns_, primary_keys, error_message_3);
+        if (!ok1 || !ok2 || !ok3)
         {
             QMessageBox::critical(0, "创建数据表失败",
-                                  error_message_1 + "\n" + error_message_2, QMessageBox::Ignore);
+                                  error_message_1 + "\n" + error_message_2 + "\n" + error_message_3, QMessageBox::Ignore);
         }
         else
         {
@@ -1769,7 +1873,8 @@ void FormLiquidDistributor::PrepareDB(
 
 bool FormLiquidDistributor::CreateDBTable(const QSqlDatabase& db,
                                           const QString& table_name,
-                                          const std::vector<QString> columns,
+                                          const std::vector<QString>& columns,
+                                          const std::vector<QString>& primary_keys,
                                           QString& error_message)
 {
     if (!db.isValid() || !db.isOpen())
@@ -1781,12 +1886,29 @@ bool FormLiquidDistributor::CreateDBTable(const QSqlDatabase& db,
     QString query_string;
     query_string.append("CREATE TABLE IF NOT EXISTS ");
     query_string.append(table_name);
-    query_string.append(" (id SERIAL primary key, ");
+    query_string.append(" (");
     for (auto& column : columns)
     {
         query_string.append("\"");
         query_string.append(column);
         query_string.append("\" TEXT,");
+    }
+    if (!primary_keys.empty())
+    {
+        query_string.append("PRIMARY KEY(");
+        for (auto& key : primary_keys)
+        {
+            query_string.append("\"");
+            query_string.append(key);
+            query_string.append("\"");
+            query_string.append(", ");
+        }
+        query_string.remove(query_string.length() - 2, 2);
+        query_string.append("), ");
+    }
+    else
+    {
+        query_string.append("id SERIAL PRIMARY KEY, ");
     }
     query_string.append("time DOUBLE PRECISION, createtime TIMESTAMP WITH TIME ZONE not null default localtimestamp(0));");
     bool ok = query.exec(query_string);
@@ -1801,15 +1923,15 @@ bool FormLiquidDistributor::CreateDBTable(const QSqlDatabase& db,
     return ok;
 }
 
-bool FormLiquidDistributor::ReadRecipeFromDB(
-        const QString& tablename, const QString& recipe_name,
+bool FormLiquidDistributor::ReadRecordsFromDB(const QString& tablename,
+        const QString& where_key, const QString& where_value,
         const std::vector<QString> columns, QSqlQuery& query,
         std::vector<std::shared_ptr<std::vector<QString>>>& value_list,
         QString& error_message)
 {
     value_list.clear();
 
-    QString query_string("select ");
+    QString query_string("SELECT ");
     for (auto& column : columns)
     {
         query_string.append("\"");
@@ -1820,11 +1942,13 @@ bool FormLiquidDistributor::ReadRecipeFromDB(
     {
         query_string.remove(query_string.size() - 2, 1); // remove the tail ","
     }
-    query_string.append(" from ");
+    query_string.append(" FROM ");
     query_string.append(tablename);
-    query_string.append(" where \"recipe_name\"=\'");
-    query_string.append(recipe_name);
-    query_string.append("\';");
+    query_string.append(" WHERE \"");
+    query_string.append(where_key);
+    query_string.append("\" = '");
+    query_string.append(where_value);
+    query_string.append("';");
     bool ok = query.exec(query_string);
     if (!ok)
     {
@@ -1900,7 +2024,7 @@ bool FormLiquidDistributor::WriteRecipeToDB(const QString& tablename,
     QString query_string;
     for (auto& values : value_list)
     {
-        query_string.append("insert into ");
+        query_string.append("INSERT INTO ");
         query_string.append(tablename);
         query_string.append(" (");
         for (auto& column : columns)
@@ -1927,6 +2051,67 @@ bool FormLiquidDistributor::WriteRecipeToDB(const QString& tablename,
     return ok;
 }
 
+bool FormLiquidDistributor::UpdateImageParamsToDB(
+        const QString& tablename, const std::vector<QString> columns,
+        const QString& primary_key, const std::vector<std::vector<QString> > value_list,
+        QSqlQuery &query, QString &error_message)
+{
+    if (value_list.size() == 0 || columns.size() != value_list.at(0).size())
+    {
+        error_message = QString("参数为空");
+        return false;
+    }
+    QString query_string;
+    QString msecs = QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    // Postgresql timestamp with time zone: 2022-10-05 11:29:50+08 plusing +08 zone automatically.
+    QString dt = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    for (auto& values : value_list)
+    {
+        query_string.append("INSERT INTO ");
+        query_string.append(tablename);
+        query_string.append(" (");
+        for (auto& column : columns)
+        {
+            query_string.append("\"");
+            query_string.append(column);
+            query_string.append("\", ");
+        }
+        query_string.append("\"time\", \"createtime\") VALUES (");
+        for (auto& value : values)
+        {
+            query_string.append("'");
+            query_string.append(value);
+            query_string.append("', ");
+        }
+        query_string.append(msecs);
+        query_string.append(", '");
+        query_string.append(dt);
+        query_string.append("') ON CONFLICT (\"");
+        query_string.append(primary_key);
+        query_string.append("\") DO UPDATE SET ");
+        for (std::size_t i = 1/*jump 'name'*/; i < columns.size(); i++)
+        {
+            query_string.append("\"");
+            query_string.append(columns.at(i));
+            query_string.append("\" = '");
+            query_string.append(values.at(i));
+            query_string.append("', ");
+        }
+        query_string.append("\"time\" = ");
+        query_string.append(msecs);
+        query_string.append(", \"createtime\" = '");
+        query_string.append(dt);
+        query_string.append("'");
+        query_string.append(";");
+    }
+    bool ok = query.exec(query_string);
+    if (!ok)
+    {
+        error_message = query.lastError().text();
+    }
+    return ok;
+}
+
 bool FormLiquidDistributor::ReadRecipeNamesFromDB(
         std::vector<QString>& recipe_names, QString &error_message)
 {
@@ -1939,17 +2124,17 @@ bool FormLiquidDistributor::ReadRecipeNamesFromDB(
         QSqlQuery query(db_);
         QString error_message;
         QString query_string;
-        query_string.append("select distinct \"recipe_name\", \"time\" from ");
+        query_string.append("SELECT DISTINCT \"recipe_name\", \"time\" FROM ");
         query_string.append(recipe_table_name_);
         if (LiquidDistributorCategory::SAMPLING == category_)
         {
-            query_string.append(" where \"type\"='0' ");
+            query_string.append(" WHERE \"type\"='0' ");
         }
         else if (LiquidDistributorCategory::COLLECTION == category_)
         {
-            query_string.append(" where \"type\"='2' ");
+            query_string.append(" WHERE \"type\"='2' ");
         }
-        query_string.append("order by \"time\" desc;");
+        query_string.append("ORDER BY \"time\" DESC;");
         bool ok = query.exec(query_string);
         if (!ok)
         {

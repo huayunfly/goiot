@@ -49,7 +49,7 @@ struct RecipeTaskEntity
     bool run_b;
     uint control_code;
 
-    std::vector<QString> ToValues()
+    std::vector<QString> ToValue()
     {
         return std::vector<QString>({recipe_name,
                                      QString::number(type),
@@ -114,6 +114,31 @@ struct ImageParams
     int min_contour_len;
     int min_line_count;
     double min_ratio;
+
+    std::vector<QString> toValue(int i)
+    {
+        return std::vector<QString>({QString("V") + QString::number(i),
+                                    QString::number(roi_x),
+                                    QString::number(roi_y),
+                                    QString::number(roi_side),
+                                    QString::number(canny_lower_threshold),
+                                    QString::number(canny_upper_threshold),
+                                    QString::number(fit_line_degree),
+                                    QString::number(min_contour_len),
+                                    QString::number(min_line_count),
+                                    QString::number(min_ratio)});
+
+    }
+
+    std::vector<double> toDoubleValue()
+    {
+        return std::vector<double> {static_cast<double>(roi_x),
+                    static_cast<double>(roi_y),static_cast<double>(roi_side),
+                    canny_lower_threshold, canny_upper_threshold, fit_line_degree,
+                    static_cast<double>(min_contour_len),
+                    static_cast<double>(min_line_count),
+                    static_cast<double>(min_ratio)};
+    }
 };
 
 class FormLiquidDistributor : public FormCommon
@@ -231,6 +256,12 @@ private:
     // Delete recipe from DB.
     bool DeleteRecipe(const QString& recipe_name);
 
+    // Save parameters to DB.
+    bool SaveImageParams();
+
+    // Load parameters from DB.
+    bool LoadImageParams();
+
     // Read a recipe from DB and dispatch recipe task to queue.
     bool DispatchRecipeTask(const QString& recipe_name);
 
@@ -276,11 +307,13 @@ private:
     // Create sampling recipe and runtime DB tables.
     // @return true if it succeeded.
     bool CreateDBTable(const QSqlDatabase& db, const QString& table_name,
-                       const std::vector<QString> columns, QString& error_massage);
+                       const std::vector<QString>& columns, const std::vector<QString>& primary_keys,
+                       QString& error_massage);
 
-    // Read sampling recipe table and return the cursor.
+    // Read DB table and return the records by where clause.
     // @return true if it succeeded.
-    bool ReadRecipeFromDB(const QString& tablename, const QString& recipe_name,
+    bool ReadRecordsFromDB(const QString& tablename,
+                          const QString& where_key, const QString& where_value,
                           const std::vector<QString> columns, QSqlQuery& query,
                           std::vector<std::shared_ptr<std::vector<QString>>>& value_list,
                           QString& error_message);
@@ -304,6 +337,11 @@ private:
     bool DeleteRecipeFromDB(const QString& tablename, const QString& recipe_name,
                             QString& error_message);
 
+    // Insert or update image parameters to DB, using INSERT INTO...ON CONFLICT
+    bool UpdateImageParamsToDB(const QString& tablename, const std::vector<QString> columns,
+                               const QString& primary_key, const std::vector<std::vector<QString>> value_list,
+                               QSqlQuery& query, QString& error_message);
+
     // Log to UI window
     void LogTaskStep();
 
@@ -321,7 +359,9 @@ private:
     QString username_;
     QString password_;
     bool db_ready_;
+    const QString image_params_table_name_ = "image_params";
     std::vector<QString> table_columns_;
+    std::vector<QString> image_param_columns_;
     const QString recipe_table_name_ = "liquid_distribute_recipe";
     const QString runtime_table_name_ = "liquid_distribute_runtime";
     const QString control_code_name_ = "control_code";

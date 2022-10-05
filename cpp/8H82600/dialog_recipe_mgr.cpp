@@ -5,7 +5,7 @@
 
 
 DialogRecipeMgr::DialogRecipeMgr(QWidget *parent, const std::vector<QString>& recipe_names,
-                                 const std::vector<std::vector<int>>& params_value) :
+                                 const std::vector<std::vector<double>>& params_value) :
     QDialog(parent), recipe_names_(recipe_names),
     ui(new Ui::DialogRecipeMgr), action_(RecipeAction::NONE),
     image_param_values_(params_value)
@@ -60,13 +60,13 @@ void DialogRecipeMgr::InitImageParamsTable()
 
     if (image_param_values_.empty())
     {
-        image_param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 80},
-                               {200, 100, 280, 15, 30, 15, 10, 10, 80}};
+        image_param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 0.8},
+                               {200, 100, 280, 15, 30, 15, 10, 10, 0.8}};
     }
 
     ui->tableWidgetParams->setColumnCount(3);
     ui->tableWidgetParams->setRowCount(param_names.size());
-    ui->tableWidgetParams->setHorizontalHeaderLabels(QStringList({"名称", "V1值", "V2值"}));
+    ui->tableWidgetParams->setHorizontalHeaderLabels(QStringList({"名称", "V0值", "V1值"}));
     ui->tableWidgetParams->horizontalHeader()->setVisible(true);
     ui->tableWidgetParams->verticalHeader()->setVisible(false);
     ui->tableWidgetParams->horizontalHeader()->setDefaultSectionSize(180);
@@ -157,8 +157,8 @@ void DialogRecipeMgr::on_pushButtonUpdateParams_clicked()
     for (int i = 0; i < ui->tableWidgetParams->rowCount(); i++)
     {
         bool ok1, ok2;
-        int v1 = ui->tableWidgetParams->item(i, 1)->text().toInt(&ok1);
-        int v2 = ui->tableWidgetParams->item(i, 2)->text().toInt(&ok2);
+        double v1 = ui->tableWidgetParams->item(i, 1)->text().toDouble(&ok1);
+        double v2 = ui->tableWidgetParams->item(i, 2)->text().toDouble(&ok2);
         if (ok1 && ok2)
         {
             image_param_values_.at(0).push_back(v1);

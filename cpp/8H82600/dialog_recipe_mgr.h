@@ -14,7 +14,7 @@ class DialogRecipeMgr : public QDialog
 public:
     explicit DialogRecipeMgr(QWidget *parent = nullptr,
                              const std::vector<QString>& recipe_names = {},
-                             const std::vector<std::vector<int>>& params_value = {});
+                             const std::vector<std::vector<double>>& params_value = {});
     ~DialogRecipeMgr();
 
     enum class RecipeAction
@@ -38,7 +38,7 @@ public:
         return acting_recipe_name_;
     }
 
-    std::vector<std::vector<int>> GetImageParams()
+    std::vector<std::vector<double>> GetImageParams()
     {
         return image_param_values_;
     }
@@ -66,7 +66,7 @@ private:
     Ui::DialogRecipeMgr *ui;
     RecipeAction action_;
     QString acting_recipe_name_;
-    std::vector<std::vector<int>> image_param_values_;
+    std::vector<std::vector<double>> image_param_values_;
 };
 
 #endif // DIALOG_RECIPE_MGR_H
