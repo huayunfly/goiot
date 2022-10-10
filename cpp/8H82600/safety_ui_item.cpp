@@ -2,8 +2,8 @@
 #include <QPainter>
 
 SafetyUIItem::SafetyUIItem(double radius, const QString& pid_code,
-             SafetyUIItemStatus status) :
-    radius_(radius), pid_code_(pid_code), status_(status)
+                           const QString& note, SafetyUIItemStatus status) :
+    radius_(radius), pid_code_(pid_code), note_(note), status_(status)
 {
 
 }
@@ -42,11 +42,11 @@ void SafetyUIItem::paint(QPainter *painter,
     }
 
     painter->drawEllipse(QPointF(0, 0), radius_, radius_);
-    // position
+    // code
     QFont font;
     font.setPointSize(7);
     painter->setFont(font);
-    painter->drawText(QPointF(10, -10), pid_code_);
+    painter->drawText(QPointF(0, -10), pid_code_);
 
     // channel
     font.setPointSize(10);

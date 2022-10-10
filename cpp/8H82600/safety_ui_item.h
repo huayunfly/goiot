@@ -23,6 +23,7 @@ public:
 
 public:
     SafetyUIItem(double radius, const QString& pid_code,
+                 const QString& note = QString(),
                  SafetyUIItemStatus status = SafetyUIItemStatus::Normal);
 
     SafetyUIItem(const SafetyUIItem&) = delete;
@@ -45,6 +46,7 @@ public:
 private:
     double radius_;
     QString pid_code_;
+    QString note_;
     SafetyUIItemStatus status_;
 };
 
