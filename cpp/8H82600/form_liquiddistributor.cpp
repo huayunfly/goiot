@@ -1750,27 +1750,6 @@ void FormLiquidDistributor::UpdateImage(int index)
     }
 }
 
-void FormLiquidDistributor::on_pushButton_clicked()
-{
-    QString recipe_name = "xb";
-    bool ok = SaveRecipe(recipe_name);
-    if (ok)
-    {
-        QMessageBox::information(0, "保存成功", recipe_name, QMessageBox::Ok);
-    }
-}
-
-void FormLiquidDistributor::on_pushButton_2_clicked()
-{
-    //LoadLiquidSamplingProcedure("23,1,1,10,2;24,9,1,11,3;128,10,1,12,6");
-    QString recipe_name = "xb_1655197617";
-    bool ok = LoadRecipe(recipe_name);
-    if (ok)
-    {
-        QMessageBox::information(0, "加载成功", recipe_name, QMessageBox::Ok);
-    }
-}
-
 void FormLiquidDistributor::SelectChannelChanged(const QString& text)
 {
     int row = ui->tableWidget->currentRow();
@@ -2182,16 +2161,6 @@ bool FormLiquidDistributor::DeleteRecipeFromDB(
     {
         error_message = "连接数据库失败";
         return false;
-    }
-}
-
-void FormLiquidDistributor::on_pushButton_3_clicked()
-{
-    QString recipe_name = "xb_1652838895";
-    bool ok = DispatchRecipeTask(recipe_name);
-    if (ok)
-    {
-        QMessageBox::information(0, "任务启动", recipe_name, QMessageBox::Ok);
     }
 }
 
