@@ -1,11 +1,13 @@
 #include "safety_ui_item.h"
 #include <QPainter>
+#include <QToolTip>
+#include <QGraphicsSceneHoverEvent>
 
 SafetyUIItem::SafetyUIItem(double radius, const QString& pid_code,
                            const QString& note, SafetyUIItemStatus status) :
     radius_(radius), pid_code_(pid_code), note_(note), status_(status)
 {
-
+    setAcceptHoverEvents(true); // Active hover
 }
 
 void SafetyUIItem::paint(QPainter *painter,
@@ -18,7 +20,7 @@ void SafetyUIItem::paint(QPainter *painter,
     switch (status_)
     {
     case SafetyUIItemStatus::Normal:
-        painter->setBrush(Qt::green);
+        painter->setBrush(Qt::darkGreen);
         label = QString();
         break;
     case SafetyUIItemStatus::HLimit:
@@ -37,6 +39,10 @@ void SafetyUIItem::paint(QPainter *painter,
         painter->setBrush(Qt::red);
         label = QString("断线");
         break;
+    case SafetyUIItemStatus::Inactive:
+        painter->setBrush(Qt::gray);
+        label = QString("N/A");
+        break;
     default:
         painter->setBrush(Qt::red);
     }
@@ -54,9 +60,41 @@ void SafetyUIItem::paint(QPainter *painter,
     painter->drawText(QPointF(-10, 10), label);
 }
 
+void SafetyUIItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QToolTip::showText(event->screenPos(), note_);
+    // How to make persistent tooltip:
+    // label->move(event->screenPos());
+    // label->setText("Tooltip that follows the mouse");
+    // if(label->isHidden()) label->show();
+}
+
 void SafetyUIItem::SetStatus(SafetyUIItemStatus status)
 {
     status_ = status;
+    switch (status_)
+    {
+    case SafetyUIItemStatus::Normal:
+        status_note_ = "正常";
+        break;
+    case SafetyUIItemStatus::HLimit:
+        status_note_ = QString("超限");
+        break;
+    case SafetyUIItemStatus::HHLimit:
+        status_note_ = QString("高限");
+        break;
+    case SafetyUIItemStatus::LLimit:
+        status_note_ = QString("低限");
+        break;
+    case SafetyUIItemStatus::TBreak:
+        status_note_ = QString("测温断线");
+        break;
+    case SafetyUIItemStatus::Inactive:
+        status_note_ = QString("未激活");
+        break;
+    default:
+        status_note_ = QString("Unknown");
+    }
     update();
 }
 

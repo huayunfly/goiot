@@ -145,22 +145,22 @@ void FormSafety::InitAlarmView()
                             AlarmItemInfo("TC6401", "移液仪座A加热"),
                             AlarmItemInfo("TC6402", "移液仪座B加热")});
     // TC group D
-    alarm_items_.push_back({AlarmItemInfo("TC4701", "箱顶出管伴热1"),
-                           AlarmItemInfo("TC4702", "箱顶出管伴热2"),
-                           AlarmItemInfo("TC4703", "箱顶出管伴热3"),
-                           AlarmItemInfo("TC4704", "箱顶出管伴热4"),
-                           AlarmItemInfo("TC4705", "箱顶出管伴热5"),
-                           AlarmItemInfo("TC4706", "箱顶出管伴热6"),
-                           AlarmItemInfo("TC4707", "箱顶出管伴热7"),
-                           AlarmItemInfo("TC4708", "箱顶出管伴热8"),
-                           AlarmItemInfo("TC4709", "箱顶出管伴热9"),
-                           AlarmItemInfo("TC4710", "箱顶出管伴热10"),
-                           AlarmItemInfo("TC4711", "箱顶出管伴热11"),
-                           AlarmItemInfo("TC4712", "箱顶出管伴热12"),
-                           AlarmItemInfo("TC4713", "箱顶出管伴热13"),
-                           AlarmItemInfo("TC4714", "箱顶出管伴热14"),
-                           AlarmItemInfo("TC4715", "箱顶出管伴热15"),
-                           AlarmItemInfo("TC4716", "箱顶出管伴热16"),
+    alarm_items_.push_back({AlarmItemInfo("TC4701", "箱顶出管1伴热"),
+                           AlarmItemInfo("TC4702", "箱顶出管2伴热"),
+                           AlarmItemInfo("TC4703", "箱顶出管3伴热"),
+                           AlarmItemInfo("TC4704", "箱顶出管4伴热"),
+                           AlarmItemInfo("TC4705", "箱顶出管5伴热"),
+                           AlarmItemInfo("TC4706", "箱顶出管6伴热"),
+                           AlarmItemInfo("TC4707", "箱顶出管7伴热"),
+                           AlarmItemInfo("TC4708", "箱顶出管8伴热"),
+                           AlarmItemInfo("TC4709", "箱顶出管9伴热"),
+                           AlarmItemInfo("TC4710", "箱顶出管10伴热"),
+                           AlarmItemInfo("TC4711", "箱顶出管11伴热"),
+                           AlarmItemInfo("TC4712", "箱顶出管12伴热"),
+                           AlarmItemInfo("TC4713", "箱顶出管13伴热"),
+                           AlarmItemInfo("TC4714", "箱顶出管14伴热"),
+                           AlarmItemInfo("TC4715", "箱顶出管15伴热"),
+                           AlarmItemInfo("TC4716", "箱顶出管16伴热"),
                            AlarmItemInfo("TC2305", "A泵头加热"),
                            AlarmItemInfo("TC2405", "B泵头加热"),
                            AlarmItemInfo("TC2306", "A泵出管伴热"),
@@ -175,14 +175,14 @@ void FormSafety::InitAlarmView()
                            AlarmItemInfo("TC6104", "液体收集箱A1-A2/B1-B2互连管伴热"),
                            AlarmItemInfo("TC7211", "液体采样箱A1-A2/B1-B2互连管伴热")});
     // PG
-    alarm_items_.push_back({AlarmItemInfo("PI1110", "H2气源"),
-                           AlarmItemInfo("PI1120", "NH3气源"),
-                           AlarmItemInfo("PI1130", "CH3Cl气源"),
-                           AlarmItemInfo("PI1140", "N2气源"),
-                           AlarmItemInfo("PI1010", "仪表气气源"),
-                           AlarmItemInfo("PI1020", "吹扫N2气源"),
-                           AlarmItemInfo("PI3110", "PO气源"),
-                           AlarmItemInfo("PI3120", "EO气源")});
+    alarm_items_.push_back({AlarmItemInfo("PI1110", "H2气源压力"),
+                           AlarmItemInfo("PI1120", "NH3气源压力"),
+                           AlarmItemInfo("PI1130", "CH3Cl气源压力"),
+                           AlarmItemInfo("PI1140", "N2气源压力"),
+                           AlarmItemInfo("PI1010", "仪表气气源压力"),
+                           AlarmItemInfo("PI1020", "吹扫N2气源压力"),
+                           AlarmItemInfo("PI3110", "PO气源压力"),
+                           AlarmItemInfo("PI3120", "EO气源压力")});
     // GAS
     alarm_items_.push_back({AlarmItemInfo("XI3901", "箱底EO1报警器"),
                            AlarmItemInfo("XI3902", "箱底EO2报警器"),
@@ -338,7 +338,6 @@ bool FormSafety::event(QEvent *event)
                     // Find alarm bit by byte_order conversion.
                     if ((test_bit << byte_order.at(i)) & e->State())
                     {
-                        qInfo("alarm code [%d]", e->State());
                         alarm_index.push_back(i);
                     }
                     else
@@ -348,11 +347,14 @@ bool FormSafety::event(QEvent *event)
                 }
                 for (std::size_t i = 0; i < alarm_index.size(); i++)
                 {
-                    alarm_ui_items_.at(offset + i)->SetStatus(status);
+                    int pos = offset + alarm_index.at(i);
+                    alarm_ui_items_.at(pos)->SetStatus(status);
+                    qWarning("alarm [%s], [%s]", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
+                          alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
                 }
                 for (std::size_t i = 0; i < normal_index.size(); i++)
                 {
-                    alarm_ui_items_.at(offset + i)->SetStatus(
+                    alarm_ui_items_.at(offset + normal_index.at(i))->SetStatus(
                                 SafetyUIItem::SafetyUIItemStatus::Normal);
                 }
             }

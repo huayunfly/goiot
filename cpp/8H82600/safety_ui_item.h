@@ -19,6 +19,7 @@ public:
         HHLimit,
         LLimit,
         TBreak,
+        Inactive
     };
 
 public:
@@ -38,16 +39,29 @@ public:
         return QRectF(-radius_, -radius_, 2 * radius_, 2 * radius_);
     }
 
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void SetStatus(SafetyUIItemStatus status);
+
+    const QString& Note()
+    {
+        return note_;
+    }
+
+    const QString& StatusNote()
+    {
+        return status_note_;
+    }
 
 private:
     double radius_;
     QString pid_code_;
     QString note_;
     SafetyUIItemStatus status_;
+    QString status_note_;
 };
 
 #endif // SAFETYUIITEM_H
