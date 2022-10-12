@@ -34,6 +34,16 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayoutAlarmView"/>
   </widget>
+  <widget class="QTableWidget" name="alarmEnableTableWidget">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>620</y>
+     <width>851</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

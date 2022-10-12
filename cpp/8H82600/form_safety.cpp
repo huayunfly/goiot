@@ -1,6 +1,7 @@
 #include "form_safety.h"
 #include "ui_form_safety.h"
 #include <QPushButton>
+#include <QCheckBox>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <thread>
@@ -11,7 +12,13 @@ FormSafety::FormSafety(QWidget *parent) :
 {
     ui->setupUi(this);
     InitUiState();
+    InitExpStatusTable();
+    InitAlarmView();
+    InitAlarmEnableTable();
+}
 
+void FormSafety::InitExpStatusTable(void)
+{
     QStringList labels;
     labels.push_back("名称");
     labels.push_back("实验状态");
@@ -55,47 +62,47 @@ FormSafety::FormSafety(QWidget *parent) :
         connect(button, &QPushButton::clicked, this, &FormSafety::on_buttonClicked);
         ui->expStatusTableWidget->setCellWidget(i, COL_STOP, button);
     }
-
-    InitAlarmView();
 }
 
 void FormSafety::InitAlarmView()
 {
     // TC group A
-    alarm_items_.push_back({AlarmItemInfo("TC4101", "釜1底加热"),
-                           AlarmItemInfo("TC4102", "釜2底加热"),
-                           AlarmItemInfo("TC4103", "釜3底加热"),
-                           AlarmItemInfo("TC4104", "釜4底加热"),
-                           AlarmItemInfo("TC4105", "釜5底加热"),
-                           AlarmItemInfo("TC4106", "釜6底加热"),
-                           AlarmItemInfo("TC4107", "釜7底加热"),
-                           AlarmItemInfo("TC4108", "釜8底加热"),
-                           AlarmItemInfo("TC4109", "釜9底加热"),
-                           AlarmItemInfo("TC4110", "釜10底加热"),
-                           AlarmItemInfo("TC4111", "釜11底加热"),
-                           AlarmItemInfo("TC4112", "釜12底加热"),
-                           AlarmItemInfo("TC4113", "釜13底加热"),
-                           AlarmItemInfo("TC4114", "釜14底加热"),
-                           AlarmItemInfo("TC4115", "釜15底加热"),
-                           AlarmItemInfo("TC4116", "釜16底加热"),
-                           AlarmItemInfo("TC4121", "釜1顶加热"),
-                           AlarmItemInfo("TC4122", "釜2顶加热"),
-                           AlarmItemInfo("TC4123", "釜3顶加热"),
-                           AlarmItemInfo("TC4124", "釜4顶加热"),
-                           AlarmItemInfo("TC4125", "釜5顶加热"),
-                           AlarmItemInfo("TC4126", "釜6顶加热"),
-                           AlarmItemInfo("TC4127", "釜7顶加热"),
-                           AlarmItemInfo("TC4128", "釜8顶加热"),
-                           AlarmItemInfo("TC4129", "釜9顶加热"),
-                           AlarmItemInfo("TC4130", "釜10顶加热"),
-                           AlarmItemInfo("TC4131", "釜11顶加热"),
-                           AlarmItemInfo("TC4132", "釜12顶加热"),
-                           AlarmItemInfo("TC4133", "釜13顶加热"),
-                           AlarmItemInfo("TC4134", "釜14顶加热"),
-                           AlarmItemInfo("TC4135", "釜15顶加热"),
-                           AlarmItemInfo("TC4136", "釜16顶加热")});
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "釜加热", {AlarmItemInfo("TC4101", "釜1底加热"),
+                                       AlarmItemInfo("TC4102", "釜2底加热"),
+                                       AlarmItemInfo("TC4103", "釜3底加热"),
+                                       AlarmItemInfo("TC4104", "釜4底加热"),
+                                       AlarmItemInfo("TC4105", "釜5底加热"),
+                                       AlarmItemInfo("TC4106", "釜6底加热"),
+                                       AlarmItemInfo("TC4107", "釜7底加热"),
+                                       AlarmItemInfo("TC4108", "釜8底加热"),
+                                       AlarmItemInfo("TC4109", "釜9底加热"),
+                                       AlarmItemInfo("TC4110", "釜10底加热"),
+                                       AlarmItemInfo("TC4111", "釜11底加热"),
+                                       AlarmItemInfo("TC4112", "釜12底加热"),
+                                       AlarmItemInfo("TC4113", "釜13底加热"),
+                                       AlarmItemInfo("TC4114", "釜14底加热"),
+                                       AlarmItemInfo("TC4115", "釜15底加热"),
+                                       AlarmItemInfo("TC4116", "釜16底加热"),
+                                       AlarmItemInfo("TC4121", "釜1顶加热"),
+                                       AlarmItemInfo("TC4122", "釜2顶加热"),
+                                       AlarmItemInfo("TC4123", "釜3顶加热"),
+                                       AlarmItemInfo("TC4124", "釜4顶加热"),
+                                       AlarmItemInfo("TC4125", "釜5顶加热"),
+                                       AlarmItemInfo("TC4126", "釜6顶加热"),
+                                       AlarmItemInfo("TC4127", "釜7顶加热"),
+                                       AlarmItemInfo("TC4128", "釜8顶加热"),
+                                       AlarmItemInfo("TC4129", "釜9顶加热"),
+                                       AlarmItemInfo("TC4130", "釜10顶加热"),
+                                       AlarmItemInfo("TC4131", "釜11顶加热"),
+                                       AlarmItemInfo("TC4132", "釜12顶加热"),
+                                       AlarmItemInfo("TC4133", "釜13顶加热"),
+                                       AlarmItemInfo("TC4134", "釜14顶加热"),
+                                       AlarmItemInfo("TC4135", "釜15顶加热"),
+                                       AlarmItemInfo("TC4136", "釜16顶加热")}));
     // TC group B
-    alarm_items_.push_back({AlarmItemInfo("TI4141", "釜1内测温"),
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "釜内测温", {AlarmItemInfo("TI4141", "釜1内测温"),
                            AlarmItemInfo("TI4142", "釜2内测温"),
                            AlarmItemInfo("TI4143", "釜3内测温"),
                            AlarmItemInfo("TI4144", "釜4内测温"),
@@ -110,9 +117,10 @@ void FormSafety::InitAlarmView()
                            AlarmItemInfo("TI4153", "釜13内测温"),
                            AlarmItemInfo("TI4154", "釜14内测温"),
                            AlarmItemInfo("TI4155", "釜15内测温"),
-                           AlarmItemInfo("TI4156", "釜16内测温"),});
+                           AlarmItemInfo("TI4156", "釜16内测温"),}));
     // TC group C
-    alarm_items_.push_back({AlarmItemInfo("TC4601", "釜1出管加热"),
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "釜出管伴热", {AlarmItemInfo("TC4601", "釜1出管加热"),
                             AlarmItemInfo("TC4602", "釜2出管加热"),
                             AlarmItemInfo("TC4603", "釜3出管加热"),
                             AlarmItemInfo("TC4604", "釜4出管加热"),
@@ -143,9 +151,10 @@ void FormSafety::InitAlarmView()
                             AlarmItemInfo("TC6301", "移液仪收集管伴热"),
                             AlarmItemInfo("TC7301", "移液仪采样管伴热"),
                             AlarmItemInfo("TC6401", "移液仪座A加热"),
-                            AlarmItemInfo("TC6402", "移液仪座B加热")});
+                            AlarmItemInfo("TC6402", "移液仪座B加热")}));
     // TC group D
-    alarm_items_.push_back({AlarmItemInfo("TC4701", "箱顶出管1伴热"),
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "进出管伴热", {AlarmItemInfo("TC4701", "箱顶出管1伴热"),
                            AlarmItemInfo("TC4702", "箱顶出管2伴热"),
                            AlarmItemInfo("TC4703", "箱顶出管3伴热"),
                            AlarmItemInfo("TC4704", "箱顶出管4伴热"),
@@ -173,21 +182,23 @@ void FormSafety::InitAlarmView()
                            AlarmItemInfo("TC2315", "进液箱A1-A2连接管伴热"),
                            AlarmItemInfo("TC2415", "进液箱B1-B2连接管伴热"),
                            AlarmItemInfo("TC6104", "液体收集箱A1-A2/B1-B2互连管伴热"),
-                           AlarmItemInfo("TC7211", "液体采样箱A1-A2/B1-B2互连管伴热")});
+                           AlarmItemInfo("TC7211", "液体采样箱A1-A2/B1-B2互连管伴热")}));
     // PG
-    alarm_items_.push_back({AlarmItemInfo("PI1110", "H2气源压力"),
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "气源压力", {AlarmItemInfo("PI1110", "H2气源压力"),
                            AlarmItemInfo("PI1120", "NH3气源压力"),
                            AlarmItemInfo("PI1130", "CH3Cl气源压力"),
                            AlarmItemInfo("PI1140", "N2气源压力"),
                            AlarmItemInfo("PI1010", "仪表气气源压力"),
                            AlarmItemInfo("PI1020", "吹扫N2气源压力"),
                            AlarmItemInfo("PI3110", "PO气源压力"),
-                           AlarmItemInfo("PI3120", "EO气源压力")});
+                           AlarmItemInfo("PI3120", "EO气源压力")}));
     // GAS
-    alarm_items_.push_back({AlarmItemInfo("XI3901", "箱底EO1报警器"),
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "气体报警", {AlarmItemInfo("XI3901", "箱底EO1报警器"),
                            AlarmItemInfo("XI3902", "箱底EO2报警器"),
                            AlarmItemInfo("XI3903", "箱顶H2报警器"),
-                           AlarmItemInfo("XI3904", "通风橱CO报警器")});
+                           AlarmItemInfo("XI3904", "通风橱CO报警器")}));
     // Group info, matching alarm_items_
     alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
                             "plc.1.alm_temp_high_a", AlarmGroupInfo(0, SafetyUIItem::SafetyUIItemStatus::HLimit, 32, 0)));
@@ -230,15 +241,15 @@ void FormSafety::InitAlarmView()
     int group_row_start = row_gap;
     for (std::size_t group = 0; group < alarm_items_.size(); group++)
     {
-        int rows = (alarm_items_.at(group).size() - 1) / cols + 1;
-        int left = (alarm_items_.at(group).size() - 1) % cols + 1;
+        int rows = (alarm_items_.at(group).second.size() - 1) / cols + 1;
+        int left = (alarm_items_.at(group).second.size() - 1) % cols + 1;
         for (int row = 0; row < rows; row++)
         {
             int item_in_col = (row + 1) == rows ? left : cols;
             for (int col = 0; col < item_in_col; col++)
             {
-                const QString& id = alarm_items_.at(group).at(row * cols + col).id;
-                const QString& note = alarm_items_.at(group).at(row * cols + col).note;
+                const QString& id = alarm_items_.at(group).second.at(row * cols + col).id;
+                const QString& note = alarm_items_.at(group).second.at(row * cols + col).note;
                 auto item =
                         std::make_shared<SafetyUIItem>(radius, id, note);
                 item->setPos((col + 1) * col_gap, group_row_start + row * row_gap);
@@ -256,6 +267,51 @@ void FormSafety::InitAlarmView()
     auto view = new QGraphicsView(scene);
     view->show();
     ui->verticalLayoutAlarmView->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
+}
+
+void FormSafety::InitAlarmEnableTable(void)
+{
+    QStringList labels;
+    int col_group_num = 4;
+    int row_num = (alarm_items_.size() + col_group_num - 1) / col_group_num;
+    for (int i = 0; i < col_group_num; i++)
+    {
+        labels.push_back("报警组");
+        labels.push_back("激活");
+    }
+
+    ui->alarmEnableTableWidget->setColumnCount(col_group_num * 2);
+    ui->alarmEnableTableWidget->setRowCount(row_num);
+    ui->alarmEnableTableWidget->setHorizontalHeaderLabels(labels);
+    ui->alarmEnableTableWidget->horizontalHeader()->setVisible(true);
+    ui->alarmEnableTableWidget->verticalHeader()->setVisible(false);
+    ui->alarmEnableTableWidget->horizontalHeader()->setDefaultSectionSize(80);
+    ui->alarmEnableTableWidget->setAlternatingRowColors(true);
+    ui->alarmEnableTableWidget->resize(810, 180);
+
+    std::size_t alarm_group_index = 0;
+    for (int i = 0; i < row_num; i++)
+    {
+        for (int j = 0; j < col_group_num; j++)
+        {
+            if (alarm_group_index >= alarm_items_.size())
+            {
+                break;
+            }
+            // Set alarm group lable.
+            ui->alarmEnableTableWidget->setItem(
+                        i, 2 * j, new QTableWidgetItem(alarm_items_.at(alarm_group_index).first));
+            ui->alarmEnableTableWidget->item(i, 2 * j)->setFlags(Qt::NoItemFlags);
+            ui->alarmEnableTableWidget->setColumnWidth(2 * j, 100);
+            // Set checkbox
+            QCheckBox *box = new QCheckBox();
+            box->setChecked(true);
+            connect(box, &QCheckBox::stateChanged, this, &FormSafety::on_boxStateChanged);
+            ui->alarmEnableTableWidget->setCellWidget(i, 2 * j + 1, box);
+            ui->alarmEnableTableWidget->setColumnWidth(2 * j + 1, 60);
+            alarm_group_index++;
+        }
+    }
 }
 
 FormSafety::~FormSafety()
@@ -392,4 +448,9 @@ void FormSafety::on_buttonClicked()
         assert(ok);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+}
+
+void FormSafety::on_boxStateChanged(int state)
+{
+
 }

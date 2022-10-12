@@ -45,7 +45,13 @@ public:
 private:
     void on_buttonClicked(void);
 
+    void on_boxStateChanged(int state);
+
+    void InitExpStatusTable(void);
+
     void InitAlarmView(void);
+
+    void InitAlarmEnableTable(void);
 
 private:
     Ui::FormSafety *ui;
@@ -58,7 +64,7 @@ private:
     const int COL_STOP = 3;
     // alarm view group
     std::vector<std::shared_ptr<SafetyUIItem> > alarm_ui_items_;
-    std::vector<std::vector<AlarmItemInfo> > alarm_items_;
+    std::vector<std::pair<QString, std::vector<AlarmItemInfo> > > alarm_items_;
     std::map<std::string, AlarmGroupInfo> alarm_group_;
     std::vector<int> byte_order_big16_ = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
     std::vector<int> byte_order_big32_ = {24, 25, 26, 27, 28, 29, 30, 31, 16, 17, 18, 19, 20, 21, 22, 23, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
