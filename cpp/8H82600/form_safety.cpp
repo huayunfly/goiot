@@ -120,7 +120,7 @@ void FormSafety::InitAlarmView()
                            AlarmItemInfo("TI4156", "釜16内测温"),}));
     // TC group C
     alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
-                               "釜出管伴热", {AlarmItemInfo("TC4601", "釜1出管加热"),
+                               "管路伴热A", {AlarmItemInfo("TC4601", "釜1出管加热"),
                             AlarmItemInfo("TC4602", "釜2出管加热"),
                             AlarmItemInfo("TC4603", "釜3出管加热"),
                             AlarmItemInfo("TC4604", "釜4出管加热"),
@@ -154,7 +154,7 @@ void FormSafety::InitAlarmView()
                             AlarmItemInfo("TC6402", "移液仪座B加热")}));
     // TC group D
     alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
-                               "进出管伴热", {AlarmItemInfo("TC4701", "箱顶出管1伴热"),
+                               "管路伴热B", {AlarmItemInfo("TC4701", "箱顶出管1伴热"),
                            AlarmItemInfo("TC4702", "箱顶出管2伴热"),
                            AlarmItemInfo("TC4703", "箱顶出管3伴热"),
                            AlarmItemInfo("TC4704", "箱顶出管4伴热"),
@@ -452,5 +452,44 @@ void FormSafety::on_buttonClicked()
 
 void FormSafety::on_boxStateChanged(int state)
 {
-
+    QCheckBox *senderObj = qobject_cast<QCheckBox*>(sender());
+    if(senderObj == nullptr)
+    {
+        return;
+    }
+    QModelIndex idx = ui->alarmEnableTableWidget->indexAt(
+                QPoint(senderObj->frameGeometry().x(), senderObj->frameGeometry().y()));
+    // Construct button id: checkbox_alm_enable_1 ...
+    int row = idx.row();
+    int col = idx.column();
+    int checkbox_idx = row * (ui->alarmEnableTableWidget->columnCount() / 2) +
+            col / 2;
+    // Mapping alarm view items
+    int alm_view_item_start = 0;
+    for (int i = 0; i < checkbox_idx; i++)
+    {
+        alm_view_item_start += alarm_items_.at(i).second.size();
+    }
+    int alm_view_item_end = alm_view_item_start +
+            alarm_items_.at(checkbox_idx).second.size();
+    // Write data
+    QString checkbox_id = "checkbox_alm_enable_" + QString::number(checkbox_idx + 1); // 1 based
+    bool ok = false;
+    if (0 == state)
+    {
+        ok = write_data_func_(this->objectName(), checkbox_id, QString::number(0));
+        assert(ok);
+    }
+    else
+    {
+        ok = write_data_func_(this->objectName(), checkbox_id, QString::number(0xffffffff));
+        assert(ok);
+    }
+    for (int i = alm_view_item_start; i < alm_view_item_end; i++)
+    {
+        alarm_ui_items_.at(i)->SetStatus(
+                    (0 == state) ? SafetyUIItem::SafetyUIItemStatus::Inactive :
+                                   SafetyUIItem::SafetyUIItemStatus::Normal);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }

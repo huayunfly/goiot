@@ -1215,6 +1215,12 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.alm_gas_high", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("plc.1.alm_gas_hhigh", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
 
+    data_model_.SetDataToUiMap("plc.1.alm_reactor_tc_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_reactor_ti_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_1_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_2_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pg_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_gas_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
     // ui_to_data
     //data_model_.SetUiToDataMap("gasfeed.svlabel", DataDef("plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0"));
     //data_model_.SetUiToDataMap("gasfeed.svlabel_2", DataDef("plc.1.out1", "plc.1.out1", "plc.1.out1"));
@@ -2054,7 +2060,13 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("safety.button_reactor_14_stop", DataDef("plc.1.reactor_14_run", "plc.1.reactor_14_run", "plc.1.reactor_14_run"));
     data_model_.SetUiToDataMap("safety.button_reactor_15_stop", DataDef("plc.1.reactor_15_run", "plc.1.reactor_15_run", "plc.1.reactor_15_run"));
     data_model_.SetUiToDataMap("safety.button_reactor_16_stop", DataDef("plc.1.reactor_16_run", "plc.1.reactor_16_run", "plc.1.reactor_16_run"));
-
+    // alarm enable group
+    data_model_.SetUiToDataMap("safety.checkbox_alm_enable_1", DataDef("plc.1.alm_reactor_tc_enable", "plc.1.alm_reactor_tc_enable", "plc.1.alm_reactor_tc_enable"));
+    data_model_.SetUiToDataMap("safety.checkbox_alm_enable_2", DataDef("plc.1.alm_reactor_ti_enable", "plc.1.alm_reactor_ti_enable", "plc.1.alm_reactor_ti_enable"));
+    data_model_.SetUiToDataMap("safety.checkbox_alm_enable_3", DataDef("plc.1.alm_pipe_tc_1_enable", "plc.1.alm_pipe_tc_1_enable", "plc.1.alm_pipe_tc_1_enable"));
+    data_model_.SetUiToDataMap("safety.checkbox_alm_enable_4", DataDef("plc.1.alm_pipe_tc_2_enable", "plc.1.alm_pipe_tc_2_enable", "plc.1.alm_pipe_tc_2_enable"));
+    data_model_.SetUiToDataMap("safety.checkbox_alm_enable_5", DataDef("plc.1.alm_pg_enable", "plc.1.alm_pg_enable", "plc.1.alm_pg_enable"));
+    data_model_.SetUiToDataMap("safety.checkbox_alm_enable_6", DataDef("plc.1.alm_gas_enable", "plc.1.alm_gas_enable", "plc.1.alm_gas_enable"));
     // liquid distributor
     data_model_.SetUiToDataMap("distributor_sampling.control_code", DataDef("plc.1.dist_controlcode", "plc.1.dist_controlcode", "plc.1.dist_controlcode"));
     data_model_.SetUiToDataMap("distributor_sampling.channel_a_run", DataDef("plc.1.dist_a_run_pv", "plc.1.dist_a_run_sv", "plc.1.dist_a_run_sv"));

@@ -8029,6 +8029,36 @@
               "id": "alm_pfc_16_hhigh",
               "name": "alm_pfc_16_hhigh",
               "register": "W5BT9007"
+            },
+            {
+              "id": "alm_reactor_tc_enable",
+              "name": "alm_reactor_tc_enable",
+              "register": "W5DUB1126"
+            },
+            {
+              "id": "alm_reactor_ti_enable",
+              "name": "alm_reactor_ti_enable",
+              "register": "W5WUB1130"
+            },
+            {
+              "id": "alm_pipe_tc_1_enable",
+              "name": "alm_pipe_tc_1_enable",
+              "register": "W5DUB1132"
+            },
+            {
+              "id": "alm_pipe_tc_2_enable",
+              "name": "alm_pipe_tc_2_enable",
+              "register": "W5DUB1136"
+            },
+            {
+              "id": "alm_pg_enable",
+              "name": "alm_pg_enable",
+              "register": "W5WUB1142"
+            },
+            {
+              "id": "alm_gas_enable",
+              "name": "alm_gas_enable",
+              "register": "W5WUB1144"
             }
           ]
         }
