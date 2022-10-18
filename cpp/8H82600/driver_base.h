@@ -59,6 +59,7 @@ namespace goiot
 		WB,
 		DUB,
 		DB,
+        BB,
 		BT,
 		STR
 	};
@@ -136,7 +137,7 @@ namespace goiot
 		DataType data_type;
 		DataZone data_zone;
 		FloatDecode float_decode; // float decode with value 0(ABCD), 1(DCBA), 2(BADC), 3(CDAB)
-		uint8_t byte_value; // for boolean
+        uint8_t byte_value; // for boolean or byte
 		int int_value;
 		double float_value;
 		std::string char_value;

@@ -245,6 +245,11 @@ int DataManager::LoadJsonConfig()
                         data_info.data_type = DataType::BT;
                         start_pos += 2;
                     }
+                    else if (data_type.find("BB") == 0)
+                    {
+                        data_info.data_type = DataType::BB;
+                        start_pos += 2;
+                    }
                     else if (data_type.find("STR") == 0)
                     {
                         data_info.data_type = DataType::STR;
@@ -477,13 +482,30 @@ void DataManager::RefreshDispatch()
                         uint8_t new_value = std::atoi(value.c_str()) > 0 ? 1 : 0;
                         if (data_info.byte_value == new_value && data_info.result == 0 && !ui_force_refresh)
                         {
-                            int i = 0;
-                            i++;
                             continue;
                         }
                         else
                         {
-                            data_info.byte_value = new_value; // updata refresh
+                            data_info.byte_value = new_value; // update refresh
+                            data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
+                        }
+                        data_info_vec->emplace_back(data_info.id,
+                                                       data_info.name, data_info.address, data_info.register_address,
+                                                       data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
+                                                       data_info.data_zone, data_info.float_decode, new_value,
+                                                       0/* integer */, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio
+                                                       );
+                    }
+                    else if (data_info.data_type == DataType::BB)
+                    {
+                        uint8_t new_value = static_cast<uint8_t>(std::atoi(value.c_str()));
+                        if (data_info.byte_value == new_value && data_info.result == 0 && !ui_force_refresh)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            data_info.byte_value = new_value; // update refresh
                             data_info_cache_.UpateOrAddEntry(data_info.id, data_info);
                         }
                         data_info_vec->emplace_back(data_info.id,
@@ -577,10 +599,9 @@ void DataManager::ResponseDispatch()
                                "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
 
                 }
-                else if (data_info.data_type == DataType::BT)
+                else if (data_info.data_type == DataType::BT || data_info.data_type == DataType::BB)
                 {
                     oss_value << static_cast<int>(data_info.byte_value); // for unsigned char conversion '\0001' problem
-                    auto s = oss_value.str();
                     cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
                                "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
                 }

@@ -7686,6 +7686,46 @@
               "ratio": 0.01
             },
             {
+              "id": "dist_servo_on",
+              "name": "distributor_servo_on",
+              "register": "RW5BT8432"
+            },
+            {
+              "id": "dist_ack_error",
+              "name": "distributor_ack_error",
+              "register": "W5BT8433"
+            },
+            {
+              "id": "dist_servo_error",
+              "name": "distributor_servo_error",
+              "register": "R5BT8448"
+            },
+            {
+              "id": "dist_y_speed",
+              "name": "distributor_y_speed",
+              "register": "RW5BB1058"
+            },
+            {
+              "id": "dist_y_sv",
+              "name": "distributor_y_sv",
+              "register": "W5BB1059"
+            },
+            {
+              "id": "dist_y_pv",
+              "name": "distributor_y_pv",
+              "register": "R5BB1060"
+            },
+            {
+              "id": "dist_x_sv",
+              "name": "distributor_x_sv",
+              "register": "W5BB1061"
+            },
+            {
+              "id": "dist_x_pv",
+              "name": "distributor_x_pv",
+              "register": "R5BB1062"
+            },
+            {
               "id": "dist_controlcode",
               "name": "distributor_controlcode",
               "register": "W5DUB1064"

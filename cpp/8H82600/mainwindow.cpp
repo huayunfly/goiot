@@ -2108,6 +2108,7 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
                         value = QString::number(fvalue, 'f', ui_info.decimals);
                         break;
                     case goiot::DataType::BT:
+                    case goiot::DataType::BB: // DataType::BB does not support ratio conversion.
                         value = QString::number(data_info.byte_value + ui_info.int_offset); // with UI offset
                         break;
                     case goiot::DataType::DB:
@@ -2251,6 +2252,7 @@ bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name,
             value = QString::number(fvalue, 'f', ui_info.decimals);
             break;
         case goiot::DataType::BT:
+        case goiot::DataType::BB:
             value = QString::number(data_info.byte_value + ui_info.int_offset); // with UI offset
             break;
         case goiot::DataType::DB:
@@ -2329,6 +2331,7 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
         data_info.float_value = float_value;
         break;
     case goiot::DataType::BT:
+    case goiot::DataType::BB:
         byte_value = value.toUShort(&ok);
         assert(ok);
         byte_value -= ui_info.int_offset; // with UI offset
