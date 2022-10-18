@@ -273,6 +273,9 @@ namespace goiot
 			case DataType::BT:
 				s7_len = S7WLBit;
 				break;
+			case DataType::BB:
+				s7_len = S7WLByte;
+				break;
 			case DataType::WB:
 			case DataType::WUB:
 				s7_len = S7WLWord;
@@ -299,6 +302,7 @@ namespace goiot
 				switch (data_info.data_type)
 				{
 				case DataType::BT:
+				case DataType::BB:
 					rd->byte_value = data_vec.at(0); // Store boolean into uint8_t
 					break;
 				case DataType::WB:
@@ -348,6 +352,10 @@ namespace goiot
 				{
 				case DataType::BT:
 					s7_len_vec.at(i) = S7WLBit;
+					byte_sum += 1;
+					break;
+				case DataType::BB:
+					s7_len_vec.at(i) = S7WLByte;
 					byte_sum += 1;
 					break;
 				case DataType::WB:
@@ -401,6 +409,7 @@ namespace goiot
 					switch (data_info_vec->at(i).data_type)
 					{
 					case DataType::BT:
+					case DataType::BB:
 						data_info_vec->at(i).byte_value = data_vec.at(data_start_pos_vec.at(i)); // Store boolean into uint8_t
 						break;
 					case DataType::WB:
@@ -472,6 +481,9 @@ namespace goiot
 						pos = register_address / 8/* absolute offset */ - db_mapping_[address].first/* db read start */;
 						data_info_vec->at(i).byte_value = (data_map[address].at(pos) & (1 << (register_address % 8))) ? 1 : 0; // Store boolean into uint8_t
 						break;
+					case DataType::BB:
+						data_info_vec->at(i).byte_value = data_map[address].at(pos);
+						break;
 					case DataType::WB:
 					case DataType::WUB:
 						data_info_vec->at(i).int_value = GetInt16(data_map[address], pos);
@@ -519,6 +531,10 @@ namespace goiot
 			{
 			case DataType::BT:
 				s7_len = S7WLBit;
+				data_vec.at(0) = data_info.byte_value;
+				break;
+			case DataType::BB:
+				s7_len = S7WLByte;
 				data_vec.at(0) = data_info.byte_value;
 				break;
 			case DataType::WB:
@@ -589,6 +605,11 @@ namespace goiot
 				case DataType::BT:
 					data_vec.push_back(data_info_vec->at(i).byte_value);
 					s7_len_vec.at(i) = S7WLBit;
+					byte_sum += 1;
+					break;
+				case DataType::BB:
+					data_vec.push_back(data_info_vec->at(i).byte_value);
+					s7_len_vec.at(i) = S7WLByte;
 					byte_sum += 1;
 					break;
 				case DataType::WB:
@@ -672,6 +693,7 @@ namespace goiot
 		switch (datatype)
 		{
 		case DataType::BT:
+		case DataType::BB:
 			return 1;
 		case DataType::WB:
 		case DataType::WUB:
@@ -756,6 +778,10 @@ namespace goiot
 			{
 			case DataType::BT:
 				start = entry.second.register_address / 8;  // to byte
+				end = start + 1;
+				break;
+			case DataType::BB:
+				start = entry.second.register_address;  // to byte
 				end = start + 1;
 				break;
 			case DataType::DB:

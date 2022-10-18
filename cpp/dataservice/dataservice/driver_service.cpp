@@ -343,7 +343,7 @@ namespace goiot {
 						//		refresh_id.c_str(), data_info.float_value, data_info.result, data_info.timestamp)
 						//	), [](redisReply* p) { if (p) freeReplyObject(p); });
 					}
-					else if (data_info.data_type == DataType::BT)
+					else if (data_info.data_type == DataType::BT || data_info.data_type == DataType::BB)
 					{
 						pipeline_result = redisAppendCommand(redis_refresh_.get(), HMSET_INTEGER_FORMAT.c_str(),
 							refresh_id.c_str(), data_info.byte_value, data_info.result, data_info.timestamp);
@@ -561,7 +561,7 @@ namespace goiot {
 							0/* integer */, 0.0/* float */, new_value, timestamp, 0/* result */, data_info.ratio
 						);
 					}
-					else if (data_info.data_type == DataType::BT)
+					else if (data_info.data_type == DataType::BT || data_info.data_type == DataType::BB)
 					{
 						byte new_value = std::atoi(value.c_str());
 						if (data_info.byte_value == new_value && data_info.result == 0 &&
@@ -749,7 +749,7 @@ namespace goiot {
 						), [](redisReply* p) { if (p) freeReplyObject(p); });
 					CheckRedisReply(data_info.id, "AddRedisPollSet", reply.get());
 				}
-				else if (data_info.data_type == DataType::BT)
+				else if (data_info.data_type == DataType::BT || data_info.data_type == DataType::BB)
 				{
 					std::unique_ptr<redisReply, void(*)(redisReply*)> reply(static_cast<redisReply*>(
 						redisCommand(redis_context.get(), HMSET_INTEGER.c_str(),

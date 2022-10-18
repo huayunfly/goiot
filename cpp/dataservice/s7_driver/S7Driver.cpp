@@ -252,6 +252,11 @@ int goiot::S7Driver::ParseConfig(const std::string& config,
                     data_info.data_type = DataType::BT;
                     start_pos += 2;
                 }
+                else if (data_type.find("BB") == 0)
+                {
+                    data_info.data_type = DataType::BB;
+                    start_pos += 2;
+                }
                 else if (data_type.find("STR") == 0)
                 {
                     data_info.data_type = DataType::STR;

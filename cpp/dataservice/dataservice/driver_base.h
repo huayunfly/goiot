@@ -5,6 +5,8 @@
  // @date: 2020.03.14
  // @copyright: GNU
  // @version: 0.1
+ // 
+ // @revision: 2022.10.17, add BB (byte) type.
 
 #include <memory>
 #include <string>
@@ -51,7 +53,7 @@ namespace goiot
 	};
 
 	// register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
-	// BT (bit), STR(string)
+	// BB(byte), BT (bit), STR(string)
 	enum class DataType
 	{
 		DF = 0,
@@ -59,6 +61,7 @@ namespace goiot
 		WB,
 		DUB,
 		DB,
+		BB,
 		BT,
 		STR
 	};
