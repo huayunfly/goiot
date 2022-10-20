@@ -14,6 +14,7 @@
 #include "form_liquidcollection.h"
 #include "form_liquidsamplinga.h"
 #include "form_liquidsamplingb.h"
+#include "form_distributorsetting.h"
 #include "form_safety.h"
 #include "form_trend.h"
 #include "form_history.h"
@@ -47,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     form_vec.push_back(new FormLiquidCollection);
     form_vec.push_back(new FormLiquidSamplingA);
     form_vec.push_back(new FormLiquidSamplingB);
+    form_vec.push_back(new FormDistributorSetting);
     form_vec.push_back(new FormSafety);
 
     for (auto& entry : form_vec)
@@ -1175,52 +1177,58 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp56_sv", UiInfo(ui_->tabWidget->widget(11), QString::fromUtf8("label_TICA7504"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp55_pv", UiInfo(ui_->tabWidget->widget(11), QString::fromUtf8("textEdit_TICA7503"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp56_pv", UiInfo(ui_->tabWidget->widget(11), QString::fromUtf8("textEdit_TICA7504"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // distributor setting, X Y
+    data_model_.SetDataToUiMap("plc.1.dist_y_speed", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_speedY"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 50, 0));
+    data_model_.SetDataToUiMap("plc.1.dist_y_pv", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_posY"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 45, 0));
+    data_model_.SetDataToUiMap("plc.1.dist_x_pv", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_posX"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dist_servo_on", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_servo_on"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.dist_servo_error", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_servo_error"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0));
     // liquid distributor
     data_model_.SetDataToUiMap("plc.1.dist_a_run_pv", {UiInfo(ui_->widget_distributor->widget(0), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
                                                        UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("plc.1.dist_b_run_pv", {UiInfo(ui_->widget_distributor->widget(0), QString::fromUtf8("label_dist_b_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
                                                        UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_b_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     // safety and experiment status
-    data_model_.SetDataToUiMap("plc.1.reactor_1_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_2_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_3_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_4_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_5_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_6_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_7_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_8_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_9_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_10_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_11_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_12_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_13_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_14_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_15_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.reactor_16_run", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_1_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_2_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_3_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_4_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_5_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_6_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_7_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_8_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_9_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_10_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_11_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_12_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_13_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_14_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_15_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.reactor_16_run", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("expStatusTableWidget"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
 
-    data_model_.SetDataToUiMap("plc.1.alm_temp_high_a", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_a", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_break_a", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_high_b", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_b", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_break_b", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_high_c", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_c", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_break_c", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_high_d", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_d", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_temp_break_d", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_pg_high", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_pg_hhigh", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_gas_high", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_gas_hhigh", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_high_a", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_a", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_break_a", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_high_b", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_b", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_break_b", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_high_c", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_c", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_break_c", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_high_d", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_hhigh_d", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_temp_break_d", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pg_high", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pg_hhigh", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_gas_high", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_gas_hhigh", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
 
-    data_model_.SetDataToUiMap("plc.1.alm_reactor_tc_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_reactor_ti_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffff, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_1_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_2_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_pg_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
-    data_model_.SetDataToUiMap("plc.1.alm_gas_enable", {UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_reactor_tc_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_reactor_ti_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_1_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_2_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_pg_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+    data_model_.SetDataToUiMap("plc.1.alm_gas_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
     // ui_to_data
     //data_model_.SetUiToDataMap("gasfeed.svlabel", DataDef("plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0"));
     //data_model_.SetUiToDataMap("gasfeed.svlabel_2", DataDef("plc.1.out1", "plc.1.out1", "plc.1.out1"));
@@ -2026,6 +2034,13 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("motorcontrol_reactor16.cell_16_sv", DataDef("reactor16.16.block_data0", "reactor16.16.block_data0", "reactor16.16.block_data0"));
     data_model_.SetUiToDataMap("motorcontrol_reactor16.button_16_start", DataDef("reactor16.16.stb", "reactor16.16.stb", "reactor16.16.stb"));
     data_model_.SetUiToDataMap("motorcontrol_reactor16.button_16_stop", DataDef("reactor16.16.s_stop", "reactor16.16.s_stop", "reactor16.16.s_stop"));
+    // distributor setting
+    data_model_.SetUiToDataMap("distsetting.button_servo_on", DataDef("plc.1.dist_servo_on", "plc.1.dist_servo_on", "plc.1.dist_servo_on"));
+    data_model_.SetUiToDataMap("distsetting.button_servo_off", DataDef("plc.1.dist_servo_on", "plc.1.dist_servo_on", "plc.1.dist_servo_on"));
+    data_model_.SetUiToDataMap("distsetting.button_ack_error", DataDef("plc.1.dist_ack_error", "plc.1.dist_ack_error", "plc.1.dist_ack_error"));
+    data_model_.SetUiToDataMap("distsetting.button_speedY", DataDef("plc.1.dist_y_speed", "plc.1.dist_y_speed", "plc.1.dist_y_speed"));
+    data_model_.SetUiToDataMap("distsetting.button_moveX", DataDef("plc.1.dist_x_pv", "plc.1.dist_x_sv", "plc.1.dist_x_sv"));
+    data_model_.SetUiToDataMap("distsetting.button_moveY", DataDef("plc.1.dist_y_pv", "plc.1.dist_y_sv", "plc.1.dist_y_sv"));
     // safety and experiment status
     data_model_.SetUiToDataMap("safety.button_reactor_1_run", DataDef("plc.1.reactor_1_run", "plc.1.reactor_1_run", "plc.1.reactor_1_run"));
     data_model_.SetUiToDataMap("safety.button_reactor_2_run", DataDef("plc.1.reactor_2_run", "plc.1.reactor_2_run", "plc.1.reactor_2_run"));

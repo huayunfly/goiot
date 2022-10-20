@@ -28,6 +28,7 @@ SOURCES += \
     form_common.cpp \
     form_cylindera.cpp \
     form_cylinderb.cpp \
+    form_distributorsetting.cpp \
     form_gasfeed.cpp \
     form_gassampling.cpp \
     form_history.cpp \
@@ -68,6 +69,7 @@ HEADERS += \
     form_common.h \
     form_cylindera.h \
     form_cylinderb.h \
+    form_distributorsetting.h \
     form_gasfeed.h \
     form_gassampling.h \
     form_history.h \
@@ -102,6 +104,7 @@ FORMS += \
     dialog_setvalue.ui \
     form_cylindera.ui \
     form_cylinderb.ui \
+    form_distributorsetting.ui \
     form_gasfeed.ui \
     form_gassampling.ui \
     form_history.ui \
