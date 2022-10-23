@@ -41,7 +41,11 @@ void SamplingUIItem::paint(QPainter *painter,
     QFont font;
     font.setPointSize(7);
     painter->setFont(font);
-    if (number_ > 0 && number_ <= MAX_SAMPLING)
+    if (number_ == 0)
+    {
+        painter->drawText(QPointF(10, -10), "home");
+    }
+    else if (number_ > 0 && number_ <= MAX_SAMPLING)
     {
         painter->drawText(QPointF(10, -10), QString::number(number_));
     }

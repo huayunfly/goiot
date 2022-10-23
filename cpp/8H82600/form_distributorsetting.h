@@ -32,6 +32,8 @@ private slots:
 
     void on_button_moveY_clicked();
 
+    void on_button_sampling_injector_clicked();
+
 private:
     // Initialize runtime view.
     void InitRuntimeView();
@@ -49,11 +51,20 @@ private:
                          int x_count, int y_count, int y_section,
                          int pos_x, int pos_y);
 
+    // Init home positions.
+    void InitHomePosItem(int x_gap, int y_gap, double radius,
+                         int x_count, int y_count, int pos_x, int pos_y);
+
     void InitControlPanel();
+
+    // Update the sampling item view, position.
+    void UpdateRuntimeView();
 
 private:
     Ui::FormDistributorSetting *ui;
 
+    int pos_x_;
+    int pos_y_;
     // sampling runtime UI group
     std::vector<std::shared_ptr<SamplingUIItem>> sampling_ui_items;
 };
