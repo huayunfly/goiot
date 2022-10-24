@@ -1127,6 +1127,8 @@ void FormLiquidDistributor::RunRecipeWorker()
             // Adjust purge duration
             bool volatile run_a = entity.run_a;
             bool volatile run_b = entity.run_b;
+            int channel_a = entity.channel_a;
+            int channel_b = entity.channel_b;
             int duration_a = entity.duration_a;
             int duration_b = entity.duration_b;
             if (entity.type == TYPE_SAMPLING_PURGE ||
@@ -1191,15 +1193,46 @@ void FormLiquidDistributor::RunRecipeWorker()
             std::future<qint64> check_a, check_b;
             if (run_a)
             {
-                check_a = std::async(
-                            &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                            StatusCheckGroup::A, duration_a);
+                if (entity.type == TYPE_SAMPLING)
+                {
+                    check_a = std::async(
+                                &FormLiquidDistributor::SamplingStatusCheckByImageDetection, this,
+                                StatusCheckGroup::A, duration_a);
+
+                }
+                else if (entity.type == TYPE_COLLECTION)
+                {
+                    check_a = std::async(
+                                &FormLiquidDistributor::SamplingStatusCheckByPressure, this,
+                                StatusCheckGroup::A, channel_a, duration_a);
+                }
+                else
+                {
+                    check_a = std::async(
+                                &FormLiquidDistributor::SamplingStatusCheckByTime, this,
+                                StatusCheckGroup::A, duration_a);
+                }
             }
             if (run_b)
             {
-                check_b = std::async(
-                            &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                            StatusCheckGroup::B, duration_b);
+                if (entity.type == TYPE_SAMPLING)
+                {
+                    check_b = std::async(
+                                &FormLiquidDistributor::SamplingStatusCheckByImageDetection, this,
+                                StatusCheckGroup::B, duration_b);
+                }
+                else if (entity.type == TYPE_COLLECTION)
+                {
+                    check_b = std::async(
+                                &FormLiquidDistributor::SamplingStatusCheckByPressure, this,
+                                StatusCheckGroup::B, channel_b, duration_b);
+                }
+                else
+                {
+                    check_b = std::async(
+                                &FormLiquidDistributor::SamplingStatusCheckByTime, this,
+                                StatusCheckGroup::B, duration_b);
+                }
             }
 
             // Write a step stopped record
@@ -1343,9 +1376,9 @@ bool FormLiquidDistributor::StopTakingLiquidCmd(StatusCheckGroup group)
 }
 
 qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
-        StatusCheckGroup group, int timeout_secs)
+        StatusCheckGroup group, int timeout_sec)
 {
-    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_secs);
+    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
     while (task_running_.load() && std::chrono::system_clock::now() < timeout)
     {
         std::this_thread::yield();
@@ -1369,6 +1402,53 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
     }
     StopTakingLiquidCmd(group);
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
+}
+
+qint64 FormLiquidDistributor::SamplingStatusCheckByPressure(
+        StatusCheckGroup group, int channel, int timeout_sec)
+{
+    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
+    float pressure_start = 0;
+    float pressure_current = 10; // a large enough initial value
+    float ratio = 0.5;  // 3barA * 0.5 = 1.5barA
+    bool ok = ReadPressure(channel, pressure_start);
+    while (task_running_.load() && std::chrono::system_clock::now() < timeout)
+    {
+        if (!ok || (pressure_current < 1.5) ||
+                (pressure_current < pressure_start * ratio))
+        {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        ok = ReadPressure(channel, pressure_current);
+    }
+    StopTakingLiquidCmd(group);
+    return QDateTime::currentDateTime().toMSecsSinceEpoch();
+}
+
+bool FormLiquidDistributor::ReadPressure(int channel, float& pressure)
+{
+    pressure = 0;
+    if (channel < 0 || channel > 16)
+    {
+        return false;
+    }
+    QString name("pressure_");
+    name.append(QString::number(channel));
+    QString value;
+    Ui::ControlStatus status;
+    UiInfo info;
+    bool ok = read_data_func_(this->objectName(), name, value, status, info); // no result check here
+    if (!ok || status != Ui::ControlStatus::OK)
+    {
+        return false;
+    }
+    pressure = value.toFloat(&ok);
+    if (!ok)
+    {
+        return false;
+    }
+    return true;
 }
 
 bool FormLiquidDistributor::DetectImage(int index)

@@ -271,16 +271,23 @@ private:
     // Send PLC command to stop taking liquid.
     bool StopTakingLiquidCmd(StatusCheckGroup group);
 
-    // Liquid sampling status check task A, using timeout
+    // Liquid sampling&collection status check task A, using timeout
     // The thread will exit if the recipe does not run.
-    qint64 SamplingStatusCheckByTime(StatusCheckGroup group, int timeout_secs);
+    qint64 SamplingStatusCheckByTime(StatusCheckGroup group, int timeout_sec);
 
     // Liquid sampling status check task B, using liquid image recognition.
     // The thread will exit if the recipe does not run.
     qint64 SamplingStatusCheckByImageDetection(StatusCheckGroup group, int timeout_sec);
 
+    // Liquid sampling status check task C, using the channel pressure drop.
+    // The thread will exit if the recipe does not run.
+    qint64 SamplingStatusCheckByPressure(StatusCheckGroup group, int channel, int timeout_sec);
+
     // Detect liquid level in image. Return true if it succeeded.
     bool DetectImage(int index);
+
+    // Read the channel pressure. It returns true if reading succeed.
+    bool ReadPressure(int channel, float& pressure);
 
     // Clear the UI setting table by category
     void ClearUITable();
