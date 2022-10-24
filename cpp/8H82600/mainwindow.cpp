@@ -119,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
     liquid_distributor_form_vec.push_back(new FormLiquidDistributor(nullptr, "distributor_collection", "液体收集", "QPSQL:127.0.0.1:5432:8H82600:postgres:hello@123", LiquidDistributorCategory::COLLECTION));
     for (auto& entry: liquid_distributor_form_vec)
     {
+        entry->RegisterReadDataFunc(std::bind(&MainWindow::ReadData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
         entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         ui_->widget_distributor->addTab(entry, entry->GetDisplayName());
     }
