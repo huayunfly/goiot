@@ -1185,6 +1185,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.dist_servo_on", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_servo_on"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dist_servo_error", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_servo_error"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc13_9", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_sampling_injector"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.smc13_11", UiInfo(ui_->tabWidget->widget(12), QString::fromUtf8("label_collection_injector"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     // liquid distributor
     data_model_.SetDataToUiMap("plc.1.dist_a_run_pv", {UiInfo(ui_->widget_distributor->widget(0), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
                                                        UiInfo(ui_->widget_distributor->widget(1), QString::fromUtf8("label_dist_a_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
@@ -2044,6 +2045,7 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("distsetting.button_moveX", DataDef("plc.1.dist_x_pv", "plc.1.dist_x_sv", "plc.1.dist_x_sv"));
     data_model_.SetUiToDataMap("distsetting.button_moveY", DataDef("plc.1.dist_y_pv", "plc.1.dist_y_sv", "plc.1.dist_y_sv"));
     data_model_.SetUiToDataMap("distsetting.button_sampling_injector", DataDef("plc.1.smc13_9", "plc.1.smc13_9", "plc.1.smc13_9"));
+    data_model_.SetUiToDataMap("distsetting.button_collection_injector", DataDef("plc.1.smc13_11", "plc.1.smc13_11", "plc.1.smc13_11"));
     // safety and experiment status
     data_model_.SetUiToDataMap("safety.button_reactor_1_run", DataDef("plc.1.reactor_1_run", "plc.1.reactor_1_run", "plc.1.reactor_1_run"));
     data_model_.SetUiToDataMap("safety.button_reactor_2_run", DataDef("plc.1.reactor_2_run", "plc.1.reactor_2_run", "plc.1.reactor_2_run"));

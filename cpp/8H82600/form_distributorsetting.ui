@@ -30,7 +30,7 @@
      <x>570</x>
      <y>0</y>
      <width>161</width>
-     <height>531</height>
+     <height>581</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -97,7 +97,7 @@
     <item>
      <widget class="QPushButton" name="button_speedY">
       <property name="text">
-       <string>Y速率（mm/s）</string>
+       <string>Y速率设定（mm/s）</string>
       </property>
      </widget>
     </item>
@@ -176,6 +176,32 @@
      <widget class="QPushButton" name="button_sampling_injector">
       <property name="text">
        <string>采样头升降</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_collection_injector">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>HC8103</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="comboBox_collection_injector"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_collection_injector">
+      <property name="text">
+       <string>收集头升降</string>
       </property>
      </widget>
     </item>

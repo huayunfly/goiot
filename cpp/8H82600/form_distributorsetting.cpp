@@ -12,6 +12,7 @@ FormDistributorSetting::FormDistributorSetting(QWidget *parent) :
     ui->setupUi(this);
     InitRuntimeView();
     InitControlPanel();
+    EnableButtons(false);
 }
 
 FormDistributorSetting::~FormDistributorSetting()
@@ -35,11 +36,13 @@ bool FormDistributorSetting::event(QEvent *event)
             {
                 ui->label_servo_on->setText("SERVO ON");
                 ui->label_servo_on->setStyleSheet("QLabel{background-color:rgb(144,238,144);}");
+                EnableButtons(true);
             }
             else
             {
                 ui->label_servo_on->setText("SERVO OFF");
                 ui->label_servo_on->setStyleSheet("QLabel{background-color:rgb(165,42,42);}");
+                EnableButtons(false);
             }
         }
         else if (e->Name().compare("label_servo_error", Qt::CaseInsensitive) == 0)
@@ -57,17 +60,17 @@ bool FormDistributorSetting::event(QEvent *event)
         }
         else if (e->Name().compare("label_speedY", Qt::CaseInsensitive) == 0)
         {
-            ui->label_speedY->setText(QString::number(e->State()) + " (mm/s)");
+            ui->label_speedY->setText(QString::number(e->State()) + " (当前速率mm/s)");
         }
         else if (e->Name().compare("label_posX", Qt::CaseInsensitive) == 0)
         {
-            ui->label_posX->setText(QString::number(e->State()) + " (posX)");
+            ui->label_posX->setText(QString::number(e->State()) + " (当前X位置)");
             pos_x_ = e->State();
             UpdateRuntimeView();
         }
         else if (e->Name().compare("label_posY", Qt::CaseInsensitive) == 0)
         {
-            ui->label_posY->setText(QString::number(e->State()) + " (posY)");
+            ui->label_posY->setText(QString::number(e->State()) + " (当前Y位置)");
             pos_y_ = e->State();
             UpdateRuntimeView();
         }
@@ -75,11 +78,22 @@ bool FormDistributorSetting::event(QEvent *event)
         {
             if (e->State() > 0)
             {
-                ui->label_sampling_injector->setText(QString::number(e->State()) + "(取液头下伸)");
+                ui->label_sampling_injector->setText(QString::number(e->State()) + "(采液头下伸)");
             }
             else
             {
-                ui->label_sampling_injector->setText(QString::number(e->State()) + "(取液头复位)");
+                ui->label_sampling_injector->setText(QString::number(e->State()) + "(采液头复位)");
+            }
+        }
+        else if (e->Name().compare("label_collection_injector", Qt::CaseInsensitive) == 0)
+        {
+            if (e->State() > 0)
+            {
+                ui->label_sampling_injector->setText(QString::number(e->State()) + "(收集头下伸)");
+            }
+            else
+            {
+                ui->label_sampling_injector->setText(QString::number(e->State()) + "(收集头复位)");
             }
         }
         return true;
@@ -200,11 +214,12 @@ void FormDistributorSetting::InitControlPanel()
     {
         pos_y.push_back(QString::number(i));
     }
-    QStringList pos_sampling_injector = {"0", "1"};
+    QStringList pos_injector = {"0", "1"};
     ui->comboBox_speedY->addItems(speed_y);
     ui->comboBox_moveX->addItems(pos_x);
     ui->comboBox_moveY->addItems(pos_y);
-    ui->comboBox_sampling_injector->addItems(pos_sampling_injector);
+    ui->comboBox_sampling_injector->addItems(pos_injector);
+    ui->comboBox_collection_injector->addItems(pos_injector);
 }
 
 void FormDistributorSetting::UpdateRuntimeView()
@@ -241,6 +256,15 @@ void FormDistributorSetting::UpdateRuntimeView()
         sampling_ui_items.at(selected + LIQ_COLLECTION_GAP)->SetStatus(
                     SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
     }
+}
+
+void FormDistributorSetting::EnableButtons(bool enable)
+{
+    ui->button_speedY->setEnabled(enable);
+    ui->button_moveX->setEnabled(enable);
+    ui->button_moveY->setEnabled(enable);
+    ui->button_sampling_injector->setEnabled(enable);
+    ui->button_collection_injector->setEnabled(enable);
 }
 
 void FormDistributorSetting::on_button_servo_on_clicked()
@@ -300,6 +324,16 @@ void FormDistributorSetting::on_button_sampling_injector_clicked()
 {
     QString button_id = "button_sampling_injector";
     int pos_injector = ui->comboBox_sampling_injector->currentText().toInt();
+    assert(pos_injector == 0 || pos_injector == 1);
+    bool ok = write_data_func_(this->objectName(), button_id, QString::number(pos_injector));
+    assert(ok);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void FormDistributorSetting::on_button_collection_injector_clicked()
+{
+    QString button_id = "button_collection_injector";
+    int pos_injector = ui->comboBox_collection_injector->currentText().toInt();
     assert(pos_injector == 0 || pos_injector == 1);
     bool ok = write_data_func_(this->objectName(), button_id, QString::number(pos_injector));
     assert(ok);

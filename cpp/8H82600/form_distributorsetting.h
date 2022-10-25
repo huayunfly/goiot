@@ -34,6 +34,8 @@ private slots:
 
     void on_button_sampling_injector_clicked();
 
+    void on_button_collection_injector_clicked();
+
 private:
     // Initialize runtime view.
     void InitRuntimeView();
@@ -59,6 +61,9 @@ private:
 
     // Update the sampling item view, position.
     void UpdateRuntimeView();
+
+    // Enable/disable buttons while servo ON/OFF.
+    void EnableButtons(bool enable);
 
 private:
     Ui::FormDistributorSetting *ui;
