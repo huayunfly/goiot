@@ -34,7 +34,8 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     dist_a_run_(false),
     dist_b_run_(false),
     timers_(2),
-    image_params_(2)
+    image_params_(2),
+    pressure_params_(2)
 {
     ui->setupUi(this);
     InitUiState();
@@ -46,6 +47,10 @@ FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
     {
         InitVideoCaps();
         LoadImageParams();
+    }
+    else if (category == LiquidDistributorCategory::COLLECTION)
+    {
+        LoadPressureParams();
     }
 
     // For the recipe setting table
@@ -362,28 +367,25 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
     }
 }
 
-bool FormLiquidDistributor::SaveImageParams()
+bool FormLiquidDistributor::SaveParams(const QString& table_name,
+                                            const std::vector<QString> columns,
+                                            std::vector<std::vector<QString>> values)
 {
-    std::shared_lock<std::shared_mutex> lk(shared_mut_);
-    std::vector<std::vector<QString>> values({image_params_.at(0).toValue(0),
-                                             image_params_.at(1).toValue(1)});
-    lk.unlock();
-
     if (db_ready_)
     {
         QSqlQuery query(db_);
         QString error_msg;
-        bool ok = UpdateImageParamsToDB(image_params_table_name_, image_param_columns_,
-                    QString("name"), values, query, error_msg);
+        bool ok = UpdateParamsToDB(table_name, columns, QString("name"),
+                                        values, query, error_msg);
         if (!ok)
         {
-            QMessageBox::critical(0, "保存图像参数失败", error_msg, QMessageBox::Ignore);
+            QMessageBox::critical(0, "保存参数失败", error_msg, QMessageBox::Ignore);
         }
         return ok;
     }
     else
     {
-        QMessageBox::critical(0, "保存图像参数失败", "数据库未连接", QMessageBox::Ignore);
+        QMessageBox::critical(0, "保存参数失败", "数据库未连接", QMessageBox::Ignore);
         return false;
     }
 }
@@ -392,17 +394,17 @@ bool FormLiquidDistributor::LoadImageParams()
 {
     if (!db_ready_)
     {
-        QMessageBox::critical(0, "加载图像失败", "数据库未连接", QMessageBox::Ignore);
+        QMessageBox::critical(0, "加载图像参数失败", "数据库未连接", QMessageBox::Ignore);
         return false;
     }
     QString error_msg;
     std::vector<std::shared_ptr<std::vector<QString>>> value_list;
     QSqlQuery query(db_);
-    std::vector<QString> image_names {"V0", "V1"};
-    for (std::size_t i = 0; i < image_names.size(); i++)
+    std::vector<QString> load_names {"V0", "V1"};
+    for (std::size_t i = 0; i < load_names.size(); i++)
     {
         bool ok = ReadRecordsFromDB(image_params_table_name_, QString("name"),
-                                    image_names.at(i), image_param_columns_,
+                                    load_names.at(i), image_param_columns_,
                                     query, value_list, error_msg);
         if (!ok)
         {
@@ -449,6 +451,52 @@ bool FormLiquidDistributor::LoadImageParams()
                 image_params_.at(i).min_contour_len = min_len;
                 image_params_.at(i).min_line_count = min_count;
                 image_params_.at(i).min_ratio = min_ratio;
+            }
+        }
+    }
+    return true;
+}
+
+bool FormLiquidDistributor::LoadPressureParams()
+{
+    if (!db_ready_)
+    {
+        QMessageBox::critical(0, "加载压力参数失败", "数据库未连接", QMessageBox::Ignore);
+        return false;
+    }
+    QString error_msg;
+    std::vector<std::shared_ptr<std::vector<QString>>> value_list;
+    QSqlQuery query(db_);
+    std::vector<QString> load_names {"P0", "P1"};
+    for (std::size_t i = 0; i < load_names.size(); i++)
+    {
+        bool ok = ReadRecordsFromDB(pressure_params_table_name_, QString("name"),
+                                    load_names.at(i), pressure_param_columns_,
+                                    query, value_list, error_msg);
+        if (!ok)
+        {
+            QMessageBox::critical(0, "加载压力参数失败", error_msg, QMessageBox::Ignore);
+            return false;
+        }
+        int index = 1; // jump 'name'
+        for (auto& values : value_list)
+        {
+            bool is_ok;
+            int error_count = 0;
+            double lower_pressure = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
+            double pressure_drop_ratio = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
+            if (error_count > 0)
+            {
+                QMessageBox::critical(0, "加载压力参数失败", "数据格式错误", QMessageBox::Ignore);
+                return false;
+            }
+            else
+            {
+                std::lock_guard<std::shared_mutex> lk(shared_mut_);
+                pressure_params_.at(i).lower_pressure = lower_pressure;
+                pressure_params_.at(i).pressure_drop_ratio = pressure_drop_ratio;
             }
         }
     }
@@ -1602,12 +1650,25 @@ void FormLiquidDistributor::LoadManagementWindow()
         return;
     }
     // Get image parameters.
+    std::vector<std::vector<double>> call_params;
+    DialogRecipeMgr::RecipeCategory dlg_category;
     std::shared_lock<std::shared_mutex> lk(shared_mut_);
-    std::vector<std::vector<double>> image_params {image_params_.at(0).toDoubleValue(),
-                                               image_params_.at(1).toDoubleValue()};
+    if (LiquidDistributorCategory::SAMPLING == category_)
+    {
+        call_params.push_back(image_params_.at(0).toDoubleValue());
+        call_params.push_back(image_params_.at(1).toDoubleValue());
+        dlg_category = DialogRecipeMgr::RecipeCategory::SAMPLING;
+    }
+    else if (LiquidDistributorCategory::COLLECTION == category_)
+    {
+        call_params.push_back(pressure_params_.at(0).toDoubleValue());
+        call_params.push_back(pressure_params_.at(1).toDoubleValue());
+        dlg_category = DialogRecipeMgr::RecipeCategory::COLLECTION;
+    }
     lk.unlock();
     // Call the dialog.
-    DialogRecipeMgr dlg_recipe_mgr = DialogRecipeMgr(this, recipe_names, image_params);
+    DialogRecipeMgr dlg_recipe_mgr =
+            DialogRecipeMgr(this, recipe_names, call_params, dlg_category);
     QString title = "配方管理 -> " + loaded_recipe_name_;
     dlg_recipe_mgr.setWindowTitle(title);
     dlg_recipe_mgr.exec();
@@ -1689,23 +1750,45 @@ void FormLiquidDistributor::LoadManagementWindow()
         }
         else if (DialogRecipeMgr::RecipeAction::UPDATE_PARAMS == act)
         {
-            std::vector<std::vector<double>> params = dlg_recipe_mgr.GetImageParams();
+            std::vector<std::vector<double>> params = dlg_recipe_mgr.GetParams();
             {
                 std::lock_guard<std::shared_mutex> lk(shared_mut_);
-                for (std::size_t i = 0; i < params.size(); i++)
+                if (LiquidDistributorCategory::SAMPLING == category_)
                 {
-                    image_params_.at(i).roi_x = params.at(i).at(0);
-                    image_params_.at(i).roi_y = params.at(i).at(1);
-                    image_params_.at(i).roi_side = params.at(i).at(2);
-                    image_params_.at(i).canny_lower_threshold = params.at(i).at(3);
-                    image_params_.at(i).canny_upper_threshold = params.at(i).at(4);
-                    image_params_.at(i).fit_line_degree = params.at(i).at(5);
-                    image_params_.at(i).min_contour_len = params.at(i).at(6);
-                    image_params_.at(i).min_line_count = params.at(i).at(7);
-                    image_params_.at(i).min_ratio = params.at(i).at(8);
+                    for (std::size_t i = 0; i < params.size(); i++)
+                    {
+                        image_params_.at(i).roi_x = params.at(i).at(0);
+                        image_params_.at(i).roi_y = params.at(i).at(1);
+                        image_params_.at(i).roi_side = params.at(i).at(2);
+                        image_params_.at(i).canny_lower_threshold = params.at(i).at(3);
+                        image_params_.at(i).canny_upper_threshold = params.at(i).at(4);
+                        image_params_.at(i).fit_line_degree = params.at(i).at(5);
+                        image_params_.at(i).min_contour_len = params.at(i).at(6);
+                        image_params_.at(i).min_line_count = params.at(i).at(7);
+                        image_params_.at(i).min_ratio = params.at(i).at(8);
+                    }
+                }
+                else if (LiquidDistributorCategory::COLLECTION == category_)
+                {
+                    for (std::size_t i = 0; i < params.size(); i++)
+                    {
+                        pressure_params_.at(i).lower_pressure = params.at(i).at(0);
+                        pressure_params_.at(i).pressure_drop_ratio = params.at(i).at(1);
+                    }
                 }
             }
-            SaveImageParams();
+            if (LiquidDistributorCategory::SAMPLING == category_)
+            {
+                std::vector<std::vector<QString>> values({image_params_.at(0).toValue(0),
+                                                         image_params_.at(1).toValue(1)});
+                SaveParams(image_params_table_name_, image_param_columns_, values);
+            }
+            else if (LiquidDistributorCategory::COLLECTION == category_)
+            {
+                std::vector<std::vector<QString>> values({pressure_params_.at(0).toValue(0),
+                                                         pressure_params_.at(1).toValue(1)});
+                SaveParams(pressure_params_table_name_, pressure_param_columns_, values);
+            }
         }
     }
 }
@@ -1910,18 +1993,21 @@ void FormLiquidDistributor::PrepareDB(
                           "duration_a", "duration_b", "run_a", "run_b", "control_code"};
         image_param_columns_ = {"name", "roi_x", "roi_y", "roi_side", "lower_threshold",
                          "upper_threshold", "direction", "min_len", "min_count", "min_ratio"};
+        pressure_param_columns_ = {"name", "lower_pressure", "pressure_drop_ratio"};
         QString error_message_1;
         QString error_message_2;
         QString error_message_3;
+        QString error_message_4;
         std::vector<QString> default_primary_keys;
         std::vector<QString> primary_keys {"name"};
         bool ok1 = CreateDBTable(db_, recipe_table_name_, table_columns_, default_primary_keys, error_message_1);
         bool ok2 = CreateDBTable(db_, runtime_table_name_, table_columns_, default_primary_keys, error_message_2);
         bool ok3 = CreateDBTable(db_, image_params_table_name_, image_param_columns_, primary_keys, error_message_3);
-        if (!ok1 || !ok2 || !ok3)
+        bool ok4 = CreateDBTable(db_, pressure_params_table_name_, pressure_param_columns_, primary_keys, error_message_4);
+        if (!ok1 || !ok2 || !ok3 || !ok4)
         {
             QMessageBox::critical(0, "创建数据表失败",
-                                  error_message_1 + "\n" + error_message_2 + "\n" + error_message_3, QMessageBox::Ignore);
+                                  error_message_1 + "\n" + error_message_2 + "\n" + error_message_3 + "\n" + error_message_4, QMessageBox::Ignore);
         }
         else
         {
@@ -2110,7 +2196,7 @@ bool FormLiquidDistributor::WriteRecipeToDB(const QString& tablename,
     return ok;
 }
 
-bool FormLiquidDistributor::UpdateImageParamsToDB(
+bool FormLiquidDistributor::UpdateParamsToDB(
         const QString& tablename, const std::vector<QString> columns,
         const QString& primary_key, const std::vector<std::vector<QString> > value_list,
         QSqlQuery &query, QString &error_message)

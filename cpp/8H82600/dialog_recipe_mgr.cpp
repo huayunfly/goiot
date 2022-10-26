@@ -5,14 +5,22 @@
 
 
 DialogRecipeMgr::DialogRecipeMgr(QWidget *parent, const std::vector<QString>& recipe_names,
-                                 const std::vector<std::vector<double>>& params_value) :
+                                 const std::vector<std::vector<double>>& params_value,
+                                 RecipeCategory category) :
     QDialog(parent), recipe_names_(recipe_names),
     ui(new Ui::DialogRecipeMgr), action_(RecipeAction::NONE),
-    image_param_values_(params_value)
+    param_values_(params_value)
 {
     ui->setupUi(this);
     InitRecipeTable();
-    InitImageParamsTable();
+    if (category == RecipeCategory::SAMPLING)
+    {
+        InitImageParamsTable();
+    }
+    else
+    {
+        InitPressureParamsTable();
+    }
 }
 
 DialogRecipeMgr::~DialogRecipeMgr()
@@ -58,9 +66,9 @@ void DialogRecipeMgr::InitImageParamsTable()
     std::vector<QString> param_names = {"ROI_X", "ROI_Y", "ROI_SIDE", "LOWER_THRESHOLD",
                                        "UPPER_THRESHOLD", "DIRECTION", "MIN_LEN", "MIN_COUNT", "MIN_RATIO"};
 
-    if (image_param_values_.empty())
+    if (param_values_.empty())
     {
-        image_param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 0.8},
+        param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 0.8},
                                {200, 100, 280, 15, 30, 15, 10, 10, 0.8}};
     }
 
@@ -81,10 +89,45 @@ void DialogRecipeMgr::InitImageParamsTable()
         ui->tableWidgetParams->item(index, 0)->setFlags(Qt::ItemIsEnabled);
 
         ui->tableWidgetParams->setItem(index, 1, new QTableWidgetItem(
-                                           QString::number(image_param_values_.at(0).at(index))));
+                                           QString::number(param_values_.at(0).at(index))));
         ui->tableWidgetParams->item(index, 1)->setFont(QFont("tahoma", 9, QFont::Normal));
         ui->tableWidgetParams->setItem(index, 2, new QTableWidgetItem(
-                                           QString::number(image_param_values_.at(1).at(index))));
+                                           QString::number(param_values_.at(1).at(index))));
+        ui->tableWidgetParams->item(index, 2)->setFont(QFont("tahoma", 9, QFont::Normal));
+        index++;
+    }
+}
+
+void DialogRecipeMgr::InitPressureParamsTable()
+{
+    std::vector<QString> param_names = {"LOWER_PRESSURE", "DROP_RATIO"};
+
+    if (param_values_.empty())
+    {
+        param_values_ = {{1.5, 0.5}, {1.5, 0.5}};
+    }
+
+    ui->tableWidgetParams->setColumnCount(3);
+    ui->tableWidgetParams->setRowCount(param_names.size());
+    ui->tableWidgetParams->setHorizontalHeaderLabels(QStringList({"名称", "P0值", "P1值"}));
+    ui->tableWidgetParams->horizontalHeader()->setVisible(true);
+    ui->tableWidgetParams->verticalHeader()->setVisible(false);
+    ui->tableWidgetParams->horizontalHeader()->setDefaultSectionSize(180);
+    ui->tableWidgetParams->verticalHeader()->setDefaultSectionSize(25);
+    ui->tableWidgetParams->setAlternatingRowColors(true);
+
+    int index = 0;
+    for (auto& name : param_names)
+    {
+        ui->tableWidgetParams->setItem(index, 0, new QTableWidgetItem(name));
+        ui->tableWidgetParams->item(index, 0)->setFont(QFont("tahoma", 9, QFont::Black));
+        ui->tableWidgetParams->item(index, 0)->setFlags(Qt::ItemIsEnabled);
+
+        ui->tableWidgetParams->setItem(index, 1, new QTableWidgetItem(
+                                           QString::number(param_values_.at(0).at(index))));
+        ui->tableWidgetParams->item(index, 1)->setFont(QFont("tahoma", 9, QFont::Normal));
+        ui->tableWidgetParams->setItem(index, 2, new QTableWidgetItem(
+                                           QString::number(param_values_.at(1).at(index))));
         ui->tableWidgetParams->item(index, 2)->setFont(QFont("tahoma", 9, QFont::Normal));
         index++;
     }
@@ -151,8 +194,8 @@ void DialogRecipeMgr::on_pushButtonStop_clicked()
 
 void DialogRecipeMgr::on_pushButtonUpdateParams_clicked()
 {
-    image_param_values_.clear();
-    image_param_values_.resize(2);
+    param_values_.clear();
+    param_values_.resize(2);
 
     for (int i = 0; i < ui->tableWidgetParams->rowCount(); i++)
     {
@@ -161,13 +204,13 @@ void DialogRecipeMgr::on_pushButtonUpdateParams_clicked()
         double v2 = ui->tableWidgetParams->item(i, 2)->text().toDouble(&ok2);
         if (ok1 && ok2)
         {
-            image_param_values_.at(0).push_back(v1);
-            image_param_values_.at(1).push_back(v2);
+            param_values_.at(0).push_back(v1);
+            param_values_.at(1).push_back(v2);
         }
         else
         {
-            image_param_values_.at(0).push_back(0);
-            image_param_values_.at(1).push_back(0);
+            param_values_.at(0).push_back(0);
+            param_values_.at(1).push_back(0);
         }
     }
     action_ = RecipeAction::UPDATE_PARAMS;

@@ -12,9 +12,17 @@ class DialogRecipeMgr : public QDialog
     Q_OBJECT
 
 public:
+    enum class RecipeCategory
+    {
+        SAMPLING = 0,
+        COLLECTION = 1
+    };
+
+public:
     explicit DialogRecipeMgr(QWidget *parent = nullptr,
                              const std::vector<QString>& recipe_names = {},
-                             const std::vector<std::vector<double>>& params_value = {});
+                             const std::vector<std::vector<double>>& params_value = {},
+                             RecipeCategory category = RecipeCategory::SAMPLING);
     ~DialogRecipeMgr();
 
     enum class RecipeAction
@@ -38,9 +46,9 @@ public:
         return acting_recipe_name_;
     }
 
-    std::vector<std::vector<double>> GetImageParams()
+    std::vector<std::vector<double>> GetParams()
     {
-        return image_param_values_;
+        return param_values_;
     }
 
 private slots:
@@ -61,12 +69,14 @@ private:
 
     void InitImageParamsTable();
 
+    void InitPressureParamsTable();
+
 private:
     std::vector<QString> recipe_names_;
     Ui::DialogRecipeMgr *ui;
     RecipeAction action_;
     QString acting_recipe_name_;
-    std::vector<std::vector<double>> image_param_values_;
+    std::vector<std::vector<double>> param_values_;
 };
 
 #endif // DIALOG_RECIPE_MGR_H

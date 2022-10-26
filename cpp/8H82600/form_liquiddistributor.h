@@ -85,6 +85,7 @@ struct RecipeUITableSetting
     int work_positions;
 };
 
+// For liquid sampling image edge detection.
 struct ImageParams
 {
     ImageParams(double lower_threshold = 15,
@@ -138,6 +139,31 @@ struct ImageParams
                     static_cast<double>(min_contour_len),
                     static_cast<double>(min_line_count),
                     static_cast<double>(min_ratio)};
+    }
+};
+
+// For liquid collection pressure drop detection.
+struct PressureParams
+{
+    PressureParams(double lower_p = 1.5,
+                double ratio_p = 0.5) :
+        lower_pressure(lower_p), pressure_drop_ratio(ratio_p)
+    {
+
+    }
+    double lower_pressure;
+    double pressure_drop_ratio;
+
+    std::vector<QString> toValue(int i)
+    {
+        return std::vector<QString>({QString("P") + QString::number(i),
+                                    QString::number(lower_pressure),
+                                    QString::number(pressure_drop_ratio)});
+    }
+
+    std::vector<double> toDoubleValue()
+    {
+        return std::vector<double> {lower_pressure, pressure_drop_ratio};
     }
 };
 
@@ -251,10 +277,14 @@ private:
     bool DeleteRecipe(const QString& recipe_name);
 
     // Save parameters to DB.
-    bool SaveImageParams();
+    bool SaveParams(const QString& table_name, const std::vector<QString> columns,
+                    std::vector<std::vector<QString>> values);
 
     // Load parameters from DB.
     bool LoadImageParams();
+
+    // Load pressure parameters from DB.
+    bool LoadPressureParams();
 
     // Read a recipe from DB and dispatch recipe task to queue.
     bool DispatchRecipeTask(const QString& recipe_name);
@@ -338,8 +368,8 @@ private:
     bool DeleteRecipeFromDB(const QString& tablename, const QString& recipe_name,
                             QString& error_message);
 
-    // Insert or update image parameters to DB, using INSERT INTO...ON CONFLICT
-    bool UpdateImageParamsToDB(const QString& tablename, const std::vector<QString> columns,
+    // Insert or update image or pressure parameters to DB, using INSERT INTO...ON CONFLICT
+    bool UpdateParamsToDB(const QString& tablename, const std::vector<QString> columns,
                                const QString& primary_key, const std::vector<std::vector<QString>> value_list,
                                QSqlQuery& query, QString& error_message);
 
@@ -361,8 +391,10 @@ private:
     QString password_;
     bool db_ready_;
     const QString image_params_table_name_ = "image_params";
+    const QString pressure_params_table_name_ = "pressure_params";
     std::vector<QString> table_columns_;
     std::vector<QString> image_param_columns_;
+    std::vector<QString> pressure_param_columns_;
     const QString recipe_table_name_ = "liquid_distribute_recipe";
     const QString runtime_table_name_ = "liquid_distribute_runtime";
     const QString control_code_name_ = "control_code";
@@ -414,6 +446,8 @@ private:
 
     // image processing parameters
     std::vector<ImageParams> image_params_;
+    // pressure check parameters
+    std::vector<PressureParams> pressure_params_;
 
     // UI
     std::shared_ptr<QMenu> log_menu;
