@@ -1455,15 +1455,21 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
 qint64 FormLiquidDistributor::SamplingStatusCheckByPressure(
         StatusCheckGroup group, int channel, int timeout_sec)
 {
+    std::size_t index = (StatusCheckGroup::B == group) ? 1 : 0;
     auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
     float pressure_start = 0;
     float pressure_current = 10; // a large enough initial value
-    float ratio = 0.5;  // 3barA * 0.5 = 1.5barA
+    // Prepare params
+    std::shared_lock<std::shared_mutex> lk(shared_mut_);
+    double lower_pressure = pressure_params_.at(index).lower_pressure;
+    double pressure_drop_ratio = pressure_params_.at(index).pressure_drop_ratio;
+    lk.unlock();
+    // Check
     bool ok = ReadPressure(channel, pressure_start);
     while (task_running_.load() && std::chrono::system_clock::now() < timeout)
     {
-        if (!ok || (pressure_current < 1.5) ||
-                (pressure_current < pressure_start * ratio))
+        if (!ok || (pressure_current < lower_pressure) ||
+                (pressure_current < pressure_start * pressure_drop_ratio))
         {
             break;
         }

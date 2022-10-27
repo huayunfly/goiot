@@ -89,11 +89,11 @@ bool FormDistributorSetting::event(QEvent *event)
         {
             if (e->State() > 0)
             {
-                ui->label_sampling_injector->setText(QString::number(e->State()) + "(收集头下伸)");
+                ui->label_collection_injector->setText(QString::number(e->State()) + "(收集头下伸)");
             }
             else
             {
-                ui->label_sampling_injector->setText(QString::number(e->State()) + "(收集头复位)");
+                ui->label_collection_injector->setText(QString::number(e->State()) + "(收集头复位)");
             }
         }
         return true;
