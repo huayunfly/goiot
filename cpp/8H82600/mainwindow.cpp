@@ -2094,22 +2094,23 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("distributor_collection.control_code", DataDef("plc.1.dist_controlcode", "plc.1.dist_controlcode", "plc.1.dist_controlcode"));
     data_model_.SetUiToDataMap("distributor_collection.channel_a_run", DataDef("plc.1.dist_a_run_pv", "plc.1.dist_a_run_sv", "plc.1.dist_a_run_sv"));
     data_model_.SetUiToDataMap("distributor_collection.channel_b_run", DataDef("plc.1.dist_b_run_pv", "plc.1.dist_b_run_sv", "plc.1.dist_b_run_sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_1", DataDef("mfcpfc.11.pv", "mfcpfc.11.sv", "mfcpfc.11.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_2", DataDef("mfcpfc.12.pv", "mfcpfc.12.sv", "mfcpfc.12.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_3", DataDef("mfcpfc.13.pv", "mfcpfc.13.sv", "mfcpfc.13.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_4", DataDef("mfcpfc.14.pv", "mfcpfc.14.sv", "mfcpfc.14.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_5", DataDef("mfcpfc.15.pv", "mfcpfc.15.sv", "mfcpfc.15.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_6", DataDef("mfcpfc.16.pv", "mfcpfc.16.sv", "mfcpfc.16.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_7", DataDef("mfcpfc.17.pv", "mfcpfc.17.sv", "mfcpfc.17.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_8", DataDef("mfcpfc.18.pv", "mfcpfc.18.sv", "mfcpfc.18.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_9", DataDef("mfcpfc.19.pv", "mfcpfc.19.sv", "mfcpfc.19.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_10", DataDef("mfcpfc.20.pv", "mfcpfc.20.sv", "mfcpfc.20.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_11", DataDef("mfcpfc.21.pv", "mfcpfc.21.sv", "mfcpfc.21.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_12", DataDef("mfcpfc.22.pv", "mfcpfc.22.sv", "mfcpfc.22.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_13", DataDef("mfcpfc.23.pv", "mfcpfc.23.sv", "mfcpfc.23.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_14", DataDef("mfcpfc.24.pv", "mfcpfc.24.sv", "mfcpfc.24.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_15", DataDef("mfcpfc.25.pv", "mfcpfc.25.sv", "mfcpfc.25.sv"));
-    data_model_.SetUiToDataMap("distributor_collection.pressure_16", DataDef("mfcpfc.26.pv", "mfcpfc.26.sv", "mfcpfc.26.sv"));
+    // For liquid collection pressure reading, using PV for pv sv_r and sv_w
+    data_model_.SetUiToDataMap("distributor_collection.pressure_1", DataDef("mfcpfc.11.pv", "mfcpfc.11.pv", "mfcpfc.11.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_2", DataDef("mfcpfc.12.pv", "mfcpfc.12.pv", "mfcpfc.12.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_3", DataDef("mfcpfc.13.pv", "mfcpfc.13.pv", "mfcpfc.13.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_4", DataDef("mfcpfc.14.pv", "mfcpfc.14.pv", "mfcpfc.14.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_5", DataDef("mfcpfc.15.pv", "mfcpfc.15.pv", "mfcpfc.15.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_6", DataDef("mfcpfc.16.pv", "mfcpfc.16.pv", "mfcpfc.16.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_7", DataDef("mfcpfc.17.pv", "mfcpfc.17.pv", "mfcpfc.17.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_8", DataDef("mfcpfc.18.pv", "mfcpfc.18.pv", "mfcpfc.18.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_9", DataDef("mfcpfc.19.pv", "mfcpfc.19.pv", "mfcpfc.19.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_10", DataDef("mfcpfc.20.pv", "mfcpfc.20.pv", "mfcpfc.20.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_11", DataDef("mfcpfc.21.pv", "mfcpfc.21.pv", "mfcpfc.21.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_12", DataDef("mfcpfc.22.pv", "mfcpfc.22.pv", "mfcpfc.22.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_13", DataDef("mfcpfc.23.pv", "mfcpfc.23.pv", "mfcpfc.23.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_14", DataDef("mfcpfc.24.pv", "mfcpfc.24.pv", "mfcpfc.24.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_15", DataDef("mfcpfc.25.pv", "mfcpfc.25.pv", "mfcpfc.25.pv"));
+    data_model_.SetUiToDataMap("distributor_collection.pressure_16", DataDef("mfcpfc.26.pv", "mfcpfc.26.pv", "mfcpfc.26.pv"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)
