@@ -1543,7 +1543,7 @@ bool FormLiquidDistributor::DetectImage(int index)
         }
         else
         {
-            roi = gray;
+            return false; // Force exit for the out-range invalid ROI.
         }
 
         cv::Canny(roi, edges, canny_lower_threshold, canny_upper_threshold,
@@ -1618,7 +1618,7 @@ bool FormLiquidDistributor::DetectImage(int index)
                                                              cv::Point(roi_x + roi_side, roi_y),
                                                              cv::Point(roi_x + roi_side, roi_y + roi_side),
                                                              cv::Point(roi_x, roi_y + roi_side)}};
-        cv::drawContours(vframes_.at(index), roi_contours, 0, cv::Scalar(0, 255, 255), 2);
+        cv::drawContours(vframes_.at(index), roi_contours, 0, cv::Scalar(0, 255, 255), 5);
         this->update();
     }
     return ok;
@@ -1838,7 +1838,7 @@ void FormLiquidDistributor::UpdateImage(int index)
             }
             else
             {
-                roi = gray;
+                return; // Force exit for the out-range invalid ROI.
             }
 
             cv::Canny(roi, edges, canny_lower_threshold, canny_upper_threshold,
@@ -1890,7 +1890,7 @@ void FormLiquidDistributor::UpdateImage(int index)
                     int level_y = static_cast<int>(
                                 roi_y + max_index * roi_side / section_num + roi_side / section_num / 2);
                     cv::line(vframes_.at(index), cv::Point(roi_x, level_y),
-                             cv::Point(roi_x + roi_side, level_y), cv::Scalar(0, 255, 0), 2);
+                             cv::Point(roi_x + roi_side, level_y), cv::Scalar(0, 255, 0), 5);
                     //                if (max_index == 0)
                     //                {
                     //                    found_level = true;
