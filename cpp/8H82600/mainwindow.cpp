@@ -807,6 +807,23 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp38_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4606"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp39_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4607"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp40_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4608"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // reactorA-out-pipe TC
+    data_model_.SetDataToUiMap("plc.1.temp65_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4701"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp66_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4702"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp67_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4703"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp68_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4704"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp69_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4705"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp70_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4706"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp71_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4707"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp72_sv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_TICA4708"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp65_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4701"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp66_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4702"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp67_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4703"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp68_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4704"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp69_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4705"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp70_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4706"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp71_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4707"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp72_pv", UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_TICA4708"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     // reactorA-block busy
     data_model_.SetDataToUiMap("reactor16.1.busy", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("label_HC4101"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
@@ -1004,6 +1021,23 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp46_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4614"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp47_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4615"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp48_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4616"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    // reactorB-out-pipe TC
+    data_model_.SetDataToUiMap("plc.1.temp73_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4709"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp74_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4710"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp75_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4711"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp76_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4712"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp77_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4713"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp78_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4714"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp79_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4715"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp80_sv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_TICA4716"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp73_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4709"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp74_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4710"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp75_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4711"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp76_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4712"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp77_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4713"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp78_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4714"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp79_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4715"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
+    data_model_.SetDataToUiMap("plc.1.temp80_pv", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_TICA4716"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     // reactorB-block busy
     data_model_.SetDataToUiMap("reactor16.9.busy", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4109"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0),
                                                      UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_MOTOR, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
@@ -1514,6 +1548,16 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("reactora.label_TICA4606", DataDef("plc.1.temp54_pv", "plc.1.temp54_sv", "plc.1.temp54_sv"));
     data_model_.SetUiToDataMap("reactora.label_TICA4607", DataDef("plc.1.temp55_pv", "plc.1.temp55_sv", "plc.1.temp55_sv"));
     data_model_.SetUiToDataMap("reactora.label_TICA4608", DataDef("plc.1.temp56_pv", "plc.1.temp56_sv", "plc.1.temp56_sv"));
+    // reactorA - out - pipe TC
+    data_model_.SetUiToDataMap("reactora.label_TICA4701", DataDef("plc.1.temp65_pv", "plc.1.temp65_sv", "plc.1.temp65_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4702", DataDef("plc.1.temp66_pv", "plc.1.temp66_sv", "plc.1.temp66_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4703", DataDef("plc.1.temp67_pv", "plc.1.temp67_sv", "plc.1.temp67_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4704", DataDef("plc.1.temp68_pv", "plc.1.temp68_sv", "plc.1.temp68_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4705", DataDef("plc.1.temp69_pv", "plc.1.temp69_sv", "plc.1.temp69_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4706", DataDef("plc.1.temp70_pv", "plc.1.temp70_sv", "plc.1.temp70_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4707", DataDef("plc.1.temp71_pv", "plc.1.temp71_sv", "plc.1.temp71_sv"));
+    data_model_.SetUiToDataMap("reactora.label_TICA4708", DataDef("plc.1.temp72_pv", "plc.1.temp72_sv", "plc.1.temp72_sv"));
+
     // reactorB
     data_model_.SetUiToDataMap("reactorb.label_HC4609", DataDef("plc.1.smc14_17", "plc.1.smc14_17", "plc.1.smc14_17"));
     data_model_.SetUiToDataMap("reactorb.label_HC4610", DataDef("plc.1.smc14_18", "plc.1.smc14_18", "plc.1.smc14_18"));
@@ -1568,6 +1612,15 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("reactorb.label_TICA4614", DataDef("plc.1.temp46_pv", "plc.1.temp46_sv", "plc.1.temp46_sv"));
     data_model_.SetUiToDataMap("reactorb.label_TICA4615", DataDef("plc.1.temp47_pv", "plc.1.temp47_sv", "plc.1.temp47_sv"));
     data_model_.SetUiToDataMap("reactorb.label_TICA4616", DataDef("plc.1.temp48_pv", "plc.1.temp48_sv", "plc.1.temp48_sv"));
+    // reactorB - out - pipe TC
+    data_model_.SetUiToDataMap("reactorb.label_TICA4709", DataDef("plc.1.temp73_pv", "plc.1.temp73_sv", "plc.1.temp73_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4710", DataDef("plc.1.temp74_pv", "plc.1.temp74_sv", "plc.1.temp74_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4711", DataDef("plc.1.temp75_pv", "plc.1.temp75_sv", "plc.1.temp75_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4712", DataDef("plc.1.temp76_pv", "plc.1.temp76_sv", "plc.1.temp76_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4713", DataDef("plc.1.temp77_pv", "plc.1.temp77_sv", "plc.1.temp77_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4714", DataDef("plc.1.temp78_pv", "plc.1.temp78_sv", "plc.1.temp78_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4715", DataDef("plc.1.temp79_pv", "plc.1.temp79_sv", "plc.1.temp79_sv"));
+    data_model_.SetUiToDataMap("reactorb.label_TICA4716", DataDef("plc.1.temp80_pv", "plc.1.temp80_sv", "plc.1.temp80_sv"));
 
     // gassampling
     data_model_.SetUiToDataMap("gassampling.label_HC4401", DataDef("plc.1.smc14_10", "plc.1.smc14_10", "plc.1.smc14_10"));

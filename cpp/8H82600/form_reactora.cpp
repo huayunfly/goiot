@@ -76,4 +76,12 @@ void FormReactorA::InitUiState()
     ui->label_TICA4606->installEventFilter(this);
     ui->label_TICA4607->installEventFilter(this);
     ui->label_TICA4608->installEventFilter(this);
+    ui->label_TICA4701->installEventFilter(this);
+    ui->label_TICA4702->installEventFilter(this);
+    ui->label_TICA4703->installEventFilter(this);
+    ui->label_TICA4704->installEventFilter(this);
+    ui->label_TICA4705->installEventFilter(this);
+    ui->label_TICA4706->installEventFilter(this);
+    ui->label_TICA4707->installEventFilter(this);
+    ui->label_TICA4708->installEventFilter(this);
 }
