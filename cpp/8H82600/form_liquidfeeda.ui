@@ -976,7 +976,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
-    <string>液体收集HC6101-2</string>
+    <string>液体收集HC6101-3</string>
    </property>
   </widget>
   <widget class="QLabel" name="txt_label_HC7101">
@@ -992,7 +992,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
-    <string>液体采样HC7101-2</string>
+    <string>液体采样HC7101-3</string>
    </property>
   </widget>
  </widget>
