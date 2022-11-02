@@ -380,10 +380,13 @@ bool FormSafety::event(QEvent *event)
             {
                 int num = (*iter).second.total_num;
                 int offset = (*iter).second.item_offset;
-                auto status = (*iter).second.status;
+                SafetyUIItem::SafetyUIItemStatus status = (*iter).second.status;
                 std::vector<int> alarm_index;
                 std::vector<int> normal_index;
                 uint32_t test_bit = 1;
+                uint64_t alm_bits = e->State(); // 64bit to 32bit force shift 0xFFFF FFFF 8000 0000 to 0xFFFF FFFF
+                alm_bits = alm_bits >> 32;
+                // qWarning("ALM coming [%s] [%u] e.state[%d]", data_info_id.c_str(), alm_bits, e->State());
                 // Adjust byte_order by 16bits or 32bits,
                 // for PLC defined array of bit[16] or [32], but get data by s7-driver
                 // WUB or DUB, which made big -> litter endian conversion.
@@ -392,7 +395,7 @@ bool FormSafety::event(QEvent *event)
                 for (int i = 0; i < num; i++)
                 {
                     // Find alarm bit by byte_order conversion.
-                    if ((test_bit << byte_order.at(i)) & e->State())
+                    if ((test_bit << byte_order.at(i)) & alm_bits)
                     {
                         alarm_index.push_back(i);
                     }
@@ -404,14 +407,21 @@ bool FormSafety::event(QEvent *event)
                 for (std::size_t i = 0; i < alarm_index.size(); i++)
                 {
                     int pos = offset + alarm_index.at(i);
-                    alarm_ui_items_.at(pos)->SetStatus(status);
-                    qWarning("alarm [%s], [%s]", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
-                          alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
+                    if (alarm_ui_items_.at(pos)->Status() != status)
+                    {
+                         alarm_ui_items_.at(pos)->SetStatus(status);
+                         qWarning("alarm [%s], [%s]", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
+                               alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
+                    }
                 }
                 for (std::size_t i = 0; i < normal_index.size(); i++)
                 {
-                    alarm_ui_items_.at(offset + normal_index.at(i))->SetStatus(
-                                SafetyUIItem::SafetyUIItemStatus::Normal);
+                    int pos = offset + normal_index.at(i);
+                    if (alarm_ui_items_.at(pos)->Status() == status)
+                    {
+                        alarm_ui_items_.at(pos)->SetStatus(
+                                    SafetyUIItem::SafetyUIItemStatus::Normal);
+                    }
                 }
             }
             return true;

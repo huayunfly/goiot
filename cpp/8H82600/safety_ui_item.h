@@ -46,6 +46,11 @@ public:
 
     void SetStatus(SafetyUIItemStatus status);
 
+    SafetyUIItemStatus Status()
+    {
+        return status_;
+    }
+
     const QString& Note()
     {
         return note_;
