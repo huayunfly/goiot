@@ -1096,6 +1096,134 @@
     <string>N2</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_R1_clean">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>440</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器1出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R2_clean">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>400</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器2出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R3_clean">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>390</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器3出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R4_clean">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>415</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器4出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R5_clean">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>460</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器5出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R6_clean">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>520</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器6出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R7_clean">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>550</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器7出管</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R8_clean">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>520</y>
+     <width>65</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>反应器8出管</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>
