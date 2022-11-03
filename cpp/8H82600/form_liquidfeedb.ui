@@ -928,6 +928,168 @@
     <string>液体收集HC6201-3</string>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_TICA2415">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>615</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA2415</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA2415">
+   <property name="geometry">
+    <rect>
+     <x>423</x>
+     <y>589</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA2415">
+   <property name="geometry">
+    <rect>
+     <x>458</x>
+     <y>590</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA3503">
+   <property name="geometry">
+    <rect>
+     <x>385</x>
+     <y>779</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA3503">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>780</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA3503">
+   <property name="geometry">
+    <rect>
+     <x>382</x>
+     <y>805</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA3503</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_TICA3504">
+   <property name="geometry">
+    <rect>
+     <x>932</x>
+     <y>805</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>TICA3504</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_TICA3504">
+   <property name="geometry">
+    <rect>
+     <x>935</x>
+     <y>779</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/temperature_controller.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_TICA3504">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>780</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

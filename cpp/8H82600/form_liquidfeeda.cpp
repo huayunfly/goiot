@@ -44,4 +44,7 @@ void FormLiquidFeedA::InitUiState()
     ui->label_HC2323->installEventFilter(this);
     ui->label_HC2324->installEventFilter(this);
     ui->label_HC2325->installEventFilter(this);
+    ui->label_TICA2315->installEventFilter(this);
+    ui->label_TICA3501->installEventFilter(this);
+    ui->label_TICA3502->installEventFilter(this);
 }
