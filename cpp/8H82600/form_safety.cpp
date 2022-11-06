@@ -384,8 +384,8 @@ bool FormSafety::event(QEvent *event)
                 std::vector<int> alarm_index;
                 std::vector<int> normal_index;
                 uint32_t test_bit = 1;
-                uint64_t alm_bits = e->State(); // 64bit to 32bit force shift 0xFFFF FFFF 8000 0000 to 0xFFFF FFFF
-                alm_bits = alm_bits >> 32;
+                uint32_t alm_bits = e->State(); // 64bit to 32bit force shift 0xFFFF FFFF 8000 0000 to 0xFFFF FFFF
+                //alm_bits = alm_bits >> 32;
                 // qWarning("ALM coming [%s] [%u] e.state[%d]", data_info_id.c_str(), alm_bits, e->State());
                 // Adjust byte_order by 16bits or 32bits,
                 // for PLC defined array of bit[16] or [32], but get data by s7-driver
