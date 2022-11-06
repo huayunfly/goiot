@@ -2468,7 +2468,7 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
     case goiot::DataType::DUB:
     case goiot::DataType::WB:
     case goiot::DataType::WUB:
-        int_value = value.toInt(&ok);
+        int_value = value.toUInt(&ok);
         if (ok)
         {
             int_value -= ui_info.int_offset; // with UI offset
