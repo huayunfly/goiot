@@ -1026,6 +1026,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>进液阀箱#1-4加热</string>
+   </property>
    <property name="text">
     <string>TICA3501</string>
    </property>
@@ -1099,6 +1102,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>进液阀箱#5-8加热</string>
+   </property>
    <property name="text">
     <string>TICA3502</string>
    </property>
@@ -1152,6 +1158,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>进液阀箱#1-8互连管伴热</string>
    </property>
    <property name="text">
     <string>TICA2315</string>

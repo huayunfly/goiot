@@ -742,6 +742,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>去GC1管伴热</string>
+   </property>
    <property name="text">
     <string>TICA5105</string>
    </property>
@@ -758,6 +761,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>去GC2管伴热</string>
+   </property>
    <property name="text">
     <string>TICA5205</string>
    </property>
@@ -766,13 +772,16 @@
    <property name="geometry">
     <rect>
      <x>770</x>
-     <y>90</y>
+     <y>85</y>
      <width>50</width>
      <height>20</height>
     </rect>
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>采气阀箱#1-8加热</string>
    </property>
    <property name="text">
     <string>TICA5501</string>
@@ -789,6 +798,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>采气阀箱#9-16加热</string>
    </property>
    <property name="text">
     <string>TICA5502</string>

@@ -596,6 +596,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>采样阀箱#9-12加热</string>
+   </property>
    <property name="text">
     <string>TICA7503</string>
    </property>
@@ -707,6 +710,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>采样阀箱#13-16加热</string>
    </property>
    <property name="text">
     <string>TICA7504</string>
