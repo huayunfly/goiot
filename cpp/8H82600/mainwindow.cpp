@@ -194,6 +194,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.pg_6", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA1020"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 10, 0));
     data_model_.SetDataToUiMap("plc.1.pg_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA3110"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 5, 0));
     data_model_.SetDataToUiMap("plc.1.pg_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA3120"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 1, 5, 0));
+    data_model_.SetDataToUiMap("plc.1.pg_9", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_PIA4404"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 2, 2, 0),
+                                              UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_PIA4404"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::BARA, 2, 2, 0)});
 
     data_model_.SetDataToUiMap("plc.1.gas_1", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3901"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 0, 30, 0));
     data_model_.SetDataToUiMap("plc.1.gas_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3902"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 0, 30, 0));
