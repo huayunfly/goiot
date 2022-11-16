@@ -8099,6 +8099,11 @@
               "id": "alm_gas_enable",
               "name": "alm_gas_enable",
               "register": "W5WUB1144"
+            },
+            {
+              "id": "pg_9",
+              "name": "PIA4404",
+              "register": "R5DF1146"
             }
           ]
         }
