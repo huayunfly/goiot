@@ -23,10 +23,19 @@ public:
         Error
     };
 
+    enum class SamplingUIItemType
+    {
+        Injection,
+        Purge,
+        Clean,
+        Home
+    };
+
 public:
     SamplingUIItem(double radius, int number = 0, int channel = 0,
+                   SamplingUIItemType type = SamplingUIItemType::Injection,
                    SamplingUIItemStatus status = SamplingUIItemStatus::Unsigned) :
-        radius_(radius), number_(number), channel_(channel), status_(status)
+        radius_(radius), number_(number), channel_(channel), type_(type), status_(status)
     {
         setFlags(QGraphicsItem::ItemIsSelectable
                  | QGraphicsItem::ItemIsFocusable);
@@ -56,10 +65,13 @@ protected:
     void mouseDoubleClickEvent (QGraphicsSceneMouseEvent *event) override;
 
 private:
-    const int MAX_SAMPLING = 128;
+    const int MAX_SAMPLING = 64;
+    const int PURGE_POSITION_LOWER = 65; // N2 purge number range lower
+    const int PURGE_POSITION_UPPER = 96; // N2 purge number range upper
     double radius_;
     int number_;
     int channel_;
+    SamplingUIItemType type_;
     SamplingUIItemStatus status_; // 0: transparent unsigned, 1: grey waiting, 2: yellow sampling, 3: green finished.
 };
 

@@ -526,7 +526,7 @@ RecipeUITableSetting FormLiquidDistributor::GetRecipeUITableSetting()
 {
     if (category_ == LiquidDistributorCategory::SAMPLING)
     {
-        return RecipeUITableSetting(33, 21, 4, 5, 128/*work pos*/);
+        return RecipeUITableSetting(17, 21, 4, 5, 64/*work pos*/);
     }
     else if (category_ == LiquidDistributorCategory::COLLECTION)
     {
@@ -575,69 +575,95 @@ void FormLiquidDistributor::InitRecipeRuntimeView()
 {
     if (category_ == LiquidDistributorCategory::SAMPLING)
     {
-        InitRecipeRuntimeView(35, 35, 15, 4, 32, 8);
+        std::vector<Layout> layout = {Layout::I, Layout::P, Layout::I,
+                                      Layout::I, Layout::P, Layout::I, Layout::C,
+                                      Layout::I, Layout::P, Layout::I,
+                                      Layout::I, Layout::P, Layout::I, Layout::H,
+                                      Layout::I, Layout::P, Layout::I,
+                                      Layout::I, Layout::P, Layout::I, Layout::C,
+                                      Layout::I, Layout::P, Layout::I,
+                                      Layout::I, Layout::P, Layout::I};
+        InitRecipeRuntimeView(45, 40, 15, 4, layout);
     }
     else if (category_ == LiquidDistributorCategory::COLLECTION)
     {
-        InitRecipeRuntimeView(65, 65, 30, 2, 8, 2);
+        std::vector<Layout> layout = {Layout::I, Layout::I, Layout::C,
+                                      Layout::I, Layout::I, Layout::H,
+                                      Layout::I, Layout::I, Layout::C,
+                                      Layout::I, Layout::I};
+        InitRecipeRuntimeView(75, 65, 30, 2, layout);
     }
 }
 
 void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double radius,
-                                                  int x_count, int y_count, int y_section)
+                                                  int x_count, const std::vector<Layout>& layout)
 {
-    std::vector<std::pair<double, double>> positions;
-    int number = 1;
-    int y_margin = 10;
-    double y_base = y_margin;
-    for (int y = 0; y < y_count; y++)
+    int x_base = x_gap + 40;
+    int y_base = y_gap;
+    int num = 1;
+    for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (y >= y_section && y < 2 * y_section)
+        if (layout.at(i) == Layout::I)
         {
-            y_base = y_gap + y_margin;
-        }
-        else if (y >= 2 * y_section && y < 3 * y_section)
-        {
-            y_base = 2 * y_gap + y_margin;
-        }
-        else if (y >= 3 * y_section)
-        {
-            y_base = 3 * y_gap + y_margin;
-        }
-        for (int x = 0; x < x_count; x++)
-        {
-            auto item =
-                    std::make_shared<SamplingUIItem>(radius, number);
-            item->setPos(x * x_gap + 2 * x_gap, y_base + y * y_gap + radius);
-            sampling_ui_items.push_back(item);
-            number++;
+            for (int j = 0; j < x_count; j++)
+            {
+                auto item =
+                        std::make_shared<SamplingUIItem>(radius, num);
+                item->setPos(x_base + j * x_gap, y_base + i * y_gap);
+                sampling_ui_items.push_back(item);
+                num++;
+            }
         }
     }
-    // for 2 sink positions
-    for (int y = 0; y < 2; y++)
+    for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (y == 0)
+        if (layout.at(i) == Layout::P)
         {
-            y_base = y_section * y_gap + y_margin;
+            for (int j = 0; j < x_count; j++)
+            {
+                auto item =
+                        std::make_shared<SamplingUIItem>(
+                            radius / 2, 0, 0, SamplingUIItem::SamplingUIItemType::Purge);
+                item->setPos(x_base + j * x_gap, y_base + i * y_gap);
+                sampling_ui_items.push_back(item);
+                num++;
+            }
         }
-        else
+    }
+    for (std::size_t i = 0; i < layout.size(); i++)
+    {
+        if (layout.at(i) == Layout::C)
         {
-            y_base = (3 * y_section + 2) * y_gap + y_margin;
-        }
-        for (int x = 0; x < x_count; x++)
-        {
-            auto item = std::make_shared<SamplingUIItem>(
-                            radius,
-                            129,
-                            0,
+            for (int j = 0; j < x_count; j++)
+            {
+                auto item =
+                        std::make_shared<SamplingUIItem>(
+                            radius / 2, 0, 0, SamplingUIItem::SamplingUIItemType::Clean,
                             SamplingUIItem::SamplingUIItemStatus::Undischarge);
-            item->setPos(x * x_gap + 2 * x_gap, y_base + radius);
-            sampling_ui_items.push_back(item);
-            number++;
+                item->setPos(x_base + j * x_gap, y_base + i * y_gap);
+                sampling_ui_items.push_back(item);
+                num++;
+            }
+        }
+    }
+    for (std::size_t i = 0; i < layout.size(); i++)
+    {
+        if (layout.at(i) == Layout::H)
+        {
+            for (int j = 0; j < x_count; j++)
+            {
+                auto item =
+                        std::make_shared<SamplingUIItem>(
+                            radius / 2, 0, 0, SamplingUIItem::SamplingUIItemType::Home);
+                item->setPos(x_base + j * x_gap, y_base + i * y_gap);
+                sampling_ui_items.push_back(item);
+                num++;
+            }
         }
     }
 
-    auto scene = new QGraphicsScene(0, 0, x_count * (2 * x_gap), (y_count + 3) * y_gap + y_margin);
+    int y_margin = 10;
+    auto scene = new QGraphicsScene(0, 0, x_count * (2 * x_gap), (layout.size() + 3) * y_gap + y_margin);
     //scene->addRect(0, 0, 300, 800);
     for (auto& item : sampling_ui_items)
     {
@@ -667,7 +693,7 @@ void FormLiquidDistributor::InitRecipeSettingTable()
         int channel_groups = 4;
         InitRecipeSettingTable(2, channel_groups,
                                channel_groups * heads.count() + 1/*seperator*/,
-                               128 / channel_groups + 1/*seperator*/, heads);
+                               64 / channel_groups + 1/*seperator*/, heads);
     }
     else if (category_ == LiquidDistributorCategory::COLLECTION)
     {

@@ -36,22 +36,30 @@ void SamplingUIItem::paint(QPainter *painter,
         throw std::invalid_argument("undefined sampling item status.");
     }
 
+    int width = (type_ == SamplingUIItemType::Injection) ? 2 : 1;
+    QPen pen(Qt::black);
+    pen.setWidth(width);
+    painter->setPen(pen);
     painter->drawEllipse(QPointF(0, 0), radius_, radius_);
     // position
     QFont font;
     font.setPointSize(7);
     painter->setFont(font);
-    if (number_ == 0)
+    if (type_ == SamplingUIItemType::Home)
     {
-        painter->drawText(QPointF(10, -10), "home");
+        painter->drawText(QPointF(10, -10), "原点");
     }
-    else if (number_ > 0 && number_ <= MAX_SAMPLING)
+    else if (type_ == SamplingUIItemType::Injection)
     {
         painter->drawText(QPointF(10, -10), QString::number(number_));
     }
-    else if (number_ > MAX_SAMPLING)
+    else if (type_ == SamplingUIItemType::Purge)
     {
-        painter->drawText(QPointF(10, -10), "sink");
+        painter->drawText(QPointF(10, -10), "吹扫");
+    }
+    else if (type_ == SamplingUIItemType::Clean)
+    {
+        painter->drawText(QPointF(10, -10), "清洗");
     }
     // channel
     font.setPointSize(10);
