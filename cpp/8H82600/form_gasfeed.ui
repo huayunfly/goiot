@@ -2059,6 +2059,47 @@
     <string>报警器组</string>
    </property>
   </widget>
+  <widget class="QTextEdit" name="textEdit_PIA4404">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>680</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA4404">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>710</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>尾气真空度</string>
+   </property>
+   <property name="text">
+    <string>PIA4404</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>textEdit_FICA1110</zorder>
   <zorder>label_HC1201</zorder>
@@ -2176,6 +2217,8 @@
   <zorder>txt_label_ALM3</zorder>
   <zorder>txt_label_ALM4</zorder>
   <zorder>txt_label_ALM</zorder>
+  <zorder>textEdit_PIA4404</zorder>
+  <zorder>txt_label_PIA4404</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>

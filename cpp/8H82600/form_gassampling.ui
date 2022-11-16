@@ -449,8 +449,8 @@
   <widget class="QLabel" name="label_HC4402">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>736</y>
+     <x>290</x>
+     <y>745</y>
      <width>23</width>
      <height>42</height>
     </rect>
@@ -468,8 +468,8 @@
   <widget class="QLabel" name="label_HC4403">
    <property name="geometry">
     <rect>
-     <x>294</x>
-     <y>776</y>
+     <x>255</x>
+     <y>795</y>
      <width>23</width>
      <height>42</height>
     </rect>
@@ -686,7 +686,7 @@
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>730</y>
+     <y>725</y>
      <width>50</width>
      <height>20</height>
     </rect>
@@ -701,8 +701,8 @@
   <widget class="QLabel" name="txt_label_HC4402">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>780</y>
+     <x>290</x>
+     <y>785</y>
      <width>50</width>
      <height>20</height>
     </rect>
@@ -717,8 +717,8 @@
   <widget class="QLabel" name="txt_label_HC4403">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>820</y>
+     <x>255</x>
+     <y>835</y>
      <width>50</width>
      <height>20</height>
     </rect>
@@ -1124,6 +1124,47 @@
    </property>
    <property name="text">
     <string>N2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_PIA4404">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>785</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>尾气真空度</string>
+   </property>
+   <property name="text">
+    <string>PIA4404</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_PIA4404">
+   <property name="geometry">
+    <rect>
+     <x>365</x>
+     <y>745</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
