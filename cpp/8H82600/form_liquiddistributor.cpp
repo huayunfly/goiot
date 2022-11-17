@@ -235,7 +235,7 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
                         TYPE_SAMPLING : TYPE_COLLECTION;
             int x = group/*0, 1 or only 0*/;
             int y = (category_ == LiquidDistributorCategory::SAMPLING) ?
-                        valid_row + 1/*start 1*/ : valid_row + 1 + 34;
+                        valid_row + 1/*start 1*/ : valid_row + 1 + 16;
             int run_a = channel_a > 0 ? 1 : 0;
             int run_b = channel_b > 0 ? 1 : 0;
             tail->push_back(r_name);
@@ -272,11 +272,11 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
                 int y = valid_row + 1/*start 1*/;
                 if (category_ == LiquidDistributorCategory::SAMPLING)
                 {
-                    y = y > 16 ? 34 : 33; // sampling purge y (1-16)33, (17-32)34
+                    y = y > 8 ? 26 : 25; // sampling clean y (1-8)25, (9-16)26
                 }
                 else if (category_ == LiquidDistributorCategory::COLLECTION)
                 {
-                    y = y > 4 ? 44 : 43; // collection purge y (1-4)44, (5-8)43
+                    y = y > 4 ? 26 : 25; // collection clean y (1-4)25, (5-8)26
                 }
                 int run_a = solvent_type_a > 0 ? 1 : 0;
                 int run_b = solvent_type_b > 0 ? 1 : 0;
@@ -315,7 +315,7 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
         int channel_a = 1; // placehold
         int channel_b = 9; // placehold
         int x = 0;
-        int y = 45; // to center position
+        int y = 35; // to center position
         int pos_a = 0; // placehold
         int pos_b = 0; // placehold
         int flow_limit_a = 0; // placehold
