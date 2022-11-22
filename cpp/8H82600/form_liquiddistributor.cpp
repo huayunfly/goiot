@@ -1106,6 +1106,28 @@ bool FormLiquidDistributor::DeleteRecipe(const QString& recipe_name)
     return true;
 }
 
+uint FormLiquidDistributor::MakeRecipeEndCode(LiquidDistributorCategory category)
+{
+    int type = (category == LiquidDistributorCategory::SAMPLING) ?
+                TYPE_SAMPLING : TYPE_COLLECTION;
+    int channel_a = 1; // placehold
+    int channel_b = 9; // placehold
+    int x = 0;
+    int y = 35; // to center position
+    int flow_limit_a = 0; // placehold
+    int flow_limit_b = 0; // placehold
+    int solvent_type_a = 0; // placehold
+    int solvent_type_b = 0; // placehold
+    int run_a = 0; // KEY parameter
+    int run_b = 0; // KEY parameter
+    uint control_code = type + (channel_a << 2) +
+            (channel_b << 7) + (x << 12) + (y << 13) +
+            (flow_limit_a << 19) + (flow_limit_b << 20) +
+            (solvent_type_a << 21) + (solvent_type_b << 25) +
+            (run_a << 29) + (run_b << 30);
+    return control_code;
+}
+
 bool FormLiquidDistributor::DispatchRecipeTask(const QString& recipe_name)
 {
     if (!db_ready_)
@@ -1251,6 +1273,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 StopTakingLiquidCmd(StatusCheckGroup::B);
                 UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                                    SamplingUIItem::SamplingUIItemStatus::Error);
+                Log2Window(recipe_name, "当前步动作启动超时");
                 break; // no lk.unlock() needed.
 //                if (!task_running_) // test code
 //                {
@@ -1353,6 +1376,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 qCritical("RunRecipeWorker() failed, %s", "No PLC step stopped feedback.");
                 UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                                    SamplingUIItem::SamplingUIItemStatus::Error);
+                Log2Window(recipe_name, "当前步动作停止超时");
                 break;
 //                if (!task_running_) // test code
 //                {
@@ -1365,6 +1389,15 @@ void FormLiquidDistributor::RunRecipeWorker()
                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
             // Sleep seconds between send dist_run_a = 0 and next loop dist_run_a = 1
             std::this_thread::sleep_for(std::chrono::seconds(10));
+        }
+        // Force dock to the safe(center) position
+        uint end_code = MakeRecipeEndCode(category_);
+        bool ok = write_data_func_(this->objectName(), control_code_name_,
+                              QString::number(end_code));
+        assert(ok);
+        if (ok)
+        {
+            Log2Window(recipe_name, "返回起始位");
         }
         // Stop
         bool expected = true;
@@ -1395,14 +1428,14 @@ void FormLiquidDistributor::UpdateRuntimeView(const RecipeTaskEntity& entity, bo
     {
         if (run_a)
         {
-            int purge_index = (entity.pos_a > 64) ? (((entity.pos_a - 1) % 4) + 128 + 4) :
-                                           (((entity.pos_a - 1) % 4) + 128);
+            int purge_index = (entity.pos_a > 32) ? (((entity.pos_a - 1) % 4) + 96 + 4) :
+                                           (((entity.pos_a - 1) % 4) + 96);
             sampling_ui_items.at(purge_index)->SetStatus(purge_status, 0);
         }
         if (run_b)
         {
-            int purge_index = (entity.pos_b > 64) ? (((entity.pos_b - 1) % 4) + 128 + 4) :
-                                           (((entity.pos_b - 1) % 4) + 128);
+            int purge_index = (entity.pos_b > 32) ? (((entity.pos_b - 1) % 4) + 96 + 4) :
+                                           (((entity.pos_b - 1) % 4) + 96);
             sampling_ui_items.at(purge_index)->SetStatus(purge_status, 0);
         }
     }

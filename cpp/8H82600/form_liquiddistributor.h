@@ -283,6 +283,9 @@ private:
     // Delete recipe from DB.
     bool DeleteRecipe(const QString& recipe_name);
 
+    // Make recipe end code (docking at the safe position).
+    uint MakeRecipeEndCode(LiquidDistributorCategory category);
+
     // Save parameters to DB.
     bool SaveParams(const QString& table_name, const std::vector<QString> columns,
                     std::vector<std::vector<QString>> values);
