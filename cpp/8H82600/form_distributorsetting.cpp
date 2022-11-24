@@ -104,14 +104,38 @@ bool FormDistributorSetting::event(QEvent *event)
 
 void FormDistributorSetting::InitRuntimeView()
 {
-    InitHomePosItem(35, 35, 10, 4, 1, 2 * (2 * 65), (16 + 1) * 35 + 15);
-    InitSamplingItem(35, 35, 15, 4, 32, 8, 2 * (2 * 65)/* x_count * (2 * x_gap) */, 0);
-    InitSamplingItem(65, 65, 30, 2, 8, 2, 0/* pos_x */, 0/* pos_y */);
+    typedef SamplingUIItem::Layout Layout;
+    std::vector<SamplingUIItem::Layout> layout_sampling = {Layout::I, Layout::P, Layout::I,
+                                  Layout::I, Layout::P, Layout::I, Layout::C,
+                                  Layout::I, Layout::P, Layout::I,
+                                  Layout::I, Layout::P, Layout::I, Layout::H,
+                                  Layout::I, Layout::P, Layout::I,
+                                  Layout::I, Layout::P, Layout::I, Layout::C,
+                                  Layout::I, Layout::P, Layout::I,
+                                  Layout::I, Layout::P, Layout::I};
+    std::vector<Layout> layout_collection = {Layout::I, Layout::I, Layout::C,
+                                  Layout::I, Layout::I, Layout::H,
+                                  Layout::I, Layout::I, Layout::C,
+                                  Layout::I, Layout::I};
+    // 1 sampling home row, distributor X 0
+    InitSamplingItem(45, 40, 15, 4, layout_sampling, 2 * (2 * 65)/* x_count * (2 * x_gap) */, 0, Layout::H);
+    // 16 sampling rows, distributor X 1-16
+    InitSamplingItem(45, 40, 15, 4, layout_sampling, 2 * (2 * 65)/* x_count * (2 * x_gap) */, 0, Layout::I);
+    // 8 collection rows, distributor X 17-24
+    InitSamplingItem(75, 65, 30, 2, layout_collection, 0/* pos_x */, 0/* pos_y */, Layout::I);
+    // 2 sampling clean rows, distributor X 25-26
+    InitSamplingItem(45, 40, 15, 4, layout_sampling, 2 * (2 * 65)/* x_count * (2 * x_gap) */, 0, Layout::C);
+    // 2 collection clean rows, distributor X 25-26 (repeatedly redundant, required to be omitted)
+    InitSamplingItem(75, 65, 30, 2, layout_collection, 0/* pos_x */, 0/* pos_y */, Layout::C);
+    // 8 sampling purge rows, distributor X 27-34
+    InitSamplingItem(45, 40, 15, 4, layout_sampling, 2 * (2 * 65)/* x_count * (2 * x_gap) */, 0, Layout::P);
+    // 1 collection home row, distributor X 0, only for view
+    InitSamplingItem(75, 65, 30, 2, layout_collection, 0/* pos_x */, 0/* pos_y */, Layout::H);
 
     auto scene = new QGraphicsScene(
                 0, 0, /*x_count * (2 * x_gap)*/500,
                 (32 + 3) * 35 + 10/*(y_count + 3) * y_gap + y_margin)*/);
-    for (auto& item : sampling_ui_items)
+    for (auto& item : sampling_ui_items_)
     {
         scene->addItem(item.get());
     }
@@ -121,60 +145,45 @@ void FormDistributorSetting::InitRuntimeView()
     ui->verticalLayout->addWidget(view, 0, Qt::AlignTop | Qt::AlignLeft);
 }
 
-void FormDistributorSetting::InitSamplingItem(
-        int x_gap, int y_gap, double radius, int x_count,
-        int y_count, int y_section, int pos_x, int pos_y)
+void FormDistributorSetting::InitSamplingItem(int x_gap, int y_gap, double radius,
+                                                  int x_count, const std::vector<SamplingUIItem::Layout>& layout,
+                                                  int pos_x, int pos_y, SamplingUIItem::Layout specified)
 {
-    std::vector<std::pair<double, double>> positions;
-    int number = 1;
-    int y_margin = 10;
-    double y_base = y_margin;
-    for (int y = 0; y < y_count; y++)
+    int x_base = x_gap + 40;
+    int y_base = y_gap;
+    int num = 1;
+    for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (y >= y_section && y < 2 * y_section)
+        if (layout.at(i) == specified)
         {
-            y_base = y_gap + y_margin;
-        }
-        else if (y >= 2 * y_section && y < 3 * y_section)
-        {
-            y_base = 2 * y_gap + y_margin;
-        }
-        else if (y >= 3 * y_section)
-        {
-            y_base = 3 * y_gap + y_margin;
-        }
-        for (int x = 0; x < x_count; x++)
-        {
-            auto item =
-                    std::make_shared<SamplingUIItem>(radius, number);
-            item->setPos(pos_x + x * x_gap + 2 * x_gap,
-                         pos_y + y_base + y * y_gap + radius);
-            sampling_ui_items.push_back(item);
-            number++;
-        }
-    }
-    // for 2 sink positions
-    for (int y = 0; y < 2; y++)
-    {
-        if (y == 0)
-        {
-            y_base = y_section * y_gap + y_margin;
-        }
-        else
-        {
-            y_base = (3 * y_section + 2) * y_gap + y_margin;
-        }
-        for (int x = 0; x < x_count; x++)
-        {
-            auto item = std::make_shared<SamplingUIItem>(
-                            radius,
-                            129,
-                            0,
-                            SamplingUIItem::SamplingUIItemStatus::Undischarge);
-            item->setPos(pos_x + x * x_gap + 2 * x_gap,
-                         pos_y + y_base + radius);
-            sampling_ui_items.push_back(item);
-            number++;
+            for (int j = 0; j < x_count; j++)
+            {
+                std::shared_ptr<SamplingUIItem> item;
+                if (SamplingUIItem::Layout::I == specified)
+                {
+                    item = std::make_shared<SamplingUIItem>(radius, num);
+                }
+                else if (SamplingUIItem::Layout::P == specified)
+                {
+                    item = std::make_shared<SamplingUIItem>(
+                                radius / 2, 0, 0, SamplingUIItem::SamplingUIItemType::Purge);
+                }
+                else if (SamplingUIItem::Layout::C == specified)
+                {
+                    item = std::make_shared<SamplingUIItem>(
+                                radius / 2, 0, 0, SamplingUIItem::SamplingUIItemType::Clean,
+                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
+                }
+                else if (SamplingUIItem::Layout::H == specified)
+                {
+                    item =
+                            std::make_shared<SamplingUIItem>(
+                                radius / 2, 0, 0, SamplingUIItem::SamplingUIItemType::Home);
+                }
+                item->setPos(pos_x + x_base + j * x_gap, pos_y + y_base + i * y_gap);
+                sampling_ui_items_.push_back(item);
+                num++;
+            }
         }
     }
 }
@@ -191,9 +200,10 @@ void FormDistributorSetting::InitHomePosItem(
                         radius,
                         0,
                         0,
+                        SamplingUIItem::SamplingUIItemType::Home,
                         SamplingUIItem::SamplingUIItemStatus::Unsigned);
         item->setPos(pos_x + x * x_gap + 2 * x_gap, pos_y + radius);
-        sampling_ui_items.push_back(item);
+        sampling_ui_items_.push_back(item);
     }
 }
 
@@ -228,11 +238,11 @@ void FormDistributorSetting::UpdateRuntimeView()
     {
         return;
     }
-    if (pos_x_ > 1 || pos_y_ > 45)
+    if (pos_x_ > 1 || pos_y_ > 35)
     {
         return;
     }
-    for (auto& item : sampling_ui_items)
+    for (auto& item : sampling_ui_items_)
     {
         item->SetStatus(SamplingUIItem::SamplingUIItemStatus::Unsigned, 0/*channel*/);
     }
@@ -240,20 +250,65 @@ void FormDistributorSetting::UpdateRuntimeView()
     int LIQ_SAMPLING_GAP = 2;
     int LIQ_COLLECTION_SLOTS = 2;
     int LIQ_COLLECTION_GAP = 1;
-    if (pos_y_ <= 34)
+    if (pos_y_ == 0 || pos_y_ == 35) // home rows
     {
-        int selected = pos_y_ * LIQ_SAMPLING_SLOTS + pos_x_ * LIQ_SAMPLING_GAP;
-        sampling_ui_items.at(selected)->SetStatus(
+        int selected = 0 + pos_x_ * LIQ_SAMPLING_GAP;
+        sampling_ui_items_.at(selected)->SetStatus(
                     SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
-        sampling_ui_items.at(selected + LIQ_SAMPLING_GAP)->SetStatus(
+        sampling_ui_items_.at(selected + LIQ_SAMPLING_GAP)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+
+        selected = 17 * LIQ_SAMPLING_SLOTS + 8 * LIQ_COLLECTION_SLOTS +
+                2 * LIQ_SAMPLING_SLOTS + 2 * LIQ_COLLECTION_SLOTS +
+                8 * LIQ_SAMPLING_SLOTS;
+        sampling_ui_items_.at(selected)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+        sampling_ui_items_.at(selected + LIQ_COLLECTION_GAP)->SetStatus(
                     SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
     }
-    else if (pos_y_ > 34 && pos_y_ < 45)
+    else if (pos_y_ >= 1 && pos_y_ <= 16) // sampling rows
     {
-        int selected = 35 * LIQ_SAMPLING_SLOTS + (pos_y_ - 35) * LIQ_COLLECTION_SLOTS;
-        sampling_ui_items.at(selected)->SetStatus(
+        int selected = 1 * LIQ_SAMPLING_SLOTS;
+        selected += (pos_y_ - 1) * LIQ_SAMPLING_SLOTS + pos_x_ * LIQ_SAMPLING_GAP;
+        sampling_ui_items_.at(selected)->SetStatus(
                     SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
-        sampling_ui_items.at(selected + LIQ_COLLECTION_GAP)->SetStatus(
+        sampling_ui_items_.at(selected + LIQ_SAMPLING_GAP)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+    }
+    else if (pos_y_ >= 17 && pos_y_ <= 24) // collection rows
+    {
+        int selected = 17 * LIQ_SAMPLING_SLOTS;
+        selected += (pos_y_ - 17) * LIQ_COLLECTION_SLOTS;
+        sampling_ui_items_.at(selected)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+        sampling_ui_items_.at(selected + LIQ_COLLECTION_GAP)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+    }
+    else if (pos_y_ == 25 || pos_y_ == 26) // clean rows
+    {
+        int selected = 17 * LIQ_SAMPLING_SLOTS + 8 * LIQ_COLLECTION_SLOTS;
+        selected += (pos_y_ - 25) * LIQ_SAMPLING_SLOTS + pos_x_ * LIQ_SAMPLING_GAP;
+        sampling_ui_items_.at(selected)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+        sampling_ui_items_.at(selected + LIQ_SAMPLING_GAP)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+
+        selected = 17 * LIQ_SAMPLING_SLOTS + 8 * LIQ_COLLECTION_SLOTS +
+                2 * LIQ_SAMPLING_SLOTS;
+        selected += (pos_y_ - 25) * LIQ_COLLECTION_SLOTS;
+        sampling_ui_items_.at(selected)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+        sampling_ui_items_.at(selected + LIQ_COLLECTION_GAP)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+    }
+    else if (pos_y_ >= 27 && pos_y_ <= 34) // sampling N2 purge rows
+    {
+        int selected = 17 * LIQ_SAMPLING_SLOTS + 8 * LIQ_COLLECTION_SLOTS +
+                2 * LIQ_SAMPLING_SLOTS + 2 * LIQ_COLLECTION_SLOTS;
+        selected += (pos_y_ - 27) * LIQ_SAMPLING_SLOTS + pos_x_ * LIQ_SAMPLING_GAP;
+        sampling_ui_items_.at(selected)->SetStatus(
+                    SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
+        sampling_ui_items_.at(selected + LIQ_SAMPLING_GAP)->SetStatus(
                     SamplingUIItem::SamplingUIItemStatus::Waiting, 0/*channel*/);
     }
 }
