@@ -98,21 +98,21 @@ void FormCylinderA::InitUiState()
     ui->label_HC3708->installEventFilter(this);
     ui->label_HC3808->installEventFilter(this);
     //
-    ui->label_FICA3101->installEventFilter(this);
-    ui->label_FICA3102->installEventFilter(this);
-    ui->label_FICA3103->installEventFilter(this);
-    ui->label_FICA3104->installEventFilter(this);
-    ui->label_FICA3105->installEventFilter(this);
-    ui->label_FICA3106->installEventFilter(this);
-    ui->label_FICA3107->installEventFilter(this);
-    ui->label_FICA3108->installEventFilter(this);
+//    ui->label_FICA3101->installEventFilter(this);
+//    ui->label_FICA3102->installEventFilter(this);
+//    ui->label_FICA3103->installEventFilter(this);
+//    ui->label_FICA3104->installEventFilter(this);
+//    ui->label_FICA3105->installEventFilter(this);
+//    ui->label_FICA3106->installEventFilter(this);
+//    ui->label_FICA3107->installEventFilter(this);
+//    ui->label_FICA3108->installEventFilter(this);
     //
-    ui->label_FICA3501->installEventFilter(this);
-    ui->label_FICA3502->installEventFilter(this);
-    ui->label_FICA3503->installEventFilter(this);
-    ui->label_FICA3504->installEventFilter(this);
-    ui->label_FICA3505->installEventFilter(this);
-    ui->label_FICA3506->installEventFilter(this);
-    ui->label_FICA3507->installEventFilter(this);
-    ui->label_FICA3508->installEventFilter(this);
+//    ui->label_FICA3501->installEventFilter(this);
+//    ui->label_FICA3502->installEventFilter(this);
+//    ui->label_FICA3503->installEventFilter(this);
+//    ui->label_FICA3504->installEventFilter(this);
+//    ui->label_FICA3505->installEventFilter(this);
+//    ui->label_FICA3506->installEventFilter(this);
+//    ui->label_FICA3507->installEventFilter(this);
+//    ui->label_FICA3508->installEventFilter(this);
 }
