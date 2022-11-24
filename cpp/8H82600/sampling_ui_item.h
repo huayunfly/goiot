@@ -31,6 +31,14 @@ public:
         Home
     };
 
+    enum class Layout
+    {
+        I = 0, // Inject
+        P = 1, // Purge
+        C = 2, // Clean
+        H = 3 // Home
+    };
+
 public:
     SamplingUIItem(double radius, int number = 0, int channel = 0,
                    SamplingUIItemType type = SamplingUIItemType::Injection,

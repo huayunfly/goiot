@@ -573,9 +573,10 @@ void FormLiquidDistributor::InitVideoCaps()
 
 void FormLiquidDistributor::InitRecipeRuntimeView()
 {
+    typedef SamplingUIItem::Layout Layout;
     if (category_ == LiquidDistributorCategory::SAMPLING)
     {
-        std::vector<Layout> layout = {Layout::I, Layout::P, Layout::I,
+        std::vector<SamplingUIItem::Layout> layout = {Layout::I, Layout::P, Layout::I,
                                       Layout::I, Layout::P, Layout::I, Layout::C,
                                       Layout::I, Layout::P, Layout::I,
                                       Layout::I, Layout::P, Layout::I, Layout::H,
@@ -596,14 +597,14 @@ void FormLiquidDistributor::InitRecipeRuntimeView()
 }
 
 void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double radius,
-                                                  int x_count, const std::vector<Layout>& layout)
+                                                  int x_count, const std::vector<SamplingUIItem::Layout>& layout)
 {
     int x_base = x_gap + 40;
     int y_base = y_gap;
     int num = 1;
     for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (layout.at(i) == Layout::I)
+        if (layout.at(i) == SamplingUIItem::Layout::I)
         {
             for (int j = 0; j < x_count; j++)
             {
@@ -617,7 +618,7 @@ void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double r
     }
     for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (layout.at(i) == Layout::P)
+        if (layout.at(i) == SamplingUIItem::Layout::P)
         {
             for (int j = 0; j < x_count; j++)
             {
@@ -632,7 +633,7 @@ void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double r
     }
     for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (layout.at(i) == Layout::C)
+        if (layout.at(i) == SamplingUIItem::Layout::C)
         {
             for (int j = 0; j < x_count; j++)
             {
@@ -648,7 +649,7 @@ void FormLiquidDistributor::InitRecipeRuntimeView(int x_gap, int y_gap, double r
     }
     for (std::size_t i = 0; i < layout.size(); i++)
     {
-        if (layout.at(i) == Layout::H)
+        if (layout.at(i) == SamplingUIItem::Layout::H)
         {
             for (int j = 0; j < x_count; j++)
             {

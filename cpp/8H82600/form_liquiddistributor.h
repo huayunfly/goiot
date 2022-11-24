@@ -177,14 +177,6 @@ class FormLiquidDistributor : public FormCommon
         B = 1
     };
 
-    enum class Layout
-    {
-        I = 0, // Inject
-        P = 1, // Purge
-        C = 2, // Clean
-        H = 3 // Home
-    };
-
 public:
     explicit FormLiquidDistributor(QWidget *parent = nullptr,
                                    const QString& object_name = QString(),
@@ -236,7 +228,7 @@ private:
     // @Param <x_count>: circle count in x.
     // @param <layout>: Inject, purge, clean, home Y-direction layout.
     void InitRecipeRuntimeView(int x_gap, int y_gap, double radius,
-                               int x_count, const std::vector<Layout>& layout);
+                               int x_count, const std::vector<SamplingUIItem::Layout>& layout);
 
     // Set the recipe runtime item to unsigned states.
     void ClearRecipeRuntimeView();
