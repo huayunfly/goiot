@@ -97,11 +97,12 @@ struct ImageParams
                 double line_degree = 15,
                 int min_len = 30,
                 int min_count = 10,
-                double ratio = 0.8) :
+                double ratio = 0.8,
+                double timeout = 10) :
         canny_lower_threshold(lower_threshold), canny_upper_threshold(upper_threshold),
         canny_aperture_size(aperture_size), roi_x(x), roi_y(y), roi_side(side),
         fit_line_degree(line_degree), min_contour_len(min_len), min_line_count(min_count),
-        min_ratio(ratio)
+        min_ratio(ratio), time_limit(timeout)
     {
 
     }
@@ -115,6 +116,7 @@ struct ImageParams
     int min_contour_len;
     int min_line_count;
     double min_ratio;
+    double time_limit;
 
     std::vector<QString> toValue(int i)
     {
@@ -127,7 +129,8 @@ struct ImageParams
                                     QString::number(fit_line_degree),
                                     QString::number(min_contour_len),
                                     QString::number(min_line_count),
-                                    QString::number(min_ratio)});
+                                    QString::number(min_ratio),
+                                    QString::number(time_limit)});
 
     }
 
@@ -138,7 +141,8 @@ struct ImageParams
                     canny_lower_threshold, canny_upper_threshold, fit_line_degree,
                     static_cast<double>(min_contour_len),
                     static_cast<double>(min_line_count),
-                    static_cast<double>(min_ratio)};
+                    min_ratio,
+                    time_limit};
     }
 };
 
@@ -146,24 +150,28 @@ struct ImageParams
 struct PressureParams
 {
     PressureParams(double lower_p = 1.5,
-                double ratio_p = 0.5) :
-        lower_pressure(lower_p), pressure_drop_ratio(ratio_p)
+                double ratio_p = 0.5,
+                   int timeout = 30) :
+        lower_pressure(lower_p), pressure_drop_ratio(ratio_p),
+        time_limit(timeout)
     {
 
     }
     double lower_pressure;
     double pressure_drop_ratio;
+    double time_limit;
 
     std::vector<QString> toValue(int i)
     {
         return std::vector<QString>({QString("P") + QString::number(i),
                                     QString::number(lower_pressure),
-                                    QString::number(pressure_drop_ratio)});
+                                    QString::number(pressure_drop_ratio),
+                                    QString::number(time_limit)});
     }
 
     std::vector<double> toDoubleValue()
     {
-        return std::vector<double> {lower_pressure, pressure_drop_ratio};
+        return std::vector<double> {lower_pressure, pressure_drop_ratio, time_limit};
     }
 };
 
@@ -308,12 +316,14 @@ private:
     qint64 SamplingStatusCheckByTime(StatusCheckGroup group, int timeout_sec);
 
     // Liquid sampling status check task B, using liquid image recognition.
+    // The time limit is used in image_params_
     // The thread will exit if the recipe does not run.
-    qint64 SamplingStatusCheckByImageDetection(StatusCheckGroup group, int timeout_sec);
+    qint64 SamplingStatusCheckByImageDetection(StatusCheckGroup group);
 
     // Liquid sampling status check task C, using the channel pressure drop.
+    // The time limit is used in pressure_params_
     // The thread will exit if the recipe does not run.
-    qint64 SamplingStatusCheckByPressure(StatusCheckGroup group, int channel, int timeout_sec);
+    qint64 SamplingStatusCheckByPressure(StatusCheckGroup group, int channel);
 
     // Detect liquid level in image. Return true if it succeeded.
     bool DetectImage(int index);

@@ -64,12 +64,12 @@ void DialogRecipeMgr::InitRecipeTable()
 void DialogRecipeMgr::InitImageParamsTable()
 {
     std::vector<QString> param_names = {"ROI_X", "ROI_Y", "ROI_SIDE", "LOWER_THRESHOLD",
-                                       "UPPER_THRESHOLD", "DIRECTION", "MIN_LEN", "MIN_COUNT", "MIN_RATIO"};
+                                       "UPPER_THRESHOLD", "DIRECTION", "MIN_LEN", "MIN_COUNT", "MIN_RATIO", "TIME_LIMIT"};
 
     if (param_values_.empty())
     {
-        param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 0.8},
-                               {200, 100, 280, 15, 30, 15, 10, 10, 0.8}};
+        param_values_ = {{200, 100, 280, 15, 30, 15, 10, 10, 0.8, 10.0},
+                               {200, 100, 280, 15, 30, 15, 10, 10, 0.8, 10.0}};
     }
 
     ui->tableWidgetParams->setColumnCount(3);
@@ -100,11 +100,11 @@ void DialogRecipeMgr::InitImageParamsTable()
 
 void DialogRecipeMgr::InitPressureParamsTable()
 {
-    std::vector<QString> param_names = {"LOWER_PRESSURE", "DROP_RATIO"};
+    std::vector<QString> param_names = {"LOWER_PRESSURE", "DROP_RATIO", "TIME_LIMIT"};
 
     if (param_values_.empty())
     {
-        param_values_ = {{1.5, 0.5}, {1.5, 0.5}};
+        param_values_ = {{1.5, 0.5, 30.0}, {1.5, 0.5, 30.0}};
     }
 
     ui->tableWidgetParams->setColumnCount(3);

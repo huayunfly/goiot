@@ -434,6 +434,8 @@ bool FormLiquidDistributor::LoadImageParams()
             if (!is_ok) error_count++;
             double min_ratio = values->at(index++).toDouble(&is_ok);
             if (!is_ok) error_count++;
+            double time_limit = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
             if (error_count > 0)
             {
                 QMessageBox::critical(0, "加载图像参数失败", "数据格式错误", QMessageBox::Ignore);
@@ -451,6 +453,7 @@ bool FormLiquidDistributor::LoadImageParams()
                 image_params_.at(i).min_contour_len = min_len;
                 image_params_.at(i).min_line_count = min_count;
                 image_params_.at(i).min_ratio = min_ratio;
+                image_params_.at(i).time_limit = time_limit;
             }
         }
     }
@@ -487,6 +490,8 @@ bool FormLiquidDistributor::LoadPressureParams()
             if (!is_ok) error_count++;
             double pressure_drop_ratio = values->at(index++).toDouble(&is_ok);
             if (!is_ok) error_count++;
+            double time_limit = values->at(index++).toDouble(&is_ok);
+            if (!is_ok) error_count++;
             if (error_count > 0)
             {
                 QMessageBox::critical(0, "加载压力参数失败", "数据格式错误", QMessageBox::Ignore);
@@ -497,6 +502,7 @@ bool FormLiquidDistributor::LoadPressureParams()
                 std::lock_guard<std::shared_mutex> lk(shared_mut_);
                 pressure_params_.at(i).lower_pressure = lower_pressure;
                 pressure_params_.at(i).pressure_drop_ratio = pressure_drop_ratio;
+                pressure_params_.at(i).time_limit = time_limit;
             }
         }
     }
@@ -740,7 +746,7 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
     QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
     QStringList channel_9_to_16({"", "9", "10", "11", "12", "13", "14", "15", "16"});
     QStringList sampling_time;
-    for (int s = 1; s < 100; s++)
+    for (int s = 15; s < 100; s++)
     {
         sampling_time.append(QString::number(s) + "s");
     }
@@ -802,6 +808,7 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
             if (category_ == LiquidDistributorCategory::SAMPLING)
             {
                 QCheckBox *checkbox = new QCheckBox();
+                checkbox->setChecked(true);
                 ui->tableWidget->setCellWidget(row, col + offset, checkbox);
                 offset++;
             }
@@ -1228,12 +1235,12 @@ void FormLiquidDistributor::RunRecipeWorker()
             int channel_b = entity.channel_b;
             int duration_a = entity.duration_a;
             int duration_b = entity.duration_b;
-            if (entity.type == TYPE_SAMPLING_PURGE ||
-                    entity.type == TYPE_COLLECTION_PURGE)
-            {
-                duration_a *= 2;
-                duration_b *= 2;
-            }
+//            if (entity.type == TYPE_SAMPLING_PURGE ||
+//                    entity.type == TYPE_COLLECTION_PURGE)
+//            {
+//                duration_a *= 2;
+//                duration_b *= 2;
+//            }
             std::vector<QString> values = entity.ToValue();
             // Send plc command run
             bool ok = write_data_func_(this->objectName(), control_code_name_,
@@ -1295,14 +1302,14 @@ void FormLiquidDistributor::RunRecipeWorker()
                 {
                     check_a = std::async(
                                 &FormLiquidDistributor::SamplingStatusCheckByImageDetection, this,
-                                StatusCheckGroup::A, duration_a);
+                                StatusCheckGroup::A);
 
                 }
                 else if (entity.type == TYPE_COLLECTION)
                 {
                     check_a = std::async(
                                 &FormLiquidDistributor::SamplingStatusCheckByPressure, this,
-                                StatusCheckGroup::A, channel_a, duration_a);
+                                StatusCheckGroup::A, channel_a);
                 }
                 else
                 {
@@ -1317,13 +1324,13 @@ void FormLiquidDistributor::RunRecipeWorker()
                 {
                     check_b = std::async(
                                 &FormLiquidDistributor::SamplingStatusCheckByImageDetection, this,
-                                StatusCheckGroup::B, duration_b);
+                                StatusCheckGroup::B);
                 }
                 else if (entity.type == TYPE_COLLECTION)
                 {
                     check_b = std::async(
                                 &FormLiquidDistributor::SamplingStatusCheckByPressure, this,
-                                StatusCheckGroup::B, channel_b, duration_b);
+                                StatusCheckGroup::B, channel_b);
                 }
                 else
                 {
@@ -1389,7 +1396,9 @@ void FormLiquidDistributor::RunRecipeWorker()
             UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Finished,
                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
             // Sleep seconds between send dist_run_a = 0 and next loop dist_run_a = 1
-            std::this_thread::sleep_for(std::chrono::seconds(10));
+            // avoiding PLC time conflicting and N2 purge time.
+            std::this_thread::sleep_for(
+                        std::chrono::seconds(duration_a > duration_b ? duration_a : duration_b));
         }
         // Force dock to the safe(center) position
         uint end_code = MakeRecipeEndCode(category_);
@@ -1496,10 +1505,16 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByTime(
 }
 
 qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
-        StatusCheckGroup group, int timeout_sec)
+        StatusCheckGroup group)
 {
     std::size_t index = (StatusCheckGroup::B == group) ? 1 : 0;
-    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
+    // lock
+    std::shared_lock<std::shared_mutex> lk(shared_mut_);
+    double timeout_sec = image_params_.at(index).time_limit;
+    lk.unlock();
+    // unlock
+    auto timeout = std::chrono::system_clock::now() +
+            std::chrono::seconds(static_cast<long>(timeout_sec));
     while (task_running_.load() && std::chrono::system_clock::now() < timeout)
     {
         if (DetectImage(index))
@@ -1513,17 +1528,20 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
 }
 
 qint64 FormLiquidDistributor::SamplingStatusCheckByPressure(
-        StatusCheckGroup group, int channel, int timeout_sec)
+        StatusCheckGroup group, int channel)
 {
     std::size_t index = (StatusCheckGroup::B == group) ? 1 : 0;
-    auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(timeout_sec);
     float pressure_start = 0;
     float pressure_current = 10; // a large enough initial value
     // Prepare params
     std::shared_lock<std::shared_mutex> lk(shared_mut_);
     double lower_pressure = pressure_params_.at(index).lower_pressure;
     double pressure_drop_ratio = pressure_params_.at(index).pressure_drop_ratio;
+    double time_limit = pressure_params_.at(index).time_limit;
     lk.unlock();
+    // unlock
+    auto timeout = std::chrono::system_clock::now() +
+            std::chrono::seconds(static_cast<long>(time_limit));
     // Check
     bool ok = ReadPressure(channel, pressure_start);
     while (task_running_.load() && std::chrono::system_clock::now() < timeout)
@@ -1832,6 +1850,7 @@ void FormLiquidDistributor::LoadManagementWindow()
                         image_params_.at(i).min_contour_len = params.at(i).at(6);
                         image_params_.at(i).min_line_count = params.at(i).at(7);
                         image_params_.at(i).min_ratio = params.at(i).at(8);
+                        image_params_.at(i).time_limit = params.at(i).at(9);
                     }
                 }
                 else if (LiquidDistributorCategory::COLLECTION == category_)
@@ -1840,6 +1859,7 @@ void FormLiquidDistributor::LoadManagementWindow()
                     {
                         pressure_params_.at(i).lower_pressure = params.at(i).at(0);
                         pressure_params_.at(i).pressure_drop_ratio = params.at(i).at(1);
+                        pressure_params_.at(i).time_limit = params.at(i).at(2);
                     }
                 }
             }
@@ -2058,8 +2078,8 @@ void FormLiquidDistributor::PrepareDB(
                           "flowlimit_b", "cleanport_a", "cleanport_b",
                           "duration_a", "duration_b", "run_a", "run_b", "control_code"};
         image_param_columns_ = {"name", "roi_x", "roi_y", "roi_side", "lower_threshold",
-                         "upper_threshold", "direction", "min_len", "min_count", "min_ratio"};
-        pressure_param_columns_ = {"name", "lower_pressure", "pressure_drop_ratio"};
+                         "upper_threshold", "direction", "min_len", "min_count", "min_ratio", "time_limit"};
+        pressure_param_columns_ = {"name", "lower_pressure", "pressure_drop_ratio", "time_limit"};
         QString error_message_1;
         QString error_message_2;
         QString error_message_3;
