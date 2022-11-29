@@ -1235,12 +1235,6 @@ void FormLiquidDistributor::RunRecipeWorker()
             int channel_b = entity.channel_b;
             int duration_a = entity.duration_a;
             int duration_b = entity.duration_b;
-//            if (entity.type == TYPE_SAMPLING_PURGE ||
-//                    entity.type == TYPE_COLLECTION_PURGE)
-//            {
-//                duration_a *= 2;
-//                duration_b *= 2;
-//            }
             std::vector<QString> values = entity.ToValue();
             // Send plc command run
             bool ok = write_data_func_(this->objectName(), control_code_name_,
@@ -1281,7 +1275,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 StopTakingLiquidCmd(StatusCheckGroup::B);
                 UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                                    SamplingUIItem::SamplingUIItemStatus::Error);
-                Log2Window(recipe_name, "当前步动作启动超时");
+                Log2Window(recipe_name, "当前动作启动超时");
                 break; // no lk.unlock() needed.
 //                if (!task_running_) // test code
 //                {
@@ -1296,6 +1290,8 @@ void FormLiquidDistributor::RunRecipeWorker()
 
             // Wait sampling or do liquid level detection, send stop command to plc.
             std::future<qint64> check_a, check_b;
+            // Match 50ml/min clean flow
+            int clean_duration = (entity.type == TYPE_SAMPLING_PURGE) ? 40 : 200;
             if (run_a)
             {
                 if (entity.type == TYPE_SAMPLING)
@@ -1315,7 +1311,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 {
                     check_a = std::async(
                                 &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                                StatusCheckGroup::A, duration_a);
+                                StatusCheckGroup::A, clean_duration);
                 }
             }
             if (run_b)
@@ -1336,7 +1332,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 {
                     check_b = std::async(
                                 &FormLiquidDistributor::SamplingStatusCheckByTime, this,
-                                StatusCheckGroup::B, duration_b);
+                                StatusCheckGroup::B, clean_duration);
                 }
             }
 
@@ -1384,7 +1380,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 qCritical("RunRecipeWorker() failed, %s", "No PLC step stopped feedback.");
                 UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                                    SamplingUIItem::SamplingUIItemStatus::Error);
-                Log2Window(recipe_name, "当前步动作停止超时");
+                Log2Window(recipe_name, "当前动作停止超时");
                 break;
 //                if (!task_running_) // test code
 //                {
@@ -1675,10 +1671,11 @@ bool FormLiquidDistributor::DetectImage(int index)
                             roi_y + max_index * roi_side / section_num + roi_side / section_num / 2);
                 cv::line(vframes_.at(index), cv::Point(roi_x, level_y),
                          cv::Point(roi_x + roi_side, level_y), cv::Scalar(0, 255, 0), 2);
-                if (max_index == 0)
-                {
-                    ok = true; // Upmost level
-                }
+//                if (max_index == 0)
+//                {
+//                    ok = true; // Upmost level
+//                }
+                ok = true; // Catch liquid level at any section.
             }
         }
         // Draw contours? time cost.
