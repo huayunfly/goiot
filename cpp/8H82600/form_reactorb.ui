@@ -3568,25 +3568,6 @@
     <string>TICA4709</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_TICA4701">
-   <property name="geometry">
-    <rect>
-     <x>1060</x>
-     <y>880</y>
-     <width>70</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Tahoma</family>
-     <pointsize>11</pointsize>
-    </font>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QTextEdit" name="textEdit_TICA4709">
    <property name="geometry">
     <rect>
@@ -4179,7 +4160,6 @@
   <zorder>label_HC4216_JiejinOn</zorder>
   <zorder>label_TICA4709</zorder>
   <zorder>txt_label_TICA4709</zorder>
-  <zorder>textEdit_TICA4701</zorder>
   <zorder>textEdit_TICA4709</zorder>
   <zorder>label_TICA4710</zorder>
   <zorder>txt_label_TICA4710</zorder>
