@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     data_manager.cpp \
     data_model.cpp \
+    dialog_logon.cpp \
     dialog_onoff.cpp \
     dialog_recipe_mgr.cpp \
     dialog_setposition.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     asyncfuture.h \
     data_manager.h \
     data_model.h \
+    dialog_logon.h \
     dialog_onoff.h \
     dialog_recipe_mgr.h \
     dialog_setposition.h \
@@ -97,6 +99,7 @@ HEADERS += \
     trendchart.h
 
 FORMS += \
+    dialog_logon.ui \
     dialog_onoff.ui \
     dialog_recipe_mgr.ui \
     dialog_setposition.ui \
