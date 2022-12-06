@@ -39,8 +39,6 @@ void FormGasSampling::InitUiState()
      ui->label_HC5203->installEventFilter(this);
      ui->label_HC5204->installEventFilter(this);
 
-     ui->label_TICA5101->installEventFilter(this);
-     ui->label_TICA5201->installEventFilter(this);
      ui->label_TICA5105->installEventFilter(this);
      ui->label_TICA5205->installEventFilter(this);
      ui->label_TICA5501->installEventFilter(this);

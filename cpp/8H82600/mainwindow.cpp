@@ -24,6 +24,7 @@
 #include "dialog_onoff.h"
 #include "form_motorcontrol.h"
 #include "form_liquiddistributor.h"
+#include "dialog_logon.h"
 #include "resourcedef.h"
 
 
@@ -33,6 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
       safety_(data_manager_), safe_timer_()
 {
     ui_->setupUi(this);
+
+    // logon
+    DialogLogon logon;
+    int result = logon.exec();
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
 
     // Control tab pages
     std::vector<FormCommon*> form_vec;
@@ -1159,14 +1168,10 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp50_sv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_TICA5502"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp57_sv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_TICA5105"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp58_sv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_TICA5205"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.temp59_sv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_TICA5101"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.temp60_sv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_TICA5201"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp49_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5501"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp50_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5502"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp57_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5105"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp58_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5205"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.temp59_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.temp60_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5201"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     // gassampling - GC ready
     data_model_.SetDataToUiMap("plc.1.di1_21", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5106"), RES_GC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.di1_23", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5206"), RES_GC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -1702,8 +1707,6 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("gassampling.label_TICA5502", DataDef("plc.1.temp50_pv", "plc.1.temp50_sv", "plc.1.temp50_sv"));
     data_model_.SetUiToDataMap("gassampling.label_TICA5105", DataDef("plc.1.temp57_pv", "plc.1.temp57_sv", "plc.1.temp57_sv"));
     data_model_.SetUiToDataMap("gassampling.label_TICA5205", DataDef("plc.1.temp58_pv", "plc.1.temp58_sv", "plc.1.temp58_sv"));
-    data_model_.SetUiToDataMap("gassampling.label_TICA5101", DataDef("plc.1.temp59_pv", "plc.1.temp59_sv", "plc.1.temp59_sv"));
-    data_model_.SetUiToDataMap("gassampling.label_TICA5201", DataDef("plc.1.temp60_pv", "plc.1.temp60_sv", "plc.1.temp60_sv"));
 
     // liquidcollection
     data_model_.SetUiToDataMap("liquidcollection.label_HC6101", DataDef("plc.1.smc11_19", "plc.1.smc11_19", "plc.1.smc11_19"));
