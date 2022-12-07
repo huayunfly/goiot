@@ -37,7 +37,7 @@ class FormSafety : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormSafety(QWidget *parent = nullptr);
+    explicit FormSafety(QWidget *parent = nullptr, bool admin = true);
     ~FormSafety();
 
     bool event(QEvent *event) override;

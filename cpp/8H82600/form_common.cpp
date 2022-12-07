@@ -7,8 +7,8 @@
 #include <QResource>
 
 FormCommon::FormCommon(QWidget *parent, const QString& object_name,
-                       const QString& display_name) :
-    QWidget(parent), display_name_(display_name)
+                       const QString& display_name, bool admin) :
+    QWidget(parent), display_name_(display_name), admin_privilege_(admin)
 {
     this->setObjectName(object_name);
 }

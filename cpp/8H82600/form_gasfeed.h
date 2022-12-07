@@ -12,7 +12,7 @@ class FormGasFeed : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormGasFeed(QWidget *parent = nullptr);
+    explicit FormGasFeed(QWidget *parent = nullptr, bool admin = true);
     ~FormGasFeed();
 
     bool event(QEvent *event) override;

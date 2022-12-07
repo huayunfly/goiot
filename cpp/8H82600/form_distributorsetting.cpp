@@ -5,8 +5,8 @@
 #include <QGraphicsView>
 #include <thread>
 
-FormDistributorSetting::FormDistributorSetting(QWidget *parent) :
-    FormCommon(parent, "distsetting", QString::fromUtf8("移液仪")),
+FormDistributorSetting::FormDistributorSetting(QWidget *parent, bool admin) :
+    FormCommon(parent, "distsetting", QString::fromUtf8("移液仪"), admin),
     ui(new Ui::FormDistributorSetting), pos_x_(-1), pos_y_(-1)
 {
     ui->setupUi(this);

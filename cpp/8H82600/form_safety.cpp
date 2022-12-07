@@ -6,8 +6,8 @@
 #include <QGraphicsView>
 #include <thread>
 
-FormSafety::FormSafety(QWidget *parent) :
-    FormCommon(parent, "safety", QString::fromUtf8("安全")),
+FormSafety::FormSafety(QWidget *parent, bool admin) :
+    FormCommon(parent, "safety", QString::fromUtf8("安全"), admin),
     ui(new Ui::FormSafety)
 {
     ui->setupUi(this);

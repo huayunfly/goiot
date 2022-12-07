@@ -12,7 +12,7 @@ class FormLiquidSwitch : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormLiquidSwitch(QWidget *parent = nullptr);
+    explicit FormLiquidSwitch(QWidget *parent = nullptr, bool admin = true);
     ~FormLiquidSwitch();
 
     bool event(QEvent *event) override;

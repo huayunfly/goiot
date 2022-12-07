@@ -12,7 +12,7 @@ class FormLiquidCollection : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormLiquidCollection(QWidget *parent = nullptr);
+    explicit FormLiquidCollection(QWidget *parent = nullptr, bool admin = true);
     ~FormLiquidCollection();
 
     bool event(QEvent *event) override;

@@ -55,7 +55,8 @@ class FormCommon : public QWidget
 public:
     explicit FormCommon(QWidget *parent = nullptr,
                         const QString& object_name = QString(),
-                        const QString& display_name = QString());
+                        const QString& display_name = QString(),
+                        bool admin = true);
 
     virtual ~FormCommon()
     {
@@ -99,6 +100,14 @@ public:
         write_data_func_ = func;
     }
 
+    /// <summary>
+    /// Set administrator privilege.
+    /// </summary>
+    void SetAdmin(bool yes)
+    {
+        admin_privilege_ = yes;
+    }
+
 protected:
     /// <summary>
     /// Event handlers.
@@ -136,6 +145,7 @@ protected:
     //std::unordered_map<QString/* ui name */, UiStateDef> ui_state_map_;
     QString object_name_;
     QString display_name_;
+    bool admin_privilege_;
     std::unordered_map<QString/* pixmap path */, QPixmap> image_cache_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, const QString&/* value */)> write_data_func_;
     std::function<bool(const QString&/* parent ui name */, const QString&/* ui name */, QString&/* value */, Ui::ControlStatus&, UiInfo&)> read_data_func_;

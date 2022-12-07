@@ -12,7 +12,7 @@ class FormLiquidFeedB : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormLiquidFeedB(QWidget *parent = nullptr);
+    explicit FormLiquidFeedB(QWidget *parent = nullptr, bool admin = true);
     ~FormLiquidFeedB();
 
     bool event(QEvent *event) override;

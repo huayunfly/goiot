@@ -12,7 +12,7 @@ class FormCylinderA : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormCylinderA(QWidget *parent = nullptr);
+    explicit FormCylinderA(QWidget *parent = nullptr, bool admin = true);
     ~FormCylinderA();
 
     bool event(QEvent *event) override;

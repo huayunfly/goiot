@@ -12,7 +12,7 @@ class FormLiquidSamplingA : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormLiquidSamplingA(QWidget *parent = nullptr);
+    explicit FormLiquidSamplingA(QWidget *parent = nullptr, bool admin = true);
     ~FormLiquidSamplingA();
 
     bool event(QEvent *event) override;

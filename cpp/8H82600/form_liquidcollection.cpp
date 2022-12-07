@@ -1,8 +1,8 @@
 #include "form_liquidcollection.h"
 #include "ui_form_liquidcollection.h"
 
-FormLiquidCollection::FormLiquidCollection(QWidget *parent) :
-    FormCommon(parent, "liquidcollection", QString::fromUtf8("液体收集")),
+FormLiquidCollection::FormLiquidCollection(QWidget *parent, bool admin) :
+    FormCommon(parent, "liquidcollection", QString::fromUtf8("液体收集"), admin),
     ui(new Ui::FormLiquidCollection)
 {
     ui->setupUi(this);
@@ -26,17 +26,20 @@ bool FormLiquidCollection::event(QEvent *event)
 
 void FormLiquidCollection::InitUiState()
 {
-    ui->label_HC6101->installEventFilter(this);
-    ui->label_HC6102->installEventFilter(this);
-    ui->label_HC6103->installEventFilter(this);
-    ui->label_HC6104->installEventFilter(this);
-    ui->label_HC6105->installEventFilter(this);
-    ui->label_HC6201->installEventFilter(this);
-    ui->label_HC6202->installEventFilter(this);
-    ui->label_HC6203->installEventFilter(this);
-    ui->label_HC6204->installEventFilter(this);
-    ui->label_HC6205->installEventFilter(this);
+    if (admin_privilege_)
+    {
+        ui->label_HC6101->installEventFilter(this);
+        ui->label_HC6102->installEventFilter(this);
+        ui->label_HC6103->installEventFilter(this);
+        ui->label_HC6104->installEventFilter(this);
+        ui->label_HC6105->installEventFilter(this);
+        ui->label_HC6201->installEventFilter(this);
+        ui->label_HC6202->installEventFilter(this);
+        ui->label_HC6203->installEventFilter(this);
+        ui->label_HC6204->installEventFilter(this);
+        ui->label_HC6205->installEventFilter(this);
 
-    ui->label_TICA6501->installEventFilter(this);
-    ui->label_TICA6502->installEventFilter(this);
+        ui->label_TICA6501->installEventFilter(this);
+        ui->label_TICA6502->installEventFilter(this);
+    }
 }

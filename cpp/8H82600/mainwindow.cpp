@@ -44,21 +44,22 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // Control tab pages
+    bool admin = logon.IsAdmin();
     std::vector<FormCommon*> form_vec;
-    form_vec.push_back(new FormGasFeed);
-    form_vec.push_back(new FormLiquidSwitch);
-    form_vec.push_back(new FormLiquidFeedA);
-    form_vec.push_back(new FormLiquidFeedB);
-    form_vec.push_back(new FormCylinderA);
-    form_vec.push_back(new FormCylinderB);
-    form_vec.push_back(new FormReactorA);
-    form_vec.push_back(new FormReactorB);
-    form_vec.push_back(new FormGasSampling);
-    form_vec.push_back(new FormLiquidCollection);
-    form_vec.push_back(new FormLiquidSamplingA);
-    form_vec.push_back(new FormLiquidSamplingB);
-    form_vec.push_back(new FormDistributorSetting);
-    form_vec.push_back(new FormSafety);
+    form_vec.push_back(new FormGasFeed(nullptr, admin));
+    form_vec.push_back(new FormLiquidSwitch(nullptr, admin));
+    form_vec.push_back(new FormLiquidFeedA(nullptr, admin));
+    form_vec.push_back(new FormLiquidFeedB(nullptr, admin));
+    form_vec.push_back(new FormCylinderA(nullptr, admin));
+    form_vec.push_back(new FormCylinderB(nullptr, admin));
+    form_vec.push_back(new FormReactorA(nullptr, admin));
+    form_vec.push_back(new FormReactorB(nullptr, admin));
+    form_vec.push_back(new FormGasSampling(nullptr, admin));
+    form_vec.push_back(new FormLiquidCollection(nullptr, admin));
+    form_vec.push_back(new FormLiquidSamplingA(nullptr, admin));
+    form_vec.push_back(new FormLiquidSamplingB(nullptr, admin));
+    form_vec.push_back(new FormDistributorSetting(nullptr, admin));
+    form_vec.push_back(new FormSafety(nullptr, admin));
 
     for (auto& entry : form_vec)
     {

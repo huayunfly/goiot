@@ -12,7 +12,7 @@ class FormGasSampling : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormGasSampling(QWidget *parent = nullptr);
+    explicit FormGasSampling(QWidget *parent = nullptr, bool admin = true);
     ~FormGasSampling();
 
     bool event(QEvent *event) override;

@@ -12,7 +12,7 @@ class FormReactorB : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormReactorB(QWidget *parent = nullptr);
+    explicit FormReactorB(QWidget *parent = nullptr, bool admin = true);
     ~FormReactorB();
 
     bool event(QEvent *event) override;

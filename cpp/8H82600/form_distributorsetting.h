@@ -14,7 +14,7 @@ class FormDistributorSetting : public FormCommon
     Q_OBJECT
 
 public:
-    explicit FormDistributorSetting(QWidget *parent = nullptr);
+    explicit FormDistributorSetting(QWidget *parent = nullptr, bool admin = true);
     ~FormDistributorSetting();
 
     bool event(QEvent *event) override;
