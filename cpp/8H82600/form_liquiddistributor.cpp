@@ -1266,7 +1266,7 @@ void FormLiquidDistributor::RunRecipeWorker()
             }
             // Wait for PLC step run feedback
             std::unique_lock<std::mutex> lk(mut_);
-            if (!task_running_.load() || !task_run_cond_.wait_for(lk, std::chrono::seconds(60), [&] {
+            if (!task_running_.load() || !task_run_cond_.wait_for(lk, std::chrono::seconds(90), [&] {
                         return (run_a == dist_a_run_) && (run_b == dist_b_run_); })
                     )
             {
@@ -1372,8 +1372,13 @@ void FormLiquidDistributor::RunRecipeWorker()
                 }
             }
             // Wait for PLC step stopped feedback
+            int wait_stop_timeout = 60;
+            if (entity.type == TYPE_SAMPLING_PURGE || entity.type == TYPE_COLLECTION_PURGE)
+            {
+                wait_stop_timeout += clean_duration;
+            }
             lk.lock();
-            if (!task_running_.load() || !task_run_cond_.wait_for(lk, std::chrono::seconds(20), [&] {
+            if (!task_running_.load() || !task_run_cond_.wait_for(lk, std::chrono::seconds(wait_stop_timeout), [&] {
                         return (0 == dist_a_run_) && (0 == dist_b_run_); })
                     )
             {
