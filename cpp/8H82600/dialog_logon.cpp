@@ -34,10 +34,12 @@ void DialogLogon::on_pushButton_logon_clicked()
 
 void DialogLogon::on_lineEdit_user_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     this->ui->label_tip->clear();
 }
 
 void DialogLogon::on_lineEdit_password_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     this->ui->label_tip->clear();
 }

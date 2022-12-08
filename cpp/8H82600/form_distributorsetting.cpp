@@ -220,7 +220,7 @@ void FormDistributorSetting::InitControlPanel()
     }
     QStringList pos_x = {"0", "1"};
     QStringList pos_y;
-    for (int i = 0; i < 45; i++)
+    for (int i = 0; i <= 37; i++) // 36, 37 +/- limits, user gets the bottles.
     {
         pos_y.push_back(QString::number(i));
     }
