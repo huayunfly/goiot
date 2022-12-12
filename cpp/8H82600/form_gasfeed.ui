@@ -1306,7 +1306,7 @@
     <string>反应器16</string>
    </property>
   </widget>
-  <widget class="QLabel" name="txt_label_HC1020_EOPO">
+  <widget class="QLabel" name="txt_label_HC1020_N2VAC">
    <property name="geometry">
     <rect>
      <x>480</x>
@@ -1319,7 +1319,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
-    <string>EO/PO吹扫</string>
+    <string>N2/VAC</string>
    </property>
   </widget>
   <widget class="QLabel" name="txt_label_HC1021_EE">
@@ -1514,7 +1514,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
-    <string>采气吹扫</string>
+    <string>采样吹扫</string>
    </property>
   </widget>
   <widget class="QLabel" name="txt_label_Vent_1">
@@ -2172,7 +2172,7 @@
   <zorder>txt_label_R4101_14</zorder>
   <zorder>txt_label_R4101_15</zorder>
   <zorder>txt_label_R4101_16</zorder>
-  <zorder>txt_label_HC1020_EOPO</zorder>
+  <zorder>txt_label_HC1020_N2VAC</zorder>
   <zorder>txt_label_HC1021_EE</zorder>
   <zorder>txt_label_PIA1110</zorder>
   <zorder>txt_label_PIA1120</zorder>
