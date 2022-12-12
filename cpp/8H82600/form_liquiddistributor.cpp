@@ -217,14 +217,14 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
             int solvent_type_a = 0;
             if (!combobox->currentText().isEmpty())
             {
-                solvent_type_a = combobox->currentText().remove("L", Qt::CaseInsensitive).toUInt();
+                solvent_type_a = combobox->currentText().remove("S", Qt::CaseInsensitive).toUInt();
             }
             combobox = static_cast<QComboBox*>(
                     ui->tableWidget->cellWidget(row, start_col_b + index));
             int solvent_type_b = 0;
             if (!combobox->currentText().isEmpty())
             {
-                solvent_type_b = combobox->currentText().remove("L", Qt::CaseInsensitive).toUInt();
+                solvent_type_b = combobox->currentText().remove("S", Qt::CaseInsensitive).toUInt();
             }
             index++;
 
@@ -278,8 +278,8 @@ bool FormLiquidDistributor::SaveRecipe(const QString &recipe_name)
                 {
                     y = y > 4 ? 26 : 25; // collection clean y (1-4)25, (5-8)26
                 }
-                int run_a = solvent_type_a > 0 ? 1 : 0;
-                int run_b = solvent_type_b > 0 ? 1 : 0;
+                int run_a = (channel_a > 0 && solvent_type_a > 0) ? 1 : 0;
+                int run_b = (channel_b > 0 && solvent_type_b > 0) ? 1 : 0;
                 tail->push_back(r_name);
                 tail->push_back(QString::number(type));
                 tail->push_back(QString::number(channel_a));
@@ -746,12 +746,12 @@ void FormLiquidDistributor::InitRecipeSettingTable(int line_seperator,
     QStringList channel_1_to_8({"", "1", "2", "3", "4", "5", "6", "7", "8"});
     QStringList channel_9_to_16({"", "9", "10", "11", "12", "13", "14", "15", "16"});
     QStringList sampling_time;
-    for (int s = 15; s < 100; s++)
+    for (int s = 60; s < 100; s++)
     {
         sampling_time.append(QString::number(s) + "s");
     }
-    QStringList solvent_type_a({"", "L2", "L3", "L4"});
-    QStringList solvent_type_b({"", "L6", "L7", "L8"});
+    QStringList solvent_type_a({"", "S2", "S3", "S4"});
+    QStringList solvent_type_b({"", "S6", "S7", "S8"});
 
     for (int row = 0; row < row_count; row++)
     {
@@ -960,7 +960,7 @@ void FormLiquidDistributor::FillUITableChannelInfo(
     index++;
     combobox = static_cast<QComboBox*>(
             ui->tableWidget->cellWidget(row, start_col + index));
-    combobox->setCurrentText(QString("L") + QString::number(cleanport));
+    combobox->setCurrentText(QString("S") + QString::number(cleanport));
 }
 
 // Log to text window.
@@ -975,19 +975,19 @@ void FormLiquidDistributor::Log2Window(
 void FormLiquidDistributor::LogTaskStep(const RecipeTaskEntity& entity)
 {
     QString info = (entity.type == 0 || entity.type == 2) ? "取液->" : "清洗->";
-    info.append("位置a[");
+    info.append("瓶号a[");
     info.append(QString::number(entity.pos_a));
     info.append("] 通道[");
     info.append(QString::number(entity.channel_a));
     info.append("] ");
-    info.append(QString::number(entity.run_a));
+    info.append(entity.run_a ? QString("启动") : QString("停止"));
     info.append(", ");
-    info.append("位置b[");
+    info.append("瓶号b[");
     info.append(QString::number(entity.pos_b));
     info.append("] 通道[");
     info.append(QString::number(entity.channel_b));
     info.append("] ");
-    info.append(QString::number(entity.run_b));
+    info.append(entity.run_b ? QString("开始") : QString("停止"));
     Log2Window(entity.recipe_name, info);
 }
 
@@ -1244,6 +1244,8 @@ void FormLiquidDistributor::RunRecipeWorker()
             {
                 qCritical("write_data_func_ QFull error in RunRecipeWorker()");
             }
+            // Log start step to window
+            LogTaskStep(entity);
             // Write a runtime record
             if (db_ready_)
             {
@@ -1261,12 +1263,12 @@ void FormLiquidDistributor::RunRecipeWorker()
             // the distributor stops at a specifed position.
             if (run_a == 0 && run_b == 0)
             {
-                LogTaskStep(entity);
                 break;
             }
             // Wait for PLC step run feedback
+            int wait_start_timeout = 60;
             std::unique_lock<std::mutex> lk(mut_);
-            if (!task_running_.load() || !task_run_cond_.wait_for(lk, std::chrono::seconds(90), [&] {
+            if (!task_running_.load() || !task_run_cond_.wait_for(lk, std::chrono::seconds(wait_start_timeout), [&] {
                         return (run_a == dist_a_run_) && (run_b == dist_b_run_); })
                     )
             {
@@ -1275,7 +1277,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 StopTakingLiquidCmd(StatusCheckGroup::B);
                 UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                                    SamplingUIItem::SamplingUIItemStatus::Error);
-                Log2Window(recipe_name, "当前动作启动超时");
+                Log2Window(recipe_name, QString("当前动作启动反馈超时(") + QString::number(wait_start_timeout) + "s), 终止任务");
                 break; // no lk.unlock() needed.
 //                if (!task_running_) // test code
 //                {
@@ -1286,7 +1288,6 @@ void FormLiquidDistributor::RunRecipeWorker()
             // Runtime view displaying
             UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Sampling,
                                SamplingUIItem::SamplingUIItemStatus::Discharge);
-            LogTaskStep(entity);
 
             // Wait sampling or do liquid level detection, send stop command to plc.
             std::future<qint64> check_a, check_b;
@@ -1371,6 +1372,10 @@ void FormLiquidDistributor::RunRecipeWorker()
                     }
                 }
             }
+            // Log stop step to window
+            entity.run_a = false;
+            entity.run_b = false;
+            LogTaskStep(entity);
             // Wait for PLC step stopped feedback
             int wait_stop_timeout = 60;
             if (entity.type == TYPE_SAMPLING_PURGE || entity.type == TYPE_COLLECTION_PURGE)
@@ -1385,7 +1390,7 @@ void FormLiquidDistributor::RunRecipeWorker()
                 qCritical("RunRecipeWorker() failed, %s", "No PLC step stopped feedback.");
                 UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Error,
                                    SamplingUIItem::SamplingUIItemStatus::Error);
-                Log2Window(recipe_name, "当前动作停止超时");
+                Log2Window(recipe_name, QString("当前动作停止反馈超时（") + QString::number(wait_stop_timeout) + "s), 终止任务");
                 break;
 //                if (!task_running_) // test code
 //                {
@@ -1397,10 +1402,16 @@ void FormLiquidDistributor::RunRecipeWorker()
             UpdateRuntimeView(entity, run_a, run_b, SamplingUIItem::SamplingUIItemStatus::Finished,
                                SamplingUIItem::SamplingUIItemStatus::Undischarge);
             // Sleep seconds between send dist_run_a = 0 and next loop dist_run_a = 1
-            // avoiding PLC time conflicting and N2 purge time.
-            std::this_thread::sleep_for(
-                        std::chrono::seconds(duration_a > duration_b ? duration_a : duration_b));
+            // avoiding PLC time conflicting
+            // The wait time is also used for N2 purge time.
+            int wait_interval = duration_a > duration_b ? duration_a : duration_b;
+            Log2Window(recipe_name, QString("执行原位N2吹扫（") + QString::number(wait_interval) + "s)");
+            std::this_thread::sleep_for(std::chrono::seconds(wait_interval));
         }
+        // Sleep seconds between StopTakingLiquidCmd() and for-loop break
+        // out's dock-to-home PLC command, avoiding confict.
+        Log2Window(recipe_name, "任务结束准备，延时60s后返回起始位");
+        std::this_thread::sleep_for(std::chrono::seconds(60));
         // Force dock to the safe(center) position
         uint end_code = MakeRecipeEndCode(category_);
         bool ok = write_data_func_(this->objectName(), control_code_name_,
@@ -1408,7 +1419,7 @@ void FormLiquidDistributor::RunRecipeWorker()
         assert(ok);
         if (ok)
         {
-            Log2Window(recipe_name, "返回起始位");
+            Log2Window(recipe_name, "执行返回起始位动作");
         }
         // Stop
         bool expected = true;
