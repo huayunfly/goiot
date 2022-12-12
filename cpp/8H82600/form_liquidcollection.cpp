@@ -39,6 +39,12 @@ void FormLiquidCollection::InitUiState()
         ui->label_HC6204->installEventFilter(this);
         ui->label_HC6205->installEventFilter(this);
 
+        ui->label_TICA6104->installEventFilter(this);
+        ui->label_TICA6105->installEventFilter(this);
+        ui->label_TICA6301->installEventFilter(this);
+        ui->label_TICA7301->installEventFilter(this);
+        ui->label_TICA6401->installEventFilter(this);
+        ui->label_TICA6402->installEventFilter(this);
         ui->label_TICA6501->installEventFilter(this);
         ui->label_TICA6502->installEventFilter(this);
     }

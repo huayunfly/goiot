@@ -48,6 +48,8 @@ void FormLiquidSamplingA::InitUiState()
         ui->label_HC7216->installEventFilter(this);
         ui->label_HC7217->installEventFilter(this);
 
+        ui->label_TICA7211->installEventFilter(this);
+        ui->label_TICA7218->installEventFilter(this);
         ui->label_TICA7501->installEventFilter(this);
         ui->label_TICA7502->installEventFilter(this);
     }
