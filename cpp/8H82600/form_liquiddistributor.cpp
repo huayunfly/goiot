@@ -1599,6 +1599,9 @@ bool FormLiquidDistributor::DetectImage(int index)
 {
     bool ok = false;
     vcaps_.at(index) >> vframes_.at(index);
+    // Discard the old cache, get the next frame.
+    std::this_thread::sleep_for(std::chrono::microseconds(66));
+    vcaps_.at(index) >> vframes_.at(index);
     if (vframes_.at(index).data != nullptr)
     {
         cv::Mat gray, roi, edges;
