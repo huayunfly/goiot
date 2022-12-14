@@ -1527,13 +1527,16 @@ qint64 FormLiquidDistributor::SamplingStatusCheckByImageDetection(
     // unlock
     auto timeout = std::chrono::system_clock::now() +
             std::chrono::seconds(static_cast<long>(timeout_sec));
+    // Discard the old cache frame
+    vcaps_.at(index) >> vframes_.at(index);
+    std::this_thread::sleep_for(std::chrono::milliseconds(66));
     while (task_running_.load() && std::chrono::system_clock::now() < timeout)
     {
         if (DetectImage(index))
         {
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(66)); // video capture interval
     }
     StopTakingLiquidCmd(group);
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -1598,9 +1601,6 @@ bool FormLiquidDistributor::ReadPressure(int channel, float& pressure)
 bool FormLiquidDistributor::DetectImage(int index)
 {
     bool ok = false;
-    vcaps_.at(index) >> vframes_.at(index);
-    // Discard the old cache, get the next frame.
-    std::this_thread::sleep_for(std::chrono::microseconds(66));
     vcaps_.at(index) >> vframes_.at(index);
     if (vframes_.at(index).data != nullptr)
     {
