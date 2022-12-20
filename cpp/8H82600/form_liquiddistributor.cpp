@@ -905,12 +905,12 @@ void FormLiquidDistributor::ClearUITable()
             {
                 QCheckBox* checkbox = static_cast<QCheckBox*>(
                         ui->tableWidget->cellWidget(row, start_col + offset));
-                checkbox->setChecked(false); // default value
+                checkbox->setChecked(true); // default value
                 offset++;
             }
             combobox = static_cast<QComboBox*>(
                     ui->tableWidget->cellWidget(row, start_col + offset));
-            combobox->setCurrentText("1s");
+            combobox->setCurrentText("60s");
             offset++;
             combobox = static_cast<QComboBox*>(
                     ui->tableWidget->cellWidget(row, start_col + offset));
@@ -1819,6 +1819,18 @@ void FormLiquidDistributor::LoadManagementWindow()
             if (recipe_name.compare(loaded_recipe_name_, Qt::CaseInsensitive) == 0 &&
                     !task_running_.load())
             {
+                // Confirmation dialog.
+                QString sampling_tip = "将执行液体采样，请检查取液瓶/废液盒就位，吹扫气压力（3~4barA）。继续当前任务？";
+                if (LiquidDistributorCategory::COLLECTION == category_)
+                {
+                    sampling_tip = "将执行液体收集，请检查取液瓶/废液盒就位，各反应釜处于试验停止状态，吹扫气压力（3~4barA）。继续当前任务？";
+                }
+                auto result = QMessageBox::question(0, "任务启动确认", sampling_tip);
+                if (result == QMessageBox::StandardButton::No)
+                {
+                    return;
+                }
+
                 bool ok = DispatchRecipeTask(recipe_name);
                 if (ok)
                 {
