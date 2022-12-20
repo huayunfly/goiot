@@ -1751,13 +1751,13 @@ void FormLiquidDistributor::LoadManagementWindow()
     }
     // Get image parameters.
     std::vector<std::vector<double>> call_params;
-    DialogRecipeMgr::RecipeCategory dlg_category;
+    DialogRecipeMgr::RecipeCategory dlg_category =
+            DialogRecipeMgr::RecipeCategory::SAMPLING;
     std::shared_lock<std::shared_mutex> lk(shared_mut_);
     if (LiquidDistributorCategory::SAMPLING == category_)
     {
         call_params.push_back(image_params_.at(0).toDoubleValue());
         call_params.push_back(image_params_.at(1).toDoubleValue());
-        dlg_category = DialogRecipeMgr::RecipeCategory::SAMPLING;
     }
     else if (LiquidDistributorCategory::COLLECTION == category_)
     {
@@ -1767,8 +1767,7 @@ void FormLiquidDistributor::LoadManagementWindow()
     }
     lk.unlock();
     // Call the dialog.
-    DialogRecipeMgr dlg_recipe_mgr =
-            DialogRecipeMgr(this, recipe_names, call_params, dlg_category);
+    DialogRecipeMgr dlg_recipe_mgr(this, recipe_names, call_params, dlg_category);
     QString title = "配方管理 -> " + loaded_recipe_name_;
     dlg_recipe_mgr.setWindowTitle(title);
     dlg_recipe_mgr.exec();
