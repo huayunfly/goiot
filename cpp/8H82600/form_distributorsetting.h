@@ -36,6 +36,12 @@ private slots:
 
     void on_button_collection_injector_clicked();
 
+    void on_button_to_forefront_clicked();
+
+    void on_button_to_rearmost_clicked();
+
+    void on_button_dock_clicked();
+
 private:
     // Initialize runtime view.
     void InitRuntimeView();

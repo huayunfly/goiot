@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QMessageBox>
 #include <thread>
 
 FormDistributorSetting::FormDistributorSetting(QWidget *parent, bool admin) :
@@ -36,13 +37,13 @@ bool FormDistributorSetting::event(QEvent *event)
             {
                 ui->label_servo_on->setText("SERVO ON");
                 ui->label_servo_on->setStyleSheet("QLabel{background-color:rgb(144,238,144);}");
-                EnableButtons(true);
+                admin_privilege_ ? EnableButtons(true) : EnableButtons(false);
             }
             else
             {
                 ui->label_servo_on->setText("SERVO OFF");
                 ui->label_servo_on->setStyleSheet("QLabel{background-color:rgb(165,42,42);}");
-                EnableButtons(false);
+                admin_privilege_ ? EnableButtons(true) : EnableButtons(false);
             }
         }
         else if (e->Name().compare("label_servo_error", Qt::CaseInsensitive) == 0)
@@ -220,7 +221,7 @@ void FormDistributorSetting::InitControlPanel()
     }
     QStringList pos_x = {"0", "1"};
     QStringList pos_y;
-    for (int i = 0; i <= 37; i++) // 36, 37 +/- limits, user gets the bottles.
+    for (int i = 0; i <= 37; i++) // 36, 37 -/+ limits, user gets the bottles.
     {
         pos_y.push_back(QString::number(i));
     }
@@ -357,6 +358,14 @@ void FormDistributorSetting::on_button_speedY_clicked()
 
 void FormDistributorSetting::on_button_moveX_clicked()
 {
+    // Confirmation dialog.
+    QString tip("取液气缸将X移位至指定位，务必检查瓶架就位/无障碍物阻挡，继续当前动作？");
+    auto result = QMessageBox::question(0, "移液仪动作确认", tip);
+    if (result == QMessageBox::StandardButton::No)
+    {
+        return;
+    }
+    // Do
     QString button_id = "button_moveX";
     int pos_x = ui->comboBox_moveX->currentText().toInt();
     assert(pos_x == 0 || pos_x == 1);
@@ -367,12 +376,20 @@ void FormDistributorSetting::on_button_moveX_clicked()
 
 void FormDistributorSetting::on_button_moveY_clicked()
 {
+    // Confirmation dialog.
+    QString tip("取液托盘将Y移位至指定位，务必检查瓶架就位/无障碍物阻挡，继续当前动作？");
+    auto result = QMessageBox::question(0, "移液仪动作确认", tip);
+    if (result == QMessageBox::StandardButton::No)
+    {
+        return;
+    }
+    // Do
     QString button_id = "button_moveY";
     int pos_y = ui->comboBox_moveY->currentText().toInt();
     assert(pos_y >= 0 && pos_y <= 45);
     bool ok = write_data_func_(this->objectName(), button_id, QString::number(pos_y));
     assert(ok);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
 
 void FormDistributorSetting::on_button_sampling_injector_clicked()
@@ -393,4 +410,55 @@ void FormDistributorSetting::on_button_collection_injector_clicked()
     bool ok = write_data_func_(this->objectName(), button_id, QString::number(pos_injector));
     assert(ok);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void FormDistributorSetting::on_button_to_forefront_clicked()
+{
+    // Confirmation dialog.
+    QString tip("取液托盘将移位至前限位，务必检查瓶架就位/无障碍物阻挡，继续当前动作？");
+    auto result = QMessageBox::question(0, "移液仪动作确认", tip);
+    if (result == QMessageBox::StandardButton::No)
+    {
+        return;
+    }
+    // Do
+    QString button_id = "button_moveY";
+    const int POS_FOREFRONT = 37;
+    bool ok = write_data_func_(this->objectName(), button_id, QString::number(POS_FOREFRONT));
+    assert(ok);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
+void FormDistributorSetting::on_button_to_rearmost_clicked()
+{
+    // Confirmation dialog.
+    QString tip("取液托盘将移位至后限位，务必检查瓶架就位/无障碍物阻挡，继续当前动作？");
+    auto result = QMessageBox::question(0, "移液仪动作确认", tip);
+    if (result == QMessageBox::StandardButton::No)
+    {
+        return;
+    }
+    // Do
+    QString button_id = "button_moveY";
+    const int POS_REARMOST = 36;
+    bool ok = write_data_func_(this->objectName(), button_id, QString::number(POS_REARMOST));
+    assert(ok);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
+void FormDistributorSetting::on_button_dock_clicked()
+{
+    // Confirmation dialog.
+    QString tip("取液托盘将移位至停靠位，务必检查瓶架就位/无障碍物阻挡，继续当前动作？");
+    auto result = QMessageBox::question(0, "移液仪动作确认", tip);
+    if (result == QMessageBox::StandardButton::No)
+    {
+        return;
+    }
+    // Do
+    QString button_id = "button_moveY";
+    const int POS_DOCK = 35;
+    bool ok = write_data_func_(this->objectName(), button_id, QString::number(POS_DOCK));
+    assert(ok);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
