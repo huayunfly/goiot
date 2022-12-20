@@ -3965,6 +3965,190 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="txt_label_R9">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>290</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜9</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R10">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>290</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜10</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R11">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>290</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜11</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R12">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>290</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜12</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R16">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>700</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜16</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R14">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>700</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜14</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R15">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>700</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜15</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_R13">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>700</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>釜13</string>
+   </property>
+  </widget>
   <zorder>label_background</zorder>
   <zorder>label_PICA4309</zorder>
   <zorder>label_PICA4310</zorder>
@@ -4182,6 +4366,14 @@
   <zorder>label_TICA4716</zorder>
   <zorder>txt_label_TICA4716</zorder>
   <zorder>textEdit_TICA4716</zorder>
+  <zorder>txt_label_R9</zorder>
+  <zorder>txt_label_R10</zorder>
+  <zorder>txt_label_R11</zorder>
+  <zorder>txt_label_R12</zorder>
+  <zorder>txt_label_R16</zorder>
+  <zorder>txt_label_R14</zorder>
+  <zorder>txt_label_R15</zorder>
+  <zorder>txt_label_R13</zorder>
  </widget>
  <resources>
   <include location="res.qrc"/>
