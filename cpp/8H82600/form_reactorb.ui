@@ -2898,7 +2898,7 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <property name="text">
-    <string>TICA4119</string>
+    <string>TICA4110</string>
    </property>
   </widget>
   <widget class="QLabel" name="txt_label_TICA4111">
