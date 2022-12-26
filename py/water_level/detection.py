@@ -57,7 +57,7 @@ min_line_len = 30
 section_num = 4
 lines_in_section = [0] * section_num
 for i in range(0, len(contours_and_hierarchy[0])):
-    if len(contours_and_hierarchy[0][i]) < min_line_len:
+    if cv2.arcLength(contours_and_hierarchy[0][i], True) < min_line_len:
         continue
     line = cv2.fitLine(contours_and_hierarchy[0][i], cv2.DIST_L2, 0, 0.01, 0.01)
     # line structure: (vx, vy, x0, y0)
