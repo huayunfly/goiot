@@ -17,6 +17,7 @@
 #include "ui_form_liquiddistributor.h"
 #include "qrcode_generator.h"
 #include "dialog_recipe_mgr.h"
+#include "dialog_liquidsamplingcheck.h"
 
 
 FormLiquidDistributor::FormLiquidDistributor(QWidget *parent,
@@ -1819,13 +1820,14 @@ void FormLiquidDistributor::LoadManagementWindow()
                     !task_running_.load())
             {
                 // Confirmation dialog.
-                QString sampling_tip = "将执行液体采样，请检查取液瓶/废液盒就位，吹扫气压力（3~4barA）。继续当前任务？";
+                auto cat = DialogLiquidSamplingCheck::TaskCategory::SAMPLING;
                 if (LiquidDistributorCategory::COLLECTION == category_)
                 {
-                    sampling_tip = "将执行液体收集，请检查取液瓶/废液盒就位，各反应釜处于试验停止状态，吹扫气压力（3~4barA）。继续当前任务？";
+                    cat = DialogLiquidSamplingCheck::TaskCategory::COLLECTION;
                 }
-                auto result = QMessageBox::question(0, "任务启动确认", sampling_tip);
-                if (result == QMessageBox::StandardButton::No)
+                auto dlg_check = DialogLiquidSamplingCheck(this, cat);
+                dlg_check.exec();
+                if (dlg_check.result() == QDialog::DialogCode::Rejected)
                 {
                     return;
                 }
