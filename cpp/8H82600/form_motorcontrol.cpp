@@ -7,8 +7,8 @@
 FormMotorControl::FormMotorControl(QWidget *parent,
                                    const QString& object_name,
                                    const QString& display_name,
-                                   MotorGroup group) :
-    FormCommon(parent, object_name, display_name), ui(new Ui::FormMotorControl),
+                                   MotorGroup group, bool admin) :
+    FormCommon(parent, object_name, display_name, admin), ui(new Ui::FormMotorControl),
     group_(group)
 {
     ui->setupUi(this);
@@ -97,7 +97,7 @@ FormMotorControl::FormMotorControl(QWidget *parent,
         ui->tableWidget->item(i, COL_PV)->setFlags(Qt::NoItemFlags);
     }
 
-    // Button
+    // Button with admin previlege.
     for (int i = 0; i < ROW_COUNT; i++)
     {
         // Button
@@ -106,30 +106,35 @@ FormMotorControl::FormMotorControl(QWidget *parent,
         button->setCursor(Qt::PointingHandCursor);
         connect(button, &QPushButton::clicked, this, &FormMotorControl::on_buttonClicked);
         ui->tableWidget->setCellWidget(i, COL_ENABLE, button);
+        admin_privilege_ ? button->setEnabled(true) : button->setEnabled(false);
 
         button = new QPushButton();
         button->setText("Disable");
         button->setCursor(Qt::PointingHandCursor);
         connect(button, &QPushButton::clicked, this, &FormMotorControl::on_buttonClicked);
         ui->tableWidget->setCellWidget(i, COL_DISABLE, button);
+        admin_privilege_ ? button->setEnabled(true) : button->setEnabled(false);
 
         button = new QPushButton();
         button->setText("Clear");
         button->setCursor(Qt::PointingHandCursor);
         connect(button, &QPushButton::clicked, this, &FormMotorControl::on_buttonClicked);
         ui->tableWidget->setCellWidget(i, COL_CLEAR_ALARM, button);
+        admin_privilege_ ? button->setEnabled(true) : button->setEnabled(false);
 
         button = new QPushButton();
         button->setText("<->");
         button->setCursor(Qt::PointingHandCursor);
         connect(button, &QPushButton::clicked, this, &FormMotorControl::on_buttonClicked);
         ui->tableWidget->setCellWidget(i, COL_START, button);
+        admin_privilege_ ? button->setEnabled(true) : button->setEnabled(false);
 
         button = new QPushButton();
         button->setText("Stop");
         button->setCursor(Qt::PointingHandCursor);
         connect(button, &QPushButton::clicked, this, &FormMotorControl::on_buttonClicked);
         ui->tableWidget->setCellWidget(i, COL_STOP, button);
+        admin_privilege_ ? button->setEnabled(true) : button->setEnabled(false);
     }
     // Editabel cell
     connect(ui->tableWidget, &QTableWidget::cellChanged, this, &FormMotorControl::on_cellChanged);

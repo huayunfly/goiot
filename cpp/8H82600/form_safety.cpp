@@ -305,8 +305,17 @@ void FormSafety::InitAlarmEnableTable(void)
             ui->alarmEnableTableWidget->setColumnWidth(2 * j, 100);
             // Set checkbox
             QCheckBox *box = new QCheckBox();
-            box->setChecked(true);
+            box->setChecked(true);  
             connect(box, &QCheckBox::stateChanged, this, &FormSafety::on_boxStateChanged);
+            // Admin
+            if (admin_privilege_)
+            {
+                box->setEnabled(true);
+            }
+            else
+            {
+                box->setEnabled(false);
+            }
             ui->alarmEnableTableWidget->setCellWidget(i, 2 * j + 1, box);
             ui->alarmEnableTableWidget->setColumnWidth(2 * j + 1, 60);
             alarm_group_index++;

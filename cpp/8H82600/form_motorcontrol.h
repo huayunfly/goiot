@@ -24,7 +24,8 @@ public:
     explicit FormMotorControl(QWidget *parent = nullptr,
                               const QString& object_name = QString(),
                               const QString& display_name = QString(),
-                              MotorGroup group = MotorGroup::CYLINDER16);
+                              MotorGroup group = MotorGroup::CYLINDER16,
+                              bool admin = true);
     ~FormMotorControl();
 
 protected:

@@ -70,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     this->setWindowState(Qt::WindowMaximized);
+    QString win_title("PPSR-16E平行反应釜系统");
+    admin ? win_title.append(QString(" [管理员]")) : win_title.append(QString(" [试验用户]"));
+    this->setWindowTitle(win_title);
 
     // Setup Ocx
     bool ok = ui_->widget_workflow->setControl("{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"); // WorkflowComponent.WorkflowComponentCtrl.1 "{B6F7A42C-8939-46F0-9BC4-518C1B3036D2}"
@@ -114,9 +117,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Attach motor control widget
     std::vector<FormCommon*> motor_form_vec;
-    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_cylinder16", "1#-8#注射缸", MotorGroup::CYLINDER16));
-    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_cylinder32", "9#-16#注射缸", MotorGroup::CYLINDER32));
-    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_reactor16", "1#-16#反应器", MotorGroup::REACTOR));
+    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_cylinder16", "1#-8#注射缸", MotorGroup::CYLINDER16, admin));
+    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_cylinder32", "9#-16#注射缸", MotorGroup::CYLINDER32, admin));
+    motor_form_vec.push_back(new FormMotorControl(nullptr, "motorcontrol_reactor16", "1#-16#反应器", MotorGroup::REACTOR, admin));
     for (auto& entry : motor_form_vec)
     {
         entry->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
