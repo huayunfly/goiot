@@ -21,12 +21,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-
-    void on_pushButton_3_clicked();
-
     void on_listView_clicked(const QModelIndex &index);
 
 private:
@@ -73,5 +71,6 @@ private:
     goiot::DataManager data_manager_;
     SafetyPolicy safety_;
     QTimer safe_timer_;
+    QString title_;
 };
 #endif // MAINWINDOW_H

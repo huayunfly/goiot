@@ -31,7 +31,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow), data_manager_(QApplication::applicationDirPath().toStdString() ),
-      safety_(data_manager_), safe_timer_()
+      safety_(data_manager_), safe_timer_(), title_("PPSR-16E平行反应釜系统")
 {
     ui_->setupUi(this);
 
@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     this->setWindowState(Qt::WindowMaximized);
-    QString win_title("PPSR-16E平行反应釜系统");
+    QString win_title(title_);
     admin ? win_title.append(QString(" [管理员]")) : win_title.append(QString(" [试验用户]"));
     this->setWindowTitle(win_title);
 
@@ -156,6 +156,21 @@ MainWindow::~MainWindow()
     safety_.Stop();
     data_manager_.Stop();
     delete ui_;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    auto result = QMessageBox::information(
+                this, title_, "确认退出?",
+                QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
+    if (QMessageBox::StandardButton::Yes == result)
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 
 void MainWindow::InitDataModel()
@@ -2324,56 +2339,56 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
     }
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    QWidget* sender = static_cast<QWidget*>(this->sender());
-    QApplication::sendEvent(ui_->tabWidget->widget(0),
-                            new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, UiInfo(), "mockid", 0.0, "xxyy"));
-    DialogSetValue set_value_dialog(sender, "34.5", MeasurementUnit::DEGREE);
+//void MainWindow::on_pushButton_clicked()
+//{
+//    QWidget* sender = static_cast<QWidget*>(this->sender());
+//    QApplication::sendEvent(ui_->tabWidget->widget(0),
+//                            new Ui::RefreshTextEvent("textEdit", Ui::ControlStatus::OK, UiInfo(), "mockid", 0.0, "xxyy"));
+//    DialogSetValue set_value_dialog(sender, "34.5", MeasurementUnit::DEGREE);
 
-    // convert the widget position to the screen position.
-    QPoint screen_pos = this->mapToGlobal(sender->pos());
-    screen_pos.setX(screen_pos.x() + 25);
-    screen_pos.setY(screen_pos.y() + 10);
-    set_value_dialog.move(screen_pos);
-    int result = set_value_dialog.exec();
-    if (result == QDialog::Accepted)
-    {
-        float f = set_value_dialog.NewValue();
-        f++;
-    }
-    else
-    {
+//    // convert the widget position to the screen position.
+//    QPoint screen_pos = this->mapToGlobal(sender->pos());
+//    screen_pos.setX(screen_pos.x() + 25);
+//    screen_pos.setY(screen_pos.y() + 10);
+//    set_value_dialog.move(screen_pos);
+//    int result = set_value_dialog.exec();
+//    if (result == QDialog::Accepted)
+//    {
+//        float f = set_value_dialog.NewValue();
+//        f++;
+//    }
+//    else
+//    {
 
-    }
+//    }
 
-}
+//}
 
-void MainWindow::on_pushButton_2_clicked()
-{
-    QWidget* sender = static_cast<QWidget*>(this->sender());
-    // dialog_setposition
-    DialogSetPosition set_position_dialog(sender, 8, 4);
-    int result = set_position_dialog.exec();
-    if (result == QDialog::Accepted)
-    {
-        int pos = set_position_dialog.NewValue();
-        std::cout << "pos: " << pos << std::endl;
-    }
-}
+//void MainWindow::on_pushButton_2_clicked()
+//{
+//    QWidget* sender = static_cast<QWidget*>(this->sender());
+//    // dialog_setposition
+//    DialogSetPosition set_position_dialog(sender, 8, 4);
+//    int result = set_position_dialog.exec();
+//    if (result == QDialog::Accepted)
+//    {
+//        int pos = set_position_dialog.NewValue();
+//        std::cout << "pos: " << pos << std::endl;
+//    }
+//}
 
-void MainWindow::on_pushButton_3_clicked()
-{
-    QWidget* sender = static_cast<QWidget*>(this->sender());
-    // dialog_setposition
-    DialogOnOff on_off_dialog(sender, 1);
-    int result = on_off_dialog.exec();
-    if (result == QDialog::Accepted)
-    {
-        int pos = on_off_dialog.NewValue();
-        std::cout << "pos: " << pos << std::endl;
-    }
-}
+//void MainWindow::on_pushButton_3_clicked()
+//{
+//    QWidget* sender = static_cast<QWidget*>(this->sender());
+//    // dialog_setposition
+//    DialogOnOff on_off_dialog(sender, 1);
+//    int result = on_off_dialog.exec();
+//    if (result == QDialog::Accepted)
+//    {
+//        int pos = on_off_dialog.NewValue();
+//        std::cout << "pos: " << pos << std::endl;
+//    }
+//}
 
 bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name, QString& value, Ui::ControlStatus& status, UiInfo& ui_info)
 {
