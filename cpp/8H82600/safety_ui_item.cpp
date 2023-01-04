@@ -43,6 +43,14 @@ void SafetyUIItem::paint(QPainter *painter,
         painter->setBrush(Qt::gray);
         label = QString("N/A");
         break;
+    case SafetyUIItemStatus::Failure:
+        painter->setBrush(Qt::red);
+        label = QString("故障");
+        break;
+    case SafetyUIItemStatus::Trigger:
+        painter->setBrush(Qt::red);
+        label = QString("触发");
+        break;
     default:
         painter->setBrush(Qt::red);
     }
@@ -91,6 +99,12 @@ void SafetyUIItem::SetStatus(SafetyUIItemStatus status)
         break;
     case SafetyUIItemStatus::Inactive:
         status_note_ = QString("未激活");
+        break;
+    case SafetyUIItemStatus::Failure:
+        status_note_ = QString("故障");
+        break;
+    case SafetyUIItemStatus::Trigger:
+        status_note_ = QString("触发");
         break;
     default:
         status_note_ = QString("Unknown");

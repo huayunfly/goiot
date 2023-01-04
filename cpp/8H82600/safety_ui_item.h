@@ -19,7 +19,9 @@ public:
         HHLimit,
         LLimit,
         TBreak,
-        Inactive
+        Inactive,
+        Failure, // POWER, SWITCH
+        Trigger // EMERGENCE button
     };
 
 public:
