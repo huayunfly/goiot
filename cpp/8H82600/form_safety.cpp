@@ -199,6 +199,14 @@ void FormSafety::InitAlarmView()
                            AlarmItemInfo("XI3902", "箱底EO2报警器"),
                            AlarmItemInfo("XI3903", "箱顶H2报警器"),
                            AlarmItemInfo("XI3904", "通风橱CO报警器")}));
+
+    // Runtime signals
+    alarm_items_.push_back(std::make_pair<QString, std::vector<AlarmItemInfo>>(
+                               "信号报警", {AlarmItemInfo("EMER", "急停按钮"),
+                           AlarmItemInfo("PHASE", "相序保护"),
+                           AlarmItemInfo("SWTICH", "断路器辅助"),
+                           AlarmItemInfo("POWER", "市电")}));
+
     // Group info, matching alarm_items_
     alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
                             "plc.1.alm_temp_high_a", AlarmGroupInfo(0, SafetyUIItem::SafetyUIItemStatus::HLimit, 32, 0)));
@@ -232,6 +240,14 @@ void FormSafety::InitAlarmView()
                             "plc.1.alm_gas_high", AlarmGroupInfo(5, SafetyUIItem::SafetyUIItemStatus::HLimit, 4, 117)));
     alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
                             "plc.1.alm_gas_hhigh", AlarmGroupInfo(5, SafetyUIItem::SafetyUIItemStatus::HHLimit, 4, 117)));
+    alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
+                            "plc.1.di1_4", AlarmGroupInfo(6, SafetyUIItem::SafetyUIItemStatus::Trigger, 1, 121)));
+    alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
+                            "plc.1.di1_7", AlarmGroupInfo(6, SafetyUIItem::SafetyUIItemStatus::Failure, 1, 122)));
+    alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
+                            "plc.1.di1_8", AlarmGroupInfo(6, SafetyUIItem::SafetyUIItemStatus::Failure, 1, 123)));
+    alarm_group_.emplace(std::make_pair<std::string, AlarmGroupInfo>(
+                            "plc.1.di1_9", AlarmGroupInfo(6, SafetyUIItem::SafetyUIItemStatus::Failure, 1, 124)));
 
     // Draw the alarm view
     int cols = 16;
@@ -287,7 +303,7 @@ void FormSafety::InitAlarmEnableTable(void)
     ui->alarmEnableTableWidget->verticalHeader()->setVisible(false);
     ui->alarmEnableTableWidget->horizontalHeader()->setDefaultSectionSize(80);
     ui->alarmEnableTableWidget->setAlternatingRowColors(true);
-    ui->alarmEnableTableWidget->resize(810, 180);
+    ui->alarmEnableTableWidget->resize(812, 130);
 
     std::size_t alarm_group_index = 0;
     for (int i = 0; i < row_num; i++)
@@ -419,7 +435,7 @@ bool FormSafety::event(QEvent *event)
                     if (alarm_ui_items_.at(pos)->Status() != status)
                     {
                          alarm_ui_items_.at(pos)->SetStatus(status);
-                         qWarning("alarm [%s], [%s]", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
+                         qWarning("警报 [%s], [%s]", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
                                alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
                     }
                 }
@@ -430,6 +446,37 @@ bool FormSafety::event(QEvent *event)
                     {
                         alarm_ui_items_.at(pos)->SetStatus(
                                     SafetyUIItem::SafetyUIItemStatus::Normal);
+                        qInfo("警报 [%s], [%s], 恢复正常", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
+                              alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
+                    }
+                }
+            }
+            return true;
+        }
+        else if (0 == data_info_id.find("plc.1.di1_")) // DI1 1-16 signals
+        {
+            auto iter = alarm_group_.find(data_info_id);
+            if (iter != alarm_group_.end())
+            {
+                int pos = (*iter).second.item_offset;
+                SafetyUIItem::SafetyUIItemStatus status = (*iter).second.status;
+                if (e->State() > 0)
+                {
+                    if (alarm_ui_items_.at(pos)->Status() != status)
+                    {
+                         alarm_ui_items_.at(pos)->SetStatus(status);
+                         qWarning("警报 [%s], [%s]", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
+                               alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
+                    }
+                }
+                else
+                {
+                    if (alarm_ui_items_.at(pos)->Status() == status)
+                    {
+                        alarm_ui_items_.at(pos)->SetStatus(
+                                    SafetyUIItem::SafetyUIItemStatus::Normal);
+                        qInfo("警报 [%s], [%s], 恢复正常", alarm_ui_items_.at(pos)->Note().toStdString().c_str(),
+                              alarm_ui_items_.at(pos)->StatusNote().toStdString().c_str());
                     }
                 }
             }
