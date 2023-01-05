@@ -15,8 +15,9 @@
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui_(new Ui::MainWindow), data_manager_(QApplication::applicationDirPath().toStdString() )
+    : QMainWindow(parent), ui_(new Ui::MainWindow),
+      data_manager_(QApplication::applicationDirPath().toStdString() ),
+      title_("RSC-600M-3C固定床和反应釜系统")
 {
     ui_->setupUi(this);
 
@@ -86,6 +87,21 @@ MainWindow::~MainWindow()
 {
     data_manager_.Stop();
     delete ui_;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    auto result = QMessageBox::information(
+                this, title_, "确认退出?",
+                QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
+    if (QMessageBox::StandardButton::Yes == result)
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 
 void MainWindow::InitDataModel()
@@ -176,7 +192,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp7_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2202"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp8_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2203"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
 
-    data_model_.SetDataToUiMap("plc.1.temp9_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2501"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
+    //data_model_.SetDataToUiMap("plc.1.temp9_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2501"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     //data_model_.SetDataToUiMap("plc.1.temp10_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2502"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp11_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2503"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp12_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2504"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
@@ -185,7 +201,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp15_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2603"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp16_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2604"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
 
-    data_model_.SetDataToUiMap("plc.1.temp17_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
+    //data_model_.SetDataToUiMap("plc.1.temp17_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp18_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2401"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp19_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2801"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));
     data_model_.SetDataToUiMap("plc.1.temp20_pv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("textEdit_TICA2404"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 140, 0));

@@ -19,6 +19,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
     void on_listView_clicked(const QModelIndex &index);
 
@@ -59,5 +62,6 @@ private:
     Ui::MainWindow *ui_;
     DataModel data_model_;
     goiot::DataManager data_manager_;
+    QString title_;
 };
 #endif // MAINWINDOW_H
