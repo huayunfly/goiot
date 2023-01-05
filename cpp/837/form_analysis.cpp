@@ -34,6 +34,6 @@ void FormAnalysis::InitUiState()
     ui->label_TICA3130->installEventFilter(this);
     ui->label_TICA3140->installEventFilter(this);
 
-    ui->label_GC1->installEventFilter(this);
-    ui->label_GC2->installEventFilter(this);
+//    ui->label_GC1->installEventFilter(this); // GC1
+//    ui->label_GC2->installEventFilter(this); // GC2
 }
