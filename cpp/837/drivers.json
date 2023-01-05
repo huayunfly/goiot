@@ -625,12 +625,12 @@
             {
               "id": "gas_1",
               "name": "XISA1001",
-              "register": "RW5DF0260"
+              "register": "RW5DF0288"
             },
             {
               "id": "gas_2",
               "name": "XISA1002",
-              "register": "RW5DF0264"
+              "register": "RW5DF0292"
             }
           ]
         }
