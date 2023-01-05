@@ -59,6 +59,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床入口管伴热</string>
+   </property>
    <property name="text">
     <string>TICA2101</string>
    </property>
@@ -280,6 +283,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床预加热</string>
+   </property>
    <property name="text">
     <string>TICA2102</string>
    </property>
@@ -295,6 +301,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床上加热</string>
    </property>
    <property name="text">
     <string>TICA2103</string>
@@ -312,6 +321,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床中加热</string>
+   </property>
    <property name="text">
     <string>TICA2104</string>
    </property>
@@ -327,6 +339,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床下加热</string>
    </property>
    <property name="text">
     <string>TICA2105</string>
@@ -384,6 +399,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床出口伴热</string>
    </property>
    <property name="text">
     <string>TICA2106</string>
@@ -458,6 +476,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床冷凝块加热</string>
+   </property>
    <property name="text">
     <string>TICA2201</string>
    </property>
@@ -474,6 +495,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床冷凝阀板加热</string>
+   </property>
    <property name="text">
     <string>TICA2202</string>
    </property>
@@ -489,6 +513,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床二级冷凝入口管伴热</string>
    </property>
    <property name="text">
     <string>TICA2203</string>
@@ -686,6 +713,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜入口管伴热</string>
+   </property>
    <property name="text">
     <string>TICA2501</string>
    </property>
@@ -701,6 +731,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜出液管伴热</string>
    </property>
    <property name="text">
     <string>TICA2503</string>
@@ -718,6 +751,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜出气管伴热</string>
+   </property>
    <property name="text">
     <string>TICA2504</string>
    </property>
@@ -733,6 +769,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜冷凝块加热</string>
    </property>
    <property name="text">
     <string>TICA2601</string>
@@ -750,6 +789,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜冷凝阀板加热</string>
+   </property>
    <property name="text">
     <string>TICA2602</string>
    </property>
@@ -765,6 +807,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜二级冷凝入口管伴热</string>
    </property>
    <property name="text">
     <string>TICA2603</string>
@@ -800,6 +845,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜液相取液阀板加热</string>
    </property>
    <property name="text">
     <string>TICA2604</string>
@@ -1053,6 +1101,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床冷凝至背压阀管路伴热</string>
+   </property>
    <property name="text">
     <string>TICA2401</string>
    </property>
@@ -1068,6 +1119,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床背压阀加热</string>
    </property>
    <property name="text">
     <string>TICA2404</string>
@@ -1167,6 +1221,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜冷凝至背压阀管路伴热</string>
+   </property>
    <property name="text">
     <string>TICA2801</string>
    </property>
@@ -1182,6 +1239,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜背压阀加热</string>
    </property>
    <property name="text">
     <string>TICA2804</string>
@@ -1243,6 +1303,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床后端压力</string>
+   </property>
    <property name="text">
     <string>PIA2402</string>
    </property>
@@ -1258,6 +1321,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>反应釜后端压力</string>
    </property>
    <property name="text">
     <string>PIA2802</string>

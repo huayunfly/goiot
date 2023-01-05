@@ -97,6 +97,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床H2质量流量控制器</string>
+   </property>
    <property name="text">
     <string>FICA1111</string>
    </property>
@@ -277,6 +280,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床CO质量流量控制器</string>
+   </property>
    <property name="text">
     <string>FICA1121</string>
    </property>
@@ -292,6 +298,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床N2质量流量控制器</string>
    </property>
    <property name="text">
     <string>FICA1131</string>
@@ -309,6 +318,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床CO2质量流量控制器</string>
+   </property>
    <property name="text">
     <string>FICA1141</string>
    </property>
@@ -324,6 +336,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>固定床C2H4质量流量控制器</string>
    </property>
    <property name="text">
     <string>FICA1151</string>
@@ -546,6 +561,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜H2质量流量控制器</string>
+   </property>
    <property name="text">
     <string>FICA1511</string>
    </property>
@@ -561,6 +579,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜CO质量流量控制器</string>
    </property>
    <property name="text">
     <string>FICA1521</string>
@@ -578,6 +599,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜N2质量流量控制器</string>
+   </property>
    <property name="text">
     <string>FICA1531</string>
    </property>
@@ -594,6 +618,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>釜CO2质量流量控制器</string>
+   </property>
    <property name="text">
     <string>FICA1541</string>
    </property>
@@ -609,6 +636,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>釜C2H4质量流量控制器</string>
    </property>
    <property name="text">
     <string>FICA1551</string>
@@ -736,6 +766,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>H2气源压力</string>
+   </property>
    <property name="text">
     <string>PIA1111</string>
    </property>
@@ -751,6 +784,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>CO气源压力</string>
    </property>
    <property name="text">
     <string>PIA1121</string>
@@ -768,6 +804,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>N2气源压力</string>
+   </property>
    <property name="text">
     <string>PIA1131</string>
    </property>
@@ -784,6 +823,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>CO2气源压力</string>
+   </property>
    <property name="text">
     <string>PIA1141</string>
    </property>
@@ -799,6 +841,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>C2H4气源压力</string>
    </property>
    <property name="text">
     <string>PIA1151</string>
@@ -838,6 +883,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>仪表气源压力</string>
+   </property>
    <property name="text">
     <string>PIA1401</string>
    </property>
@@ -876,6 +924,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>固定床前端压力</string>
+   </property>
    <property name="text">
     <string>PIA1113</string>
    </property>
@@ -913,6 +964,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>反应釜前端压力</string>
    </property>
    <property name="text">
     <string>PIA1513</string>
@@ -974,6 +1028,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>H2</string>
+   </property>
    <property name="text">
     <string>XISA1001</string>
    </property>
@@ -989,6 +1046,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>CO</string>
    </property>
    <property name="text">
     <string>XISA1002</string>

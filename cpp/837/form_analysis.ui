@@ -85,6 +85,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>背压阀至总收集管路伴热</string>
+   </property>
    <property name="text">
     <string>TICA3110</string>
    </property>
@@ -183,6 +186,9 @@
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
+   <property name="toolTip">
+    <string>背压阀板加热</string>
+   </property>
    <property name="text">
     <string>TICA3120</string>
    </property>
@@ -198,6 +204,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>GC1管路伴热</string>
    </property>
    <property name="text">
     <string>TICA3130</string>
@@ -293,6 +302,9 @@
    </property>
    <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>GC2管路伴热</string>
    </property>
    <property name="text">
     <string>TICA3140</string>
