@@ -15,6 +15,9 @@ FormSafety::FormSafety(QWidget *parent, bool admin) :
     InitExpStatusTable();
     InitAlarmView();
     InitAlarmEnableTable();
+    connect(&timer_, &QTimer::timeout, this, &FormSafety::CheckTotalAlarmBox);
+    timer_.start(1800 * 1000); // call EnableTotalAlarm by 30min interval.
+    QTimer::singleShot(10000, this, &FormSafety::EnableTotalAlarm); // Force enable alarm once.
 }
 
 void FormSafety::InitExpStatusTable(void)
@@ -310,7 +313,7 @@ void FormSafety::InitAlarmEnableTable(void)
     {
         for (int j = 0; j < col_group_num; j++)
         {
-            if (alarm_group_index >= alarm_items_.size())
+            if (alarm_group_index >= alarm_items_.size() - 1) // Exclude the Runtime signals group.
             {
                 break;
             }
@@ -486,6 +489,28 @@ bool FormSafety::event(QEvent *event)
     return QWidget::event(event);
 }
 
+void FormSafety::CheckTotalAlarmBox()
+{
+    int group_num = alarm_items_.size() - 1; // exclude "信号报警" group
+    int group_idx = 0;
+    for (int row = 0; row < ui->alarmEnableTableWidget->rowCount(); row++)
+    {
+        for (int col = 1; col < ui->alarmEnableTableWidget->columnCount(); )
+        {
+            if (group_idx > group_num - 1)
+            {
+                return;
+            }
+            QCheckBox* checkbox = static_cast<QCheckBox*>(
+                    ui->alarmEnableTableWidget->cellWidget(row, col));
+            checkbox->setChecked(false);
+            col += 2;
+            group_idx++;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+    }
+}
+
 void FormSafety::on_buttonClicked()
 {
     QPushButton *senderObj = qobject_cast<QPushButton*>(sender());
@@ -516,6 +541,19 @@ void FormSafety::on_buttonClicked()
     }
 }
 
+void FormSafety::EnableTotalAlarm(void)
+{
+    int idx_num = alarm_items_.size() - 1; // Exclude Runtime signals group
+    for (int checkbox_idx = 0; checkbox_idx < idx_num; checkbox_idx++)
+    {
+        // Write data
+        QString checkbox_id = "checkbox_alm_enable_" + QString::number(checkbox_idx + 1); // 1 based
+        bool ok = write_data_func_(this->objectName(), checkbox_id, QString::number(0xffffffff));
+        assert(ok);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+}
+
 void FormSafety::on_boxStateChanged(int state)
 {
     QCheckBox *senderObj = qobject_cast<QCheckBox*>(sender());
@@ -529,7 +567,7 @@ void FormSafety::on_boxStateChanged(int state)
     int row = idx.row();
     int col = idx.column();
     int checkbox_idx = row * (ui->alarmEnableTableWidget->columnCount() / 2) +
-            col / 2;
+            col / 2/*note and checkbox pair*/;
     // Mapping alarm view items
     int alm_view_item_start = 0;
     for (int i = 0; i < checkbox_idx; i++)
@@ -559,3 +597,5 @@ void FormSafety::on_boxStateChanged(int state)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
+
+

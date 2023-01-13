@@ -4,6 +4,7 @@
 #include "form_common.h"
 #include "safety_ui_item.h"
 #include <map>
+#include <QTimer>
 
 namespace Ui {
 class FormSafety;
@@ -53,6 +54,11 @@ private:
 
     void InitAlarmEnableTable(void);
 
+    void EnableTotalAlarm(void);
+
+    // Force check the alarm checkboxes.
+    void CheckTotalAlarmBox();
+
 private:
     Ui::FormSafety *ui;
     // constants
@@ -68,6 +74,7 @@ private:
     std::map<std::string, AlarmGroupInfo> alarm_group_;
     std::vector<int> byte_order_big16_ = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
     std::vector<int> byte_order_big32_ = {24, 25, 26, 27, 28, 29, 30, 31, 16, 17, 18, 19, 20, 21, 22, 23, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
+    QTimer timer_;
 };
 
 #endif // FORM_SAFETY_H
