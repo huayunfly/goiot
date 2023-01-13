@@ -1333,8 +1333,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.alm_gas_high", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("plc.1.alm_gas_hhigh", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("plc.1.di1_4", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.di1_7", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
-    data_model_.SetDataToUiMap("plc.1.di1_8", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    //data_model_.SetDataToUiMap("plc.1.di1_7", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
+    //data_model_.SetDataToUiMap("plc.1.di1_8", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("plc.1.di1_9", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("verticalLayoutAlarmView"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 1, 0)});
 
     data_model_.SetDataToUiMap("plc.1.alm_reactor_tc_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
