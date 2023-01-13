@@ -968,9 +968,10 @@ void FormLiquidDistributor::FillUITableChannelInfo(
 void FormLiquidDistributor::Log2Window(
         const QString& recipe_name, const QString& status)
 {
-    ui->textEdit_log->append(
-                QDateTime::currentDateTime().toString("MM月dd日 hh:mm:ss ")
-                + "[" + recipe_name + "]: " + status);
+    QString info = QDateTime::currentDateTime().toString("MM月dd日 hh:mm:ss ")
+            + "[" + recipe_name + "]: " + status;
+    ui->textEdit_log->append(info);
+    qInfo("液体分配 [%s]", info.toStdString().c_str());
 }
 
 void FormLiquidDistributor::LogTaskStep(const RecipeTaskEntity& entity)
