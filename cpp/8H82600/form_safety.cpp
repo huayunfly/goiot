@@ -503,7 +503,7 @@ void FormSafety::CheckTotalAlarmBox()
             }
             QCheckBox* checkbox = static_cast<QCheckBox*>(
                     ui->alarmEnableTableWidget->cellWidget(row, col));
-            checkbox->setChecked(false);
+            checkbox->setChecked(true);
             col += 2;
             group_idx++;
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
