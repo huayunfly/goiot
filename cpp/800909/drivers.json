@@ -1,0 +1,177 @@
+{
+  "name": "800909",
+  "redis": "127.0.0.1:6379",
+  "db": "127.0.0.1:5432:800909:postgres:hello@123",
+  "drivers": [
+    {
+      "id": "e5cc",
+      "name": "modbus3",
+      "type": "modbus_rtu",
+      "port": "COM3,19200,E,8,1",
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "2",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "3",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "5",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "6",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "7",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "address": "8",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 1.0
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4DUB0262",
+              "ratio": 1.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
