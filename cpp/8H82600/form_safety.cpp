@@ -16,8 +16,8 @@ FormSafety::FormSafety(QWidget *parent, bool admin) :
     InitAlarmView();
     InitAlarmEnableTable();
     connect(&timer_, &QTimer::timeout, this, &FormSafety::CheckTotalAlarmBox);
-    timer_.start(1800 * 1000); // call EnableTotalAlarm by 30min interval.
-    QTimer::singleShot(10000, this, &FormSafety::EnableTotalAlarm); // Force enable alarm once.
+    timer_.start(ALM_RESTORE_INTERVAL); // call EnableTotalAlarm by 30min interval.
+    QTimer::singleShot(10 * 1000, this, &FormSafety::EnableTotalAlarm); // Force enable alarm once.
 }
 
 void FormSafety::InitExpStatusTable(void)
@@ -583,6 +583,7 @@ void FormSafety::on_boxStateChanged(int state)
     {
         ok = write_data_func_(this->objectName(), checkbox_id, QString::number(0));
         assert(ok);
+        timer_.start(ALM_RESTORE_INTERVAL); // restart timer.
     }
     else
     {

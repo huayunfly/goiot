@@ -68,6 +68,7 @@ private:
     const int COL_STATUS = 1;
     const int COL_RUN = 2;
     const int COL_STOP = 3;
+    const int ALM_RESTORE_INTERVAL = 3600 * 1000; // ms
     // alarm view group
     std::vector<std::shared_ptr<SafetyUIItem> > alarm_ui_items_;
     std::vector<std::pair<QString, std::vector<AlarmItemInfo> > > alarm_items_;
