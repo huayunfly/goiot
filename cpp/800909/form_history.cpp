@@ -36,7 +36,7 @@ FormHistory::FormHistory(QWidget *parent) :
     line_defs.push_back(HistoryLineDef("e5cc.16.pv", "TC208", "加热28"));
 
     chart_reactor_2_.reset(new HistoryChart(nullptr/* can not be *this form*/, line_defs,
-                                          "QPSQL:127.0.0.1:5432:837:postgres:hello@123", QString("(历史)反应温度℃"), 5/*interval*/, std::make_pair<double, double>(0, 400.0), 50/*segment*/, 360000, 7200));
+                                          "QPSQL:127.0.0.1:5432:800909:postgres:hello@123", QString("(历史)反应温度℃"), 5/*interval*/, std::make_pair<double, double>(0, 400.0), 50/*segment*/, 360000, 7200));
     chart_reactor_2_->setObjectName(QString::fromUtf8("chart_reactor2"));
     chart_reactor_2_->setMouseTracking(false);
     ui->horizontalLayout_2->addWidget(chart_reactor_2_.get());
