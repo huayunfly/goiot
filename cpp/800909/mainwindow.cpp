@@ -105,15 +105,6 @@ void MainWindow::InitDataModel()
     // data_to_ui
 
     // reactor TC
-    data_model_.SetDataToUiMap("e5cc.1.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA101"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.2.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA102"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.3.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA103"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.4.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA104"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.5.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA105"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.6.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA106"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.7.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA107"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-    data_model_.SetDataToUiMap("e5cc.8.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA108"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
-
     data_model_.SetDataToUiMap("e5cc.1.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
     data_model_.SetDataToUiMap("e5cc.2.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA102"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
@@ -131,6 +122,40 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("e5cc.8.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA108"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
                                UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
 
+    data_model_.SetDataToUiMap("e5cc.9.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA201"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.10.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA202"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.11.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA203"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.12.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA204"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.13.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA205"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.14.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA206"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.15.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA207"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+    data_model_.SetDataToUiMap("e5cc.16.pv", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA208"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0),
+                               UiInfo((QWidget*)ui_->widget_trend->children().first(), QString::fromUtf8("chart_reactor2"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0)});
+
+    data_model_.SetDataToUiMap("e5cc.17.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA301"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.18.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA302"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.19.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA303"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.20.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA304"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.21.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA305"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.22.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA306"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.23.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA307"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.24.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_TICA308"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 500, 0));
+
+    data_model_.SetDataToUiMap("e5cc.1.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA101"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.2.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA102"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.3.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA103"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.4.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA104"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.5.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA105"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.6.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA106"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.7.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA107"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
+    data_model_.SetDataToUiMap("e5cc.8.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA108"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
 
     data_model_.SetDataToUiMap("e5cc.9.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA201"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
     data_model_.SetDataToUiMap("e5cc.10.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA202"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
