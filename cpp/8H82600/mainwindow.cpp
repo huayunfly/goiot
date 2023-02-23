@@ -228,7 +228,7 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.gas_1", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3901"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 0, 30, 0));
     data_model_.SetDataToUiMap("plc.1.gas_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3902"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 0, 30, 0));
     data_model_.SetDataToUiMap("plc.1.gas_3", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3903"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::LEL, 1, 100, 0));
-    data_model_.SetDataToUiMap("plc.1.gas_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3904"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 0, 500, 0));
+    //data_model_.SetDataToUiMap("plc.1.gas_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_XISA3904"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PPM, 0, 500, 0)); // remove Gas4-CO alarm and replace with EO2 alarmer
 
     // gasfeed - pump,electric valve
     data_model_.SetDataToUiMap("plc.1.dq3_2", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1400"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
