@@ -1,3 +1,4 @@
+// @date 2023.03.03
 const https = require('https');
 const zlib = require('zlib');
 const assert = require('assert');
@@ -34,12 +35,39 @@ class DBConnector {
     }
 }
 
+class DataModel {
+    constructor() {
+        this.model_ = new Map();
+    }
+
+    // Adds a new element with a specified key and value to the Map. 
+    // If an element with the same key already exists, the element will be updated.
+    add(key, value) {
+        this.model_.set(key, value);
+    }
+
+    // Get value by key or return undefined.
+    query(key) {
+        return this.model_.get(key)
+    }
+
+    // Return boolean.
+    has(key) {
+        return this.model_.has(key);
+    }
+
+    // Return keys iterator.
+    keys() {
+        return this.model_.keys();
+    }
+}
+
 class RedisConnector extends DBConnector {
     constructor(connection_path, data_config) {
         super(connection_path);
         this.data_config_ = data_config;
         this.keep_running_ = true;
-        this.model_ = new Map();
+        this.model_ = new DataModel();
         this.open();
     }
 
@@ -77,14 +105,14 @@ class RedisConnector extends DBConnector {
         if (!this.data_config_) {
             throw 'Undefined data configuration.';
         }
-        const name = this.data_config_.name;
+        const name = this.data_config_.name??'dummy';
         const timestamp = new Date().getTime() / 1000.0;
         for (const driver of this.data_config_.drivers) {
             const driver_id = driver.id;
             for (const node of driver.nodes) {
                 const address = node.address;
                 for (const data of node.data) {
-                    const id = [driver_id, address, data.id].join('.');
+                    const id = [name, driver_id, address, data.id].join('.');
                     let ratio = 1.0;
                     let fvalue = parseFloat(data.ratio);
                     if (!isNaN(fvalue)) {
@@ -99,7 +127,7 @@ class RedisConnector extends DBConnector {
                     {
                         read_or_write = D_PRIVILEGE.WRITE_ONLY;
                     }
-                    this.model_.set(id, new DataInfo(id, data.name, 1/*dtype*/, read_or_write, ratio, 0, -1, timestamp));           
+                    this.model_.add(id, new DataInfo(id, data.name, 1/*dtype*/, read_or_write, ratio, 0, -1, timestamp));           
                 }
             }
         }
@@ -124,7 +152,7 @@ class RedisConnector extends DBConnector {
         let add_num = 0;
         for (let id of data_info_ids)
         {
-            const data_info = this.model_.get(id);
+            const data_info = this.model_.query(id);
             if (!is_poll || (is_poll && data_info.privilege != D_PRIVILEGE.READ_ONLY))
             {
                 const ns_id = key_namespace + id;
@@ -150,6 +178,56 @@ class RedisConnector extends DBConnector {
         {
             console.log(`Redis reply error: [${id}] [${op_name}] ${reply}`);
         }
+    }
+
+    // Return the in-memory data model.
+    data_model ()
+    {
+        return this.model_;
+    }
+
+    // Return updated data number.
+    async update_data(data_list) {
+        if (!data_list?.length)
+        {
+            return 0;
+        }
+
+        const batch = 64;
+        let ok_num = 0;
+        for (let i = 0; i < data_list.length;) 
+        {
+            let start = i;
+            let end = start + batch;
+            if (end > data_list.length)
+            {
+                end = start + data_list.length % batch;
+            }
+            i = end;
+            const selected = data_list.slice(start, end);
+            const transaction = this.db_.multi();
+            for (const data of selected) 
+            {
+                let ns_id = D_NAMESPACE.NS_REFRESH + data.id;
+                transaction.hmset(
+                    ns_id, 'value', data.value, 'result', data.result, 'timestamp', data.timestamp);
+                transaction.zadd(D_NAMESPACE.NS_REFRESH_TIME, data.timestamp, ns_id);
+            }
+            // Each response follows the format `[err, result]`.
+            const reply = await transaction.exec();
+            for (const item of reply) 
+            {
+                if (item[1] == 'OK') {
+                    ok_num++;
+                }
+            }
+        }
+        return ok_num;
+    }
+
+    query_data(id, latest_timestamp)
+    {
+
     }
 }
 
