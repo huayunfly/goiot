@@ -225,13 +225,14 @@ class RedisConnector extends DBConnector {
         return ok_num;
     }
 
-    async get_data(id_list, time_range, props, batch_num, batch_size)
+    // Get data from redis.
+    // @param <group_name> group name like goiot.
+    // @param <id_list> data ID with 'group_name.' prefix. Empty array covers all data.
+    // @param <time_range> start and stop time array in second. [0, -1] covers all time.
+    // @return A data list whose ID removed <group_name>.
+    async get_data(group_name, id_list, time_range, props, batch_num, batch_size)
     {
         const data_list = [];
-        if (!id_list?.length)
-        {
-            return data_list;
-        }
         // Initialize time_range [now - 5s, now]
         let t_end = Date.now() / 1000;
         let t_start = t_end - 5.0;
@@ -245,22 +246,31 @@ class RedisConnector extends DBConnector {
         {
             props = ['value', 'result', 'timestamp'];
         }
-        // zrange
-        const filter_by_time = await this.db_.zrange(D_NAMESPACE.NS_REFRESH_TIME, t_start, t_end);
-        const set_by_time = new Set(filter_by_time);
+        // ZRANGEBYSCORE 
+        const id_by_time = await this.db_.zrangebyscore(D_NAMESPACE.NS_REFRESH_TIME, t_start, t_end);
         const match_ids = [];
-        id_list.forEach(x => {
-            const new_id = D_NAMESPACE.NS_REFRESH + x;
-            if (set_by_time.has(new_id))
-            {
-                match_ids.push(new_id);
-            }
-        });
+        // ID matching
+        if (!id_list?.length)
+        {
+            match_ids.push(...id_by_time);
+        }
+        else
+        {
+            const set_by_time = new Set(id_by_time);
+            id_list.forEach(x => {
+                const new_id = D_NAMESPACE.NS_REFRESH + x;
+                if (set_by_time.has(new_id))
+                {
+                    match_ids.push(new_id);
+                }
+            });
+        }
         // batch read
         if (batch_size < 64 || batch_size > 128)
         {
-            batch_size = 64
+            batch_size = 64;
         }
+        const DOMAIN_LEN = D_NAMESPACE.NS_REFRESH.length + group_name.length + 1;
         for (let i = 0; i < match_ids.length;) 
         {
             let start = i;
@@ -280,7 +290,7 @@ class RedisConnector extends DBConnector {
             for (let i = 0; i < reply.length; i++)
             {
                 const new_data = {};
-                new_data['id'] = selected[i];
+                new_data['id'] = selected[i].slice(DOMAIN_LEN);
                 for (let j = 0; j < props.length; j++)
                 {
                     if (props[j] == 'timestamp')
@@ -295,7 +305,7 @@ class RedisConnector extends DBConnector {
                 data_list.push(new_data);
             }
         }
-        return data_list;    
+        return {'group_name': group_name, 'list': data_list, 'size': data_list.length};    
     }
 }
 

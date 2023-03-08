@@ -81,6 +81,7 @@ server.post('/message', async (req, reply) => {
             const service = service_collection['redis'];
             const model = service.data_model();
             const data_list = [];
+            const check_set = new Set();
             for (const item of req.body.data.list)
             {
                 if (!item.id || !item.value || !item.result || isNaN(Number.parseFloat(item.timestamp)))
@@ -91,8 +92,14 @@ server.post('/message', async (req, reply) => {
                 // Query data model by new id.
                 if (!model.has(newid))
                 {
-                    throw 'Data id does not existed.';
+                    continue; //throw 'Data id does not existed.';
                 }
+                // Distinct id
+                if (check_set.has(newid))
+                {
+                    continue;
+                }
+                check_set.add(newid);
                 // Shadow copy.
                 data_list.push({
                     'id': newid, 'value': item.value, 'result': item.result, 'timestamp': item.timestamp})
@@ -100,7 +107,7 @@ server.post('/message', async (req, reply) => {
             const updated_num = await service.update_data(data_list);
             return {
                 message: `Message post (${operation}) ok`,
-                result: {'succeeded': updated_num},
+                result: {'size': updated_num},
                 statusCode: '200'
             };
         }
@@ -115,9 +122,10 @@ server.post('/message', async (req, reply) => {
             }
             const service = service_collection['redis'];
             const model = service.data_model();
+            const group_name = req.body.condition.group_name;
             // Distinct id
             const check_set = new Set(req.body.condition.id_list.map(
-                x => [req.body.condition.group_name, x].join('.')));
+                x => [group_name, x].join('.')));
             // Check ids in model
             const id_list = [];
             check_set.forEach(x => {
@@ -125,8 +133,13 @@ server.post('/message', async (req, reply) => {
                     id_list.push(x);
                 }
             });
-            const result_data = await service.get_data(id_list, req.body.condition.time_range, 
-                req.body.condition.properties, -1, -1);
+            let result_data = {'group_name': group_name, 'list': [], 'size': 0};  
+            // Id matched.  
+            if (!(check_set.size > 0 && id_list.length == 0))
+            {
+                result_data = await service.get_data(group_name, id_list, 
+                    req.body.condition.time_range, req.body.condition.properties, -1, -1);
+            }
             return {
                     message: `Message post (${operation}) ok`,
                     result: {'data': result_data},
