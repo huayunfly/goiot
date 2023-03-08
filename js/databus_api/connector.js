@@ -193,15 +193,15 @@ class RedisConnector extends DBConnector {
             return 0;
         }
 
-        const batch = 64;
+        const batch_size = 64;
         let ok_num = 0;
         for (let i = 0; i < data_list.length;) 
         {
             let start = i;
-            let end = start + batch;
+            let end = start + batch_size;
             if (end > data_list.length)
             {
-                end = start + data_list.length % batch;
+                end = start + data_list.length % batch_size;
             }
             i = end;
             const selected = data_list.slice(start, end);
@@ -225,9 +225,77 @@ class RedisConnector extends DBConnector {
         return ok_num;
     }
 
-    query_data(id, latest_timestamp)
+    async get_data(id_list, time_range, props, batch_num, batch_size)
     {
-
+        const data_list = [];
+        if (!id_list?.length)
+        {
+            return data_list;
+        }
+        // Initialize time_range [now - 5s, now]
+        let t_end = Date.now() / 1000;
+        let t_start = t_end - 5.0;
+        if (time_range?.length && time_range.length >= 2)
+        {
+            t_end = parseFloat(time_range[1]);
+            t_start = parseFloat(time_range[0]);
+        }
+        // Initialize properties
+        if (!props?.length)
+        {
+            props = ['value', 'result', 'timestamp'];
+        }
+        // zrange
+        const filter_by_time = await this.db_.zrange(D_NAMESPACE.NS_REFRESH_TIME, t_start, t_end);
+        const set_by_time = new Set(filter_by_time);
+        const match_ids = [];
+        id_list.forEach(x => {
+            const new_id = D_NAMESPACE.NS_REFRESH + x;
+            if (set_by_time.has(new_id))
+            {
+                match_ids.push(new_id);
+            }
+        });
+        // batch read
+        if (batch_size < 64 || batch_size > 128)
+        {
+            batch_size = 64
+        }
+        for (let i = 0; i < match_ids.length;) 
+        {
+            let start = i;
+            let end = start + batch_size;
+            if (end > match_ids.length)
+            {
+                end = start + match_ids.length % batch_size;
+            }
+            i = end;
+            const selected = match_ids.slice(start, end);
+            const transaction = this.db_.multi();
+            for (const ns_id of selected) 
+            {
+                transaction.hmget(ns_id, props);
+            }
+            const reply = await transaction.exec();
+            for (let i = 0; i < reply.length; i++)
+            {
+                const new_data = {};
+                new_data['id'] = selected[i];
+                for (let j = 0; j < props.length; j++)
+                {
+                    if (props[j] == 'timestamp')
+                    {
+                        new_data[props[j]] = parseFloat(reply[i][1][j]);
+                    }
+                    else
+                    {
+                        new_data[props[j]] = reply[i][1][j];
+                    }
+                }
+                data_list.push(new_data);
+            }
+        }
+        return data_list;    
     }
 }
 

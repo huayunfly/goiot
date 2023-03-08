@@ -8,7 +8,6 @@
 // @date 2023.02.10
 
 const read_file = require('fs').readFile;
-const { timeStamp } = require('console');
 const yargs = require('yargs');
 const RedisConnector = require('./connector').RedisConnector;
 const server = require('fastify')({ logger: true });
@@ -43,11 +42,18 @@ read_file(argv.f, (err, data_buffer) => {
 
 server.get('/message', async (req, reply) => {
     console.log(`worker request pid=${process.pid}`);
-    return {
-        message: 'Databus message api need right request format.',
-        error: 'Wrong request',
-        statusCode: '404'
-    };
+    try
+    {
+        throw 'Unsupported operation.';
+    }
+    catch(err)
+    {
+        return {
+            message: 'Message put error',
+            error: err,
+            statusCode: '404'
+        };
+    }
 });
 
 server.post('/message', async (req, reply) => {
@@ -66,7 +72,7 @@ server.post('/message', async (req, reply) => {
         const operation = req.body.operation.toUpperCase();
         if (operation == 'SETDATA')
         {
-            if (!req.body.data || !req.body.data.group_name || !req.body.data.group_name ||
+            if (!req.body.data || !req.body.data.group_name || 
                 !Array.isArray(req.body.data.list))
             {
                 throw `Invalid ${operation} content attributes.`;
@@ -91,19 +97,48 @@ server.post('/message', async (req, reply) => {
                 data_list.push({
                     'id': newid, 'value': item.value, 'result': item.result, 'timestamp': item.timestamp})
             }
-            const reply = await service.update_data(data_list);
+            const updated_num = await service.update_data(data_list);
             return {
                 message: `Message post (${operation}) ok`,
-                data: {'req_num': data_list.length, 'ok_num': reply},
+                result: {'succeeded': updated_num},
                 statusCode: '200'
             };
+        }
+        else if (operation == 'GETDATA')
+        {
+            if (!req.body.condition || !req.body.condition.group_name || 
+                !Array.isArray(req.body.condition.id_list) || 
+                !Array.isArray(req.body.condition.time_range) ||
+                !Array.isArray(req.body.condition.properties))
+            {
+                throw `Invalid ${operation} content attributes.`;
+            }
+            const service = service_collection['redis'];
+            const model = service.data_model();
+            // Distinct id
+            const check_set = new Set(req.body.condition.id_list.map(
+                x => [req.body.condition.group_name, x].join('.')));
+            // Check ids in model
+            const id_list = [];
+            check_set.forEach(x => {
+                if (model.has(x)) {
+                    id_list.push(x);
+                }
+            });
+            const result_data = await service.get_data(id_list, req.body.condition.time_range, 
+                req.body.condition.properties, -1, -1);
+            return {
+                    message: `Message post (${operation}) ok`,
+                    result: {'data': result_data},
+                    statusCode: '200'
+                };
         }
         throw 'Unsupported operation.'
     }
     catch (err) {
         return {
             message: 'Message post error',
-            error: err,
+            error: err.message,
             statusCode: '404'
         };
     }
