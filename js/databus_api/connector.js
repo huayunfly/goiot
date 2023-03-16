@@ -265,13 +265,18 @@ class RedisConnector extends DBConnector {
                 }
             });
         }
-        // batch read
-        if (batch_size < 64 || batch_size > 128)
+        // Batch read with default value.
+        if (batch_size <= 0)
         {
-            batch_size = 64;
+            batch_size = 128;
         }
-        const DOMAIN_LEN = D_NAMESPACE.NS_REFRESH.length + group_name.length + 1;
-        for (let i = 0; i < match_ids.length;) 
+        // Batch number with default value 1 (start).
+        if (batch_num <= 0)
+        {
+            batch_num = 1;
+        }
+        const DOMAIN_LEN = D_NAMESPACE.NS_REFRESH.length + group_name.length + 1/* dot */;
+        for (let i = (batch_num - 1) * batch_size; i < match_ids.length;) 
         {
             let start = i;
             let end = start + batch_size;
@@ -304,8 +309,9 @@ class RedisConnector extends DBConnector {
                 }
                 data_list.push(new_data);
             }
+            break; // One batch read finished.
         }
-        return {'group_name': group_name, 'list': data_list, 'size': data_list.length};    
+        return {'group_name': group_name, 'list': data_list, 'total': match_ids.length};    
     }
 }
 

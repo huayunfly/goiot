@@ -107,16 +107,34 @@ server.post('/message', async (req, reply) => {
             const updated_num = await service.update_data(data_list);
             return {
                 message: `Message post (${operation}) ok`,
-                result: {'size': updated_num},
+                result: {'total': updated_num},
                 statusCode: '200'
             };
         }
+        /* GETDATA format
+        {
+            "name": "service_name",
+            "operation": "GetData",
+            "token": "6ac89607254a437c90c28ccc1c034706",
+            "condition": {
+                "group_name": "goiot",
+                "id_list": ["mfcpfc.1.pv", "mfcpfc.2.pv"],
+                "time_range": [1677154222.8210001, 1677154222.8410001],
+                "properties": ["value", "result", "timestamp"],
+                "batch_size":128,
+                "batch_num": 1
+            }
+        }
+        */
         else if (operation == 'GETDATA')
         {
+            const batch_num = Number.parseInt(req.body.condition.batch_num);
+            const batch_size = Number.parseInt(req.body.condition.batch_size);
             if (!req.body.condition || !req.body.condition.group_name || 
                 !Array.isArray(req.body.condition.id_list) || 
                 !Array.isArray(req.body.condition.time_range) ||
-                !Array.isArray(req.body.condition.properties))
+                !Array.isArray(req.body.condition.properties) ||
+                isNaN(batch_num) || isNaN(batch_size))
             {
                 throw `Invalid ${operation} content attributes.`;
             }
@@ -133,12 +151,13 @@ server.post('/message', async (req, reply) => {
                     id_list.push(x);
                 }
             });
-            let result_data = {'group_name': group_name, 'list': [], 'size': 0};  
+            let result_data = {'group_name': group_name, 'list': [], 'total': 0};  
             // Id matched.  
             if (!(check_set.size > 0 && id_list.length == 0))
             {
                 result_data = await service.get_data(group_name, id_list, 
-                    req.body.condition.time_range, req.body.condition.properties, -1, -1);
+                    req.body.condition.time_range, req.body.condition.properties, 
+                    batch_num, batch_size);
             }
             return {
                     message: `Message post (${operation}) ok`,
