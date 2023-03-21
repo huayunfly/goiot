@@ -3,6 +3,7 @@ const https = require('https');
 const zlib = require('zlib');
 const assert = require('assert');
 const redis = require('ioredis');
+const { time } = require('console');
 
 
 const D_PRIVILEGE =
@@ -186,11 +187,31 @@ class RedisConnector extends DBConnector {
         return this.model_;
     }
 
+    // @param <namespace> set data namespace indicating manipulation, poll or refresh.
+    // @param <data_list> data list.
     // Return updated data number.
-    async update_data(data_list) {
+    async update_data(namespace, data_list) 
+    {
         if (!data_list?.length)
         {
             return 0;
+        }
+
+        // namespace
+        let key_namespace, time_namespace;
+        if (namespace == D_NAMESPACE.NS_REFRESH) 
+        {
+            key_namespace = D_NAMESPACE.NS_REFRESH;
+            time_namespace = D_NAMESPACE.NS_REFRESH_TIME;
+        }
+        else if (namespace == D_NAMESPACE.NS_POLL) 
+        {
+            key_namespace = D_NAMESPACE.NS_POLL;
+            time_namespace = D_NAMESPACE.NS_POLL_TIME;
+        }
+        else 
+        {
+            throw 'Unsupported namespace.';
         }
 
         const batch_size = 64;
@@ -208,10 +229,10 @@ class RedisConnector extends DBConnector {
             const transaction = this.db_.multi();
             for (const data of selected) 
             {
-                let ns_id = D_NAMESPACE.NS_REFRESH + data.id;
+                let ns_id = key_namespace + data.id;
                 transaction.hmset(
                     ns_id, 'value', data.value, 'result', data.result, 'timestamp', data.timestamp);
-                transaction.zadd(D_NAMESPACE.NS_REFRESH_TIME, data.timestamp, ns_id);
+                transaction.zadd(time_namespace, data.timestamp, ns_id);
             }
             // Each response follows the format `[err, result]`.
             const reply = await transaction.exec();
@@ -226,11 +247,12 @@ class RedisConnector extends DBConnector {
     }
 
     // Get data from redis.
+    // @param <namespace> get data namespace indicating manipulation, poll or refresh.
     // @param <group_name> group name like goiot.
     // @param <id_list> data ID with 'group_name.' prefix. Empty array covers all data.
     // @param <time_range> start and stop time array in second. [0, -1] covers all time.
     // @return A data list whose ID removed <group_name>.
-    async get_data(group_name, id_list, time_range, props, batch_num, batch_size)
+    async get_data(namespace, group_name, id_list, time_range, props, batch_num, batch_size)
     {
         const data_list = [];
         // Initialize time_range [now - 5s, now]
@@ -246,8 +268,24 @@ class RedisConnector extends DBConnector {
         {
             props = ['value', 'result', 'timestamp'];
         }
+        // namespace
+        let key_namespace, time_namespace;
+        if (namespace == D_NAMESPACE.NS_REFRESH)
+        {
+            key_namespace = D_NAMESPACE.NS_REFRESH;
+            time_namespace = D_NAMESPACE.NS_REFRESH_TIME;
+        }
+        else if (namespace == D_NAMESPACE.NS_POLL)
+        {
+            key_namespace = D_NAMESPACE.NS_POLL;
+            time_namespace = D_NAMESPACE.NS_POLL_TIME;
+        }
+        else
+        {
+            throw 'Unsupported namespace.';
+        }
         // ZRANGEBYSCORE 
-        const id_by_time = await this.db_.zrangebyscore(D_NAMESPACE.NS_REFRESH_TIME, t_start, t_end);
+        const id_by_time = await this.db_.zrangebyscore(time_namespace, t_start, t_end);
         const match_ids = [];
         // ID matching
         if (!id_list?.length)
@@ -258,7 +296,7 @@ class RedisConnector extends DBConnector {
         {
             const set_by_time = new Set(id_by_time);
             id_list.forEach(x => {
-                const new_id = D_NAMESPACE.NS_REFRESH + x;
+                const new_id = key_namespace + x;
                 if (set_by_time.has(new_id))
                 {
                     match_ids.push(new_id);
@@ -275,7 +313,7 @@ class RedisConnector extends DBConnector {
         {
             batch_num = 1;
         }
-        const DOMAIN_LEN = D_NAMESPACE.NS_REFRESH.length + group_name.length + 1/* dot */;
+        const DOMAIN_LEN = key_namespace.length + group_name.length + 1/* dot */;
         for (let i = (batch_num - 1) * batch_size; i < match_ids.length;) 
         {
             let start = i;
@@ -368,3 +406,5 @@ class WebServiceConnector {
 
 module.exports.RedisConnector = RedisConnector;
 module.exports.WebServiceConnector = WebServiceConnector;
+module.exports.D_NAMESPACE = D_NAMESPACE;
+module.exports.D_PRIVILEGE = D_PRIVILEGE;

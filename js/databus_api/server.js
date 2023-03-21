@@ -9,6 +9,7 @@
 
 const read_file = require('fs').readFile;
 const yargs = require('yargs');
+const { D_NAMESPACE, D_PRIVILEGE } = require('./connector');
 const RedisConnector = require('./connector').RedisConnector;
 const server = require('fastify')({ logger: true });
 const HOST = process.env.HOST || '127.0.0.1';
@@ -70,8 +71,15 @@ server.post('/message', async (req, reply) => {
         }
         const token = req.body.token;
         const operation = req.body.operation.toUpperCase();
-        if (operation == 'SETDATA')
+        if (operation == 'SETDATAR' || operation == 'SETDATAP')
         {
+            let namespace = D_NAMESPACE.NS_REFRESH;
+            let is_refresh = true;
+            if (operation == 'SETDATAP')
+            {
+                namespace = D_NAMESPACE.NS_POLL;
+                is_refresh = false;
+            }
             if (!req.body.data || !req.body.data.group_name || 
                 !Array.isArray(req.body.data.list))
             {
@@ -89,22 +97,25 @@ server.post('/message', async (req, reply) => {
                     throw `Invalid ${operation} data item.`;
                 }
                 const newid = [group_name, item.id].join('.');
-                // Query data model by new id.
-                if (!model.has(newid))
-                {
-                    continue; //throw 'Data id does not existed.';
-                }
                 // Distinct id
-                if (check_set.has(newid))
+                if (check_set.has(newid)) 
                 {
                     continue;
+                }
+                // Query data model by new id.
+                const data_info = model.query(newid);
+                // Exclude undifined and READ_ONLY data.
+                if (!data_info || (!is_refresh && data_info.privilege == D_PRIVILEGE.READ_ONLY) ||
+                (is_refresh && data_info.privilege == D_PRIVILEGE.WRITE_ONLY))
+                {
+                    continue; //throw 'Data id does not existed.';
                 }
                 check_set.add(newid);
                 // Shadow copy.
                 data_list.push({
                     'id': newid, 'value': item.value, 'result': item.result, 'timestamp': item.timestamp})
             }
-            const updated_num = await service.update_data(data_list);
+            const updated_num = await service.update_data(namespace, data_list);
             return {
                 message: `Message post (${operation}) ok`,
                 result: {'total': updated_num},
@@ -126,8 +137,13 @@ server.post('/message', async (req, reply) => {
             }
         }
         */
-        else if (operation == 'GETDATA')
+        else if (operation == 'GETDATAR' || operation == 'GETDATAP')
         {
+            let namespace = D_NAMESPACE.NS_REFRESH;
+            if (operation == 'GETDATAP')
+            {
+                namespace = D_NAMESPACE.NS_POLL;
+            }
             const batch_num = Number.parseInt(req.body.condition.batch_num);
             const batch_size = Number.parseInt(req.body.condition.batch_size);
             if (!req.body.condition || !req.body.condition.group_name || 
@@ -155,7 +171,7 @@ server.post('/message', async (req, reply) => {
             // Id matched.  
             if (!(check_set.size > 0 && id_list.length == 0))
             {
-                result_data = await service.get_data(group_name, id_list, 
+                result_data = await service.get_data(namespace, group_name, id_list, 
                     req.body.condition.time_range, req.body.condition.properties, 
                     batch_num, batch_size);
             }
@@ -170,7 +186,7 @@ server.post('/message', async (req, reply) => {
     catch (err) {
         return {
             message: 'Message post error',
-            error: err.message,
+            error: err.message??err,
             statusCode: '404'
         };
     }
