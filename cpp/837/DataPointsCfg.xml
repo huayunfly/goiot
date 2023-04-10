@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PIDCodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PIDCode Name="FICA1111" DeviceType="MFC" DeviceName="FICA1111">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.1.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.1.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1121" DeviceType="MFC" DeviceName="FICA1121">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.2.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.2.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1131" DeviceType="MFC" DeviceName="FICA1131">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.3.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.3.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1141" DeviceType="MFC" DeviceName="FICA1141">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.4.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.4.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1151" DeviceType="MFC" DeviceName="FICA1151">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.5.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.5.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1511" DeviceType="MFC" DeviceName="FICA1511">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.6.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.6.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1521" DeviceType="MFC" DeviceName="FICA1521">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.7.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.7.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1531" DeviceType="MFC" DeviceName="FICA1531">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.8.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.8.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1541" DeviceType="MFC" DeviceName="FICA1541">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.9.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.9.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="FICA1551" DeviceType="MFC" DeviceName="FICA1551">
+    <DataPoint Type="FLOAT" Number="0" Id="mfc.10.sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="mfc.10.pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2102" DeviceType="TC" DeviceName="TICA2102">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp1_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp1_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2103" DeviceType="TC" DeviceName="TICA2103">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp2_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp2_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2104" DeviceType="TC" DeviceName="TICA2104">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp3_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp3_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2105" DeviceType="TC" DeviceName="TICA2105">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp4_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp4_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2106" DeviceType="TC" DeviceName="TICA2106">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp5_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp5_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2201" DeviceType="TC" DeviceName="TICA2201">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp6_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp6_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2202" DeviceType="TC" DeviceName="TICA2202">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp7_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp7_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2203" DeviceType="TC" DeviceName="TICA2203">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp8_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp8_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+</PIDCodes>

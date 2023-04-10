@@ -92,6 +92,7 @@ win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../.
 #win32:contains(QT_ARCH, i386):CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdLib/qredisclient/lib/ -lqredisclient_32d
 
 DISTFILES += \
+    DataPointsCfg.xml \
     drivers.json
 
 RESOURCES += \
