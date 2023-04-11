@@ -72,4 +72,52 @@
     <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp8_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
     <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp8_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
   </PIDCode>
+  <PIDCode Name="TICA2501" DeviceType="TC" DeviceName="TICA2501">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp9_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp9_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2503" DeviceType="TC" DeviceName="TICA2503">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp11_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp11_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2504" DeviceType="TC" DeviceName="TICA2504">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp12_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp12_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2601" DeviceType="TC" DeviceName="TICA2601">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp13_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp13_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2602" DeviceType="TC" DeviceName="TICA2602">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp14_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp14_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2603" DeviceType="TC" DeviceName="TICA2603">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp15_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp15_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2604" DeviceType="TC" DeviceName="TICA2604">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp16_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp16_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2101" DeviceType="TC" DeviceName="TICA2101">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp17_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp17_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2401" DeviceType="TC" DeviceName="TICA2401">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp18_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp18_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2801" DeviceType="TC" DeviceName="TICA2801">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp19_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp19_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2404" DeviceType="TC" DeviceName="TICA2404">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp20_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp20_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
+  <PIDCode Name="TICA2804" DeviceType="TC" DeviceName="TICA2804">
+    <DataPoint Type="FLOAT" Number="0" Id="plc.1.temp21_sv" PropertyName="SP" DescName="SetPoint" Accessing="both"/>
+    <DataPoint Type="FLOAT" Number="1" Id="plc.1.temp21_pv" PropertyName="PV" DescName="PresentValue" Accessing="get"/>
+  </PIDCode>
 </PIDCodes>
