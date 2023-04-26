@@ -39,7 +39,7 @@ class PostgreSQLConnector extends DBConnector {
             if (err) {
                 throw err;
             }
-            console.log('PostgreSQL client connected to database', database);
+            console.log(`PostgreSQL client connected to database '${database}'`);
         });
     }
 

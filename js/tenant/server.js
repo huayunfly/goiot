@@ -6,9 +6,10 @@
 // 3. Session, mainly token and access time control.
 // @date 2023.04.24
 
+const assert = require('node:assert').strict;
 const read_file = require('fs').readFile;
 const yargs = require('yargs');
-const { D_NAMESPACE, D_PRIVILEGE } = require('./connector');
+const SessionMagager = require('./session').SessionMagager;
 const PostgreSQLConnector = require('./connector').PostgreSQLConnector;
 const server = require('fastify')({ logger: true });
 let HOST = process.env.HOST;
@@ -48,6 +49,7 @@ read_file(argv.f, (err, data_buffer) => {
             {
                 throw 'DB connection setting missing.';
             }
+            service_collection['session'] = new SessionMagager();   
             start(); // service start
         }
         catch (e) {
@@ -106,7 +108,7 @@ server.post('/api', async (req, reply) => {
             }    
             return {
                 message: `Api post (${operation}) ok`,
-                result: {'token': 'aadfafafa7898049aasfadf88d**dff'},
+                result: {'token': `${service_collection['session'].create_session()}`},
                 statusCode: '200'
             };
         }
@@ -117,18 +119,18 @@ server.post('/api', async (req, reply) => {
             {
                 throw 'Token missing';
             }
-            const failed = false;
+            const failed = !service_collection['session'].touch_session(token);
             if (failed)
             {
                 return {
                     message: `Api post (${operation}) failed`,
                     error: 'Session expired or not existed',
-                    statusCode: '400'
+                    statusCode: '404'
                 };
             }  
             return {
                 message: `Api post (${operation}) ok`,
-                result: {'token': 'aadfafafa7898049aasfadf88d**dff'},
+                result: {'token': `${token}`},
                 statusCode: '200'
             };
         }
@@ -143,14 +145,27 @@ server.post('/api', async (req, reply) => {
     }
 });
 
-const start = async () => {
+const start = async () => 
+{
     try {
         await server.listen({ port: PORT, host: HOST }, () => {
             console.log(`Tenant running at http://${HOST}:${PORT}`);
-        })
+        });
+        setInterval(() => {
+            service_collection['session'].cleanup_all_sessions();
+        }, 60_000);
     }
-    catch (err) {
+    catch (err) 
+    {
         server.log.error(err)
         process.exit(1)
     }
+}
+
+function test() 
+{
+    const guid = service_collection['session'].create_session();
+    service_collection['session'].set_session_data(guid, 'hua', 44);
+    assert.equal(service_collection['session'].get_session_data(guid, 'hua'), 44);
+    service_collection['session'].cleanup_all_sessions();
 }
