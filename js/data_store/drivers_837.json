@@ -1,0 +1,640 @@
+{
+  "name": "837",
+  "redis": "127.0.0.1:6379",
+  "db": "127.0.0.1:5432:837:postgres:hello@123",
+  "drivers": [
+    {
+      "id": "mfc",
+      "name": "modbus3",
+      "type": "modbus_rtu",
+      "port": "COM3,19200,E,8,2",
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "2",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "3",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "4",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "5",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "6",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "7",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "8",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "9",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        },
+        {
+          "address": "10",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4WUB0032",
+              "ratio": 0.0078125
+            },
+            {
+              "id": "sv",
+              "name": "setpoint",
+              "register": "RW4WUB0033",
+              "ratio": 0.0078125
+            }
+          ]
+        }
+      ]
+    },
+   {
+      "id": "plc",
+      "name": "s7-1500",
+      "type": "s7",
+      "port": "192.168.1.110,0,1",
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 250,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "temp1_sv",
+              "name": "temp1_sv",
+              "register": "RW5DF0000"
+            },
+            {
+              "id": "temp1_pv",
+              "name": "temp1_pv",
+              "register": "RW5DF0004"
+            },
+            {
+              "id": "temp2_sv",
+              "name": "temp2_sv",
+              "register": "RW5DF0008"
+            },
+            {
+              "id": "temp2_pv",
+              "name": "temp2_pv",
+              "register": "RW5DF0012"
+            },
+            {
+              "id": "temp3_sv",
+              "name": "temp3_sv",
+              "register": "RW5DF0016"
+            },
+            {
+              "id": "temp3_pv",
+              "name": "temp3_pv",
+              "register": "RW5DF0020"
+            },
+            {
+              "id": "temp4_sv",
+              "name": "temp4_sv",
+              "register": "RW5DF0024"
+            },
+            {
+              "id": "temp4_pv",
+              "name": "temp4_pv",
+              "register": "RW5DF0028"
+            },
+            {
+              "id": "temp5_sv",
+              "name": "temp5_sv",
+              "register": "RW5DF0032"
+            },
+            {
+              "id": "temp5_pv",
+              "name": "temp5_pv",
+              "register": "RW5DF0036"
+            },
+            {
+              "id": "temp6_sv",
+              "name": "temp6_sv",
+              "register": "RW5DF0040"
+            },
+            {
+              "id": "temp6_pv",
+              "name": "temp6_pv",
+              "register": "RW5DF0044"
+            },
+            {
+              "id": "temp7_sv",
+              "name": "temp7_sv",
+              "register": "RW5DF0048"
+            },
+            {
+              "id": "temp7_pv",
+              "name": "temp7_pv",
+              "register": "RW5DF0052"
+            },
+            {
+              "id": "temp8_sv",
+              "name": "temp8_sv",
+              "register": "RW5DF0056"
+            },
+            {
+              "id": "temp8_pv",
+              "name": "temp8_pv",
+              "register": "RW5DF0060"
+            },
+            {
+              "id": "temp9_sv",
+              "name": "temp9_sv",
+              "register": "RW5DF0064"
+            },
+            {
+              "id": "temp9_pv",
+              "name": "temp9_pv",
+              "register": "RW5DF0068"
+            },
+            {
+              "id": "temp10_sv",
+              "name": "temp10_sv",
+              "register": "RW5DF0072"
+            },
+            {
+              "id": "temp10_pv",
+              "name": "temp10_pv",
+              "register": "RW5DF0076"
+            },
+            {
+              "id": "temp11_sv",
+              "name": "temp11_sv",
+              "register": "RW5DF0080"
+            },
+            {
+              "id": "temp11_pv",
+              "name": "temp11_pv",
+              "register": "RW5DF0084"
+            },
+            {
+              "id": "temp12_sv",
+              "name": "temp12_sv",
+              "register": "RW5DF0088"
+            },
+            {
+              "id": "temp12_pv",
+              "name": "temp12_pv",
+              "register": "RW5DF0092"
+            },
+            {
+              "id": "temp13_sv",
+              "name": "temp13_sv",
+              "register": "RW5DF0096"
+            },
+            {
+              "id": "temp13_pv",
+              "name": "temp13_pv",
+              "register": "RW5DF0100"
+            },
+            {
+              "id": "temp14_sv",
+              "name": "temp14_sv",
+              "register": "RW5DF0104"
+            },
+            {
+              "id": "temp14_pv",
+              "name": "temp14_pv",
+              "register": "RW5DF0108"
+            },
+            {
+              "id": "temp15_sv",
+              "name": "temp15_sv",
+              "register": "RW5DF0112"
+            },
+            {
+              "id": "temp15_pv",
+              "name": "temp15_pv",
+              "register": "RW5DF0116"
+            },
+            {
+              "id": "temp16_sv",
+              "name": "temp16_sv",
+              "register": "RW5DF0120"
+            },
+            {
+              "id": "temp16_pv",
+              "name": "temp16_pv",
+              "register": "RW5DF0124"
+            },
+            {
+              "id": "temp17_sv",
+              "name": "temp17_sv",
+              "register": "RW5DF0128"
+            },
+            {
+              "id": "temp17_pv",
+              "name": "temp17_pv",
+              "register": "RW5DF0132"
+            },
+            {
+              "id": "temp18_sv",
+              "name": "temp18_sv",
+              "register": "RW5DF0136"
+            },
+            {
+              "id": "temp18_pv",
+              "name": "temp18_pv",
+              "register": "RW5DF0140"
+            },
+            {
+              "id": "temp19_sv",
+              "name": "temp19_sv",
+              "register": "RW5DF0144"
+            },
+            {
+              "id": "temp19_pv",
+              "name": "temp19_pv",
+              "register": "RW5DF0148"
+            },
+            {
+              "id": "temp20_sv",
+              "name": "temp20_sv",
+              "register": "RW5DF0152"
+            },
+            {
+              "id": "temp20_pv",
+              "name": "temp20_pv",
+              "register": "RW5DF0156"
+            },
+            {
+              "id": "temp21_sv",
+              "name": "temp21_sv",
+              "register": "RW5DF0160"
+            },
+            {
+              "id": "temp21_pv",
+              "name": "temp21_pv",
+              "register": "RW5DF0164"
+            },
+            {
+              "id": "temp22_sv",
+              "name": "temp22_sv",
+              "register": "RW5DF0168"
+            },
+            {
+              "id": "temp22_pv",
+              "name": "temp22_pv",
+              "register": "RW5DF0172"
+            },
+            {
+              "id": "temp23_sv",
+              "name": "temp23_sv",
+              "register": "RW5DF0176"
+            },
+            {
+              "id": "temp23_pv",
+              "name": "temp23_pv",
+              "register": "RW5DF0180"
+            },
+            {
+              "id": "temp24_sv",
+              "name": "temp24_sv",
+              "register": "RW5DF0184"
+            },
+            {
+              "id": "temp24_pv",
+              "name": "temp24_pv",
+              "register": "RW5DF0188"
+            },
+            {
+              "id": "temp25_sv",
+              "name": "temp25_sv",
+              "register": "RW5DF0192"
+            },
+            {
+              "id": "temp25_pv",
+              "name": "temp25_pv",
+              "register": "RW5DF0196"
+            },
+            {
+              "id": "temp26_sv",
+              "name": "temp26_sv",
+              "register": "RW5DF0200"
+            },
+            {
+              "id": "temp26_pv",
+              "name": "temp26_pv",
+              "register": "RW5DF0204"
+            },
+			{
+              "id": "temp27_sv",
+              "name": "temp27_sv",
+              "register": "RW5DF0208"
+            },
+            {
+              "id": "temp27_pv",
+              "name": "temp27_pv",
+              "register": "RW5DF0212"
+            },
+			{
+              "id": "di1_1",
+              "name": "di1_1",
+              "register": "RW5BT1728"
+            },
+			{
+              "id": "di1_2",
+              "name": "di1_2",
+              "register": "RW5BT1729"
+            },
+			{
+              "id": "di1_3",
+              "name": "di1_3",
+              "register": "RW5BT1730"
+            },
+			{
+              "id": "di1_4",
+              "name": "di1_4",
+              "register": "RW5BT1731"
+            },
+			{
+              "id": "di1_5",
+              "name": "di1_5",
+              "register": "RW5BT1732"
+            },
+			{
+              "id": "di1_6",
+              "name": "di1_6",
+              "register": "RW5BT1733"
+            },
+			{
+              "id": "di1_7",
+              "name": "di1_7",
+              "register": "RW5BT1734"
+            },
+			{
+              "id": "di1_8",
+              "name": "di1_8",
+              "register": "RW5BT1735"
+            },
+            {
+              "id": "dq2_1",
+              "name": "dq2_1",
+              "register": "RW5BT1760"
+            },
+            {
+              "id": "dq2_2",
+              "name": "dq2_2",
+              "register": "RW5BT1761"
+            },
+            {
+              "id": "dq2_3",
+              "name": "dq2_3",
+              "register": "RW5BT1762"
+            },
+            {
+              "id": "dq2_4",
+              "name": "dq2_4",
+              "register": "RW5BT1763"
+            },
+            {
+              "id": "dq2_5",
+              "name": "dq2_5",
+              "register": "RW5BT1764"
+            },
+            {
+              "id": "dq2_6",
+              "name": "dq2_6",
+              "register": "RW5BT1765"
+            },
+            {
+              "id": "dq2_7",
+              "name": "dq2_7",
+              "register": "RW5BT1766"
+            },
+            {
+              "id": "dq2_8",
+              "name": "dq2_8",
+              "register": "RW5BT1767"
+            },
+            {
+              "id": "pg_1",
+              "name": "PIA1111",
+              "register": "RW5DF0224"
+            },
+            {
+              "id": "pg_2",
+              "name": "PIA1121",
+              "register": "RW5DF0228"
+            },
+            {
+              "id": "pg_3",
+              "name": "PIA1131",
+              "register": "RW5DF0232"
+            },
+            {
+              "id": "pg_4",
+              "name": "PIA1141",
+              "register": "RW5DF0236"
+            },
+            {
+              "id": "pg_5",
+              "name": "PIA1151",
+              "register": "RW5DF0240"
+            },
+            {
+              "id": "pg_6",
+              "name": "PIA1113",
+              "register": "RW5DF0244"
+            },
+            {
+              "id": "pg_7",
+              "name": "PIA1513",
+              "register": "RW5DF0248"
+            },
+            {
+              "id": "pg_8",
+              "name": "PIA2402",
+              "register": "RW5DF0252"
+            },
+			{
+              "id": "pg_9",
+              "name": "PIA2802",
+              "register": "RW5DF0256"
+            },
+            {
+              "id": "gas_1",
+              "name": "XISA1001",
+              "register": "RW5DF0260"
+            },
+            {
+              "id": "gas_2",
+              "name": "XISA1002",
+              "register": "RW5DF0264"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
