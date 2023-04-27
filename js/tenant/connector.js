@@ -1,5 +1,11 @@
 const pg = require('pg');
 const assert = require('assert');
+const crypto = require('crypto')
+
+async function digest_message(message) 
+{
+    return crypto.createHash("SHA256").update(message).digest("base64");
+}
 
 class DBConnector {
     constructor(connection_path) {
@@ -49,6 +55,21 @@ class PostgreSQLConnector extends DBConnector {
         }
     }
 
+    // Validate user by password, return true if OK. 
+   async validate_user(user, host, password)
+    {   
+        const auth_string = await digest_message(password);
+        const result = await this.db_.query(`
+        SELECT COUNT(*)
+        FROM public."user" WHERE "User"='${user}' and "Host"='${host}' and "authentication_string"='${auth_string}';
+         `);
+        if (result === undefined || Number.parseInt(result.rows[0].count) == 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
     // Create DB tables if not exist.
     create_tables(model) {
         if (!model) {
@@ -68,26 +89,6 @@ class PostgreSQLConnector extends DBConnector {
             });
         }
         this.table_created_ = true;
-    }
-
-    // Insert a new record.
-    insert(table, names, data_array) {
-        if (!this.table_created_) {
-            console.log(`Table "${table}" is not existed.`);
-            return;
-        }
-        // Insert table with special column name wrapped with "", like "mfcpfc.4.pv"     
-        this.db_.query(`
- INSERT INTO ${table} (${names.map(n => '"' + n + '"').join(',')}, time) VALUES (
- ${data_array.map(n => '\'' + n.toString() + '\'').join(',')}, ${Date.now() / 1000}
- ) RETURNING id;
-`, (err, result) => {
-            if (err) {
-                throw err;
-            }
-            const id = result.rows[0].id;
-            console.log('Inserted row with id %s', id);
-        });
     }
 }
 

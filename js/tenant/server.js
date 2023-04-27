@@ -97,18 +97,20 @@ server.post('/api', async (req, reply) => {
             {
                 throw 'User name or password missing';
             }
-            const failed = false;
-            if (failed)
+            const host = '127.0.0.1';
+            const ok = await service_collection['pg'].validate_user(username, host, password);
+            if (!ok)
             {
                 return {
                     message: `Api post (${operation}) failed`,
                     error: 'Username or password error',
                     statusCode: '400'
                 };
-            }    
+            }
+            const s_id = service_collection['session'].create_session(); 
             return {
                 message: `Api post (${operation}) ok`,
-                result: {'token': `${service_collection['session'].create_session()}`},
+                result: {'token': `${s_id}`},
                 statusCode: '200'
             };
         }
@@ -119,8 +121,8 @@ server.post('/api', async (req, reply) => {
             {
                 throw 'Token missing';
             }
-            const failed = !service_collection['session'].touch_session(token);
-            if (failed)
+            const ok = service_collection['session'].touch_session(token);
+            if (!ok)
             {
                 return {
                     message: `Api post (${operation}) failed`,
