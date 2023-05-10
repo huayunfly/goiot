@@ -4,6 +4,7 @@ const zlib = require('zlib');
 const assert = require('assert');
 const redis = require('ioredis');
 const { time } = require('console');
+const fetch = require('node-fetch');
 
 
 const D_PRIVILEGE =
