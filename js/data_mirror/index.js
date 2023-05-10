@@ -18,15 +18,19 @@ read_file(argv.f, (err, data_buffer) => {
     else
     {
         try
-        {
-            //const api_address = 'http://localhost/goiot/data/webapi';
-            const webapi = new WebServiceConnector('localhost', 80);
+        {            
             const data_config = JSON.parse(data_buffer.toString());
-            redis_string = '127.0.0.1:6379';
+            let redis_string = '127.0.0.1:6379'; // default
             if (data_config.redis)
             {
                 redis_string = data_config.redis;
             }
+            let webapi_string = 'http://localhost:80/ms';
+            if (data_config.webapi)
+            {
+                webapi_string = data_config.webapi;
+            }
+            const webapi = new WebServiceConnector(webapi_string);
             const redis_connector = new RedisConnector(redis_string, data_config, webapi);
         }
         catch (e)

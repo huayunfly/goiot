@@ -1,7 +1,8 @@
 const https = require('https');
 const zlib = require('zlib');
 const assert = require('assert');
-const redis = require('redis');
+const redis = require('ioredis');
+const fetch = require('node-fetch');
 
 class DBConnector {
     constructor(connection_path) {
@@ -37,7 +38,7 @@ class RedisConnector extends DBConnector {
         // Create model
         this.create_model();
         // Create redis client.
-        this.db_ = redis.createClient(port, host);
+        this.db_ = new redis(port, host);
         // If the connection fails and an error handler is supplied, 
         // the Redis client will attempt to retry the connection.
         this.db_.on('connect', () => console.log('Redis client connected to server.'));
@@ -73,34 +74,37 @@ class RedisConnector extends DBConnector {
             }
             this.model_.push({ driver_id: driver_id, data_array: data_array });
         }
-
     }
 
-    refresh_data(obj) {
+    // Callback function with obj as the parameter.
+    async refresh_data(obj) {
         for (const table of obj.model_) {
             const table_name = table.driver_id;
-            // Batch is a kind of Multi without transaction.
-            const batch = obj.db_.batch();
+            // Pipeline is a kind of Multi without transaction.
+            const pipeline = obj.db_.pipeline();
             for (const data of table.data_array) {
-                batch.hmget('refresh:' + data, 'value', 'result');
+                pipeline.hmget('refresh:' + data, 'value', 'result');
             }
-            batch.exec((err, replies) => {
+            const reply = await pipeline.exec((err, replies) => {
                 if (err) {
                     console.err('Referesh data from redis failed.');
                     return;
                 }
-                // Value is valid if Result is '0'. 
-                //obj.sqldb_.insert(table_name, table.data_array, replies.map(n => Number(n[1]) == 0 ? n[0] : 'NULL'));
-                this.webapi_.post('/goiot/data', {token: null, name: 'SetData', data: []});
             });
+            // Value is valid if Result is '0'.  ? n[0] : 'NULL'));
+            obj.webapi_.post('', {token: null, name: 'SetData', data: reply});
         }
     }
 }
 
 class WebServiceConnector {
-    constructor(hostname, port, path) {
-        this.hostname_ = hostname;
-        this.port_ = port;
+    constructor(api_path) {
+        if (!api_path)
+        {
+            throw 'null api_path';
+        }
+        // check api_path
+        this.api_path_ = api_path;
     }
 
     post(service_path, data_obj) {
@@ -108,7 +112,7 @@ class WebServiceConnector {
         const options = {
             hostname: this.hostname_,
             port: this.port_,
-            path: service_path,
+            path: this.api_path_ + service_path,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
