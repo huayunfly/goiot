@@ -29,6 +29,7 @@
 #define RES_SRV_ON ":/ui_ctrls/UICtrls/Res/srv_on.png"
 #define RES_MOTOR ":/ui_ctrls/UICtrls/Res/motor.png"
 #define RES_JIEJIN_ON ":/ui_ctrls/UICtrls/Res/jiejin_on.png"
+#define RES_SYSTEM_ON ":/ui_ctrls/UICtrls/Res/system_on.png"
 
 #define ICON_CONTROL ":/ui_ctrls/Res/icon_control.png"
 #define ICON_WORKFLOW ":/ui_ctrls/Res/icon_workflow.png"

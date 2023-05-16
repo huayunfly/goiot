@@ -236,6 +236,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.dq3_4", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1406"), RES_MECHANICAL_PUMP, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dq3_7", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1402"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.dq3_8", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_HC1403"), RES_VALVE_ELECTRIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    // gasfeed - system start status
+    data_model_.SetDataToUiMap("plc.1.dq3_1", {UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_system_on"), RES_SYSTEM_ON, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
 
     // liquidswitch
     data_model_.SetDataToUiMap("plc.1.mvalve1_sv", UiInfo(ui_->tabWidget->widget(1), QString::fromUtf8("label_HC2301"), RES_SVALVE_1, WidgetType::NONE, MeasurementUnit::NONE, 0, 4, 1));

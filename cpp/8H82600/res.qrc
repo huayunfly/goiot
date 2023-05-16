@@ -45,5 +45,6 @@
         <file>Res/icon_workflow.png</file>
         <file>Res/icon_device.png</file>
         <file>UICtrls/Res/jiejin_on.png</file>
+        <file>UICtrls/Res/system_on.png</file>
     </qresource>
 </RCC>
