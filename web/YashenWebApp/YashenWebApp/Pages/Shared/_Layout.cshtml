@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 亚申科技</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    <img src="/img/common/yashen_logo.png" alt="" width="34" height="32">
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="navbarNavDropdown">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item dropdown active">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">产业化</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-page="/FTS">费托合成</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/SootlessDiesel">无烟柴油生产</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/DMC">柴油酯生产</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown active">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">产品</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-page="/HTE">高通量设备</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Company">公司</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/News">新闻</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Support">支持</a>
+                        </li>
+                    </ul>
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    </form>
+                    <a class="btn btn-outline-success border-0" type="submit" asp-area="" asp-page="/Login">登录</a>
+                    <button class="btn btn-outline-success" type="submit" asp-area="" asp-page="/Register">注册</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container my-3">
+            <p class="h6 small">
+                &copy; 2023 - <a asp-area="" asp-page="/Privacy">亚申科技版权所有</a> - <a href="https://beian.miit.gov.cn/#/Integrated/index">浙ICP备19034128号-1</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

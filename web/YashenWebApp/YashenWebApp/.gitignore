@@ -1,0 +1,7 @@
+.config
+bin
+obj
+Properties/PublishProfiles
+*.jpg
+*.png
+appsettings.json

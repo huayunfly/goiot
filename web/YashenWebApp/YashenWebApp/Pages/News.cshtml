@@ -1,0 +1,68 @@
+﻿@page
+@model YashenWebApp.Pages.NewsModel
+@{
+    ViewData["Title"] = "新闻";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@foreach (var item in Model.NewsItems.Where(
+    i => !string.IsNullOrWhiteSpace(i.PicturePath)).OrderByDescending(i => i.PublishDate))
+{
+    <div class="card mb-3" style="max-width: 800px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src=@Html.DisplayFor(inputModel => item.PicturePath) alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(inputModel => item.Title)</h5>
+                    @{
+                        var paras = item.Content.Split(
+                        "@@", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    }
+                    @foreach (var para in paras)
+                    {
+                        <p class="card-text">@Html.DisplayFor(inputModel => para)</p>
+                    }  
+                    @{
+                        var days = (DateTime.Now - item.PublishDate).TotalDays;
+                        var monthsOrDays = days > 30 ? Math.Round(days / 30) : days;
+                        var timeUnit = days > 30 ? "个月" : "天";
+                    }
+                    <p class="card-text">
+                        <small class="text-muted">@monthsOrDays@timeUnit 前更新</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@foreach (var item in Model.NewsItems.Where(
+   i => string.IsNullOrWhiteSpace(i.PicturePath)).OrderByDescending(i => i.PublishDate))
+{   
+    <div class="panel-group" id="accordion">
+        <div class="panel panel-default p-1">
+            <div class="panel-heading">
+                <h5 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#@item.Id">
+                        @Html.DisplayFor(inputModel => item.Title)
+                    </a>
+                </h5>
+            </div>
+            <div id="@item.Id" class="panel-collapse collapse in">
+                <div class="panel-body w-75">
+                    @{
+                        var paras = item.Content.Split(
+                            "@@", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    }
+                    @foreach (var para in paras)
+                    {
+                        <p>@Html.DisplayFor(inputModel => para)</p>   
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

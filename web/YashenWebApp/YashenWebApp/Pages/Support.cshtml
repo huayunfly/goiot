@@ -1,0 +1,75 @@
+﻿@page
+@model YashenWebApp.Pages.SupportModel
+@{
+    ViewData["Title"] = "联系支持";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+
+<div class="container-fluid p-0 mt-3">
+    <div class="row text-left">
+        <div class="figure col-md-6">
+            <img src="./img/waiguan1.jpg" class="m-0 figure-img img-fluid rounded float-left" alt="waiguan1">
+        </div>
+        <div class="figure col-md-6">
+            <div id="myMap" class="m-0"></div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <ul class="list-unstyled col-md-4 col-md-offset-4 h6">
+            <li class="mt-2"><strong>亚申科技（浙江）有限公司</strong></li>
+            <li class="mt-2">浙江省绍兴市柯桥经济开发区管湖沿路68号</li>
+            <li class="mt-2">邮编：312030</li>
+            <li class="mt-2">电子邮件：shangwu@yashentech.com</li>
+            <li class="mt-2">电话：0575-85666000</li>
+        </ul>
+    </div>
+    <p>
+        <a class="btn btn-default btn-sm" href="#">
+            <img src="./img/common/icon32_appwx_logo.png" class="float-left" alt="appwx" />
+        </a>
+        <a class="btn btn-default btn-sm" href="#">
+            <img src="./img/common/icon32_douyin_logo.png" class="float-left" alt="douying" />
+        </a>
+        <a class="btn btn-default btn-sm" href="#">
+            <img src="./img/common/icon32_zhihu_logo.png" class="float-left" alt="zhihu" />
+        </a>
+    </p>
+</div>
+
+<!-- Reference to the Bing Maps SDK -->
+<script type='text/javascript'
+        src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap'
+        async defer></script>
+
+<script type='text/javascript'>
+    function GetMap() {
+        var map = new Microsoft.Maps.Map('#myMap', {
+            credentials: 'An5ICemJvHbPKFvTDDiIlHgpV-emSVyYGZ1d9T8_VAvQi3JVYw7aZY1v6Ehux1aB',
+            center: new Microsoft.Maps.Location(30.13573769441755, 120.5357945433988),
+            zoom: 15
+        });
+        var center = map.getCenter();
+        //Create custom Pushpin
+        var pin = new Microsoft.Maps.Pushpin(center, {
+            title: '亚申科技',
+            subTitle: '绍兴柯桥',
+            text: '1'
+        });
+        //Add the pushpin to the map
+        map.entities.push(pin);
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+

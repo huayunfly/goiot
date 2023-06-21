@@ -1,0 +1,69 @@
+﻿@page
+@model YashenWebApp.Pages.LoginModel
+@{
+    ViewData["Title"] = "登录亚申网站";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 offset-md-4">
+            <img src="./img/common/yashen_logo_chs.png" height="39" width="142" class="d-block mx-auto mt-4" alt="yashen">
+            <h3 class="text-center mt-4 text-black-50">@ViewData["Title"]</h3>
+        </div>
+    </div>
+    <div class="row mt-3" id="message">
+        <!-- To be filled -->
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-4 offset-md-4 border border-secondary rounded bg-light">
+            <form class="m-2" id="formlogin" action="api/login" method="post" enctype="application/x-www-form-urlencoded">
+                <!-- Username input -->
+                <div class="form-group mt-3">
+                    <label class="form-label" for="usernameInput">邮件地址</label>
+                    <input type="email" id="usernameInput" name="username" class="form-control" />
+                </div>
+
+                <!-- Password input -->
+                <div class="form-group mt-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label" for="passwordInput">密码</label>
+                        </div>
+                        <div class="col-6">
+                            <!-- Forget me link -->
+                            <a class="float-right" href="#!">忘记密码?</a>
+                        </div>
+                    </div>
+                    <input type="password" id="passwordInput" name="password" class="form-control" />
+                </div>
+                <!-- Login buttons -->
+                <button type="submit" class="btn btn-success btn-block mt-3">登录</button>
+            </form>
+        </div>
+    </div>
+    <!-- Register buttons -->
+    <div class="row mt-3">
+        <div class="col-md-4 offset-md-4 border border-secondary rounded bg-light">
+            <p class="m-2 text-center">亚申科技的新用户? <a href="#!">注册</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="./lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    $("#formlogin").submit(function () {
+        var jqxhr = $.post("api/login", $("#formlogin").serialize())
+            .done(function (response) {
+                if (response?.statusCode == "200" && response?.result?.token) {
+                    alert(response.result.token);
+                    window.location.href = `Company?token=${response.result.token}`;
+                }
+            })
+            .fail(function () {
+                const a = $('<div class="col-md-4 offset-md-4 border border-secondary rounded bg-warning"><label class="m-2 text-center text-black-50">无效的用户名或密码。</label></div>');
+                    $('#message').html(a);
+                });
+            return false;
+        });
+</script>
+
