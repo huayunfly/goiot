@@ -7,7 +7,7 @@
 <h1>@ViewData["Title"]</h1>
 
 @foreach (var item in Model.NewsItems.Where(
-    i => !string.IsNullOrWhiteSpace(i.PicturePath)).OrderByDescending(i => i.PublishDate))
+    i => !string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted).OrderByDescending(i => i.PublishDate))
 {
     <div class="card mb-3" style="max-width: 800px;">
         <div class="row g-0">
@@ -40,7 +40,7 @@
 }
 
 @foreach (var item in Model.NewsItems.Where(
-   i => string.IsNullOrWhiteSpace(i.PicturePath)).OrderByDescending(i => i.PublishDate))
+   i => string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted).OrderByDescending(i => i.PublishDate))
 {   
     <div class="panel-group" id="accordion">
         <div class="panel panel-default p-1">
