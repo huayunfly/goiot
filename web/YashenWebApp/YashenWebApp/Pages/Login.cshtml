@@ -56,7 +56,7 @@
             .done(function (response) {
                 if (response?.statusCode == "200" && response?.result?.token) {
                     alert(response.result.token);
-                    window.location.href = `Company?token=${response.result.token}`;
+                    window.location.href = `Management/Entry/${response.result.token}`;
                 }
             })
             .fail(function () {

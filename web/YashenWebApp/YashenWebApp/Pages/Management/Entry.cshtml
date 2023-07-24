@@ -1,0 +1,59 @@
+﻿@page "/management/entry/{token?}"
+@model YashenWebApp.Pages.Management.EntryModel
+@{
+    ViewData["title"] = "用户管理";
+}
+<p>Entry</p>
+<p>@ViewData["token"]</p>
+
+<form class="row w-75" id="form-create-news" action="/api/publishnews" enctype="multipart/form-data" method="post">
+    <div class="mb-3 col-12">
+        <label for="inputTitle" class="form-label">标题</label>
+        <textarea class="form-control" id="inputTitle" name="Title" rows="1"></textarea>
+    </div>
+    <div class="mb-3 col-12">
+        <label for="inputContent" class="form-label">新闻内容</label>
+        <textarea class="form-control" id="inputContent" name="Content" rows="3"></textarea>
+    </div>
+    <div class="mb-3 col-md-8">
+        <label for="uploadFile" class="form-label">图片上传</label>
+        <input type="file" class="form-control" id="uploadFile" name="ImageFile" />
+    </div>
+    <div class="mb-3 col-md-4">
+        <label for="inputDate" class="form-label">发布日期</label>
+        <input type="date" class="form-control" id="inputDate" name="PublishDate" value="@ViewData["date"]" title="指定日期（6个月内）" />
+    </div>
+    <div class="col-3">
+        <button type="submit" class="btn btn-primary btn-block mt-3">提交</button>
+    </div>
+</form>
+
+<script src="/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    "use strict";
+    $("#form-create-news").submit(function () {
+        var files = $("#uploadFile").prop('files');
+        var data = new FormData();
+        data.append("ImageFile", files[0]);
+        data.append("Title", $("#inputTitle").prop("value"));
+        data.append("Content", $("#inputContent").prop("value"));
+        data.append("PublishDate", $("#inputDate").prop("value"));
+        var jqxhr = $.ajax({
+            url: "/api/publishnews/create",
+            type: 'POST',
+            data: data,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function (response) {
+            if (response?.statusCode == "200" && response?.result?.token) {
+                alert(response.result.token);
+                window.location.href = `Management/Entry/${response.result.token}`;
+            }
+        }).fail(function () {
+                alert("Create news failed.");
+            });
+        return false;
+    });
+</script>
+
