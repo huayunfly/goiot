@@ -51,7 +51,7 @@ namespace YashenWebApp.Pages
             }
             else
             {
-                return $"最后更新 {span.TotalDays} 天前";
+                return $"最后更新 {Convert.ToInt32(span.TotalDays)} 天前";
             }
         }
     }

@@ -20,7 +20,7 @@
         <input type="file" class="form-control" id="uploadFile" name="ImageFile" />
     </div>
     <div class="mb-3 col-md-4">
-        <label for="inputDate" class="form-label">发布日期</label>
+        <label for="inputDate" class="form-label">发布日期（6个月内）</label>
         <input type="date" class="form-control" id="inputDate" name="PublishDate" value="@ViewData["date"]" title="指定日期（6个月内）" />
     </div>
     <div class="col-3">
@@ -34,10 +34,11 @@
     $("#form-create-news").submit(function () {
         var files = $("#uploadFile").prop('files');
         var data = new FormData();
-        data.append("ImageFile", files[0]);
-        data.append("Title", $("#inputTitle").prop("value"));
-        data.append("Content", $("#inputContent").prop("value"));
-        data.append("PublishDate", $("#inputDate").prop("value"));
+        data.append("imagefile", files[0]);
+        data.append("title", $("#inputTitle").prop("value"));
+        data.append("content", $("#inputContent").prop("value"));
+        data.append("publishdate", $("#inputDate").prop("value"));
+
         var jqxhr = $.ajax({
             url: "/api/publishnews/create",
             type: 'POST',
@@ -47,8 +48,7 @@
             contentType: false
         }).done(function (response) {
             if (response?.statusCode == "200" && response?.result?.token) {
-                alert(response.result.token);
-                window.location.href = `Management/Entry/${response.result.token}`;
+                window.location.href = "/News";
             }
         }).fail(function () {
                 alert("Create news failed.");

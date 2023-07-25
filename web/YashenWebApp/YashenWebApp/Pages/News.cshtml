@@ -27,7 +27,7 @@
                     }  
                     @{
                         var days = (DateTime.Now - item.PublishDate).TotalDays;
-                        var monthsOrDays = days > 30 ? Math.Round(days / 30) : days;
+                        var monthsOrDays = days > 30 ? Math.Round(days / 30) : Math.Round(days);
                         var timeUnit = days > 30 ? "个月" : "天";
                     }
                     <p class="card-text">
