@@ -8,6 +8,6 @@ namespace YashenWebApp.Services
 {
     public interface IUserService
     {
-        Task LoginAsync(LoginInfo login); 
+        Task<string> LoginAsync(LoginInfo login); 
     }
 }

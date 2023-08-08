@@ -55,16 +55,18 @@ namespace YashenWebApp.Controllers
         // POST api/<LoginController>
         [HttpPost]
         [Consumes("application/x-www-form-urlencoded")]
-        public ActionResult<string> PostForm([FromForm] LoginInfo info)
+        public async Task<ActionResult<string>> PostForm([FromForm] LoginInfo info)
         {
             if (info != null)
             {
-                if (info.Username.Equals("a@a.com") && info.Password.Equals("123"))
+                //if (info.Username.Equals("a@a.com") && info.Password.Equals("123"))
+                string token = await userService_.LoginAsync(info);
+                if (!string.IsNullOrWhiteSpace(token))
                 {
                     var obj = new
                     {
                         message = $"Api post {nameof(PostForm)} ok",
-                        result = new { token = "adfafad89j&jafjasjf[map*ladfjlj" },
+                        result = new { token },
                         statusCode = "200"
                     };
                     //string content = JsonSerializer.Serialize(obj); // Create escaped string.
