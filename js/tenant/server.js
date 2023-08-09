@@ -107,7 +107,7 @@ server.post('/api', async (req, reply) => {
                     statusCode: '400'
                 };
             }
-            const s_id = service_collection['session'].create_session(); 
+            const s_id = service_collection['session'].create_session(username); 
             return {
                 message: `Api post (${operation}) ok`,
                 result: {'token': `${s_id}`},
@@ -121,8 +121,8 @@ server.post('/api', async (req, reply) => {
             {
                 throw 'Token missing';
             }
-            const ok = service_collection['session'].touch_session(token);
-            if (!ok)
+            const username = service_collection['session'].touch_session(token);
+            if (username == null)
             {
                 return {
                     message: `Api post (${operation}) failed`,
@@ -132,7 +132,7 @@ server.post('/api', async (req, reply) => {
             }  
             return {
                 message: `Api post (${operation}) ok`,
-                result: {'token': `${token}`},
+                result: {'username': `${username}`},
                 statusCode: '200'
             };
         }

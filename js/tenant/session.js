@@ -6,10 +6,12 @@ class Session
 {
     s_id;
     last_access_time;
-    constructor(id, lasttime)
+    username;
+    constructor(id, lasttime, username)
     {
         this.s_id = id;
         this.last_access_time = lasttime;
+        this.username = username;
     }
 }
 
@@ -28,16 +30,16 @@ class SessionMagager
         return new Date().getTime() / 1000.0;
     }
 
-    create_session()
+    create_session(username)
     {
         const s_id = this.create_guid();
-        this.sessions_.set(s_id, new Session(s_id, this.time_now));
+        this.sessions_.set(s_id, new Session(s_id, this.time_now, username));
         return s_id;
     }
 
     create_guid()
     {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
           var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
           return v.toString(16);
         });
@@ -65,10 +67,10 @@ class SessionMagager
         let s = this.sessions_.get(s_id);
         if (s === undefined)
         {
-            return false;
+            return null;
         }
         s.last_access_time = this.time_now;
-        return true;
+        return s.username;
     }
 
     set_session_data(s_id, key, value)
