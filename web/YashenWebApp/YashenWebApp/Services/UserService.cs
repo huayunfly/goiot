@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using NuGet.Protocol.Plugins;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
@@ -11,44 +13,16 @@ using YashenWebApp.Models;
 
 namespace YashenWebApp.Services
 {
-    public class ApiResultBody
-    {
-        public string Message { get; set; }
-        public Dictionary<string, object> Result { get; set; }
-        public string StatusCode { get; set; }
-    }
-
-    /// <summary>
-    /// API request common body.
-    /// </summary>
-    public class ApiRequestBody
-    {
-        public string Name { get; set; }
-        public string Token { get; set; }
-        public string Operation { get; set; }
-    }
-
-    /// <summary>
-    /// Get data request body.
-    /// </summary>
-    public class ApiGetDataBody : ApiRequestBody
-    {
-        public Dictionary<string, object> Condition { get; set; }
-    }
-
-    /// <summary>
-    /// Set data request body.
-    /// </summary>
-    public class ApiSetDataBody : ApiRequestBody
-    {
-        public Dictionary<string, object> Data { get; set; }
-    }
-
     public class UserService : IUserService
     {
-        public async Task<string> LoginAsync(LoginInfo login)
+        private readonly Int32 TIMEOUT_IN_MS = 5000;
+        public async Task<string> LoginAsync(LoginInfo login, IConfiguration configuration)
         {
-            string url = "http://127.0.0.1:6301/api";
+            if (login == null || configuration == null) 
+            { 
+                return null; 
+            }
+            string url = configuration["ServiceApi"] ?? string.Empty;
             string contentType = "application/json";
             ApiGetDataBody dataBody = new()
             {
@@ -63,7 +37,7 @@ namespace YashenWebApp.Services
                 WriteIndented = true
             };
             string strContent = JsonSerializer.Serialize(dataBody, options);
-            var cts = new CancellationTokenSource(5000);
+            var cts = new CancellationTokenSource(TIMEOUT_IN_MS);
             try
             {
                 Tuple<byte[], string, string, string> resPost = 
@@ -89,6 +63,59 @@ namespace YashenWebApp.Services
                     return null;
                 }
                 return token?.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return null;
+        }
+
+        public async Task<string> ValidateAsync(string token, IConfiguration configuration)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return null;
+            }
+            string url = configuration["ServiceApi"] ?? string.Empty;
+            string contentType = "application/json";
+            ApiGetDataBody dataBody = new()
+            {
+                Name = "tenant",
+                Token = token,
+                Operation = "Touch"
+            };
+            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
+            {
+                WriteIndented = true
+            };
+            string strContent = JsonSerializer.Serialize(dataBody, options);
+            var cts = new CancellationTokenSource(TIMEOUT_IN_MS);
+            try
+            {
+                Tuple<byte[], string, string, string> resPost =
+                    await WebSvcCaller.PostAsync(url, contentType, strContent, cts.Token).ConfigureAwait(false);
+                if (resPost == null || resPost.Item1 == null)
+                {
+                    throw new ArgumentNullException(nameof(resPost));
+                }
+                string strResponse = System.Text.Encoding.UTF8.GetString(resPost.Item1);
+                if (string.IsNullOrWhiteSpace(strResponse))
+                {
+                    throw new ArgumentNullException(nameof(strResponse));
+                }
+                ApiResultBody resBody = JsonSerializer.Deserialize<ApiResultBody>(strResponse, options);
+                if (resBody == null)
+                {
+                    throw new ArgumentNullException(nameof(resBody));
+                }
+                object username = null;
+                if (resBody.StatusCode != "200" || resBody.Result == null ||
+                    !resBody.Result.TryGetValue("username", out username))
+                {
+                    return null;
+                }
+                return username?.ToString();
             }
             catch (Exception ex)
             {

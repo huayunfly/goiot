@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using YashenWebApp.Models;
 using YashenWebApp.Services;
 
@@ -19,14 +20,11 @@ namespace YashenWebApp.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IUserService userService_;
-        public LoginController(IUserService userService) =>
-        userService_ = userService;
-
-        // GET: api/<LoginController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IConfiguration configuration_;
+        public LoginController(IUserService userService, IConfiguration configuration)
         {
-            return new string[] { "value1", "value2" };
+            userService_ = userService;
+            configuration_ = configuration;
         }
 
         // GET api/<LoginController>/5
@@ -59,8 +57,7 @@ namespace YashenWebApp.Controllers
         {
             if (info != null)
             {
-                //if (info.Username.Equals("a@a.com") && info.Password.Equals("123"))
-                string token = await userService_.LoginAsync(info);
+                string token = await userService_.LoginAsync(info, configuration_);
                 if (!string.IsNullOrWhiteSpace(token))
                 {
                     var obj = new

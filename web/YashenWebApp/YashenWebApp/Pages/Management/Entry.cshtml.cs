@@ -1,38 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using NuGet.Protocol;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.Configuration;
+using System.Threading.Tasks;
+using YashenWebApp.Services;
 
 namespace YashenWebApp.Pages.Management
 {
     public class EntryModel : PageModel
     {
-        public IActionResult OnGet([FromRoute] string token = null)
+        private readonly IUserService userService_;
+        private readonly IConfiguration configuration_;
+
+        public EntryModel(IConfiguration configuration, IUserService userService)
+        {
+            configuration_ = configuration;
+            userService_ = userService;
+        }
+
+        public async Task<IActionResult> OnGet([FromRoute] string token = null)
         {
             ViewData["date"] = DateTime.Now.ToString("yyyy-MM-dd");
-            if (Validate(token))
+            string username = await userService_.ValidateAsync(token, configuration_);
+            if (!string.IsNullOrWhiteSpace(username))
             {
                 ViewData["token"] = token;
+                ViewData["user"] = username;
                 return Page();
             }
             else
             {
                 return RedirectToPage("Index");
             }
-        }
-
-        /// <summary>
-        /// Validate token by service.
-        /// </summary>
-        /// <param name="token">User token</param>
-        /// <returns>True if it is succeeded.</returns>
-        private bool Validate(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return false;
-            }
-            return true;
         }
     }
 }
