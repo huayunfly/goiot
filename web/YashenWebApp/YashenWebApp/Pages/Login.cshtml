@@ -55,7 +55,6 @@
         var jqxhr = $.post("api/login", $("#formlogin").serialize())
             .done(function (response) {
                 if (response?.statusCode == "200" && response?.result?.token) {
-                    alert(response.result.token);
                     window.location.href = `Management/Entry/${response.result.token}`;
                 }
             })

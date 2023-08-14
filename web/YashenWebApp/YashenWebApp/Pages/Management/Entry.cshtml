@@ -7,6 +7,10 @@
 <p>用户 @ViewData["user"]</p>
 
 <form class="row w-75" id="form-create-news" action="/api/publishnews" enctype="multipart/form-data" method="post">
+    <div class="mb-3 col-12 d-none">
+        <label for="cachedToken" class="form-label">token</label>
+        <textarea class="form-control" id="cachedToken" name="Token" rows="1">@ViewData["token"]</textarea>
+    </div>
     <div class="mb-3 col-12">
         <label for="inputTitle" class="form-label">标题</label>
         <textarea class="form-control" id="inputTitle" name="Title" rows="1"></textarea>
@@ -34,10 +38,11 @@
     $("#form-create-news").submit(function () {
         var files = $("#uploadFile").prop('files');
         var data = new FormData();
-        data.append("imagefile", files[0]);
+        data.append("imageFile", files[0]);
         data.append("title", $("#inputTitle").prop("value"));
         data.append("content", $("#inputContent").prop("value"));
-        data.append("publishdate", $("#inputDate").prop("value"));
+        data.append("publishDate", $("#inputDate").prop("value"));
+        data.append("token", $("#cachedToken").prop("value"));
 
         var jqxhr = $.ajax({
             url: "/api/publishnews/create",
@@ -47,7 +52,7 @@
             processData: false,
             contentType: false
         }).done(function (response) {
-            if (response?.statusCode == "200" && response?.result?.token) {
+            if (response?.statusCode == "200" && response?.result?.username) {
                 window.location.href = "/News";
             }
         }).fail(function () {

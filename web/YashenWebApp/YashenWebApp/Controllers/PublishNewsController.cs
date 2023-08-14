@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using YashenWebApp.Models;
 using YashenWebApp.Services;
@@ -18,35 +17,22 @@ namespace YashenWebApp.Controllers
     [ApiController]
     public class PublishNewsController : Controller
     {
-        private readonly IPublishNewsService publishNewsService_;
-        private readonly IConfiguration configuration_;
+        private readonly IPublishNewsService _publishNewsService;
+        private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public PublishNewsController(IPublishNewsService publishNewsService, IConfiguration configuration) 
+        public PublishNewsController(IPublishNewsService publishNewsService, 
+            IConfiguration configuration, IUserService userService) 
         {
-            if (publishNewsService == null)
+            if (publishNewsService == null || configuration == null ||
+                userService == null)
             {
-                throw new ArgumentNullException(nameof(publishNewsService));
+                throw new ArgumentNullException(nameof(PublishNewsController));
             }
-            publishNewsService_ = publishNewsService;
-            configuration_ = configuration;
+            _publishNewsService = publishNewsService;
+            _configuration = configuration;
+            _userService = userService;
         }
-        //// GET: PublishNewsController
-        //public ActionResult Index()
-        //{ 
-        //    return View();
-        //}
-
-        //// GET: PublishNewsController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
-
-        //// GET: PublishNewsController/Create
-        //public ActionResult Create()
-        //{
-        //    return View();
-        //}
 
         // POST: PublishNewsController/Create
         [HttpPost]
@@ -56,10 +42,15 @@ namespace YashenWebApp.Controllers
         {
             try
             {
+                string token = string.Empty;
                 string title = string.Empty;
                 string content = string.Empty;
                 DateTime publish_date = DateTime.Today;
                 StringValues values;
+                if (collection.TryGetValue("token", out values))
+                {
+                    token = values.ToString();
+                }
                 if (collection.TryGetValue("title", out values))
                 { 
                     title = values.ToString();
@@ -68,21 +59,35 @@ namespace YashenWebApp.Controllers
                 {
                     content = values.ToString();
                 }
-                if (collection.TryGetValue("publishdate", out values))
+                if (collection.TryGetValue("publishDate", out values))
                 {
                     DateTime.TryParse(values.ToString(), out publish_date);
                 }
                 // Validate
-                if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(content)) 
+                if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(title) || 
+                    string.IsNullOrWhiteSpace(content)) 
                 {
                     var error_obj = new
                     {
                         message = $"Api post {nameof(Create)} failed",
-                        error = "Null or empty fields",
+                        error = "Empty fields",
                         statusCode = "400"
                     };
                     return BadRequest(error_obj);
                 }
+
+                string username = await _userService.ValidateAsync(token, _configuration);
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    var error_obj = new
+                    {
+                        message = $"Api post {nameof(Create)} failed",
+                        error = "Error token",
+                        statusCode = "400"
+                    };
+                    return BadRequest(error_obj);
+                }
+
                 if (title.Length > 140 || content.Length > 1024 || publish_date.Date > DateTime.Today ||
                     publish_date.Date < (DateTime.Today.AddDays(-180))) 
                 {
@@ -94,10 +99,16 @@ namespace YashenWebApp.Controllers
                     };
                     return BadRequest(error_obj);
                 }
-                content = content.Replace("\r\n", "@@"); // Return characters protocal the same with UI
-                string author = "a@acom";
-                var formfile = collection.Files.GetFile("imagefile");
-                if (formfile != null && (formfile.Length == 0 || formfile.Length > 1048576))
+
+                // Replace \r\n with @@ in the content with the same UI protocal.
+                content = content.Replace("\r\n", "@@");
+
+                // Get and resize image.
+                var formfile = collection.Files.GetFile("imageFile");
+                if (formfile == null || 
+                    (formfile.Length == 0 || formfile.Length > 1048576) ||
+                    (!formfile.ContentType.Equals("image/jpeg") && !formfile.ContentType.Equals("image/png"))
+                    )
                 {
                     var error_obj = new
                     {
@@ -114,20 +125,19 @@ namespace YashenWebApp.Controllers
                     Random rnd = new Random();
                     string picture_name = $"news_{publish_date.ToString("yyyyMMdd")}_{rnd.Next(32768)}.jpg";
                     picture_path = Path.Combine("\\img", picture_name); // Store an absolute webapp path
-                    string file_path = Path.Combine(configuration_["StoredFilesPath"], "img", picture_name);
-                    using (var stream = System.IO.File.Create(file_path))
-                    {
-                        await formfile.CopyToAsync(stream);
-                    }
+                    string file_path = Path.Combine(_configuration["StoredFilesPath"], "img", picture_name);
+                    using var img = await Image.LoadAsync(formfile.OpenReadStream());
+                    img.Mutate(x => x.Resize(225, 300));
+                    img.Save(file_path);
                 }
                 // to DB
                 NewsItem item = new NewsItem(Guid.NewGuid(), title, content,
-                    publish_date.ToUniversalTime(), picture_path, author, false, DateTime.Now.ToUniversalTime());
-                await publishNewsService_.AddAsync(item);
+                    publish_date.ToUniversalTime(), picture_path, username, false, DateTime.Now.ToUniversalTime());
+                await _publishNewsService.AddAsync(item);
                 var obj = new
                 {
                     message = $"Api post {nameof(Create)} ok",
-                    result = new { token = "adfafad89j&jafjasjf[map*ladfjlj" },
+                    result = new { username },
                     statusCode = "200"
                 };
                 return Ok(obj);
@@ -166,26 +176,5 @@ namespace YashenWebApp.Controllers
                 return View();
             }
         }
-
-        //// GET: PublishNewsController/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: PublishNewsController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }
