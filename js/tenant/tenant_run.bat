@@ -1,0 +1,1 @@
+node server.js -f service_config.json
