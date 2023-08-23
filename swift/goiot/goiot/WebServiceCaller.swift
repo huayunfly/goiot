@@ -8,10 +8,6 @@
 import Foundation
 
 enum WebServiceError: Error {
-    case noConnection
-    case lowBandwidth
-    case fileNotFound
-    case timeout
     case invalidServerResponse
     case invalidJSONEncode
     case invalidJSONDecode
@@ -27,9 +23,9 @@ class WebServiceCaller {
     /// - Parameter reqContentType: content type
     /// - Parameter sendData: json to send
     /// - Returns: Data
-    class func Post(to url: String, contentType reqContentType: String, with sendData: Data) async throws -> Data {
+    class func Post(to url: String, contentType reqContentType: String, with sendData: Data, timeoutInterval timeout: TimeInterval) async throws -> Data {
         let url = URL(string: url)!
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeout)
 
         // Change the URLRequest to a POST request
         request.httpMethod = "POST"
@@ -52,7 +48,7 @@ class WebServiceCaller {
     /// - Parameter url: The URL
     /// - Parameter objectJSON: json to send
     /// - Returns: JSON object in [String: Any].
-    class func PostJSONDictionary(to url: String, with objectJSON: [String: Any]) async throws -> [String: Any] {
+    class func PostJSONDictionary(to url: String, with objectJSON: [String: Any], timeoutInterval timeout: TimeInterval) async throws -> [String: Any] {
         guard let bodyData = try? JSONSerialization.data(
             withJSONObject: objectJSON,
             options: []
@@ -60,7 +56,7 @@ class WebServiceCaller {
             throw WebServiceError.invalidJSONEncode
         }
         
-        let data = try await Post(to: url, contentType: "application/json", with: bodyData)
+        let data = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
             throw WebServiceError.invalidJSONDecode
         }
@@ -76,13 +72,13 @@ class WebServiceCaller {
     /// - Parameter url: The URL
     /// - Parameter objectJSON: Encodable object to send
     /// - Returns: Decodable object.
-    class func PostJSON<T1: Encodable, T2: Decodable>(to url: String, with objectJSON: T1) async throws -> T2 {
+    class func PostJSON<T1: Encodable, T2: Decodable>(to url: String, with objectJSON: T1, timeoutInterval timeout: TimeInterval) async throws -> T2 {
         let encoder = JSONEncoder()
         guard let bodyData = try? encoder.encode(objectJSON) else {
             throw WebServiceError.invalidJSONEncode
         }
         
-        let data = try await Post(to: url, contentType: "application/json", with: bodyData)
+        let data = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
         
         let decoder = JSONDecoder()
         guard let response = try? decoder.decode(T2.self, from: data) else {

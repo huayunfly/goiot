@@ -85,7 +85,7 @@ struct SettingTabView: View {
             let requestBody = ApiRequestBody(name: "tenant", token: nil, operation: "Login", condition: ["username": username, "password": password])
             
             do {
-                let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody)
+                let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
                 guard response.statusCode == "200" else {
                     print("Login return status error.")
                     throw WebServiceError.statusError
@@ -96,59 +96,6 @@ struct SettingTabView: View {
                 print(ex)
             }
         }
-
-        
-//        let url = URL(string: address)!
-//        var request = URLRequest(url: url)
-//        let body: [String: Any] = ["name": "tenant", "operation": "Login", "condition": ["username": username, "password": password]]
-//        let bodyData = try? JSONSerialization.data(
-//            withJSONObject: body,
-//            options: []
-//        )
-
-//        // Change the URLRequest to a POST request
-//        request.httpMethod = "POST"
-//        request.httpBody = bodyData
-//        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.addValue("utf-8", forHTTPHeaderField: "charset")
-//
-//        // Create the HTTP request
-//        let session = URLSession.shared
-//        let task = session.dataTask(with: request) { (data, response, error) in
-//            if let error = error {
-//                print(error)
-//            }
-//            else if let data {
-//                let decoder = JSONDecoder()
-//                let response = try? decoder.decode(ApiResultBody.self, from: data)
-//                if let response, response.statusCode == "200" {
-//                    token = response.result["token"] ?? "1-2-3-4-5-6"
-//                    print(token)
-//                }
-//                else {
-//                    print("JSON decode failed.")
-//                }
-////                // JSON parse example directively.
-////                let json = try? JSONSerialization.jsonObject(with: data, options: [])
-////                if let response = json as? [String: Any]
-////                {
-////                    if let status = response["statusCode"] as? String
-////                    {
-////                        if status == "200", let result = response["result"] as? [String: Any]
-////                        {
-////                            token = result["token"] as? String ?? "1-2-3-4-5-6"
-////                            print(token)
-////                            isConnected = !isConnected
-////                        }
-////                    }
-////                }
-//            }
-//            else
-//            {
-//                print("Unexpected error.")
-//            }
-//        }
-//        task.resume()
     }
 }
 
