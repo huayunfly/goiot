@@ -1,0 +1,608 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6CB4073C2A8469580093AEF7 /* goiotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4073B2A8469580093AEF7 /* goiotApp.swift */; };
+		6CB4073E2A8469580093AEF7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4073D2A8469580093AEF7 /* ContentView.swift */; };
+		6CB407402A8469590093AEF7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB4073F2A8469590093AEF7 /* Assets.xcassets */; };
+		6CB407432A8469590093AEF7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB407422A8469590093AEF7 /* Preview Assets.xcassets */; };
+		6CB4074D2A8469590093AEF7 /* goiotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4074C2A8469590093AEF7 /* goiotTests.swift */; };
+		6CB407572A8469590093AEF7 /* goiotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407562A8469590093AEF7 /* goiotUITests.swift */; };
+		6CB407592A8469590093AEF7 /* goiotUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407582A8469590093AEF7 /* goiotUITestsLaunchTests.swift */; };
+		6CB407662A8489C10093AEF7 /* MonitorTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407652A8489C10093AEF7 /* MonitorTabView.swift */; };
+		6CB407682A848A650093AEF7 /* TrendTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407672A848A650093AEF7 /* TrendTabView.swift */; };
+		6CB4076A2A848A950093AEF7 /* SettingTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407692A848A950093AEF7 /* SettingTabView.swift */; };
+		6CFAACE72A9435E70052ED7A /* ApiHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFAACE62A9435E70052ED7A /* ApiHelper.swift */; };
+		6CFAACE92A945EFB0052ED7A /* WebServiceCaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6CB407492A8469590093AEF7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6CB407302A8469580093AEF7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6CB407372A8469580093AEF7;
+			remoteInfo = goiot;
+		};
+		6CB407532A8469590093AEF7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6CB407302A8469580093AEF7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6CB407372A8469580093AEF7;
+			remoteInfo = goiot;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6CB407382A8469580093AEF7 /* goiot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = goiot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CB4073B2A8469580093AEF7 /* goiotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = goiotApp.swift; sourceTree = "<group>"; };
+		6CB4073D2A8469580093AEF7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		6CB4073F2A8469590093AEF7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6CB407422A8469590093AEF7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		6CB407482A8469590093AEF7 /* goiotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = goiotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CB4074C2A8469590093AEF7 /* goiotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = goiotTests.swift; sourceTree = "<group>"; };
+		6CB407522A8469590093AEF7 /* goiotUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = goiotUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CB407562A8469590093AEF7 /* goiotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = goiotUITests.swift; sourceTree = "<group>"; };
+		6CB407582A8469590093AEF7 /* goiotUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = goiotUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		6CB407652A8489C10093AEF7 /* MonitorTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorTabView.swift; sourceTree = "<group>"; };
+		6CB407672A848A650093AEF7 /* TrendTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendTabView.swift; sourceTree = "<group>"; };
+		6CB407692A848A950093AEF7 /* SettingTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTabView.swift; sourceTree = "<group>"; };
+		6CFAACE62A9435E70052ED7A /* ApiHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiHelper.swift; sourceTree = "<group>"; };
+		6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebServiceCaller.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6CB407352A8469580093AEF7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CB407452A8469590093AEF7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CB4074F2A8469590093AEF7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6CB4072F2A8469580093AEF7 = {
+			isa = PBXGroup;
+			children = (
+				6CB4073A2A8469580093AEF7 /* goiot */,
+				6CB4074B2A8469590093AEF7 /* goiotTests */,
+				6CB407552A8469590093AEF7 /* goiotUITests */,
+				6CB407392A8469580093AEF7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6CB407392A8469580093AEF7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6CB407382A8469580093AEF7 /* goiot.app */,
+				6CB407482A8469590093AEF7 /* goiotTests.xctest */,
+				6CB407522A8469590093AEF7 /* goiotUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6CB4073A2A8469580093AEF7 /* goiot */ = {
+			isa = PBXGroup;
+			children = (
+				6CB4073B2A8469580093AEF7 /* goiotApp.swift */,
+				6CB4073D2A8469580093AEF7 /* ContentView.swift */,
+				6CB4073F2A8469590093AEF7 /* Assets.xcassets */,
+				6CB407412A8469590093AEF7 /* Preview Content */,
+				6CB407652A8489C10093AEF7 /* MonitorTabView.swift */,
+				6CB407672A848A650093AEF7 /* TrendTabView.swift */,
+				6CB407692A848A950093AEF7 /* SettingTabView.swift */,
+				6CFAACE62A9435E70052ED7A /* ApiHelper.swift */,
+				6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */,
+			);
+			path = goiot;
+			sourceTree = "<group>";
+		};
+		6CB407412A8469590093AEF7 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				6CB407422A8469590093AEF7 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		6CB4074B2A8469590093AEF7 /* goiotTests */ = {
+			isa = PBXGroup;
+			children = (
+				6CB4074C2A8469590093AEF7 /* goiotTests.swift */,
+			);
+			path = goiotTests;
+			sourceTree = "<group>";
+		};
+		6CB407552A8469590093AEF7 /* goiotUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6CB407562A8469590093AEF7 /* goiotUITests.swift */,
+				6CB407582A8469590093AEF7 /* goiotUITestsLaunchTests.swift */,
+			);
+			path = goiotUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6CB407372A8469580093AEF7 /* goiot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CB4075C2A8469590093AEF7 /* Build configuration list for PBXNativeTarget "goiot" */;
+			buildPhases = (
+				6CB407342A8469580093AEF7 /* Sources */,
+				6CB407352A8469580093AEF7 /* Frameworks */,
+				6CB407362A8469580093AEF7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = goiot;
+			productName = goiot;
+			productReference = 6CB407382A8469580093AEF7 /* goiot.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6CB407472A8469590093AEF7 /* goiotTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CB4075F2A8469590093AEF7 /* Build configuration list for PBXNativeTarget "goiotTests" */;
+			buildPhases = (
+				6CB407442A8469590093AEF7 /* Sources */,
+				6CB407452A8469590093AEF7 /* Frameworks */,
+				6CB407462A8469590093AEF7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6CB4074A2A8469590093AEF7 /* PBXTargetDependency */,
+			);
+			name = goiotTests;
+			productName = goiotTests;
+			productReference = 6CB407482A8469590093AEF7 /* goiotTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6CB407512A8469590093AEF7 /* goiotUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CB407622A8469590093AEF7 /* Build configuration list for PBXNativeTarget "goiotUITests" */;
+			buildPhases = (
+				6CB4074E2A8469590093AEF7 /* Sources */,
+				6CB4074F2A8469590093AEF7 /* Frameworks */,
+				6CB407502A8469590093AEF7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6CB407542A8469590093AEF7 /* PBXTargetDependency */,
+			);
+			name = goiotUITests;
+			productName = goiotUITests;
+			productReference = 6CB407522A8469590093AEF7 /* goiotUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6CB407302A8469580093AEF7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					6CB407372A8469580093AEF7 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+					6CB407472A8469590093AEF7 = {
+						CreatedOnToolsVersion = 14.3.1;
+						TestTargetID = 6CB407372A8469580093AEF7;
+					};
+					6CB407512A8469590093AEF7 = {
+						CreatedOnToolsVersion = 14.3.1;
+						TestTargetID = 6CB407372A8469580093AEF7;
+					};
+				};
+			};
+			buildConfigurationList = 6CB407332A8469580093AEF7 /* Build configuration list for PBXProject "goiot" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6CB4072F2A8469580093AEF7;
+			productRefGroup = 6CB407392A8469580093AEF7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6CB407372A8469580093AEF7 /* goiot */,
+				6CB407472A8469590093AEF7 /* goiotTests */,
+				6CB407512A8469590093AEF7 /* goiotUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6CB407362A8469580093AEF7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CB407432A8469590093AEF7 /* Preview Assets.xcassets in Resources */,
+				6CB407402A8469590093AEF7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CB407462A8469590093AEF7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CB407502A8469590093AEF7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6CB407342A8469580093AEF7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CFAACE72A9435E70052ED7A /* ApiHelper.swift in Sources */,
+				6CFAACE92A945EFB0052ED7A /* WebServiceCaller.swift in Sources */,
+				6CB4076A2A848A950093AEF7 /* SettingTabView.swift in Sources */,
+				6CB407682A848A650093AEF7 /* TrendTabView.swift in Sources */,
+				6CB4073E2A8469580093AEF7 /* ContentView.swift in Sources */,
+				6CB4073C2A8469580093AEF7 /* goiotApp.swift in Sources */,
+				6CB407662A8489C10093AEF7 /* MonitorTabView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CB407442A8469590093AEF7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CB4074D2A8469590093AEF7 /* goiotTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CB4074E2A8469590093AEF7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CB407572A8469590093AEF7 /* goiotUITests.swift in Sources */,
+				6CB407592A8469590093AEF7 /* goiotUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6CB4074A2A8469590093AEF7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6CB407372A8469580093AEF7 /* goiot */;
+			targetProxy = 6CB407492A8469590093AEF7 /* PBXContainerItemProxy */;
+		};
+		6CB407542A8469590093AEF7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6CB407372A8469580093AEF7 /* goiot */;
+			targetProxy = 6CB407532A8469590093AEF7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6CB4075A2A8469590093AEF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6CB4075B2A8469590093AEF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6CB4075D2A8469590093AEF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"goiot/Preview Content\"";
+				DEVELOPMENT_TEAM = EA597HW9QH;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = huayunfly.goiot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6CB4075E2A8469590093AEF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"goiot/Preview Content\"";
+				DEVELOPMENT_TEAM = EA597HW9QH;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = huayunfly.goiot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6CB407602A8469590093AEF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EA597HW9QH;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = huayunfly.goiotTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/goiot.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/goiot";
+			};
+			name = Debug;
+		};
+		6CB407612A8469590093AEF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EA597HW9QH;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = huayunfly.goiotTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/goiot.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/goiot";
+			};
+			name = Release;
+		};
+		6CB407632A8469590093AEF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EA597HW9QH;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = huayunfly.goiotUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = goiot;
+			};
+			name = Debug;
+		};
+		6CB407642A8469590093AEF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EA597HW9QH;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = huayunfly.goiotUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = goiot;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6CB407332A8469580093AEF7 /* Build configuration list for PBXProject "goiot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CB4075A2A8469590093AEF7 /* Debug */,
+				6CB4075B2A8469590093AEF7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6CB4075C2A8469590093AEF7 /* Build configuration list for PBXNativeTarget "goiot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CB4075D2A8469590093AEF7 /* Debug */,
+				6CB4075E2A8469590093AEF7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6CB4075F2A8469590093AEF7 /* Build configuration list for PBXNativeTarget "goiotTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CB407602A8469590093AEF7 /* Debug */,
+				6CB407612A8469590093AEF7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6CB407622A8469590093AEF7 /* Build configuration list for PBXNativeTarget "goiotUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CB407632A8469590093AEF7 /* Debug */,
+				6CB407642A8469590093AEF7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6CB407302A8469580093AEF7 /* Project object */;
+}
