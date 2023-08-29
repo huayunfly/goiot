@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MonitorTabView: View {
+    
+    @EnvironmentObject var userData: UserData
+    
     var body: some View {
         HStack(alignment: .oneThird) {
             Rectangle()
@@ -25,8 +28,8 @@ struct MonitorTabView: View {
                 .alignmentGuide(.oneThird,
                      computeValue: { d in d[VerticalAlignment.top] })
                 .frame(width: 50, height: 200)
+            Text("First Content View")
         }
-        Text("First Content View")
     }
 }
 

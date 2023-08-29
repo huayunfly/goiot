@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C4C25882A9C96EA0085F967 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4C25872A9C96EA0085F967 /* UserData.swift */; };
 		6CB4073C2A8469580093AEF7 /* goiotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4073B2A8469580093AEF7 /* goiotApp.swift */; };
 		6CB4073E2A8469580093AEF7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4073D2A8469580093AEF7 /* ContentView.swift */; };
 		6CB407402A8469590093AEF7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB4073F2A8469590093AEF7 /* Assets.xcassets */; };
@@ -39,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6C4C25872A9C96EA0085F967 /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		6CB407382A8469580093AEF7 /* goiot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = goiot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB4073B2A8469580093AEF7 /* goiotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = goiotApp.swift; sourceTree = "<group>"; };
 		6CB4073D2A8469580093AEF7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				6CB407692A848A950093AEF7 /* SettingTabView.swift */,
 				6CFAACE62A9435E70052ED7A /* ApiHelper.swift */,
 				6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */,
+				6C4C25872A9C96EA0085F967 /* UserData.swift */,
 			);
 			path = goiot;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 			files = (
 				6CFAACE72A9435E70052ED7A /* ApiHelper.swift in Sources */,
 				6CFAACE92A945EFB0052ED7A /* WebServiceCaller.swift in Sources */,
+				6C4C25882A9C96EA0085F967 /* UserData.swift in Sources */,
 				6CB4076A2A848A950093AEF7 /* SettingTabView.swift in Sources */,
 				6CB407682A848A650093AEF7 /* TrendTabView.swift in Sources */,
 				6CB4073E2A8469580093AEF7 /* ContentView.swift in Sources */,
