@@ -1,5 +1,6 @@
 #include "form_gassampling.h"
 #include "ui_form_gassampling.h"
+#include <thread>
 
 FormGasSampling::FormGasSampling(QWidget *parent, bool admin) :
     FormCommon(parent, "gassampling", QString::fromUtf8("采气/尾气"), admin),
@@ -46,4 +47,25 @@ void FormGasSampling::InitUiState()
         ui->label_TICA5501->installEventFilter(this);
         ui->label_TICA5502->installEventFilter(this);
     }
+}
+
+void FormGasSampling::SendGCStartPulseSignal(const QString& button_id)
+{
+    // Send a GC1 start pulse signal.
+    bool ok = write_data_func_(this->objectName(), button_id, QString::number(1));
+    assert(ok);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    ok = write_data_func_(this->objectName(), button_id, QString::number(0));
+    assert(ok);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+void FormGasSampling::on_pushButton_GC1_start_clicked()
+{
+    SendGCStartPulseSignal("button_gc1_start");
+}
+
+void FormGasSampling::on_pushButton_GC2_start_clicked()
+{
+    SendGCStartPulseSignal("button_gc2_start");
 }

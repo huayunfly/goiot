@@ -1732,6 +1732,8 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("gassampling.label_TICA5502", DataDef("plc.1.temp50_pv", "plc.1.temp50_sv", "plc.1.temp50_sv"));
     data_model_.SetUiToDataMap("gassampling.label_TICA5105", DataDef("plc.1.temp57_pv", "plc.1.temp57_sv", "plc.1.temp57_sv"));
     data_model_.SetUiToDataMap("gassampling.label_TICA5205", DataDef("plc.1.temp58_pv", "plc.1.temp58_sv", "plc.1.temp58_sv"));
+    data_model_.SetUiToDataMap("gassampling.button_gc1_start", DataDef("plc.1.dq3_5", "plc.1.dq3_5", "plc.1.dq3_5"));
+    data_model_.SetUiToDataMap("gassampling.button_gc2_start", DataDef("plc.1.dq3_6", "plc.1.dq3_6", "plc.1.dq3_6"));
 
     // liquidcollection
     data_model_.SetUiToDataMap("liquidcollection.label_HC6101", DataDef("plc.1.smc11_19", "plc.1.smc11_19", "plc.1.smc11_19"));
