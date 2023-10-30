@@ -4,7 +4,7 @@
     ViewData["title"] = "用户管理";
 }
 <p>后台管理</p>
-<p>用户 @ViewData["user"]</p>
+<p>用户 - @ViewData["user"]</p>
 
 <form class="row w-75" id="form-create-news" action="/api/publishnews" enctype="multipart/form-data" method="post">
     <div class="mb-3 col-12 d-none">
@@ -20,7 +20,7 @@
         <textarea class="form-control" id="inputContent" name="Content" rows="3"></textarea>
     </div>
     <div class="mb-3 col-md-8">
-        <label for="uploadFile" class="form-label">图片上传 (.jpeg .png)</label>
+        <label for="uploadFile" class="form-label">图片上传 (.jpeg .png 推荐宽x高=300x400像素 小于1MB)</label>
         <input type="file" class="form-control" id="uploadFile" name="ImageFile" />
     </div>
     <div class="mb-3 col-md-4">
