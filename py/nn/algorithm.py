@@ -14,7 +14,7 @@ Graph vertex definition
 
 
 class Vertex:
-    def __init__(self, id) -> None:
+    def __init__(self, id: object) -> None:
         self.id = id
         self.color = None
         self.discovered = 0
@@ -26,19 +26,22 @@ class Vertex:
 
 
 class Graph:
-    def __init__(self) -> None:
+    C_WHITE = 'white'
+    C_GRAY = 'gray'
+    C_BLACK = 'black'
+
+    def __init__(self, debug = False) -> None:
         self.G = dict()
-        self.time = 0
-        self.debug = False
+        self.debug = debug
         pass
 
     # Set edges
-    def set_edges(self, u, v_list):
+    def set_edges(self, u: Vertex, v_list):
         self.G[u] = v_list
 
     # Append edges
-    def add_edges(self, u, v_list):
-        adjs = self.G.get(u, None)
+    def add_edges(self, u: Vertex, v_list):
+        adjs = self.G.get(u)
         if (adjs is None):
             self.set_edges(u, v_list)
         else:
@@ -46,50 +49,61 @@ class Graph:
             
     # Depth first search
     def dfs(self):
-        for u in self.G.keys():
-            u.color = 'WHITE'
+        for u in self.G:
+            u.color = Graph.C_WHITE
             u.pre = None
-        self.time = 0
-        for u in self.G.keys():
-            if u.color == 'WHITE':
-                self.dfs_visit(u)
+        time = [0]
+        for u in self.G:
+            if u.color == Graph.C_WHITE:
+                self.dfs_visit(u, time)
 
     # Depth first search routine
-    def dfs_visit(self, u):
-        self.time += 1
-        u.discovery = self.time
-        u.color = 'GRAY'
-        for v in self.G[u]:
-            if v.color == 'WHITE':
-                v.pre = u
-                if (self.debug):
-                    print(v.id)
-                self.dfs_visit(v)
-        self.time += 1
-        u.finished = self.time
-        u.color = 'BLACK'
+    def dfs_visit(self, u: Vertex, time):
+        time[0] += 1
+        u.discovery = time[0]
+        u.color = Graph.C_GRAY
+        # debug
+        if (self.debug):
+            print(u.id)
+        # adjacent
+        v_list = self.G.get(u)
+        if (v_list is not None):         
+            for v in v_list:
+                if v.color == Graph.C_WHITE:
+                    v.pre = u
+                    self.dfs_visit(v, time)
+        time[0] += 1
+        u.finished = time[0]
+        u.color = Graph.C_BLACK
 
     # Breadth first search
-    def bfs(self, s):
-        excluded = self.G.keys().remove(s)
+    def bfs(self, s: Vertex):
+        if s is None:
+            raise ValueError(s)
+        excluded = set(self.G.keys()) - {s}
         for u in excluded:
-            u.color = 'WHITE'
+            u.color = Graph.C_WHITE
             u.distance = math.inf
             u.pre = None
-        s.color = 'GRAY'
+        s.color = Graph.C_GRAY
         s.distance = 0
         s.pre = None
         queue = deque()
         queue.append(s)
         while queue:
             u = queue.popleft()
-            for v in self.G[u]:
-                if v.color == 'WHITE':
-                    v.color = 'GRAY'
-                    v.distance = u.distance + 1
-                    v.pre = u
-                    queue.append(v)
-            u.color = 'BLACK'
+            v_list = self.G.get(u)
+            if (v_list is not None):
+                for v in v_list:
+                    if v.color == Graph.C_WHITE:
+                        v.color = Graph.C_GRAY
+                        v.distance = u.distance + 1
+                        v.pre = u
+                        queue.append(v)
+            u.color = Graph.C_BLACK
+            # debug
+            if self.debug:
+                print(u.id)
 
 
 """
@@ -121,8 +135,7 @@ op = Operator()
 assert (op.calculate('sum', [1, 2]) == 3)
 assert (op.calculate('npsum', [1, 2]) == 3)
 
-g = Graph()
-g.debug = True
+g = Graph(True)
 shanghai = Vertex('shanghai')
 suzhou = Vertex('suzhou')
 hangzhou = Vertex('hangzhou')
@@ -134,5 +147,13 @@ huangshan = Vertex('huangshan')
 g.set_edges(shanghai, [suzhou, hangzhou])
 g.set_edges(suzhou, [wuxi, taicang])
 g.set_edges(hangzhou, [shaoxing, jinhua, huangshan])
+g.set_edges(wuxi, None)
+g.set_edges(taicang, None)
+g.set_edges(shaoxing, None)
+g.set_edges(jinhua, None)
+g.set_edges(huangshan, None)
+print('* Test dfs()')
 g.dfs()
+print('* Test bfs()')
+g.bfs(shanghai)
 
