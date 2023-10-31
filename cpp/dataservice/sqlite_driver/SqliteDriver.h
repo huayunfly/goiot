@@ -1,6 +1,8 @@
 // @author: Yun Hua (huayunfly at 126.com)
 // @version: 0.1 2023.10.30
 #pragma once
+
+#include <json/json.h>
 #include "../dataservice/driver_base.h"
 #include "./DriverWorker.h"
 
@@ -65,7 +67,7 @@ namespace goiot
             ConnectionInfo& connection_info, std::map<std::string, DataInfo>& data_map);
 
     private:
-        std::unique_ptr<DriverWorker> _driver_worker;
+        std::unique_ptr<SqliteDriverWorker> _driver_worker;
         std::string _id;
         bool _worker_ready;
     };
