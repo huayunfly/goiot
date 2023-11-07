@@ -26,7 +26,7 @@ namespace goiot
             set_data_info(pair.second);
         }
 
-        _driver_worker.reset(new SqliteDriverWorker(connection_details, std::move(data_map), response_queue));
+        _driver_worker.reset(new SqliteDriverWorker(connection_details, std::move(data_map), response_queue, _id));
         int return_code = _driver_worker->OpenConnection();
         std::cout << "SqliteDriver::InitDriver() returns " << return_code << std::endl;
         _driver_worker->Start();
