@@ -49,12 +49,16 @@ namespace goiot
 
 	RESULT_DSAPI SqliteDriver::AsyncWrite(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id)
 	{
-		return ENOTCONN;
+        if (!_worker_ready) // Todo: race condition with Stop()
+        {
+            return ENOTCONN;
+        }
+        return _driver_worker->AsyncWrite(data_info_vec, 0/* reserved transaction id */);
 	}
 
 	RESULT_DSAPI SqliteDriver::AsyncRead(const std::vector<DataInfo>& data_info_vec, uint64_t trans_id, std::function<void(std::vector<DataInfo>&&, uint64_t)> read_callback)
 	{
-		return ENOTCONN;
+        throw std::runtime_error("Not implemented.");
 	}
 
 	int SqliteDriver::ParseConfig(const std::string& config,

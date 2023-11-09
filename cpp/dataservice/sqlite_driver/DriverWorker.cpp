@@ -512,7 +512,7 @@ namespace goiot
 				ss << "UPDATE " << elem.first << " SET ";
 				for (auto& item : elem.second)
 				{
-					ss << item.second << "=" << dataid_value_map[item.first] << ","; // UPDATE all rows
+					ss << item.second << "=" << "'" << dataid_value_map[item.first] << "'" << ","; // UPDATE all rows
 				}
 				std::string sql = ss.str();
 				sql.replace(sql.find_last_of(","), 1, ";");
