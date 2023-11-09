@@ -4,6 +4,46 @@
   "db": "127.0.0.1:5432:8H82600:postgres:hello@123",
   "drivers": [
     {
+        "id": "sqlite",
+        "name": "sqlite3",
+        "type": "sqlite",
+        "port": "sqlite3.db",
+        "response_timeout_msec": 1000,
+        "refresh_interval_msec": 1000,
+        "nodes": [
+          {
+            "address": "expinfo",
+            "data": [
+              {
+                "id": "recordpath",
+                "name": "recordpath",
+                "register": "RW6STR"
+              },
+              {
+                "id": "expname",
+                "name": "expname",
+                "register": "RW6STR"
+              },
+              {
+                "id": "channel",
+                "name": "channel",
+                "register": "RW6WUB"
+              },
+              {
+                "id": "tos",
+                "name": "tos",
+                "register": "RW6DF"
+              },
+              {
+                "id": "runtime",
+                "name": "runtime",
+                "register": "RW6DF"
+              }
+            ]
+          }
+       ]
+    },
+    {
       "id": "mfcpfc",
       "name": "modbus3",
       "type": "modbus_rtu",

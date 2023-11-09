@@ -125,7 +125,8 @@ int DataManager::LoadJsonConfig()
                     assert(false);
                     continue;
                 }
-                int address = node_obj["address"].toString().toInt();
+                //int address = node_obj["address"].toString().toInt();
+                std::string address = node_obj["address"].toString().toStdString();
                 auto data_vec = node_obj["data"].toArray();
                 for (const auto& data : data_vec)
                 {
@@ -145,7 +146,10 @@ int DataManager::LoadJsonConfig()
                     DataInfo data_info;
                     data_info.id = oss.str();
                     data_info.name = data_obj["name"].toString().toStdString();
-                    data_info.address = address;
+                    int int_address = 0;
+                    std::istringstream iss_address(address);
+                    iss_address >> int_address;
+                    data_info.address = int_address;
                     data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
                     if (data_obj.contains("ratio"))
@@ -158,8 +162,12 @@ int DataManager::LoadJsonConfig()
                     }
                     // data type
                     auto channel = data_obj["register"].toString().toStdString();
-                    assert(channel.length() > 6);
-                    if (channel.length() <= 6)
+                    if (data_info.id.find("sqlite") == 0)
+                    {
+                        ;
+                    }
+                    assert(channel.length() > 3);
+                    if (channel.length() <= 3)
                     {
                         std::cout << "DataManager::ParseConfig() data.register " << channel << " is invalid." << std::endl;
                         continue;
@@ -206,6 +214,9 @@ int DataManager::LoadJsonConfig()
                         break;
                     case 5:
                         data_info.data_zone = DataZone::PLC_DB;
+                        break;
+                    case 6:
+                        data_info.data_zone = DataZone::DB;
                         break;
                     default:
                         assert(false);

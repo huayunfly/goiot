@@ -18,6 +18,7 @@
 #include "form_safety.h"
 #include "form_trend.h"
 #include "form_history.h"
+#include "form_expinfo.h"
 #include "events.h"
 #include "dialog_setvalue.h"
 #include "dialog_setposition.h"
@@ -95,6 +96,13 @@ MainWindow::MainWindow(QWidget *parent)
     form_history->setAutoFillBackground(false);
     form_history->setStyleSheet(QString::fromUtf8("background:#FFFFFF"));
 
+    // Expinfo
+    FormExpInfo* form_expinfo = new FormExpInfo(ui_->widget_expinfo);
+    form_expinfo->setGeometry(QRect(61, 0, 1200, 1100));
+    form_expinfo->setAutoFillBackground(false);
+    form_expinfo->setStyleSheet(QString::fromUtf8("background:#FFFFFF"));
+    form_expinfo->RegisterWriteDataFunc(std::bind(&MainWindow::WriteData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
     // Setup listview pages
     QStandardItemModel* model = new QStandardItemModel(this);
     QList<QStandardItem*> list;
@@ -104,12 +112,15 @@ MainWindow::MainWindow(QWidget *parent)
     QStandardItem* s4 = new QStandardItem(QIcon(ICON_TREND), QString("趋势"));
     QStandardItem* s5 = new QStandardItem(QIcon(ICON_HISTORY), QString("历史"));
     QStandardItem* s6 = new QStandardItem(QIcon(ICON_DISTRIBUTOR), QString("液体分配"));
+    QStandardItem* s7 = new QStandardItem(QIcon(ICON_EXPINFO), QString("实验设置"));
+
     model->appendRow(s1);
     model->appendRow(s2);
     model->appendRow(s3);
     model->appendRow(s4);
     model->appendRow(s5);
     model->appendRow(s6);
+    model->appendRow(s7);
     ui_->listView->setModel(model);
     QModelIndex index_want = model->index(0, 0);
     on_listView_clicked(index_want);
@@ -1345,10 +1356,14 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.alm_pipe_tc_2_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
     data_model_.SetDataToUiMap("plc.1.alm_pg_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
     data_model_.SetDataToUiMap("plc.1.alm_gas_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
+
+    // expinfo
+    data_model_.SetDataToUiMap("sqlite.expinfo.recordpath", {
+                                   UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("textEdit_recordpath"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("sqlite.expinfo.expname", {
+                                   UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("textEdit_expname"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::NONE, 0, 1, 0)});
+
     // ui_to_data
-    //data_model_.SetUiToDataMap("gasfeed.svlabel", DataDef("plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0", "plc.1.writebyte_channel_0"));
-    //data_model_.SetUiToDataMap("gasfeed.svlabel_2", DataDef("plc.1.out1", "plc.1.out1", "plc.1.out1"));
-    //data_model_.SetUiToDataMap("gasfeed.svlabel_3", DataDef("mfcpfc.4.pv", "mfcpfc.4.sv", "mfcpfc.4.sv"));
     // gasfeed
     data_model_.SetUiToDataMap("gasfeed.label_HC1110", DataDef("plc.1.smc14_1", "plc.1.smc14_1", "plc.1.smc14_1"));
     data_model_.SetUiToDataMap("gasfeed.label_HC1120", DataDef("plc.1.smc14_2", "plc.1.smc14_2", "plc.1.smc14_2"));
@@ -2265,6 +2280,8 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("distributor_collection.pressure_14", DataDef("mfcpfc.24.pv", "mfcpfc.24.pv", "mfcpfc.24.pv"));
     data_model_.SetUiToDataMap("distributor_collection.pressure_15", DataDef("mfcpfc.25.pv", "mfcpfc.25.pv", "mfcpfc.25.pv"));
     data_model_.SetUiToDataMap("distributor_collection.pressure_16", DataDef("mfcpfc.26.pv", "mfcpfc.26.pv", "mfcpfc.26.pv"));
+    // expinfo
+    data_model_.SetUiToDataMap("expinfo.button_filefolder_selection", DataDef("sqlite.expinfo.recordpath", "sqlite.expinfo.recordpath", "sqlite.expinfo.recordpath"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)
@@ -2285,7 +2302,7 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
                     switch (data_info.data_type)
                     {
                     case goiot::DataType::STR:
-                        value.fromStdString(data_info.char_value);
+                        value = QString::fromStdString(data_info.char_value);
                         break;
                     case goiot::DataType::DF:
                         if (std::abs(data_info.ratio - 1.0) < 1e-6) // ratio conversion
@@ -2580,6 +2597,7 @@ void MainWindow::on_listView_clicked(const QModelIndex &index)
     controls.push_back("widget_trend");
     controls.push_back("widget_history");
     controls.push_back("widget_distributor");
+    controls.push_back("widget_expinfo");
 
     QRegularExpression re("^widget_");
 

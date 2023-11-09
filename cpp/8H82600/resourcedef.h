@@ -37,5 +37,6 @@
 #define ICON_DISTRIBUTOR ":/ui_ctrls/Res/icon_distributor.png"
 #define ICON_TREND ":/ui_ctrls/Res/icon_trend.png"
 #define ICON_HISTORY ":/ui_ctrls/Res/icon_history.png"
+#define ICON_EXPINFO ":/ui_ctrls/Res/icon_expinfo.png"
 
 #endif // RESOURCEDEF_H

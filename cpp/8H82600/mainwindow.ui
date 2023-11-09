@@ -207,6 +207,22 @@
      </rect>
     </property>
    </widget>
+   <widget class="QWidget" name="widget_expinfo" native="true">
+    <property name="geometry">
+     <rect>
+      <x>61</x>
+      <y>0</y>
+      <width>1200</width>
+      <height>1100</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:#FFFFFF</string>
+    </property>
+   </widget>
    <zorder>widget_workflow</zorder>
    <zorder>listView</zorder>
    <zorder>widget_history</zorder>
