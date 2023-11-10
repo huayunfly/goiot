@@ -411,13 +411,16 @@ namespace goiot
 				{
 					data_info_vec->at(i).result = 0;
 					std::stringstream ss(found->second);
+					int val = 0;
 					switch (data_info_vec->at(i).data_type)
 					{
 					case DataType::BT:
-						ss >> data_info_vec->at(i).byte_value;
+						ss >> val; // fix convert 1 to ASCII 49 error
+						data_info_vec->at(i).byte_value = static_cast<uint8_t>(val); 
 						break;
 					case DataType::BB:
-						ss >> data_info_vec->at(i).byte_value;
+						ss >> val;
+						data_info_vec->at(i).byte_value = static_cast<uint8_t>(val);
 						break;
 					case DataType::WB:
 					case DataType::WUB:
@@ -477,10 +480,10 @@ namespace goiot
 					switch (data_info_vec->at(i).data_type)
 					{
 					case DataType::BT:
-						ss << data_info_vec->at(i).byte_value;
+						ss << static_cast<int>(data_info_vec->at(i).byte_value); // fix '\0' error
 						break;
 					case DataType::BB:
-						ss << data_info_vec->at(i).byte_value;
+						ss << static_cast<int>(data_info_vec->at(i).byte_value);
 						break;
 					case DataType::WB:
 					case DataType::WUB:
@@ -491,7 +494,7 @@ namespace goiot
 						ss << data_info_vec->at(i).int_value;
 						break;
 					case DataType::DF:
-						ss << data_info_vec->at(i).float_value;
+						ss << std::fixed << data_info_vec->at(i).float_value;
 						break;
 					case DataType::STR:
 						ss << data_info_vec->at(i).char_value;
