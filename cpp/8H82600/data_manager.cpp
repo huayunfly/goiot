@@ -605,7 +605,7 @@ void DataManager::ResponseDispatch()
                 }
                 else if (data_info.data_type == DataType::DF)
                 {
-                    oss_value << std::fixed << std::setprecision(3) << data_info.float_value;
+                    oss_value << std::fixed << /*std::setprecision(3) <<*/ data_info.float_value;
                     cmd.addToPipeline({HMSET.c_str(), poll_id.c_str(), "value", oss_value.str().c_str(),
                                "result", oss_result.str().c_str(), "time", oss_time.str().c_str()});
 

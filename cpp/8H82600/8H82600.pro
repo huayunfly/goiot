@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     data_manager.cpp \
     data_model.cpp \
+    dialog_inputinfo.cpp \
     dialog_liquidsamplingcheck.cpp \
     dialog_logon.cpp \
     dialog_onoff.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     asyncfuture.h \
     data_manager.h \
     data_model.h \
+    dialog_inputinfo.h \
     dialog_liquidsamplingcheck.h \
     dialog_logon.h \
     dialog_onoff.h \
@@ -103,6 +105,7 @@ HEADERS += \
     trendchart.h
 
 FORMS += \
+    dialog_inputinfo.ui \
     dialog_liquidsamplingcheck.ui \
     dialog_logon.ui \
     dialog_onoff.ui \

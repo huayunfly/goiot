@@ -2282,6 +2282,10 @@ void MainWindow::InitDataModel()
     data_model_.SetUiToDataMap("distributor_collection.pressure_16", DataDef("mfcpfc.26.pv", "mfcpfc.26.pv", "mfcpfc.26.pv"));
     // expinfo
     data_model_.SetUiToDataMap("expinfo.button_filefolder_selection", DataDef("sqlite.expinfo.recordpath", "sqlite.expinfo.recordpath", "sqlite.expinfo.recordpath"));
+    data_model_.SetUiToDataMap("expinfo.button_expname", DataDef("sqlite.expinfo.expname", "sqlite.expinfo.expname", "sqlite.expinfo.expname"));
+    data_model_.SetUiToDataMap("expinfo.button_exp_run", DataDef("sqlite.expinfo.run", "sqlite.expinfo.run", "sqlite.expinfo.run"));
+    data_model_.SetUiToDataMap("expinfo.button_exp_tos", DataDef("sqlite.expinfo.tos", "sqlite.expinfo.tos", "sqlite.expinfo.tos"));
+    data_model_.SetUiToDataMap("expinfo.button_exp_runtime", DataDef("sqlite.expinfo.runtime", "sqlite.expinfo.runtime", "sqlite.expinfo.runtime"));
 }
 
 void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_info_vec)

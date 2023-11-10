@@ -19,9 +19,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>169</x>
      <y>60</y>
-     <width>300</width>
+     <width>361</width>
      <height>28</height>
     </rect>
    </property>
@@ -40,9 +40,15 @@
     <rect>
      <x>30</x>
      <y>60</y>
-     <width>80</width>
+     <width>111</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>记录路径...</string>
@@ -53,9 +59,15 @@
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>80</width>
+     <width>111</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>实验名称...</string>
@@ -67,9 +79,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>169</x>
      <y>20</y>
-     <width>300</width>
+     <width>361</width>
      <height>28</height>
     </rect>
    </property>
@@ -81,6 +93,44 @@
    </property>
    <property name="readOnly">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_exp_run">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>110</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>实验开始</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_exp_stop">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>110</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>实验结束</string>
    </property>
   </widget>
  </widget>

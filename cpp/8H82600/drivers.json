@@ -38,6 +38,11 @@
                 "id": "runtime",
                 "name": "runtime",
                 "register": "RW6DF"
+              },
+              {
+                "id": "run",
+                "name": "run",
+                "register": "RW6BT"
               }
             ]
           }

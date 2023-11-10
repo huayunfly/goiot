@@ -23,6 +23,12 @@ public:
 private slots:
     void on_button_filefolder_selection_clicked();
 
+    void on_button_expname_clicked();
+
+    void on_button_exp_run_clicked();
+
+    void on_button_exp_stop_clicked();
+
 private:
     Ui::FormExpInfo *ui;
 };
