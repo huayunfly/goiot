@@ -78,9 +78,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\drivers\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\drivers\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,7 +132,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <OutputFile>$(OutDir)drivers\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\snap7\v1_4_2\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>Snap7_vc142_x64_v_1_4_2D.lib;jsoncppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -153,7 +155,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <OutputFile>$(OutDir)drivers\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\snap7\v1_4_2\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>Snap7_vc142_x64_v_1_4_2.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>

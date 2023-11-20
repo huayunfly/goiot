@@ -72,6 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\drivers\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -81,6 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\drivers</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -98,7 +100,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\libmodbus\v3_1_6\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>modbus_vc142_x64_v_3_1_6D.lib;jsoncppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)drivers\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -155,7 +157,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>modbus_vc142_v_3_1_6.lib;jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\libmodbus\v3_1_6\lib</AdditionalLibraryDirectories>
-      <OutputFile>$(OutDir)drivers\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
