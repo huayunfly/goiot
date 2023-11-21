@@ -27,6 +27,7 @@ SOURCES += \
     dialog_setposition.cpp \
     dialog_settimerange.cpp \
     dialog_setvalue.cpp \
+    digital_clock.cpp \
     events.cpp \
     form_common.cpp \
     form_cylindera.cpp \
@@ -71,6 +72,7 @@ HEADERS += \
     dialog_setposition.h \
     dialog_settimerange.h \
     dialog_setvalue.h \
+    digital_clock.h \
     driver_base.h \
     events.h \
     form_common.h \

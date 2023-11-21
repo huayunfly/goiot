@@ -1358,10 +1358,16 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.alm_gas_enable", {UiInfo(ui_->tabWidget->widget(13), QString::fromUtf8("alarmEnableTableWidget"), RES_EMPTY, WidgetType::STATE, MeasurementUnit::NONE, 0, 0xffffffff, 0)});
 
     // expinfo
+    data_model_.SetDataToUiMap("sqlite.expinfo.run", {
+                                   UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("button_exp_run"), RES_EMPTY, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("sqlite.expinfo.recordpath", {
                                    UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("textEdit_recordpath"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::NONE, 0, 1, 0)});
     data_model_.SetDataToUiMap("sqlite.expinfo.expname", {
                                    UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("textEdit_expname"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::NONE, 0, 1, 0)});
+    data_model_.SetDataToUiMap("sqlite.expinfo.tos", {
+                                   UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("widget_tos"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::NONE, 3, 99999999, 0)});
+    data_model_.SetDataToUiMap("sqlite.expinfo.runtime", {
+                                   UiInfo((QWidget*)ui_->widget_expinfo->children().first(), QString::fromUtf8("widget_runtime"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::NONE, 3, 99999999, 0)});
 
     // ui_to_data
     // gasfeed

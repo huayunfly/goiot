@@ -51,7 +51,7 @@
     </font>
    </property>
    <property name="text">
-    <string>记录路径...</string>
+    <string>数据路径...</string>
    </property>
   </widget>
   <widget class="QPushButton" name="button_expname">
@@ -98,8 +98,8 @@
   <widget class="QPushButton" name="button_exp_run">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>110</y>
+     <x>560</x>
+     <y>20</y>
      <width>111</width>
      <height>28</height>
     </rect>
@@ -111,14 +111,14 @@
     </font>
    </property>
    <property name="text">
-    <string>实验开始</string>
+    <string>开始实验</string>
    </property>
   </widget>
   <widget class="QPushButton" name="button_exp_stop">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>110</y>
+     <x>560</x>
+     <y>60</y>
      <width>111</width>
      <height>28</height>
     </rect>
@@ -130,7 +130,94 @@
     </font>
    </property>
    <property name="text">
-    <string>实验结束</string>
+    <string>结束实验</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_exp_runtime">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>100</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>设实验时间</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget_clock" native="true">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>20</y>
+     <width>261</width>
+     <height>80</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget_runtime" native="true">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>150</y>
+     <width>181</width>
+     <height>51</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget_tos" native="true">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>150</y>
+     <width>181</width>
+     <height>51</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_tos">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>120</y>
+     <width>110</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>开始时间：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_runtime">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>120</y>
+     <width>110</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>运行时间：</string>
    </property>
   </widget>
  </widget>

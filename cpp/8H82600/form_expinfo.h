@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "form_common.h"
+#include "digital_clock.h"
 
 namespace Ui {
 class FormExpInfo;
@@ -27,10 +28,16 @@ private slots:
 
     void on_button_exp_run_clicked();
 
+    void on_button_exp_runtime_clicked();
+
     void on_button_exp_stop_clicked();
 
 private:
     Ui::FormExpInfo *ui;
+    bool _exp_run;
+    DigitalClock* _clock; // Current time displayer
+    DigitalClock* _tos_clock; // Time of start displayer
+    DigitalClock* _rt_clock; // Runtime displayer
 };
 
 #endif // FORM_EXPINFO_H
