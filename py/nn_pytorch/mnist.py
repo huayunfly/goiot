@@ -9,6 +9,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+from matplotlib import pyplot as plt
 
 # Download training data from open datasets.
 training_data = datasets.FashionMNIST(
@@ -25,6 +26,10 @@ test_data = datasets.FashionMNIST(
     download=True,
     transform=ToTensor(),
 )
+
+img, label = training_data[1]
+plt.imshow(img[0])
+plt.show()
 
 batch_size = 64
 
