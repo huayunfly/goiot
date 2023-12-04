@@ -1205,8 +1205,8 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("plc.1.temp57_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5105"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     data_model_.SetDataToUiMap("plc.1.temp58_pv", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("textEdit_TICA5205"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::DEGREE, 1, 100, 0));
     // gassampling - GC ready
-    data_model_.SetDataToUiMap("plc.1.di1_5", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5106"), RES_GC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
-    data_model_.SetDataToUiMap("plc.1.di1_6", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5206"), RES_GC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_5", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5106"), RES_GC_NOT_LOGIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
+    data_model_.SetDataToUiMap("plc.1.di1_6", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC5206"), RES_GC_NOT_LOGIC, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
 
     // liquidcollection
     data_model_.SetDataToUiMap("plc.1.smc11_19", UiInfo(ui_->tabWidget->widget(9), QString::fromUtf8("label_HC6101"), RES_SVALVE_6, WidgetType::STATE, MeasurementUnit::NONE, 0, 2, 1, 1));

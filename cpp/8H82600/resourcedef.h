@@ -21,6 +21,7 @@
 #define RES_CYLINDER_UP ":/ui_ctrls/UICtrls/Res/cylinder_up.png"
 #define RES_CYLINDER_DOWN ":/ui_ctrls/UICtrls/Res/cylinder_down.png"
 #define RES_GC ":/ui_ctrls/UICtrls/Res/gc.png"
+#define RES_GC_NOT_LOGIC ":/ui_ctrls/UICtrls/Res/gc_not_logic.png"
 #define RES_MECHANICAL_PUMP ":/ui_ctrls/UICtrls/Res/mechanical_pump.png"
 #define RES_WATER_PUMP ":/ui_ctrls/UICtrls/Res/water_pump.png"
 #define RES_VALVE_ELECTRIC ":/ui_ctrls/UICtrls/Res/valve_electric.png"
