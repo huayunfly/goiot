@@ -70,6 +70,9 @@
    <property name="text">
     <string>确认</string>
    </property>
+   <property name="shortcut">
+    <string>Return</string>
+   </property>
   </widget>
   <widget class="QPushButton" name="button_cancel">
    <property name="geometry">
@@ -88,6 +91,9 @@
    </property>
    <property name="text">
     <string>取消</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
    </property>
   </widget>
  </widget>
