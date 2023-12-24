@@ -1,4 +1,6 @@
 data/FashionMNIST
+data/CIFAR10
 *.pth
 *.jpg
 *.pyc
+*.pt
