@@ -3223,6 +3223,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -3300,6 +3306,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -3383,6 +3395,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -3460,6 +3478,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -3543,6 +3567,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -3620,6 +3650,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -3703,6 +3739,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -3780,6 +3822,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -3863,6 +3911,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -3940,6 +3994,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -4023,6 +4083,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -4100,6 +4166,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -4183,6 +4255,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -4260,6 +4338,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {
@@ -4343,6 +4427,12 @@
               "ratio": 1
             },
             {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
+              "ratio": 1
+            },
+            {
               "id": "speed",
               "name": "speed",
               "register": "R4DB16421",
@@ -4420,6 +4510,12 @@
               "id": "busy",
               "name": "busy",
               "register": "R0BT0320",
+              "ratio": 1
+            },
+            {
+              "id": "overload",
+              "name": "overload_ratio",
+              "register": "R4DB16398",
               "ratio": 1
             },
             {

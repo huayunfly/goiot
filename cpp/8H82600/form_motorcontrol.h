@@ -54,8 +54,9 @@ private:
     const int COL_PV = 7;
     const int COL_SV = 8;
     const int COL_SPEED = 9;
-    const int COL_START = 10;
-    const int COL_STOP = 11;
+    const int COL_OVERLOAD = 10;
+    const int COL_START = 11;
+    const int COL_STOP = 12;
     // Cylinder motor specified parameters
     const float MAX_REACTOR_SPEED = 600.0f; /*rpm*/
     const int REACTOR_REDUCTION_RATIO = 5; /*反应器伺服减速比*/

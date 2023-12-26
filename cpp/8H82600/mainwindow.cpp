@@ -967,6 +967,15 @@ void MainWindow::InitDataModel()
                                                             UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
     data_model_.SetDataToUiMap("reactor16.8.speed", {UiInfo(ui_->tabWidget->widget(6), QString::fromUtf8("textEdit_HC4108"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
                                                             UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+    // reactorA-overload ratio
+    data_model_.SetDataToUiMap("reactor16.1.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.2.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.3.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.4.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.5.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.6.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.7.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.8.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
     // reactorB
     data_model_.SetDataToUiMap("plc.1.smc14_17", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4609"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc14_18", UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("label_HC4610"), RES_VALVE_GAS_LEFT, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
@@ -1180,7 +1189,16 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("reactor16.15.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4115"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
                                                             UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
     data_model_.SetDataToUiMap("reactor16.16.speed", {UiInfo(ui_->tabWidget->widget(7), QString::fromUtf8("textEdit_HC4116"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0),
-                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});
+                                                            UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::RPM, 0, 600, 0)});    
+    // reactorB-overload ratio
+    data_model_.SetDataToUiMap("reactor16.9.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.10.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.11.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.12.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.13.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.14.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.15.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
+    data_model_.SetDataToUiMap("reactor16.16.overload", UiInfo(ui_->widget_motor->widget(2), QString::fromUtf8("tableWidget"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::PERCENT, 0, 200, 0));
     // gassampling
     data_model_.SetDataToUiMap("plc.1.smc14_10", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4401"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));
     data_model_.SetDataToUiMap("plc.1.smc14_11", UiInfo(ui_->tabWidget->widget(8), QString::fromUtf8("label_HC4402"), RES_VALVE_GAS, WidgetType::ONOFF, MeasurementUnit::NONE, 0, 1, 0));

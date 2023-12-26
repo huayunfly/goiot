@@ -36,7 +36,7 @@ FormMotorControl::FormMotorControl(QWidget *parent,
     {
         throw std::invalid_argument("Unsupported Motor group");
     }
-
+    labels.push_back("负载率");
     labels.push_back("移动");
     labels.push_back("停止");
     ui->tableWidget->setColumnCount(COL_COUNT);
@@ -95,6 +95,8 @@ FormMotorControl::FormMotorControl(QWidget *parent,
         ui->tableWidget->item(i, COL_RUN)->setFlags(Qt::NoItemFlags);
         ui->tableWidget->setItem(i, COL_PV, new QTableWidgetItem("n/a"));
         ui->tableWidget->item(i, COL_PV)->setFlags(Qt::NoItemFlags);
+        ui->tableWidget->setItem(i, COL_OVERLOAD, new QTableWidgetItem("n/a"));
+        ui->tableWidget->item(i, COL_OVERLOAD)->setFlags(Qt::NoItemFlags);
     }
 
     // Button with admin previlege.
@@ -263,12 +265,19 @@ bool FormMotorControl::event(QEvent *event)
                 case MeasurementUnit::RPM:
                     unit = "rpm";
                     break;
+                case MeasurementUnit::PERCENT:
+                    unit = "%";
+                    break;
                 default:
                     break;
                 }
                 if (data_info_id.find(".multi_turn") != std::string::npos)
                 {
                     tableWidget->item(data_index - 1, COL_PV)->setText(e->Text() + unit);
+                }
+                else if (data_info_id.find(".overload") != std::string::npos)
+                {
+                    tableWidget->item(data_index - 1, COL_OVERLOAD)->setText(e->Text() + unit);
                 }
             }
             else

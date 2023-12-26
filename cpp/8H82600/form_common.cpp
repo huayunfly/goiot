@@ -98,6 +98,9 @@ bool FormCommon::event(QEvent *event)
                 case MeasurementUnit::KG:
                     unit = "kg";
                     break;
+                case MeasurementUnit::PERCENT:
+                    unit = "%";
+                    break;
                 default:
                     break;
                 }

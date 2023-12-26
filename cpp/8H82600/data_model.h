@@ -22,7 +22,8 @@ enum class MeasurementUnit
     LEL = 10,
     PPM = 11,
     G = 12,
-    KG = 13
+    KG = 13,
+    PERCENT = 14
 };
 
 enum class WidgetType
