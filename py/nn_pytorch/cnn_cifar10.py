@@ -140,6 +140,7 @@ class CNetRes(nn.Module):
     '''
     Residual network.
     32 channels, 50 blcoks, 15min - 10epochs on i9-13900k
+    32 channels, 50 blocks, 1.5min - 10epochs on 4090
     '''
     def __init__(self, n_channels_1=32, n_blocks=10):
         super().__init__()
@@ -195,7 +196,7 @@ def validate(model, train_loader, val_loader):
 
 
 # Train and validate
-model = CNetRes(n_channels_1=32, n_blocks=50).to(device=device)
+model = CNetRes(n_channels_1=32, n_blocks=5).to(device=device)
 print('Total parameters {}'.format(sum(p.numel() for p in model.parameters())))
 #img_ts, _ = transformed_cifar10[177]
 #model(img_ts.unsqueeze(0))          
