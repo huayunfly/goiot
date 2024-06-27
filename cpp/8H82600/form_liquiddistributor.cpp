@@ -1667,7 +1667,7 @@ bool FormLiquidDistributor::DetectImage(int index)
             {
                 lines_idx.push_back(i);
                 // Map the fitted line to different ROI section by y0
-                lines_in_section.at(int(line[3] / (roi_side / section_num))) += 1;
+                lines_in_section.at(int(line[3] / (float(roi_side) / float(section_num)))) += 1;
             }
         }
         // Draw liquid level
@@ -1977,7 +1977,7 @@ void FormLiquidDistributor::UpdateImage(int index)
                 {
                     lines_idx.push_back(i);
                     // Map the fitted line to different ROI section by y0
-                    lines_in_section.at(int(line[3] / (roi_side / section_num))) += 1;
+                    lines_in_section.at(int(line[3] / (float(roi_side) / float(section_num)))) += 1;
                 }
             }
             // Draw liquid level
