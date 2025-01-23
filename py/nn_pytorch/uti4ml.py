@@ -1,10 +1,12 @@
 """
 Utilities for ML.
 1. Import libraries.
-2. Draw functions.
+2. Draw functions in 2D and 3D
 """
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator
 
 import numpy as np
 import torch
@@ -69,6 +71,47 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         axes.plot(x, y, fmt) if len(x) else axes.plot(y, fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
     plt.show() # Interactive mode on
+
+
+def plot3D(X=None, Y=None, Z=None, zlim=None, znumticks=10, zfmt='{x:.02f}'):
+    """
+    Plot 3D data
+    """
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+
+    # Plot the surface.
+    surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+
+    # Customize the z axis.
+    ax.set_zlim(zlim)
+    ax.zaxis.set_major_locator(LinearLocator(znumticks))
+    # A StrMethodFormatter is used automatically
+    ax.zaxis.set_major_formatter(zfmt)
+
+    # Add a color bar which maps values to colors.
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+
+    plt.show()
+
+
+def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5), cmap='Reds'):
+    """Show heatmaps"""
+    use_svg_display()
+    num_rows, num_cols, _, _ = matrices.shape
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=figsize, 
+                             sharex=True, sharey=True, squeeze=False)
+    for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
+        for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
+            pcm = ax.imshow(matrix.detach().numpy(), cmap=cmap)
+            if i == num_rows - 1:
+                ax.set_xlabel(xlabel)
+            if j == 0:
+                ax.set_ylabel(ylabel)
+            if titles:
+                ax.set_title(titles[j])
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
+
+
 
 
 

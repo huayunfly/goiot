@@ -78,6 +78,17 @@ y.sum().backward()
 Y = [y.detach().numpy(), x.grad.numpy()]
 uti4ml.plot(X, Y, 'x', 'f(x)', legend=['sin(x)', 'd_sin(x) by grad'])
 
+# Draw 3D 2024.12.10
+X = uti4ml.np.arange(0.0, 4.0, 0.1)
+Y = uti4ml.np.arange(0.0, 4.0, 0.1)
+X, Y = uti4ml.np.meshgrid(X, Y)
+Z = uti4ml.np.sin(uti4ml.np.sqrt(X**2 + Y**2))
+uti4ml.plot3D(X, Y, Z, (-1.01, 1.01))
+    
+
+
+
+
 
 
 
