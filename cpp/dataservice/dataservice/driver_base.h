@@ -7,6 +7,7 @@
  // @version: 0.1
  // 
  // @revision: 2022.10.17, add BB (byte) type.
+ // @revision: 2025.03.24, add DataInfo.offset (float) field
 
 #include <memory>
 #include <string>
@@ -117,7 +118,7 @@ namespace goiot
 		DataInfo() : id(""), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
 			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), dword_decode(DWordDecode::ABCD), byte_value(0), int_value(0), float_value(0), char_value(""),
 			timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
-				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0), ratio(1.0)
+				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0), ratio(1.0), offset(0.0)
 		{
 
 		}
@@ -125,7 +126,7 @@ namespace goiot
 		DataInfo(const std::string& new_id) : id(new_id), name(""), address(0), register_address(0), read_write_priviledge(ReadWritePrivilege::READ_ONLY),
 			data_flow_type(DataFlowType::READ), data_type(DataType::WB), data_zone(DataZone::OUTPUT_REGISTER), float_decode(FloatDecode::ABCD), dword_decode(DWordDecode::ABCD), byte_value(0), int_value(0), float_value(0), char_value(""),
 			timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
-				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0), ratio(1.0)
+				std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0), result(0), ratio(1.0), offset(0.0)
 		{
 
 		}
@@ -133,10 +134,10 @@ namespace goiot
 		// For data copy.
 		DataInfo(const std::string& new_id, const std::string& new_name, int new_address, int new_register_address, ReadWritePrivilege new_read_write_priviledge,
 			DataFlowType new_data_flow_type, DataType new_data_type, DataZone new_data_zone, FloatDecode new_float_decode, DWordDecode new_dword_decode, uint8_t new_byte_value, int new_int_value, double new_float_value, const std::string& new_char_value,
-			double new_timestamp, int result_code = 0, float new_ratio = 1.0) : 
+			double new_timestamp, int result_code = 0, float new_ratio = 1.0, float new_offset = 0.0) : 
 			id(new_id), name(new_name), address(new_address), register_address(new_register_address), read_write_priviledge(new_read_write_priviledge),
 			data_flow_type(new_data_flow_type), data_type(new_data_type), data_zone(new_data_zone), float_decode(new_float_decode), dword_decode(new_dword_decode), byte_value(new_byte_value), int_value(new_int_value), float_value(new_float_value), char_value(new_char_value),
-			timestamp(new_timestamp), result(result_code), ratio(new_ratio)
+			timestamp(new_timestamp), result(result_code), ratio(new_ratio), offset(new_offset)
 		{
 
 		}
@@ -158,6 +159,7 @@ namespace goiot
 		double timestamp; // in microsecond -> std::chrono::system_clock::now().time_since_epoch().count();
 		int result; // Complies with std::error_code
 		float ratio; // Read data from the device * ratio, write data to the device / ratio, ratio can not be zero
+		float offset; // Linear algebra offset default 0, read data from the device * ratio + offset, write data to the device (data - offset) / ratio
 	};
 
 	template <typename T>
