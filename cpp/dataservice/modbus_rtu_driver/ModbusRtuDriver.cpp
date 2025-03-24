@@ -208,6 +208,8 @@ namespace goiot
                 {
                     data_info.ratio = ratio;
                 }
+                float offset = data_node["offset"].asFloat(); // The offset token may missing, asFloat() returns 0.0 by default
+                data_info.offset = offset;
                 std::string channel = data_node["register"].asString();
                 assert(channel.length() > 6);
                 if (channel.length() <= 6)
