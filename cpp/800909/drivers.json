@@ -172,6 +172,56 @@
           ]
         }
       ]
+    },
+    {
+      "id": "adam4017_1",
+      "name": "modbus_mfc1",
+      "type": "modbus_rtu",
+      "port": "COM4,9600,N,8,1",
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 0.09765625,
+              "offset": -3199.902344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "adam4017_2",
+      "name": "modbus_mfc2",
+      "type": "modbus_rtu",
+      "port": "COM5,9600,N,8,1",
+      "response_timeout_msec": 500,
+      "refresh_interval_msec": 500,
+      "nodes": [
+        {
+          "address": "1",
+          "wdec": "0",
+          "dwdec": "0",
+          "fdec": "0",
+          "data": [
+            {
+              "id": "pv",
+              "name": "measure",
+              "register": "R4DUB0000",
+              "ratio": 0.09765625,
+              "offset": -3199.902344
+            }
+          ]
+        }
+      ]
     }
   ]
 }

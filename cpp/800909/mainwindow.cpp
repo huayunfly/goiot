@@ -175,6 +175,10 @@ void MainWindow::InitDataModel()
     data_model_.SetDataToUiMap("e5cc.23.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA307"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
     data_model_.SetDataToUiMap("e5cc.24.sv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("label_TICA308"), RES_TC, WidgetType::PROCESS_VALUE, MeasurementUnit::DEGREE, 0, 500, 0));
 
+    // mfc
+    data_model_.SetDataToUiMap("adam4017_1.1.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_FICA101"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::SCCM, 1, 3200, 0));
+    data_model_.SetDataToUiMap("adam4017_2.1.pv", UiInfo(ui_->tabWidget->widget(0), QString::fromUtf8("textEdit_FICA102"), RES_EMPTY, WidgetType::TEXT, MeasurementUnit::SCCM, 1, 3200, 0));
+
     // reactor
     data_model_.SetUiToDataMap("reactor.label_TICA101", DataDef("e5cc.1.pv", "e5cc.1.sv", "e5cc.1.sv"));
     data_model_.SetUiToDataMap("reactor.label_TICA102", DataDef("e5cc.2.pv", "e5cc.2.sv", "e5cc.2.sv"));
@@ -233,6 +237,7 @@ void MainWindow::RefreshUi(std::shared_ptr<std::vector<goiot::DataInfo>> data_in
                         {
                             fvalue = data_info.float_value * data_info.ratio;
                         }
+                        fvalue += data_info.offset; // raw value * ratio + offset
                         value = QString::number(fvalue, 'f', ui_info.decimals);
                         break;
                     case goiot::DataType::BT:
@@ -325,6 +330,7 @@ bool MainWindow::ReadData(const QString& parent_ui_name, const QString& ui_name,
             {
                 fvalue = data_info.float_value * data_info.ratio;
             }
+            fvalue += data_info.offset; // raw value * ratio + offset
             value = QString::number(fvalue, 'f', ui_info.decimals);
             break;
         case goiot::DataType::BT:
@@ -399,6 +405,7 @@ bool MainWindow::WriteData(const QString& parent_ui_name, const QString& ui_name
             assert(false);
             throw std::invalid_argument("MainWindow::WriteData converts an invalid value.");
         }
+        float_value -= data_info.offset; // (ui value - offset) / ratio
         if (std::abs(data_info.ratio - 1.0) >= 1e-6) // ratio conversion
         {
             float_value /= data_info.ratio;

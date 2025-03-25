@@ -1487,6 +1487,234 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="label_FICA101">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>450</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA101">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>460</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA102">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>460</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA102">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>450</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA103">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>450</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA103">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>460</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FICA104">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>450</y>
+     <width>36</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="res.qrc">:/ui_ctrls/UICtrls/Res/mfc.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_FICA104">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>460</y>
+     <width>70</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA101">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>490</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>加热31</string>
+   </property>
+   <property name="text">
+    <string>TICA101</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA102">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>490</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>加热31</string>
+   </property>
+   <property name="text">
+    <string>TICA101</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA103">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>490</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>加热31</string>
+   </property>
+   <property name="text">
+    <string>TICA101</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="txt_label_FICA104">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>490</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="toolTip">
+    <string>加热31</string>
+   </property>
+   <property name="text">
+    <string>TICA101</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res.qrc"/>

@@ -156,6 +156,10 @@ int DataManager::LoadJsonConfig()
                             data_info.ratio = ratio; // guard, otherwise default 1.0
                         }
                     }
+                    if (data_obj.contains("offset"))
+                    {
+                        data_info.offset = data_obj["offset"].toDouble();
+                    }
                     // data type
                     auto channel = data_obj["register"].toString().toStdString();
                     assert(channel.length() > 6);
@@ -448,8 +452,9 @@ void DataManager::RefreshDispatch()
                         data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
-                                                       data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       0/* integer */, new_value, ""/* string */, timestamp, data_info.result, data_info.ratio
+                                                       data_info.data_zone, data_info.float_decode, data_info.dword_decode, 0/* byte */,
+                                                       0/* integer */, new_value, ""/* string */, timestamp, data_info.result, data_info.ratio,
+                                                       data_info.offset
                                                        );
                     }
                     else if (data_info.data_type == DataType::STR)
@@ -467,8 +472,9 @@ void DataManager::RefreshDispatch()
                         data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
-                                                       data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       0/* integer */, 0.0/* float */, new_value, timestamp, data_info.result, data_info.ratio
+                                                       data_info.data_zone, data_info.float_decode, data_info.dword_decode, 0/* byte */,
+                                                       0/* integer */, 0.0/* float */, new_value, timestamp, data_info.result, data_info.ratio,
+                                                       data_info.offset
                                                        );
                     }
                     else if (data_info.data_type == DataType::BT)
@@ -488,8 +494,9 @@ void DataManager::RefreshDispatch()
                         data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
-                                                       data_info.data_zone, data_info.float_decode, new_value,
-                                                       0/* integer */, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio
+                                                       data_info.data_zone, data_info.float_decode, data_info.dword_decode, new_value,
+                                                       0/* integer */, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio,
+                                                       data_info.offset
                                                        );
                     }
                     else
@@ -507,8 +514,9 @@ void DataManager::RefreshDispatch()
                         data_info_vec->emplace_back(data_info.id,
                                                        data_info.name, data_info.address, data_info.register_address,
                                                        data_info.read_write_priviledge, DataFlowType::REFRESH, data_info.data_type,
-                                                       data_info.data_zone, data_info.float_decode, 0/* byte */,
-                                                       new_value, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio
+                                                       data_info.data_zone, data_info.float_decode, data_info.dword_decode, 0/* byte */,
+                                                       new_value, 0.0/* float */, "", timestamp, data_info.result, data_info.ratio,
+                                                       data_info.offset
                                                        );
                     }
                 }
