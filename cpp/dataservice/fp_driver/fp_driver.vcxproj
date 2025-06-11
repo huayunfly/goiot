@@ -132,8 +132,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\\boost\v1_72_0\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jsoncppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\boost\v1_72_0\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jsoncppD.lib;libboost_date_time-vc142-mt-gd-x64-1_72.lib;libboost_regex-vc142-mt-gd-x64-1_72.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,8 +154,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\\boost\v1_72_0\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(YASHEN3RDLIB_HOME)\jsoncpp\lib;$(YASHEN3RDLIB_HOME)\boost\v1_72_0\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jsoncpp.lib;libboost_date_time-vc142-mt-x64-1_72.lib;libboost_regex-vc142-mt-x64-1_72.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
