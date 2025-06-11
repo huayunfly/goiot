@@ -84,6 +84,16 @@ Y = uti4ml.np.arange(0.0, 4.0, 0.1)
 X, Y = uti4ml.np.meshgrid(X, Y)
 Z = uti4ml.np.sin(uti4ml.np.sqrt(X**2 + Y**2))
 uti4ml.plot3D(X, Y, Z, (-1.01, 1.01))
+
+# Attention weights visualization
+attention_weights = torch.eye(10).reshape((1, 1, 10, 10))
+attention_weights = torch.rand(10, 10) # generate 10x10 random matrix
+m = torch.nn.Softmax(dim=0) # softmax on dim0
+out = m(attention_weights) # apply softmax
+
+# the following two lines are simply borrowed from the example
+attention_weights = out.reshape((1, 1, 10, 10))
+uti4ml.show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
     
 
 

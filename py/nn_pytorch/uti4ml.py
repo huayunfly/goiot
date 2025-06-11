@@ -110,6 +110,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5), cma
             if titles:
                 ax.set_title(titles[j])
     fig.colorbar(pcm, ax=axes, shrink=0.6)
+    plt.show()
 
 
 
