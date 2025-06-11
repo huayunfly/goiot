@@ -1,4 +1,8 @@
 .vscode
 /cpp/dataservice/dataservice/drivers - 副本.json
 /js/store_data
+/js/vue-csv-table
+/py/data
+/web/aiweb
+/web/arthouse
 .DS_Store
