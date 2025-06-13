@@ -47,10 +47,12 @@ namespace goiot
 		std::shared_ptr<std::vector<DataInfo>> ReadMultiTypeData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
 		// Write data to fp2 plc
 		std::shared_ptr<std::vector<DataInfo>> WriteData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
-		// Int to BCD in range[0, 99999]
-		int Int2BCD(int val);
-		// Positive Int to ASCII string with prefixed "0" 
+		// Unsigned Int to BCD in range[0, 99999]
+		int UInt2BCD(int val);
+		// Unsigned Int to ASCII string with prefixed "0" 
 		std::string UInt2ASCIIWithFixedDigits(int val, int digits);
+		// BCC string validation to BCD char
+		std::string BCCStr2BCDStr(const std::string& val);
 
 	private:
 		std::once_flag _connection_init_flag;

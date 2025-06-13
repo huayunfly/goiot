@@ -8,6 +8,13 @@ namespace goiot
 {
 	int FpDriverWorker::OpenConnection()
 	{
+
+		int bcd = UInt2BCD(99998123);
+
+		std::string req = "%01#RDD";
+
+		std::string bcd1 = BCCStr2BCDStr("%01#RDD0066000661");
+
 		_connection_manager.reset(new boost::asio::serial_port(*_io_ctx));
 
 		boost::system::error_code ec;
@@ -249,7 +256,40 @@ namespace goiot
 				// 发送 % 01 # RD D 00660 00661 54 \r(回车)
 				// 回复 % 01$RD9A99B94110  解释为浮点数 41B9 999A 即23.200000762939453
 				req = "%01#RDD";
+				req += UInt2ASCIIWithFixedDigits(data_block_range.first, 5);
+				if (data_block_range.first == data_block_range.second)
+				{		
+					req += UInt2ASCIIWithFixedDigits(data_block_range.first + 1, 5); // double value: address + 1
+				}
+				else
+				{
+					req += UInt2ASCIIWithFixedDigits(data_block_range.second + 1, 5); // double value: address + 1
+				}
+				req += BCCStr2BCDStr(req);
+				req += '\r';
+				try
+				{
+					boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+					const int max_length = 1024;
+					char receive_buffer[max_length];
+					size_t len = boost::asio::read(*_connection_manager, boost::asio::buffer(receive_buffer, max_length));
+					std::string reply_str(receive_buffer);
+					if (len <= 4 || reply_str.substr(0, 4) != "%01$")
+					{
+						throw std::invalid_argument("Communication error.");
+					}
+					int data_count = ((data_block_range.second - data_block_range.first) + 1) * 2; // double value
+					// BCC check
+					if (reply_str.substr(len - 1, 1) != BCCStr2BCDStr(reply_str.substr(9, len - 1)))
+					{
+						throw std::invalid_argument("BCC error");
+					}
 
+				}
+				catch (const boost::system::system_error& e) {
+					std::cerr << "Error: " << e.what() << std::endl;
+					return nullptr;
+				}
 				break;
 			default:
 				throw std::runtime_error("Unsupported fp2 data type.");
@@ -268,18 +308,32 @@ namespace goiot
 		}
 	}
 
-	int FpDriverWorker::Int2BCD(int val)
+	int FpDriverWorker::UInt2BCD(int val)
 	{
-		if (val < 0 || val > 99999)
+		if (val < 0)
 		{
 			return 0;
 		}
-		int bcd = (val / 10000) * 1 << 16 + (val / 1000) * 1 << 12 + (val / 100) * 2 << 8 + (val / 10) * 2 << 4 + (val % 10);
+
+		int bcd = 0;
+		std::string numstr = std::to_string(val);
+		if (numstr.size() > 5)
+		{
+			return 0; // Overflow protection.
+		}
+		int offset = 0;
+		for (char c : numstr)
+		{
+			bcd = bcd << 4;
+			int num = c - '0';
+			bcd += num;		
+		}
 		return bcd;
 	}
 
 	std::string FpDriverWorker::UInt2ASCIIWithFixedDigits(int val, int digits)
 	{
+		// 998 -> "998"
 		if (val < 0)
 		{
 			return "";
@@ -288,5 +342,26 @@ namespace goiot
 		sstr << std::setw(digits) << std::setfill('0') << val;
 		return sstr.str();
 	}
+
+	std::string FpDriverWorker::BCCStr2BCDStr(const std::string& val)
+	{
+		// "%01#RDD0066000661" (BCC->) 0x54
+		char bcc = 0;
+		bool first = true;
+		for (char c : val)
+		{
+			if (first)
+			{
+				bcc = c;
+				first = false;
+			}
+			else
+			{
+				bcc ^= c;
+			}
+		}		
+		return std::to_string((bcc >> 4) & 0x0F) + std::to_string(bcc & 0x0F);
+	}
+	
 }
 
