@@ -30,8 +30,10 @@ namespace goiot
 		{
 		case 'O':
 			_connection_manager->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::odd));
+			break;
 		case 'E':
 			_connection_manager->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::even));
+			break;
 		default:
 			_connection_manager->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
 		}	
@@ -221,13 +223,13 @@ namespace goiot
 		std::pair<int, int> data_block_range(std::make_pair(START_LIMIT, END_LIMIT));
 		for (std::size_t i = 0; i < data_info_vec->size(); i++)
 		{
-			if (data_info_vec->at(i).address < data_block_range.first)
+			if (data_info_vec->at(i).register_address < data_block_range.first)
 			{
-				data_block_range.first = data_info_vec->at(i).address;
+				data_block_range.first = data_info_vec->at(i).register_address;
 			}
-			else if (data_info_vec->at(i).address > data_block_range.second)
+			else if (data_info_vec->at(i).register_address > data_block_range.second)
 			{
-				data_block_range.second = data_info_vec->at(i).address;
+				data_block_range.second = data_info_vec->at(i).register_address;
 			}
 		}
 		if (data_block_range.first > data_block_range.second)
@@ -272,7 +274,22 @@ namespace goiot
 					boost::asio::write(*_connection_manager, boost::asio::buffer(req));
 					const int max_length = 1024;
 					char receive_buffer[max_length];
-					size_t len = boost::asio::read(*_connection_manager, boost::asio::buffer(receive_buffer, max_length));
+					size_t len = boost::asio::read(
+						*_connection_manager, boost::asio::buffer(receive_buffer, max_length));
+                    // async read
+					boost::asio::deadline_timer read_timer(*_io_ctx);
+					read_timer.expires_from_now(boost::posix_time::seconds(5));
+					read_timer.async_wait(std::bind(&FpDriverWorker::handle_timeout, this, std::placeholders::_1));
+					boost::asio::streambuf input_buffer;
+					boost::asio::async_read(*_connection_manager, input_buffer,
+						[&input_buffer](boost::system::error_code ec, std::size_t sz)
+						{
+							std::string s((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+							input_buffer.consume(sz);
+							std::cout << "Msg: " << s << " size " << s.size() << " Size " <<
+								sz << " " << ec << ec.message() << '\n';
+						});
+
 					std::string reply_str(receive_buffer);
 					if (len <= 4 || reply_str.substr(0, 4) != "%01$")
 					{
@@ -286,15 +303,17 @@ namespace goiot
 					}
 
 				}
-				catch (const boost::system::system_error& e) {
-					std::cerr << "Error: " << e.what() << std::endl;
+				catch (const std::runtime_error& e)
+				{
+					//boost::system::error_code ec = e.code();
+					//std::cerr << ec.value() << std::endl;
+					//std::cerr << ec.category().name() << std::endl;
 					return nullptr;
 				}
 				break;
 			default:
 				throw std::runtime_error("Unsupported fp2 data type.");
 			}		
-
 			return nullptr;
 		}
 	}
@@ -363,5 +382,23 @@ namespace goiot
 		return std::to_string((bcc >> 4) & 0x0F) + std::to_string(bcc & 0x0F);
 	}
 	
+	void FpDriverWorker::handle_read(const boost::system::error_code& error,
+		size_t bytes_transferred,
+		const boost::array<char, 1024>& buffer) {
+		if (error) {
+			std::cerr << "Read error: " << error.message() << std::endl;
+			return;
+		}
+		//std::cout.write(buffer, bytes_transferred);
+		std::cout << std::endl;
+	}
+
+	void FpDriverWorker::handle_timeout(const boost::system::error_code& error) 
+	{
+		if (error == boost::asio::error::operation_aborted) {
+			return;
+		}
+		std::cerr << "Operation timed out!" << std::endl;
+	}
 }
 

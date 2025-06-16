@@ -53,6 +53,12 @@ namespace goiot
 		std::string UInt2ASCIIWithFixedDigits(int val, int digits);
 		// BCC string validation to BCD char
 		std::string BCCStr2BCDStr(const std::string& val);
+		// Handle read
+		void handle_read(const boost::system::error_code& error,
+			size_t bytes_transferred,
+			const boost::array<char, 1024>& buffer);
+		// Handle timeout
+		void handle_timeout(const boost::system::error_code& error);
 
 	private:
 		std::once_flag _connection_init_flag;
