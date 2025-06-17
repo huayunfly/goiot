@@ -8,13 +8,6 @@ namespace goiot
 {
 	int FpDriverWorker::OpenConnection()
 	{
-
-		int bcd = UInt2BCD(99998123);
-
-		std::string req = "%01#RDD";
-
-		std::string bcd1 = BCCStr2BCDStr("%01#RDD0066000661");
-
 		_connection_manager.reset(new boost::asio::serial_port(*_io_ctx));
 
 		boost::system::error_code ec;
@@ -322,35 +315,12 @@ namespace goiot
 						{
 							throw std::invalid_argument("fpplc::RDD reply's data count is error.");
 						}
+						std::vector<float> values = BCDStr2Float(data_str);
 					}
 
                     // async read
-					//boost::asio::deadline_timer read_timer(*_io_ctx);
-					//read_timer.expires_from_now(boost::posix_time::seconds(0));
-					//read_timer.async_wait(std::bind(&FpDriverWorker::handle_timeout, this, std::placeholders::_1));
-					//boost::asio::streambuf buf;
 					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
-					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2)
-						//[&buf](boost::system::error_code ec, std::size_t sz)
-						//{
-						//	std::string s((std::istreambuf_iterator<char>(&_input_buffer)), std::istreambuf_iterator<char>());
-						//	_input_buffer.consume(sz);
-						//	std::cout << "Msg: " << s << " size " << s.size() << " Size " <<
-						//		sz << " " << ec << ec.message() << '\n';
-
-						//	//std::string reply_str(receive_buffer);
-						//	//if (len <= 4 || reply_str.substr(0, 4) != "%01$")
-						//	//{
-						//	//	throw std::invalid_argument("Communication error.");
-						//	//}
-						//	//int data_count = ((data_block_range.second - data_block_range.first) + 1) * 2; // double value
-						//	//// BCC check
-						//	//if (reply_str.substr(len - 1, 1) != BCCStr2BCDStr(reply_str.substr(9, len - 1)))
-						//	//{
-						//	//	throw std::invalid_argument("BCC error");
-						//	//}
-						//
-						//);
+					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2));
 				}
 				catch (boost::system::system_error& e)
 				{
@@ -435,6 +405,30 @@ namespace goiot
 			}
 		}		
 		return std::to_string((bcc >> 4) & 0x0F) + std::to_string(bcc & 0x0F);
+	}
+
+	std::vector<float> FpDriverWorker::BCDStr2Float(const std::string& data_str)
+	{
+		std::vector<float> data_list;
+		if (data_str.size() / 8 < 1 || data_str.size() / 8 > 9999)
+		{
+			return data_list;
+		}
+		for (std::size_t i = 0; i < data_str.size() / 8; i++)
+		{
+			unsigned int value = 0;
+			value |= data_str.at(i * 8 + 6) > '9' ? (data_str.at(i * 8 + 6) - 'A' + 10) << 28 : (data_str.at(i * 8 + 6) - '0') << 28;
+			value |= data_str.at(i * 8 + 7) > '9' ? (data_str.at(i * 8 + 7) - 'A' + 10) << 24 : (data_str.at(i * 8 + 7) - '0') << 24;
+			value |= data_str.at(i * 8 + 4) > '9' ? (data_str.at(i * 8 + 4) - 'A' + 10) << 20 : (data_str.at(i * 8 + 4) - '0') << 20;
+			value |= data_str.at(i * 8 + 5) > '9' ? (data_str.at(i * 8 + 5) - 'A' + 10) << 16 : (data_str.at(i * 8 + 5) - '0') << 16;
+			value |= data_str.at(i * 8 + 2) > '9' ? (data_str.at(i * 8 + 2) - 'A' + 10) << 12 : (data_str.at(i * 8 + 2) - '0') << 12;
+			value |= data_str.at(i * 8 + 3) > '9' ? (data_str.at(i * 8 + 3) - 'A' + 10) << 8 : (data_str.at(i * 8 + 3) - '0') << 8;
+			value |= data_str.at(i * 8 + 0) > '9' ? (data_str.at(i * 8 + 0) - 'A' + 10) << 4 : (data_str.at(i * 8 + 0) - '0') << 4;
+			value |= data_str.at(i * 8 + 1) > '9' ? (data_str.at(i * 8 + 1) - 'A' + 10) << 0 : (data_str.at(i * 8 + 1) - '0') << 0;
+			float f = *((float*)&value);
+			data_list.push_back(static_cast<float>(f));
+		}
+		return data_list;
 	}
 	
 	void FpDriverWorker::handle_read(const boost::system::error_code& error, 
