@@ -54,11 +54,12 @@ namespace goiot
 		// BCC string validation to BCD char
 		std::string BCCStr2BCDStr(const std::string& val);
 		// Handle read
-		void handle_read(const boost::system::error_code& error,
-			size_t bytes_transferred,
-			const boost::array<char, 1024>& buffer);
+		void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 		// Handle timeout
 		void handle_timeout(const boost::system::error_code& error);
+
+		// IO run
+		void IORun();
 
 	private:
 		std::once_flag _connection_init_flag;
@@ -73,5 +74,7 @@ namespace goiot
 		bool _refresh;
 		bool _connected;
 		std::string _driver_id;
+		boost::asio::streambuf _input_buffer;
+		boost::asio::streambuf _output_buffer;
 	};
 }

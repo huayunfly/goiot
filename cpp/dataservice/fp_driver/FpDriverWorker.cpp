@@ -21,6 +21,7 @@ namespace goiot
 		_connection_manager->open(_connection_details.port, ec);
 		if (ec)
 		{
+			_connected = false;
 			std::cout << "FpDriver Connection failed: " << ec.message() << std::endl;
 			return ENOTCONN;
 		}
@@ -61,6 +62,7 @@ namespace goiot
 	{
 		std::call_once(_connection_init_flag, &FpDriverWorker::OpenConnection, this);
 		_refresh = true;
+		_threads.emplace_back(&FpDriverWorker::IORun, this);
 		_threads.emplace_back(&FpDriverWorker::Refresh, this);
 		_threads.emplace_back(&FpDriverWorker::Request_Dispatch, this);
 		_threads.emplace_back(&FpDriverWorker::Response_Dispatch, this);
@@ -68,6 +70,7 @@ namespace goiot
 
 	void FpDriverWorker::Stop()
 	{
+		_io_ctx->stop();
 		_refresh = false;
 		_in_queue.Close();
 		_out_queue.Close();
@@ -75,6 +78,11 @@ namespace goiot
 		{
 			entry.join();
 		}
+	}
+
+	void FpDriverWorker::IORun()
+	{
+		_io_ctx->run();
 	}
 
 	// Refreshs the data reading or writing requests into in_queue, classied by DF(float), R(register), DW(dword) types. 
@@ -178,13 +186,13 @@ namespace goiot
 			}
 			catch (const QFull&)
 			{
-				std::cerr << "sqlite_driver:Out-queue is full" << std::endl;
+				std::cerr << "fpplc_driver:Out-queue is full" << std::endl;
 			}
 			catch (const std::exception& e) {
-				std::cerr << "sqlite_driver:EXCEPTION: " << e.what() << std::endl;
+				std::cerr << "fpplc_driver:EXCEPTION: " << e.what() << std::endl;
 			}
 			catch (...) {
-				std::cerr << "sqlite_driver:EXCEPTION (unknown)" << std::endl;
+				std::cerr << "fpplc_driver:EXCEPTION (unknown)" << std::endl;
 			}
 		}
 	}
@@ -214,6 +222,8 @@ namespace goiot
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::ReadMultiTypeData(
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
+		const char END_OF_CMD = '\r';
+		const std::string REPLY_HEAD = "%01$";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
 		const std::size_t TYPE_INDEX_DF = 2;
@@ -268,54 +278,99 @@ namespace goiot
 					req += UInt2ASCIIWithFixedDigits(data_block_range.second + 1, 5); // double value: address + 1
 				}
 				req += BCCStr2BCDStr(req);
-				req += '\r';
+				req += END_OF_CMD;
 				try
 				{
+					// async write
 					boost::asio::write(*_connection_manager, boost::asio::buffer(req));
-					const int max_length = 1024;
-					char receive_buffer[max_length];
-					size_t len = boost::asio::read(
-						*_connection_manager, boost::asio::buffer(receive_buffer, max_length));
-                    // async read
-					boost::asio::deadline_timer read_timer(*_io_ctx);
-					read_timer.expires_from_now(boost::posix_time::seconds(5));
-					read_timer.async_wait(std::bind(&FpDriverWorker::handle_timeout, this, std::placeholders::_1));
+					//auto output_buffer = boost::asio::buffer(req);
+					//boost::asio::async_write(*_connection_manager,
+					//	output_buffer,
+					//	[](boost::system::error_code ec, std::size_t sz)
+					//	{
+					//		std::cout << "Size Written " << sz << " Ec: "
+					//			<< ec << ec.message() << '\n';
+					//	});
+					boost::system::error_code ec;
 					boost::asio::streambuf input_buffer;
-					boost::asio::async_read(*_connection_manager, input_buffer,
-						[&input_buffer](boost::system::error_code ec, std::size_t sz)
+					// Sync read, return 0 if an error occurred.
+					size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+					if (len > 0)
+					{
+						std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+						input_buffer.consume(len); // Drop the buffer data.
+						reply.erase(reply.end() - 1); // Remove the tail char "END_OF_CMD".
+						std::cout << reply << std::endl;
+						const std::string RDD_HEAD = "%01$";
+						if (reply.size() <= REPLY_HEAD.size() || 
+							reply.substr(0, REPLY_HEAD.size()).compare(REPLY_HEAD) != 0)
 						{
-							std::string s((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
-							input_buffer.consume(sz);
-							std::cout << "Msg: " << s << " size " << s.size() << " Size " <<
-								sz << " " << ec << ec.message() << '\n';
-						});
-
-					std::string reply_str(receive_buffer);
-					if (len <= 4 || reply_str.substr(0, 4) != "%01$")
-					{
-						throw std::invalid_argument("Communication error.");
+							throw std::invalid_argument("fpplc::RDD reply's head is error.");
+						}
+						// BCC check
+						std::string tail = reply.substr(reply.size() - 2, 2);
+						std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
+						if (tail.compare(bcc) != 0)
+						{
+							throw std::invalid_argument("fpplc::RDD reply's BCC checking is error.");
+						}
+						std::string data_str = 
+							reply.substr(REPLY_HEAD.size(), reply.size() - REPLY_HEAD.size() - 2);
+						int data_count = (data_block_range.second == data_block_range.first) 
+							? 1 : ((data_block_range.second - data_block_range.first) / 2 + 1);
+						if ((data_str.size() / 8/*double*/) != data_count)
+						{
+							throw std::invalid_argument("fpplc::RDD reply's data count is error.");
+						}
 					}
-					int data_count = ((data_block_range.second - data_block_range.first) + 1) * 2; // double value
-					// BCC check
-					if (reply_str.substr(len - 1, 1) != BCCStr2BCDStr(reply_str.substr(9, len - 1)))
-					{
-						throw std::invalid_argument("BCC error");
-					}
 
+                    // async read
+					//boost::asio::deadline_timer read_timer(*_io_ctx);
+					//read_timer.expires_from_now(boost::posix_time::seconds(0));
+					//read_timer.async_wait(std::bind(&FpDriverWorker::handle_timeout, this, std::placeholders::_1));
+					//boost::asio::streambuf buf;
+					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
+					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2)
+						//[&buf](boost::system::error_code ec, std::size_t sz)
+						//{
+						//	std::string s((std::istreambuf_iterator<char>(&_input_buffer)), std::istreambuf_iterator<char>());
+						//	_input_buffer.consume(sz);
+						//	std::cout << "Msg: " << s << " size " << s.size() << " Size " <<
+						//		sz << " " << ec << ec.message() << '\n';
+
+						//	//std::string reply_str(receive_buffer);
+						//	//if (len <= 4 || reply_str.substr(0, 4) != "%01$")
+						//	//{
+						//	//	throw std::invalid_argument("Communication error.");
+						//	//}
+						//	//int data_count = ((data_block_range.second - data_block_range.first) + 1) * 2; // double value
+						//	//// BCC check
+						//	//if (reply_str.substr(len - 1, 1) != BCCStr2BCDStr(reply_str.substr(9, len - 1)))
+						//	//{
+						//	//	throw std::invalid_argument("BCC error");
+						//	//}
+						//
+						//);
 				}
-				catch (const std::runtime_error& e)
+				catch (boost::system::system_error& e)
 				{
-					//boost::system::error_code ec = e.code();
-					//std::cerr << ec.value() << std::endl;
-					//std::cerr << ec.category().name() << std::endl;
-					return nullptr;
+					boost::system::error_code ec = e.code();
+					std::cerr << ec.value() << std::endl;
+					std::cerr << ec.category().name() << std::endl;
 				}
 				break;
 			default:
 				throw std::runtime_error("Unsupported fp2 data type.");
 			}		
-			return nullptr;
 		}
+		//IORun();
+		for (auto& data_info : *data_info_vec)
+		{
+			data_info.result = EINVAL;
+			data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+		}
+		return data_info_vec; // Mark invalid and return.
 	}
 
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::WriteData(
@@ -382,20 +437,24 @@ namespace goiot
 		return std::to_string((bcc >> 4) & 0x0F) + std::to_string(bcc & 0x0F);
 	}
 	
-	void FpDriverWorker::handle_read(const boost::system::error_code& error,
-		size_t bytes_transferred,
-		const boost::array<char, 1024>& buffer) {
+	void FpDriverWorker::handle_read(const boost::system::error_code& error, 
+		std::size_t bytes_transferred) 
+	{
 		if (error) {
 			std::cerr << "Read error: " << error.message() << std::endl;
 			return;
 		}
-		//std::cout.write(buffer, bytes_transferred);
-		std::cout << std::endl;
+		std::string str((std::istreambuf_iterator<char>(&_input_buffer)), std::istreambuf_iterator<char>());
+        _input_buffer.consume(bytes_transferred); // Drops data in the stream buffer after the data processing.
+		std::cout << str << std::endl;
+
+
 	}
 
 	void FpDriverWorker::handle_timeout(const boost::system::error_code& error) 
 	{
-		if (error == boost::asio::error::operation_aborted) {
+		if (error == boost::asio::error::operation_aborted) 
+		{
 			return;
 		}
 		std::cerr << "Operation timed out!" << std::endl;
