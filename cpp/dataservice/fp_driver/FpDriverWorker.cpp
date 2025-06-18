@@ -224,19 +224,21 @@ namespace goiot
 		const int END_LIMIT = -1;
 		const int MAX_READ_WORD_COUNT = 26;
 
-		std::pair<int, int> data_block_range(std::make_pair(START_LIMIT, END_LIMIT));
+		std::vector<std::pair<int, int>> data_block_range;
+		int first = START_LIMIT;
+		int end = END_LIMIT;
 		for (std::size_t i = 0; i < data_info_vec->size(); i++)
 		{
-			if (data_info_vec->at(i).register_address < data_block_range.first)
+			if (data_info_vec->at(i).register_address < first)
 			{
-				data_block_range.first = data_info_vec->at(i).register_address;
+				first = data_info_vec->at(i).register_address;
 			}
-			else if (data_info_vec->at(i).register_address > data_block_range.second)
+			else if (data_info_vec->at(i).register_address > end)
 			{
-				data_block_range.second = data_info_vec->at(i).register_address;
+				end = data_info_vec->at(i).register_address;
 			}
 		}
-		if (data_block_range.first > data_block_range.second)
+		if (first > end)
 		{
 			for (auto& data_info : *data_info_vec)
 			{
@@ -245,6 +247,21 @@ namespace goiot
 					std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 			}
 			return data_info_vec; // Mark invalid and return.
+		}
+		// Divide
+		int start = first;
+		while (true)
+		{
+			if (start + MAX_READ_WORD_COUNT <= end)
+			{
+				data_block_range.push_back(std::make_pair(start, start + MAX_READ_WORD_COUNT - 2));
+				start += MAX_READ_WORD_COUNT;
+			}
+			else
+			{
+				data_block_range.push_back(std::make_pair(start, end));
+				break;
+			}
 		}
 
 		if (_connection_manager->is_open())
@@ -262,67 +279,73 @@ namespace goiot
 				// 发送 % 01 # RD D 00660 00661 54 \r(回车)
 				// 回复 % 01$RD9A99B94110  解释为浮点数 41B9 999A 即23.200000762939453
 				// 最大只能读26个字，即13个浮点，数据块DDF660 - 785，读数超过26个字，返回值截断结尾为 & 即无效BCC码
-				req = "%01#RDD";
-				req += UInt2ASCIIWithFixedDigits(data_block_range.first, 5);
-				if (data_block_range.first == data_block_range.second)
-				{		
-					req += UInt2ASCIIWithFixedDigits(data_block_range.first + 1, 5); // double value: address + 1
-				}
-				else
-				{
-					req += UInt2ASCIIWithFixedDigits(data_block_range.second + 1, 5); // double value: address + 1
-				}
-				req += BCCStr2BCDStr(req);
-				req += END_OF_CMD;
 				try
 				{
-					// async write
-					boost::asio::write(*_connection_manager, boost::asio::buffer(req));
-					//auto output_buffer = boost::asio::buffer(req);
-					//boost::asio::async_write(*_connection_manager,
-					//	output_buffer,
-					//	[](boost::system::error_code ec, std::size_t sz)
-					//	{
-					//		std::cout << "Size Written " << sz << " Ec: "
-					//			<< ec << ec.message() << '\n';
-					//	});
-					boost::system::error_code ec;
-					boost::asio::streambuf input_buffer;
-					// Sync read, return 0 if an error occurred.
-					size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
-					if (len > 0)
+					std::vector<float> total_values;
+					for (auto& divided_range : data_block_range)
 					{
-						std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
-						// Drop the buffer data.
-						input_buffer.consume(len); 
-						// Remove the tail "END_OF_CMD".
-						reply.erase(reply.end() - END_OF_CMD.size()); 
-						std::cout << reply << std::endl;
-						if (reply.size() <= REPLY_READ_FLOAT_HEAD.size() ||
-							reply.substr(0, REPLY_READ_FLOAT_HEAD.size()).compare(REPLY_READ_FLOAT_HEAD) != 0)
+						req = "%01#RDD";
+						req += UInt2ASCIIWithFixedDigits(divided_range.first, 5);
+						if (divided_range.first == divided_range.second)
 						{
-							throw std::invalid_argument("fpplc::RDD reply's head is error.");
+							req += UInt2ASCIIWithFixedDigits(divided_range.first + 1, 5); // double value: address + 1
 						}
-						// BCC check
-						std::string tail = reply.substr(reply.size() - 2, 2);
-						std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
-						if (tail.compare(bcc) != 0)
+						else
 						{
-							throw std::invalid_argument("fpplc::RDD reply's BCC checking is error.");
+							req += UInt2ASCIIWithFixedDigits(divided_range.second + 1, 5); // double value: address + 1
 						}
-						std::string data_str = 
-							reply.substr(REPLY_READ_FLOAT_HEAD.size(), reply.size() - REPLY_READ_FLOAT_HEAD.size() - 2);
-						int data_count = (data_block_range.second == data_block_range.first) 
-							? 1 : ((data_block_range.second - data_block_range.first) / 2 + 1);
-						if ((data_str.size() / 8/*double*/) != data_count)
+						req += BCCStr2BCDStr(req);
+						req += END_OF_CMD;
+						// async write
+						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						//auto output_buffer = boost::asio::buffer(req);
+						//boost::asio::async_write(*_connection_manager,
+						//	output_buffer,
+						//	[](boost::system::error_code ec, std::size_t sz)
+						//	{
+						//		std::cout << "Size Written " << sz << " Ec: "
+						//			<< ec << ec.message() << '\n';
+						//	});
+						boost::system::error_code ec;
+						boost::asio::streambuf input_buffer;
+						// Sync read, return 0 if an error occurred.
+						size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+						if (len > 0)
 						{
-							throw std::invalid_argument("fpplc::RDD reply's data count is error.");
+							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+							// Drop the buffer data.
+							input_buffer.consume(len);
+							// Remove the tail "END_OF_CMD".
+							reply.erase(reply.end() - END_OF_CMD.size());
+							std::cout << reply << std::endl;
+							if (reply.size() <= REPLY_READ_FLOAT_HEAD.size() ||
+								reply.substr(0, REPLY_READ_FLOAT_HEAD.size()).compare(REPLY_READ_FLOAT_HEAD) != 0)
+							{
+								throw std::invalid_argument("fpplc::RDD reply's head is error.");
+							}
+							// BCC check
+							std::string tail = reply.substr(reply.size() - 2, 2);
+							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
+							if (tail.compare(bcc) != 0)
+							{
+								throw std::invalid_argument("fpplc::RDD reply's BCC checking is error.");
+							}
+							std::string data_str =
+								reply.substr(REPLY_READ_FLOAT_HEAD.size(), reply.size() - REPLY_READ_FLOAT_HEAD.size() - 2/*BCC*/);
+							int data_count = (divided_range.second == divided_range.first)
+								? 1 : ((divided_range.second - divided_range.first) / 2 + 1);
+							if ((data_str.size() / 8/*double*/) != data_count)
+							{
+								throw std::invalid_argument("fpplc::RDD reply's data count is error.");
+							}
+							std::vector<float> values = BCDStr2Float(data_str);
+							total_values.insert(total_values.end(), values.begin(), values.end());
+
 						}
-						std::vector<float> values = BCDStr2Float(data_str);
 						for (auto& data_info : *data_info_vec)
 						{
 							data_info.result = 0;
-							data_info.float_value = values.at((data_info.register_address - data_block_range.first) / 2);
+							data_info.float_value = total_values.at((data_info.register_address - first) / 2);
 							data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
 								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 						}
@@ -338,6 +361,7 @@ namespace goiot
 					msg += e.what();
 					throw std::runtime_error(msg);
 				}
+				
 				break;
 			default:
 				throw std::invalid_argument("Unsupported fpplc data type.");
