@@ -215,13 +215,14 @@ namespace goiot
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::ReadMultiTypeData(
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
-		const char END_OF_CMD = '\r';
-		const std::string REPLY_HEAD = "%01$";
+		const std::string END_OF_CMD = "\r";
+		const std::string REPLY_READ_FLOAT_HEAD = "%01$RD";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
 		const std::size_t TYPE_INDEX_DF = 2;
 		const int START_LIMIT = 99999;
 		const int END_LIMIT = -1;
+		const int MAX_READ_WORD_COUNT = 26;
 
 		std::pair<int, int> data_block_range(std::make_pair(START_LIMIT, END_LIMIT));
 		for (std::size_t i = 0; i < data_info_vec->size(); i++)
@@ -260,6 +261,7 @@ namespace goiot
 			case DataType::DF:
 				// 发送 % 01 # RD D 00660 00661 54 \r(回车)
 				// 回复 % 01$RD9A99B94110  解释为浮点数 41B9 999A 即23.200000762939453
+				// 最大只能读26个字，即13个浮点，数据块DDF660 - 785，读数超过26个字，返回值截断结尾为 & 即无效BCC码
 				req = "%01#RDD";
 				req += UInt2ASCIIWithFixedDigits(data_block_range.first, 5);
 				if (data_block_range.first == data_block_range.second)
@@ -291,12 +293,13 @@ namespace goiot
 					if (len > 0)
 					{
 						std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
-						input_buffer.consume(len); // Drop the buffer data.
-						reply.erase(reply.end() - 1); // Remove the tail char "END_OF_CMD".
+						// Drop the buffer data.
+						input_buffer.consume(len); 
+						// Remove the tail "END_OF_CMD".
+						reply.erase(reply.end() - END_OF_CMD.size()); 
 						std::cout << reply << std::endl;
-						const std::string RDD_HEAD = "%01$";
-						if (reply.size() <= REPLY_HEAD.size() || 
-							reply.substr(0, REPLY_HEAD.size()).compare(REPLY_HEAD) != 0)
+						if (reply.size() <= REPLY_READ_FLOAT_HEAD.size() ||
+							reply.substr(0, REPLY_READ_FLOAT_HEAD.size()).compare(REPLY_READ_FLOAT_HEAD) != 0)
 						{
 							throw std::invalid_argument("fpplc::RDD reply's head is error.");
 						}
@@ -308,7 +311,7 @@ namespace goiot
 							throw std::invalid_argument("fpplc::RDD reply's BCC checking is error.");
 						}
 						std::string data_str = 
-							reply.substr(REPLY_HEAD.size(), reply.size() - REPLY_HEAD.size() - 2);
+							reply.substr(REPLY_READ_FLOAT_HEAD.size(), reply.size() - REPLY_READ_FLOAT_HEAD.size() - 2);
 						int data_count = (data_block_range.second == data_block_range.first) 
 							? 1 : ((data_block_range.second - data_block_range.first) / 2 + 1);
 						if ((data_str.size() / 8/*double*/) != data_count)
@@ -316,27 +319,33 @@ namespace goiot
 							throw std::invalid_argument("fpplc::RDD reply's data count is error.");
 						}
 						std::vector<float> values = BCDStr2Float(data_str);
+						for (auto& data_info : *data_info_vec)
+						{
+							data_info.result = 0;
+							data_info.float_value = values.at((data_info.register_address - data_block_range.first) / 2);
+							data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+						}
+						return data_info_vec;
 					}
-
                     // async read
 					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
 					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2));
 				}
 				catch (boost::system::system_error& e)
 				{
-					boost::system::error_code ec = e.code();
-					std::cerr << ec.value() << std::endl;
-					std::cerr << ec.category().name() << std::endl;
+					std::string msg = "fpplc: port r/w exception error.";
+					msg += e.what();
+					throw std::runtime_error(msg);
 				}
 				break;
 			default:
-				throw std::runtime_error("Unsupported fp2 data type.");
+				throw std::invalid_argument("Unsupported fpplc data type.");
 			}		
 		}
-		//IORun();
 		for (auto& data_info : *data_info_vec)
 		{
-			data_info.result = EINVAL;
+			data_info.result = ENOTCONN;
 			data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 		}
@@ -390,6 +399,7 @@ namespace goiot
 	std::string FpDriverWorker::BCCStr2BCDStr(const std::string& val)
 	{
 		// "%01#RDD0066000661" (BCC->) 0x54
+		std::vector<char> bcd_codes {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 		char bcc = 0;
 		bool first = true;
 		for (char c : val)
@@ -403,8 +413,9 @@ namespace goiot
 			{
 				bcc ^= c;
 			}
-		}		
-		return std::to_string((bcc >> 4) & 0x0F) + std::to_string(bcc & 0x0F);
+		};
+		std::string str{ bcd_codes.at((bcc >> 4) & 0x0F), bcd_codes.at(bcc & 0x0F) };
+		return str;
 	}
 
 	std::vector<float> FpDriverWorker::BCDStr2Float(const std::string& data_str)
