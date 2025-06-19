@@ -55,7 +55,6 @@ namespace goiot
 	{
 		std::call_once(_connection_init_flag, &FpDriverWorker::OpenConnection, this);
 		_refresh = true;
-		_threads.emplace_back(&FpDriverWorker::IORun, this);
 		_threads.emplace_back(&FpDriverWorker::Refresh, this);
 		_threads.emplace_back(&FpDriverWorker::Request_Dispatch, this);
 		_threads.emplace_back(&FpDriverWorker::Response_Dispatch, this);
@@ -63,7 +62,6 @@ namespace goiot
 
 	void FpDriverWorker::Stop()
 	{
-		_io_ctx->stop();
 		_refresh = false;
 		_in_queue.Close();
 		_out_queue.Close();
@@ -217,6 +215,7 @@ namespace goiot
 	{
 		const std::string END_OF_CMD = "\r";
 		const std::string REPLY_READ_FLOAT_HEAD = "%01$RD";
+		const std::string REPLY_READ_REGISTER_HEAD = "%01$RC";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
 		const std::size_t TYPE_INDEX_DF = 2;
@@ -224,21 +223,20 @@ namespace goiot
 		const int END_LIMIT = -1;
 		const int MAX_READ_WORD_COUNT = 26;
 
-		std::vector<std::pair<int, int>> data_block_range;
 		int first = START_LIMIT;
-		int end = END_LIMIT;
+		int last = END_LIMIT;
 		for (std::size_t i = 0; i < data_info_vec->size(); i++)
 		{
 			if (data_info_vec->at(i).register_address < first)
 			{
 				first = data_info_vec->at(i).register_address;
 			}
-			else if (data_info_vec->at(i).register_address > end)
+			else if (data_info_vec->at(i).register_address > last)
 			{
-				end = data_info_vec->at(i).register_address;
+				last = data_info_vec->at(i).register_address;
 			}
 		}
-		if (first > end)
+		if (first > last)
 		{
 			for (auto& data_info : *data_info_vec)
 			{
@@ -248,8 +246,25 @@ namespace goiot
 			}
 			return data_info_vec; // Mark invalid and return.
 		}
-		// Divide
-		int start = first;
+		// Divide into some batches, a batch contains max 26 WORDs.
+		std::vector<std::pair<int, int>> data_block_range;
+		int start = 0;
+		int end = 0;
+		switch (data_info_vec->at(0).data_type)
+		{
+		case DataType::BT:
+			start = first / 16;
+			end = last / 16;
+			break;
+		case DataType::DB:
+			break;
+		case DataType::DF:
+			start = first;
+			end = last;
+			break;
+		default:
+			throw std::invalid_argument("Unsupported fpplc data type.");
+		}
 		while (true)
 		{
 			if (start + MAX_READ_WORD_COUNT <= end)
@@ -270,7 +285,84 @@ namespace goiot
 			switch (data_info_vec->at(0).data_type)
 			{
 			case DataType::BT:
-				req = "%01#RCC";
+				//	* 按字单位读取触点状态 （R寄存器），返回3C00解释为003C，按位取3C bit位。
+				//	发送 % 01 # RCC R 0108 0112 0C \r
+				//	回复 % 01$RC3C000000000000000C0012
+				try
+				{
+					std::vector<unsigned short> total_values;
+					for (auto& divided_range : data_block_range)
+					{
+						req = "%01#RCCR";
+						req += UInt2ASCIIWithFixedDigits(divided_range.first, 4);
+						if (divided_range.first == divided_range.second)
+						{
+							req += UInt2ASCIIWithFixedDigits(divided_range.first, 4); // word value: first == end
+						}
+						else
+						{
+							req += UInt2ASCIIWithFixedDigits(divided_range.second, 4);
+						}
+						req += BCCStr2BCDStr(req);
+						req += END_OF_CMD;
+						// Sync write
+						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						boost::system::error_code ec;
+						boost::asio::streambuf input_buffer;
+						// Sync read, return 0 if an error occurred.
+						size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+						if (len > 0)
+						{
+							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+							// Drop the buffer data.
+							input_buffer.consume(len);
+							// Remove the tail "END_OF_CMD".
+							reply.erase(reply.end() - END_OF_CMD.size());
+							std::cout << reply << std::endl;
+							if (reply.size() <= REPLY_READ_REGISTER_HEAD.size() ||
+								reply.substr(0, REPLY_READ_REGISTER_HEAD.size()).compare(REPLY_READ_REGISTER_HEAD) != 0)
+							{
+								throw std::invalid_argument("fpplc::RC reply's head is error.");
+							}
+							// BCC check
+							std::string tail = reply.substr(reply.size() - 2, 2);
+							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
+							if (tail.compare(bcc) != 0)
+							{
+								throw std::invalid_argument("fpplc::RC reply's BCC checking is error.");
+							}
+							std::string data_str =
+								reply.substr(REPLY_READ_REGISTER_HEAD.size(), reply.size() - REPLY_READ_REGISTER_HEAD.size() - 2/*BCC*/);
+							int data_count = (divided_range.second == divided_range.first)
+								? 1 : (divided_range.second - divided_range.first + 1);
+							if ((data_str.size() / 4/*word*/) != data_count)
+							{
+								throw std::invalid_argument("fpplc::RC reply's data count is error.");
+							}
+							std::vector<unsigned short> values = BCDStr2Word(data_str);
+							total_values.insert(total_values.end(), values.begin(), values.end());
+						}
+					}
+					for (auto& data_info : *data_info_vec)
+					{
+						data_info.result = 0;
+						std::size_t word_index = (data_info.register_address - first) / 16;
+						unsigned short bit_index = data_info.register_address % 16;
+						data_info.byte_value = ((total_values.at(word_index) & (1 << bit_index))) > 0 ? 1 : 0 ;
+						data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+							std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+					}
+					return data_info_vec;
+					// async read
+					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
+					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2));
+				}
+				catch (boost::system::system_error& e)
+				{
+					std::string msg = "fpplc: port r/w exception error.";
+					msg += e.what();
+					throw std::runtime_error(msg);
+				}
 				break;
 			case DataType::DB:
 				req = "%01#RDB";
@@ -340,17 +432,16 @@ namespace goiot
 							}
 							std::vector<float> values = BCDStr2Float(data_str);
 							total_values.insert(total_values.end(), values.begin(), values.end());
-
 						}
-						for (auto& data_info : *data_info_vec)
-						{
-							data_info.result = 0;
-							data_info.float_value = total_values.at((data_info.register_address - first) / 2);
-							data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
-						}
-						return data_info_vec;
 					}
+					for (auto& data_info : *data_info_vec)
+					{
+						data_info.result = 0;
+						data_info.float_value = total_values.at((data_info.register_address - first) / 2);
+						data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+							std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+					}
+					return data_info_vec;
                     // async read
 					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
 					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2));
@@ -462,6 +553,25 @@ namespace goiot
 			value |= data_str.at(i * 8 + 1) > '9' ? (data_str.at(i * 8 + 1) - 'A' + 10) << 0 : (data_str.at(i * 8 + 1) - '0') << 0;
 			float f = *((float*)&value);
 			data_list.push_back(static_cast<float>(f));
+		}
+		return data_list;
+	}
+
+	std::vector<unsigned short> FpDriverWorker::BCDStr2Word(const std::string& data_str)
+	{
+		std::vector<unsigned short> data_list;
+		if (data_str.size() / 4 < 1 || data_str.size() / 4 > 999)
+		{
+			return data_list;
+		}
+		for (std::size_t i = 0; i < data_str.size() / 4; i++)
+		{
+			unsigned short value = 0;
+			value |= data_str.at(i * 4 + 2) > '9' ? (data_str.at(i * 4 + 2) - 'A' + 10) << 12 : (data_str.at(i * 4 + 2) - '0') << 12;
+			value |= data_str.at(i * 4 + 3) > '9' ? (data_str.at(i * 4 + 3) - 'A' + 10) << 8 : (data_str.at(i * 4 + 3) - '0') << 8;
+			value |= data_str.at(i * 4 + 0) > '9' ? (data_str.at(i * 4 + 0) - 'A' + 10) << 4 : (data_str.at(i * 4 + 0) - '0') << 4;
+			value |= data_str.at(i * 4 + 1) > '9' ? (data_str.at(i * 4 + 1) - 'A' + 10) << 0 : (data_str.at(i * 4 + 1) - '0') << 0;
+			data_list.push_back(value);
 		}
 		return data_list;
 	}

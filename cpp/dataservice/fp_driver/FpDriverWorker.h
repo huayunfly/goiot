@@ -55,6 +55,8 @@ namespace goiot
 		std::string BCCStr2BCDStr(const std::string& val);
 		// BCC string to float
 		std::vector<float> BCDStr2Float(const std::string& data_str);
+		// BCC string to word
+		std::vector<unsigned short> BCDStr2Word(const std::string& data_str);
 		// Handle read
 		void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 		// Handle timeout
