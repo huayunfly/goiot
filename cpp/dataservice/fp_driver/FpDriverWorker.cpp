@@ -8,6 +8,17 @@ namespace goiot
 {
 	int FpDriverWorker::OpenConnection()
 	{
+		// test code
+		//auto vec = std::make_shared<std::vector<DataInfo>>();
+		//DataInfo a1, a2, a3;
+		//a1.register_address = 90;
+		//a2.register_address = 76;
+		//a3.register_address = 34;
+		//vec->push_back(a1);
+		//vec->push_back(a2);
+		//vec->push_back(a3);
+		//WriteData(vec);
+
 		_connection_manager.reset(new boost::asio::serial_port(*_io_ctx));
 
 		boost::system::error_code ec;
@@ -470,6 +481,30 @@ namespace goiot
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::WriteData(
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
+		const std::string END_OF_CMD = "\r";
+		const std::string REPLY_READ_FLOAT_HEAD = "%01$WD";
+		const std::string REPLY_READ_REGISTER_HEAD = "%01$WC";
+		const std::size_t TYPE_INDEX_BT = 0;
+		const std::size_t TYPE_INDEX_DB = 1;
+		const std::size_t TYPE_INDEX_DF = 2;
+		const int START_LIMIT = 99999;
+		const int END_LIMIT = -1;
+		const int MAX_READ_WORD_COUNT = 26;
+
+		std::vector<std::pair<int, int>> register_data_index_vec;
+		int i = 0;
+		for (const auto& datainfo : *data_info_vec)
+		{
+			register_data_index_vec.push_back(std::make_pair(datainfo.register_address, i));
+			i++;
+		}
+		std::sort(register_data_index_vec.begin(), register_data_index_vec.end(),
+			[](const std::pair<int, int>& e1, const std::pair<int, int>& e2)
+			{
+				return e1.first < e2.first; // Sort by DataInfo.registger_address.
+			});
+
+
 		if (_connection_manager)
 		{
 			return nullptr;
