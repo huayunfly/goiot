@@ -8,17 +8,6 @@ namespace goiot
 {
 	int FpDriverWorker::OpenConnection()
 	{
-		// test code
-		//auto vec = std::make_shared<std::vector<DataInfo>>();
-		//DataInfo a1, a2, a3;
-		//a1.register_address = 90;
-		//a2.register_address = 76;
-		//a3.register_address = 34;
-		//vec->push_back(a1);
-		//vec->push_back(a2);
-		//vec->push_back(a3);
-		//WriteData(vec);
-
 		_connection_manager.reset(new boost::asio::serial_port(*_io_ctx));
 
 		boost::system::error_code ec;
@@ -52,6 +41,77 @@ namespace goiot
 			_connection_manager->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
 		}
 		_connected = true;
+
+
+		// test code
+// 2,4,6,10,14...58,68
+		auto vec = std::make_shared<std::vector<DataInfo>>();
+		DataInfo a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16,
+			a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29;
+		a1.register_address = 68;
+		a2.register_address = 4;
+		a3.register_address = 6;
+		a4.register_address = 10;
+		a5.register_address = 14;
+		a6.register_address = 16;
+		a7.register_address = 18;
+		a8.register_address = 20;
+		a9.register_address = 22;
+		a10.register_address = 24;
+		a11.register_address = 26;
+		a12.register_address = 28;
+		a13.register_address = 30;
+		a14.register_address = 32;
+		a15.register_address = 34;
+		a16.register_address = 36;
+		a17.register_address = 38;
+		a18.register_address = 40;
+		a19.register_address = 42;
+		a20.register_address = 44;
+		a21.register_address = 46;
+		a22.register_address = 48;
+		a23.register_address = 50;
+		a24.register_address = 52;
+		a25.register_address = 54;
+		a26.register_address = 56;
+		a27.register_address = 58;
+		a28.register_address = 2;
+		a29.register_address = 70;
+
+		vec->push_back(a1);
+		vec->push_back(a2);
+		vec->push_back(a3);
+		vec->push_back(a4);
+		vec->push_back(a5);
+		vec->push_back(a6);
+		vec->push_back(a7);
+		vec->push_back(a8);
+		vec->push_back(a9);
+		vec->push_back(a10);
+		vec->push_back(a11);
+		vec->push_back(a12);
+		vec->push_back(a13);
+		vec->push_back(a14);
+		vec->push_back(a15);
+		vec->push_back(a16);
+		vec->push_back(a17);
+		vec->push_back(a18);
+		vec->push_back(a19);
+		vec->push_back(a20);
+		vec->push_back(a21);
+		vec->push_back(a22);
+		vec->push_back(a23);
+		vec->push_back(a24);
+		vec->push_back(a25);
+		vec->push_back(a26);
+		vec->push_back(a27);
+		vec->push_back(a28);
+		vec->push_back(a29);
+		for (auto& item : *vec)
+		{
+			item.data_type = DataType::DF;
+		}
+		WriteData(vec);
 		return 0;
 	}
 
@@ -482,8 +542,8 @@ namespace goiot
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
 		const std::string END_OF_CMD = "\r";
-		const std::string REPLY_READ_FLOAT_HEAD = "%01$WD";
-		const std::string REPLY_READ_REGISTER_HEAD = "%01$WC";
+		const std::string REPLY_WRITE_FLOAT_HEAD = "%01$WD";
+		const std::string REPLY_WRITE_REGISTER_HEAD = "%01$WC";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
 		const std::size_t TYPE_INDEX_DF = 2;
@@ -491,7 +551,7 @@ namespace goiot
 		const int END_LIMIT = -1;
 		const int MAX_READ_WORD_COUNT = 26;
 
-		std::vector<std::pair<int, int>> register_data_index_vec;
+		std::vector<std::pair<int/*register address*/, int/*index*/>> register_data_index_vec;
 		int i = 0;
 		for (const auto& datainfo : *data_info_vec)
 		{
@@ -503,11 +563,97 @@ namespace goiot
 			{
 				return e1.first < e2.first; // Sort by DataInfo.registger_address.
 			});
-
-
-		if (_connection_manager)
+        // Float registers: 2,4,6,10,14...58,68,70 => (2,4,6),(10),(14...38),(40...58),(68,70) with MAX_READ_WORD_COUNT limit
+		std::vector<std::vector<std::pair<int, int>>> data_block_range;
+		int start = 0;
+		int end = 0;
+		for (std::size_t i = 1; i < register_data_index_vec.size(); i++)
 		{
-			return nullptr;
+			if (register_data_index_vec.at(i).first == (register_data_index_vec.at(end).first + 2) &&
+				(register_data_index_vec.at(i).first - register_data_index_vec.at(start).first + 2) <= MAX_READ_WORD_COUNT)
+			{
+				end = i;
+				continue;
+			}
+			else
+			{
+				auto first = register_data_index_vec.cbegin() + start;
+				auto last = register_data_index_vec.cbegin() + end + 1;
+				data_block_range.push_back(std::vector<std::pair<int, int>>(first, last));
+				start = i;
+				end = start;
+			}
+		}
+		auto first = register_data_index_vec.cbegin() + start;
+		auto last = register_data_index_vec.cbegin() + end + 1;
+		data_block_range.push_back(std::vector<std::pair<int, int>>(first, last));
+
+		if (_connection_manager->is_open())
+		{
+			std::string req;
+			switch (data_info_vec->at(0).data_type)
+			{
+			case DataType::BT:
+				break;
+			case DataType::DB:
+				req = "%01#RDB";
+				break;
+			case DataType::DF:
+				// Send %01# WDD 00700 00703 0000 0000 0000 0000 53\r
+				// Reply %01$WD13  13 is BCC checking.
+				try
+				{
+					std::vector<float> total_values;
+					for (auto& divided_range : data_block_range)
+					{
+						req = "%01#WDD";
+						req += UInt2ASCIIWithFixedDigits(divided_range.cbegin()->first, 5);
+						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first, 5);
+						req += BCCStr2BCDStr(req);
+						req += END_OF_CMD;
+						// Sync write
+						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						boost::system::error_code ec;
+						boost::asio::streambuf input_buffer;
+						// Sync read, return 0 if an error occurred.
+						size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+						if (len > 0)
+						{
+							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+							// Drop the buffer data.
+							input_buffer.consume(len);
+							// Remove the tail "END_OF_CMD".
+							reply.erase(reply.end() - END_OF_CMD.size());
+							std::cout << reply << std::endl;
+							if (reply.size() <= REPLY_WRITE_FLOAT_HEAD.size() ||
+								reply.substr(0, REPLY_WRITE_FLOAT_HEAD.size()).compare(REPLY_WRITE_FLOAT_HEAD) != 0)
+							{
+								throw std::invalid_argument("fpplc::RDD reply's head is error.");
+							}
+							// BCC check
+							std::string tail = reply.substr(reply.size() - 2, 2);
+							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
+							if (tail.compare(bcc) != 0)
+							{
+								throw std::invalid_argument("fpplc::RDD reply's BCC checking is error.");
+							}
+						}
+					}
+					return data_info_vec;
+					// async read
+					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
+					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2));
+				}
+				catch (boost::system::system_error& e)
+				{
+					std::string msg = "fpplc: port r/w exception error.";
+					msg += e.what();
+					throw std::runtime_error(msg);
+				}
+				break;
+			default:
+				throw std::invalid_argument("Unsupported fpplc data type.");
+			}
 		}
 	}
 
