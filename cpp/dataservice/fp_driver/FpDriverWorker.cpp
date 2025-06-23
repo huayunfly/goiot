@@ -43,75 +43,74 @@ namespace goiot
 		_connected = true;
 
 
-		// test code
-// 2,4,6,10,14...58,68
-		auto vec = std::make_shared<std::vector<DataInfo>>();
-		DataInfo a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16,
-			a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29;
-		a1.register_address = 68;
-		a2.register_address = 4;
-		a3.register_address = 6;
-		a4.register_address = 10;
-		a5.register_address = 14;
-		a6.register_address = 16;
-		a7.register_address = 18;
-		a8.register_address = 20;
-		a9.register_address = 22;
-		a10.register_address = 24;
-		a11.register_address = 26;
-		a12.register_address = 28;
-		a13.register_address = 30;
-		a14.register_address = 32;
-		a15.register_address = 34;
-		a16.register_address = 36;
-		a17.register_address = 38;
-		a18.register_address = 40;
-		a19.register_address = 42;
-		a20.register_address = 44;
-		a21.register_address = 46;
-		a22.register_address = 48;
-		a23.register_address = 50;
-		a24.register_address = 52;
-		a25.register_address = 54;
-		a26.register_address = 56;
-		a27.register_address = 58;
-		a28.register_address = 2;
-		a29.register_address = 70;
+		// test code 2,4,6,10,14...58,68
+		//auto vec = std::make_shared<std::vector<DataInfo>>();
+		//DataInfo a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16,
+		//	a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29;
+		//a1.register_address = 68;
+		//a2.register_address = 4;
+		//a3.register_address = 6;
+		//a4.register_address = 10;
+		//a5.register_address = 14;
+		//a6.register_address = 16;
+		//a7.register_address = 18;
+		//a8.register_address = 20;
+		//a9.register_address = 22;
+		//a10.register_address = 24;
+		//a11.register_address = 26;
+		//a12.register_address = 28;
+		//a13.register_address = 30;
+		//a14.register_address = 32;
+		//a15.register_address = 34;
+		//a16.register_address = 36;
+		//a17.register_address = 38;
+		//a18.register_address = 40;
+		//a19.register_address = 42;
+		//a20.register_address = 44;
+		//a21.register_address = 46;
+		//a22.register_address = 48;
+		//a23.register_address = 50;
+		//a24.register_address = 52;
+		//a25.register_address = 54;
+		//a26.register_address = 56;
+		//a27.register_address = 58;
+		//a28.register_address = 2;
+		//a29.register_address = 70;
 
-		vec->push_back(a1);
-		vec->push_back(a2);
-		vec->push_back(a3);
-		vec->push_back(a4);
-		vec->push_back(a5);
-		vec->push_back(a6);
-		vec->push_back(a7);
-		vec->push_back(a8);
-		vec->push_back(a9);
-		vec->push_back(a10);
-		vec->push_back(a11);
-		vec->push_back(a12);
-		vec->push_back(a13);
-		vec->push_back(a14);
-		vec->push_back(a15);
-		vec->push_back(a16);
-		vec->push_back(a17);
-		vec->push_back(a18);
-		vec->push_back(a19);
-		vec->push_back(a20);
-		vec->push_back(a21);
-		vec->push_back(a22);
-		vec->push_back(a23);
-		vec->push_back(a24);
-		vec->push_back(a25);
-		vec->push_back(a26);
-		vec->push_back(a27);
-		vec->push_back(a28);
-		vec->push_back(a29);
-		for (auto& item : *vec)
-		{
-			item.data_type = DataType::DF;
-		}
-		WriteData(vec);
+		//vec->push_back(a1);
+		//vec->push_back(a2);
+		//vec->push_back(a3);
+		//vec->push_back(a4);
+		//vec->push_back(a5);
+		//vec->push_back(a6);
+		//vec->push_back(a7);
+		//vec->push_back(a8);
+		//vec->push_back(a9);
+		//vec->push_back(a10);
+		//vec->push_back(a11);
+		//vec->push_back(a12);
+		//vec->push_back(a13);
+		//vec->push_back(a14);
+		//vec->push_back(a15);
+		//vec->push_back(a16);
+		//vec->push_back(a17);
+		//vec->push_back(a18);
+		//vec->push_back(a19);
+		//vec->push_back(a20);
+		//vec->push_back(a21);
+		//vec->push_back(a22);
+		//vec->push_back(a23);
+		//vec->push_back(a24);
+		//vec->push_back(a25);
+		//vec->push_back(a26);
+		//vec->push_back(a27);
+		//vec->push_back(a28);
+		//vec->push_back(a29);
+		//for (auto& item : *vec)
+		//{
+		//	item.data_type = DataType::DF;
+		//}
+		//WriteData(vec);
 		return 0;
 	}
 
@@ -565,8 +564,8 @@ namespace goiot
 			});
         // Float registers: 2,4,6,10,14...58,68,70 => (2,4,6),(10),(14...38),(40...58),(68,70) with MAX_READ_WORD_COUNT limit
 		std::vector<std::vector<std::pair<int, int>>> data_block_range;
-		int start = 0;
-		int end = 0;
+		std::size_t start = 0;
+		std::size_t end = 0;
 		for (std::size_t i = 1; i < register_data_index_vec.size(); i++)
 		{
 			if (register_data_index_vec.at(i).first == (register_data_index_vec.at(end).first + 2) &&
@@ -609,7 +608,12 @@ namespace goiot
 						req = "%01#WDD";
 						req += UInt2ASCIIWithFixedDigits(divided_range.cbegin()->first, 5);
 						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first, 5);
-						req += BCCStr2BCDStr(req);
+						std::vector<float> data_vec;
+						for (const auto& item : divided_range)
+						{
+							data_vec.push_back(static_cast<float>(data_info_vec->at(item.second).float_value));
+						}
+						req += Float2BCCStr(data_vec);
 						req += END_OF_CMD;
 						// Sync write
 						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
@@ -655,6 +659,7 @@ namespace goiot
 				throw std::invalid_argument("Unsupported fpplc data type.");
 			}
 		}
+		return data_info_vec;
 	}
 
 	int FpDriverWorker::UInt2BCD(int val)
@@ -711,6 +716,26 @@ namespace goiot
 			}
 		};
 		std::string str{ bcd_codes.at((bcc >> 4) & 0x0F), bcd_codes.at(bcc & 0x0F) };
+		return str;
+	}
+
+	std::string FpDriverWorker::Float2BCCStr(const std::vector<float>& data_vec)
+	{
+		// 1.01f -> 0x3F8147AE -> "AE47813F"
+		std::string str;
+		std::vector<char> char_num {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+		for (std::size_t i = 0; i < data_vec.size(); i++)
+		{
+			unsigned int value = *((unsigned int*)(&data_vec.at(i)));
+			str += char_num.at((value >> 4) & 0xF);
+			str += char_num.at((value >> 0) & 0xF);
+			str += char_num.at((value >> 12) & 0xF);
+			str += char_num.at((value >> 8) & 0xF);
+			str += char_num.at((value >> 20) & 0xF);
+			str += char_num.at((value >> 16) & 0xF);
+			str += char_num.at((value >> 28) & 0xF);
+			str += char_num.at((value >> 24) & 0xF);
+		}
 		return str;
 	}
 
