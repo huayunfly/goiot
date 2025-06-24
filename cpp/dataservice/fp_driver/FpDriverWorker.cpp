@@ -530,6 +530,82 @@ namespace goiot
 			switch (data_info_vec->at(0).data_type)
 			{
 			case DataType::BT:
+				// Single contact
+				// Send %01# WCS R 0108 1 2A \r
+				// Reply %01$WC 14 \r 14 is BCC checking
+				try
+				{
+					for (std::size_t i = 0; i < data_info_vec->size(); i++)
+					{
+						req = "%01#WCSR";
+						int word_index = data_info_vec->at(i).register_address / 16;
+						unsigned short bit_index = data_info_vec->at(i).register_address % 16;
+						req += UInt2ASCIIWithFixedDigits(word_index, 3);
+						req += UInt2SingleBCDChar(bit_index);
+						req += BCCStr2BCDStr(req);
+						req += END_OF_CMD;
+						// Sync write
+						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						boost::system::error_code ec;
+						boost::asio::streambuf input_buffer;
+						// Sync read, return 0 if an error occurred.
+						std::size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+						if (len > 0)
+						{
+							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+							// Drop the buffer data.
+							input_buffer.consume(len);
+							// Remove the tail "END_OF_CMD".
+							reply.erase(reply.end() - END_OF_CMD.size());
+							std::cout << reply << std::endl;
+							if (reply.size() <= REPLY_WRITE_REGISTER_HEAD.size() ||
+								reply.substr(0, REPLY_WRITE_REGISTER_HEAD.size()).compare(REPLY_WRITE_REGISTER_HEAD) != 0)
+							{
+#ifdef DEBUG
+								std::cerr << "fpplc::WCSR reply's head is error.") << std::endl;
+#endif // DEBUG
+								data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+								data_info_vec->at(i).result = EBADMSG;
+								data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+									std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+								continue;
+							}
+							// BCC check
+							std::string tail = reply.substr(reply.size() - 2, 2);
+							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
+							if (tail.compare(bcc) != 0)
+							{
+#ifdef DEBUG
+								std::cerr << "fpplc::WCSR reply's BCC checking is error.") << std::endl;
+#endif // DEBUG
+
+								data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+								data_info_vec->at(i).result = EBADMSG;
+								data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+									std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+								continue;
+							}
+							data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+							data_info_vec->at(i).result = 0;
+							data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+						}
+						else
+						{
+							data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+							data_info_vec->at(i).result = ENODATA;
+							data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+
+						}
+					}
+				}
+				catch (boost::system::system_error& e)
+				{
+					std::string msg = "fpplc: port r/w exception error.";
+					msg += e.what();
+					throw std::runtime_error(msg);
+				}
 				break;
 			case DataType::DB:
 				req = "%01#RDB";
@@ -558,7 +634,7 @@ namespace goiot
 						boost::system::error_code ec;
 						boost::asio::streambuf input_buffer;
 						// Sync read, return 0 if an error occurred.
-						size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+						std::size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
 						if (len > 0)
 						{
 							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
@@ -570,19 +646,50 @@ namespace goiot
 							if (reply.size() <= REPLY_WRITE_FLOAT_HEAD.size() ||
 								reply.substr(0, REPLY_WRITE_FLOAT_HEAD.size()).compare(REPLY_WRITE_FLOAT_HEAD) != 0)
 							{
-								throw std::invalid_argument("fpplc::WDD reply's head is error.");
+#ifdef DEBUG
+								std::cerr << "fpplc::WDD reply's head is error." << std::endl;
+#endif // DEBUG
+								for (const auto& item : divided_range)
+								{
+									data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
+									data_info_vec->at(item.second).result = EBADMSG;
+									data_info_vec->at(item.second).timestamp =
+										std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+								}
+								continue;			
 							}
 							// BCC check
 							std::string tail = reply.substr(reply.size() - 2, 2);
 							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
 							if (tail.compare(bcc) != 0)
 							{
-								throw std::invalid_argument("fpplc::WDD reply's BCC checking is error.");
+#ifdef DEBUG
+
+								std::cerr << "fpplc::WDD reply's BCC checking is error." << std::endl;
+#endif // DEBUG
+								for (const auto& item : divided_range)
+								{
+									data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
+									data_info_vec->at(item.second).result = EBADMSG;
+									data_info_vec->at(item.second).timestamp =
+										std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+								}
+								continue;
 							}
 							for (const auto& item : divided_range)
 							{
 								data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
 								data_info_vec->at(item.second).result = 0;
+								data_info_vec->at(item.second).timestamp =
+									std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+							}
+						}
+						else
+						{
+							for (const auto& item : divided_range)
+							{
+								data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
+								data_info_vec->at(item.second).result = ENODATA;
 								data_info_vec->at(item.second).timestamp =
 									std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
 							}
@@ -612,29 +719,6 @@ namespace goiot
 			}
 		}
 		return data_info_vec;
-	}
-
-	int FpDriverWorker::UInt2BCD(int val)
-	{
-		if (val < 0)
-		{
-			return 0;
-		}
-
-		int bcd = 0;
-		std::string numstr = std::to_string(val);
-		if (numstr.size() > 5)
-		{
-			return 0; // Overflow protection.
-		}
-		int offset = 0;
-		for (char c : numstr)
-		{
-			bcd = bcd << 4;
-			int num = c - '0';
-			bcd += num;		
-		}
-		return bcd;
 	}
 
 	std::string FpDriverWorker::UInt2ASCIIWithFixedDigits(int val, int digits)
@@ -668,6 +752,14 @@ namespace goiot
 			}
 		};
 		std::string str{ bcd_codes.at((bcc >> 4) & 0x0F), bcd_codes.at(bcc & 0x0F) };
+		return str;
+	}
+
+	std::string FpDriverWorker::UInt2SingleBCDChar(unsigned int value)
+	{
+		// 0xF -> "F"
+		std::vector<char> char_num{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		std::string str{ char_num.at(value & 0xF) };
 		return str;
 	}
 

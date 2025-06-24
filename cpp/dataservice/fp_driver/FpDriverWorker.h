@@ -47,8 +47,6 @@ namespace goiot
 		std::shared_ptr<std::vector<DataInfo>> ReadMultiTypeData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
 		// Write data to fp2 plc
 		std::shared_ptr<std::vector<DataInfo>> WriteData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
-		// Unsigned Int to BCD in range[0, 99999]
-		int UInt2BCD(int val);
 		// Unsigned Int to ASCII string with prefixed "0" 
 		std::string UInt2ASCIIWithFixedDigits(int val, int digits);
 		// BCC string validation to BCD char
@@ -59,6 +57,8 @@ namespace goiot
 		std::string Float2BCCStr(const std::vector<float>& data_vec);
 		// BCC string to word
 		std::vector<unsigned short> BCDStr2Word(const std::string& data_str);
+        // Unsigned integer to single BCD character.
+		std::string UInt2SingleBCDChar(unsigned int value);
 		// Handle read
 		void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 		// Handle timeout
