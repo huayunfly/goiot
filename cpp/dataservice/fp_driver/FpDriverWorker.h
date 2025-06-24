@@ -65,6 +65,8 @@ namespace goiot
 		void handle_timeout(const boost::system::error_code& error);
 		// IO run
 		void IORun();
+		// Test
+		void Test();
 
 	private:
 		std::once_flag _connection_init_flag;

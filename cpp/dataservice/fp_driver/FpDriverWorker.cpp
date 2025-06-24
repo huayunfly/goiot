@@ -41,76 +41,7 @@ namespace goiot
 			_connection_manager->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
 		}
 		_connected = true;
-
-
-		// test code 2,4,6,10,14...58,68
-		//auto vec = std::make_shared<std::vector<DataInfo>>();
-		//DataInfo a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16,
-		//	a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29;
-		//a1.register_address = 68;
-		//a2.register_address = 4;
-		//a3.register_address = 6;
-		//a4.register_address = 10;
-		//a5.register_address = 14;
-		//a6.register_address = 16;
-		//a7.register_address = 18;
-		//a8.register_address = 20;
-		//a9.register_address = 22;
-		//a10.register_address = 24;
-		//a11.register_address = 26;
-		//a12.register_address = 28;
-		//a13.register_address = 30;
-		//a14.register_address = 32;
-		//a15.register_address = 34;
-		//a16.register_address = 36;
-		//a17.register_address = 38;
-		//a18.register_address = 40;
-		//a19.register_address = 42;
-		//a20.register_address = 44;
-		//a21.register_address = 46;
-		//a22.register_address = 48;
-		//a23.register_address = 50;
-		//a24.register_address = 52;
-		//a25.register_address = 54;
-		//a26.register_address = 56;
-		//a27.register_address = 58;
-		//a28.register_address = 2;
-		//a29.register_address = 70;
-
-		//vec->push_back(a1);
-		//vec->push_back(a2);
-		//vec->push_back(a3);
-		//vec->push_back(a4);
-		//vec->push_back(a5);
-		//vec->push_back(a6);
-		//vec->push_back(a7);
-		//vec->push_back(a8);
-		//vec->push_back(a9);
-		//vec->push_back(a10);
-		//vec->push_back(a11);
-		//vec->push_back(a12);
-		//vec->push_back(a13);
-		//vec->push_back(a14);
-		//vec->push_back(a15);
-		//vec->push_back(a16);
-		//vec->push_back(a17);
-		//vec->push_back(a18);
-		//vec->push_back(a19);
-		//vec->push_back(a20);
-		//vec->push_back(a21);
-		//vec->push_back(a22);
-		//vec->push_back(a23);
-		//vec->push_back(a24);
-		//vec->push_back(a25);
-		//vec->push_back(a26);
-		//vec->push_back(a27);
-		//vec->push_back(a28);
-		//vec->push_back(a29);
-		//for (auto& item : *vec)
-		//{
-		//	item.data_type = DataType::DF;
-		//}
-		//WriteData(vec);
+		Test();
 		return 0;
 	}
 
@@ -415,6 +346,7 @@ namespace goiot
 					}
 					for (auto& data_info : *data_info_vec)
 					{
+						data_info.data_flow_type = DataFlowType::READ_RETURN;
 						data_info.result = 0;
 						std::size_t word_index = (data_info.register_address - first) / 16;
 						unsigned short bit_index = data_info.register_address % 16;
@@ -506,6 +438,7 @@ namespace goiot
 					}
 					for (auto& data_info : *data_info_vec)
 					{
+						data_info.data_flow_type = DataFlowType::READ_RETURN;
 						data_info.result = 0;
 						data_info.float_value = total_values.at((data_info.register_address - first) / 2);
 						data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -528,11 +461,15 @@ namespace goiot
 				throw std::invalid_argument("Unsupported fpplc data type.");
 			}		
 		}
-		for (auto& data_info : *data_info_vec)
+		else
 		{
-			data_info.result = ENOTCONN;
-			data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-				std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+			for (auto& data_info : *data_info_vec)
+			{
+				data_info.data_flow_type = DataFlowType::READ_RETURN;
+				data_info.result = ENOTCONN;
+				data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+					std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+			}
 		}
 		return data_info_vec; // Mark invalid and return.
 	}
@@ -607,13 +544,14 @@ namespace goiot
 					{
 						req = "%01#WDD";
 						req += UInt2ASCIIWithFixedDigits(divided_range.cbegin()->first, 5);
-						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first, 5);
+						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first + 1, 5);
 						std::vector<float> data_vec;
 						for (const auto& item : divided_range)
 						{
 							data_vec.push_back(static_cast<float>(data_info_vec->at(item.second).float_value));
 						}
 						req += Float2BCCStr(data_vec);
+						req += BCCStr2BCDStr(req);
 						req += END_OF_CMD;
 						// Sync write
 						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
@@ -632,21 +570,25 @@ namespace goiot
 							if (reply.size() <= REPLY_WRITE_FLOAT_HEAD.size() ||
 								reply.substr(0, REPLY_WRITE_FLOAT_HEAD.size()).compare(REPLY_WRITE_FLOAT_HEAD) != 0)
 							{
-								throw std::invalid_argument("fpplc::RDD reply's head is error.");
+								throw std::invalid_argument("fpplc::WDD reply's head is error.");
 							}
 							// BCC check
 							std::string tail = reply.substr(reply.size() - 2, 2);
 							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
 							if (tail.compare(bcc) != 0)
 							{
-								throw std::invalid_argument("fpplc::RDD reply's BCC checking is error.");
+								throw std::invalid_argument("fpplc::WDD reply's BCC checking is error.");
+							}
+							for (const auto& item : divided_range)
+							{
+								data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
+								data_info_vec->at(item.second).result = 0;
+								data_info_vec->at(item.second).timestamp =
+									std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
 							}
 						}
 					}
 					return data_info_vec;
-					// async read
-					//boost::asio::async_read_until(*_connection_manager, _input_buffer, END_OF_CMD,
-					//	std::bind(&FpDriverWorker::handle_read, this, std::placeholders::_1, std::placeholders::_2));
 				}
 				catch (boost::system::system_error& e)
 				{
@@ -657,6 +599,16 @@ namespace goiot
 				break;
 			default:
 				throw std::invalid_argument("Unsupported fpplc data type.");
+			}
+		}
+		else
+		{
+			for (std::size_t i = 0; i < data_info_vec->size(); i++)
+			{
+				data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
+				data_info_vec->at(i).result = ENOTCONN;
+				data_info_vec->at(i).timestamp =
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
 			}
 		}
 		return data_info_vec;
@@ -803,6 +755,79 @@ namespace goiot
 			return;
 		}
 		std::cerr << "Operation timed out!" << std::endl;
+	}
+
+	void FpDriverWorker::Test()
+	{
+		// test code 2,4,6,10,14...58,68
+		auto vec = std::make_shared<std::vector<DataInfo>>();
+		DataInfo a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16,
+			a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29;
+		a1.register_address = 714;
+		a2.register_address = 716;
+		a3.register_address = 700;
+		a4.register_address = 702;
+		a5.register_address = 704;
+		a6.register_address = 706;
+		a7.register_address = 708;
+		//a8.register_address = 20;
+		//a9.register_address = 22;
+		//a10.register_address = 24;
+		//a11.register_address = 26;
+		//a12.register_address = 28;
+		//a13.register_address = 30;
+		//a14.register_address = 32;
+		//a15.register_address = 34;
+		//a16.register_address = 36;
+		//a17.register_address = 38;
+		//a18.register_address = 40;
+		//a19.register_address = 42;
+		//a20.register_address = 44;
+		//a21.register_address = 46;
+		//a22.register_address = 48;
+		//a23.register_address = 50;
+		//a24.register_address = 52;
+		//a25.register_address = 54;
+		//a26.register_address = 56;
+		//a27.register_address = 58;
+		//a28.register_address = 2;
+		//a29.register_address = 70;
+
+		vec->push_back(a1);
+		vec->push_back(a2);
+		vec->push_back(a3);
+		vec->push_back(a4);
+		vec->push_back(a5);
+		vec->push_back(a6);
+		vec->push_back(a7);
+		//vec->push_back(a8);
+		//vec->push_back(a9);
+		//vec->push_back(a10);
+		//vec->push_back(a11);
+		//vec->push_back(a12);
+		//vec->push_back(a13);
+		//vec->push_back(a14);
+		//vec->push_back(a15);
+		//vec->push_back(a16);
+		//vec->push_back(a17);
+		//vec->push_back(a18);
+		//vec->push_back(a19);
+		//vec->push_back(a20);
+		//vec->push_back(a21);
+		//vec->push_back(a22);
+		//vec->push_back(a23);
+		//vec->push_back(a24);
+		//vec->push_back(a25);
+		//vec->push_back(a26);
+		//vec->push_back(a27);
+		//vec->push_back(a28);
+		//vec->push_back(a29);
+		for (auto& item : *vec)
+		{
+			item.data_type = DataType::DF;
+			item.read_write_priviledge = ReadWritePrivilege::READ_WRITE;
+		}
+		WriteData(vec);
 	}
 }
 
