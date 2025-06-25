@@ -11,7 +11,8 @@ namespace goiot
         // Constructs a blocking reader, pass in an open serial_port and
         // a timeout in milliseconds.
         BlockingReader(std::shared_ptr<boost::asio::serial_port> port, boost::asio::io_context& io, std::size_t timeout) :
-            _port(port), _io(io), _timer(io), _timeout(timeout), _read_error(), _bytes_transferred(0)
+            _port(port), _io(io), _timer(io), _timeout(timeout), 
+            _read_error(boost::system::errc::make_error_code(boost::system::errc::success)), _bytes_transferred(0)
         {
         }
         BlockingReader() = delete;
