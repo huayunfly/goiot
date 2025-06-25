@@ -2,6 +2,7 @@
 #include "FpDriverWorker.h"
 #include <iostream>
 #include <iomanip>
+#include "BlockingReader.h"
 
 
 namespace goiot
@@ -403,12 +404,18 @@ namespace goiot
 						boost::system::error_code ec;
 						boost::asio::streambuf input_buffer;
 						// Sync read, return 0 if an error occurred.
-						size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
-						if (len > 0)
+						//size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
+						//if (len > 0)
+						//{
+						//	std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
+						//	// Drop the buffer data.
+						//	input_buffer.consume(len);
+						// Block read
+					    std::string reply;
+						BlockingReader reader(_connection_manager, *_io_ctx, 3000);
+						bool ok = reader.ReadUntil(END_OF_CMD, reply);
+						if (ok)
 						{
-							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
-							// Drop the buffer data.
-							input_buffer.consume(len);
 							// Remove the tail "END_OF_CMD".
 							reply.erase(reply.end() - END_OF_CMD.size());
 							std::cout << reply << std::endl;
