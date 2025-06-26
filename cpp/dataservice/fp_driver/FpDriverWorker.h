@@ -63,10 +63,12 @@ namespace goiot
 		void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 		// Handle timeout
 		void handle_timeout(const boost::system::error_code& error);
-		// IO run
-		void IORun();
 		// Test
 		void Test();
+		// Set DataInfo result fvalue
+		void SetDataInfoResult(DataInfo& data_info, float fvalue, DataFlowType data_flow_type, int result);
+		// Set DataInfo result bool value
+		void SetDataInfoResult(DataInfo& data_info, uint8_t bvalue, DataFlowType data_flow_type, int result);
 
 	private:
 		std::once_flag _connection_init_flag;
