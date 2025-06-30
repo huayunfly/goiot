@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include "BlockingReader.h"
+#include "BlockingWriter.h"
 
 
 namespace goiot
@@ -299,11 +300,23 @@ namespace goiot
 						int data_count = (divided_range.second == divided_range.first)
 							? 1 : (divided_range.second - divided_range.first + 1);
 						// Sync write
-						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						//boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+					    // Block write
+						BlockingWriter writer(_connection_manager, *_io_ctx, 1000);
+						bool ok = writer.Write(req);
+						if (!ok)
+						{
+#ifdef _DEBUG
+							std::cerr << "fpplc::RC write timeout or error." << std::endl;
+#endif // DEBUG
+							operation_results.insert(operation_results.end(), data_count, ETIMEDOUT);
+							total_values.insert(total_values.end(), data_count, 0);
+							continue;
+						}
 						// Block read
 						std::string reply;
 						BlockingReader reader(_connection_manager, *_io_ctx, 1000);
-						bool ok = reader.ReadUntil(END_OF_CMD, reply);
+						ok = reader.ReadUntil(END_OF_CMD, reply);
 						if (ok)
 						{
 							// Remove the tail "END_OF_CMD".
@@ -317,6 +330,7 @@ namespace goiot
 #endif // DEBUG
 								operation_results.insert(operation_results.end(), data_count, EBADMSG);
 								total_values.insert(total_values.end(), data_count, 0);
+								continue;
 							}
 							// BCC check
 							std::string tail = reply.substr(reply.size() - 2, 2);
@@ -328,6 +342,7 @@ namespace goiot
 #endif // DEBUG
 								operation_results.insert(operation_results.end(), data_count, EBADMSG);
 								total_values.insert(total_values.end(), data_count, 0);
+								continue;
 							}
 							std::string data_str =
 								reply.substr(REPLY_READ_REGISTER_HEAD.size(), reply.size() - REPLY_READ_REGISTER_HEAD.size() - 2/*BCC*/);
@@ -338,6 +353,7 @@ namespace goiot
 #endif // DEBUG
 								operation_results.insert(operation_results.end(), data_count, EBADMSG);
 								total_values.insert(total_values.end(), data_count, 0);
+								continue;
 							}
 							operation_results.insert(operation_results.end(), data_count, 0/*S_OK*/);
 							std::vector<unsigned short> values = BCDStr2Word(data_str);
@@ -395,11 +411,23 @@ namespace goiot
 						int data_count = (divided_range.second == divided_range.first)
 							? 1 : ((divided_range.second - divided_range.first) / 2 + 1);
 						// Sync write
-						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						//boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						// Block write
+						BlockingWriter writer(_connection_manager, *_io_ctx, 1000);
+						bool ok = writer.Write(req);
+						if (!ok)
+						{
+#ifdef _DEBUG
+							std::cerr << "fpplc::RDD write timeout or error." << std::endl;
+#endif // DEBUG
+							operation_results.insert(operation_results.end(), data_count, ETIMEDOUT);
+							total_values.insert(total_values.end(), data_count, 0.0f);
+							continue;
+						}
 						// Block read
 					    std::string reply;
 						BlockingReader reader(_connection_manager, *_io_ctx, 1000);
-						bool ok = reader.ReadUntil(END_OF_CMD, reply);
+						ok = reader.ReadUntil(END_OF_CMD, reply);
 						if (ok)
 						{
 							// Remove the tail "END_OF_CMD".
@@ -413,6 +441,7 @@ namespace goiot
 #endif // DEBUG
 								operation_results.insert(operation_results.end(), data_count, EBADMSG);
 								total_values.insert(total_values.end(), data_count, 0.0f);
+								continue;
 							}
 							// BCC check
 							std::string tail = reply.substr(reply.size() - 2, 2);
@@ -424,6 +453,7 @@ namespace goiot
 #endif // DEBUG
 								operation_results.insert(operation_results.end(), data_count, EBADMSG);
 								total_values.insert(total_values.end(), data_count, 0.0f);
+								continue;
 							}
 							std::string data_str =
 								reply.substr(REPLY_READ_FLOAT_HEAD.size(), reply.size() - REPLY_READ_FLOAT_HEAD.size() - 2/*BCC*/);
@@ -434,6 +464,7 @@ namespace goiot
 #endif // DEBUG
 								operation_results.insert(operation_results.end(), data_count, EBADMSG);
 								total_values.insert(total_values.end(), data_count, 0.0f);
+								continue;
 							}
 							operation_results.insert(operation_results.end(), data_count, 0/*S_OK*/);
 							std::vector<float> values = BCDStr2Float(data_str);
@@ -547,17 +578,23 @@ namespace goiot
 						req += UInt2SingleBCDChar(bit_index);
 						req += BCCStr2BCDStr(req);
 						req += END_OF_CMD;
-						// Sync write
-						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
-						boost::system::error_code ec;
-						boost::asio::streambuf input_buffer;
-						// Sync read, return 0 if an error occurred.
-						std::size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
-						if (len > 0)
+						// Block write
+						BlockingWriter writer(_connection_manager, *_io_ctx, 1000);
+						bool ok = writer.Write(req);
+						if (!ok)
 						{
-							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
-							// Drop the buffer data.
-							input_buffer.consume(len);
+#ifdef _DEBUG
+							std::cerr << "fpplc::WCSR write timeout or error." << std::endl;
+#endif // DEBUG
+							SetDataInfoResult(data_info_vec->at(i), DataFlowType::WRITE_RETURN, ETIMEDOUT);
+							continue;
+						}
+						// Blocking read
+						std::string reply;
+						BlockingReader reader(_connection_manager, *_io_ctx, 1000);
+						ok = reader.ReadUntil(END_OF_CMD, reply);
+						if (ok)
+						{
 							// Remove the tail "END_OF_CMD".
 							reply.erase(reply.end() - END_OF_CMD.size());
 							std::cout << reply << std::endl;
@@ -567,10 +604,7 @@ namespace goiot
 #ifdef _DEBUG
 								std::cerr << "fpplc::WCSR reply's head is error." << std::endl;
 #endif // DEBUG
-								data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
-								data_info_vec->at(i).result = EBADMSG;
-								data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-									std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+								SetDataInfoResult(data_info_vec->at(i), DataFlowType::WRITE_RETURN, EBADMSG);
 								continue;
 							}
 							// BCC check
@@ -581,25 +615,14 @@ namespace goiot
 #ifdef _DEBUG
 								std::cerr << "fpplc::WCSR reply's BCC checking is error." << std::endl;
 #endif // DEBUG
-
-								data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
-								data_info_vec->at(i).result = EBADMSG;
-								data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-									std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+								SetDataInfoResult(data_info_vec->at(i), DataFlowType::WRITE_RETURN, EBADMSG);
 								continue;
 							}
-							data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
-							data_info_vec->at(i).result = 0;
-							data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+							SetDataInfoResult(data_info_vec->at(i), DataFlowType::WRITE_RETURN, 0/*S_OK*/);
 						}
 						else
 						{
-							data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
-							data_info_vec->at(i).result = ENODATA;
-							data_info_vec->at(i).timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-								std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
-
+							SetDataInfoResult(data_info_vec->at(i), DataFlowType::WRITE_RETURN, ENODATA);
 						}
 					}
 				}
@@ -633,16 +656,26 @@ namespace goiot
 						req += BCCStr2BCDStr(req);
 						req += END_OF_CMD;
 						// Sync write
-						boost::asio::write(*_connection_manager, boost::asio::buffer(req));
-						boost::system::error_code ec;
-						boost::asio::streambuf input_buffer;
-						// Sync read, return 0 if an error occurred.
-						std::size_t len = boost::asio::read_until(*_connection_manager, input_buffer, END_OF_CMD, ec);
-						if (len > 0)
+						//boost::asio::write(*_connection_manager, boost::asio::buffer(req));
+						BlockingWriter writer(_connection_manager, *_io_ctx, 1000);
+						bool ok = writer.Write(req);
+						if (!ok)
 						{
-							std::string reply((std::istreambuf_iterator<char>(&input_buffer)), std::istreambuf_iterator<char>());
-							// Drop the buffer data.
-							input_buffer.consume(len);
+#ifdef _DEBUG
+							std::cerr << "fpplc::WDD write timeout or error." << std::endl;
+#endif // DEBUG
+							for (const auto& item : divided_range)
+							{
+								SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, ETIMEDOUT);
+							}
+							continue;
+						}
+						// Blocking read
+						std::string reply;
+						BlockingReader reader(_connection_manager, *_io_ctx, 1000);
+						ok = reader.ReadUntil(END_OF_CMD, reply);
+						if (ok)
+						{
 							// Remove the tail "END_OF_CMD".
 							reply.erase(reply.end() - END_OF_CMD.size());
 							std::cout << reply << std::endl;
@@ -654,10 +687,7 @@ namespace goiot
 #endif // DEBUG
 								for (const auto& item : divided_range)
 								{
-									data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
-									data_info_vec->at(item.second).result = EBADMSG;
-									data_info_vec->at(item.second).timestamp =
-										std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+									SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, EBADMSG);
 								}
 								continue;			
 							}
@@ -672,29 +702,20 @@ namespace goiot
 #endif // DEBUG
 								for (const auto& item : divided_range)
 								{
-									data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
-									data_info_vec->at(item.second).result = EBADMSG;
-									data_info_vec->at(item.second).timestamp =
-										std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+									SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, EBADMSG);
 								}
 								continue;
 							}
 							for (const auto& item : divided_range)
 							{
-								data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
-								data_info_vec->at(item.second).result = 0;
-								data_info_vec->at(item.second).timestamp =
-									std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+								SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, 0/*S_OK*/);
 							}
 						}
 						else
 						{
 							for (const auto& item : divided_range)
 							{
-								data_info_vec->at(item.second).data_flow_type = DataFlowType::WRITE_RETURN;
-								data_info_vec->at(item.second).result = ENODATA;
-								data_info_vec->at(item.second).timestamp =
-									std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+								SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, ENODATA);
 							}
 						}
 					}
@@ -715,10 +736,7 @@ namespace goiot
 		{
 			for (std::size_t i = 0; i < data_info_vec->size(); i++)
 			{
-				data_info_vec->at(i).data_flow_type = DataFlowType::WRITE_RETURN;
-				data_info_vec->at(i).result = ENOTCONN;
-				data_info_vec->at(i).timestamp =
-					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count() / 1000.0;
+				SetDataInfoResult(data_info_vec->at(i), DataFlowType::WRITE_RETURN, ENOTCONN);
 			}
 		}
 		return data_info_vec;
@@ -861,12 +879,22 @@ namespace goiot
 		data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 	}
+
 	// Set DataInfo result bool value
 	void FpDriverWorker::SetDataInfoResult(DataInfo& data_info, uint8_t bvalue, DataFlowType data_flow_type, int result)
 	{
 		data_info.result = result;
 		data_info.data_flow_type = data_flow_type;
 		data_info.byte_value = bvalue;
+		data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
+	}
+
+	// Set DataInfo result without value
+	void FpDriverWorker::SetDataInfoResult(DataInfo& data_info,  DataFlowType data_flow_type, int result)
+	{
+		data_info.result = result;
+		data_info.data_flow_type = data_flow_type;
 		data_info.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::system_clock::now().time_since_epoch()).count() / 1000.0;
 	}

@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BlockingReader.h" />
+    <ClInclude Include="BlockingWriter.h" />
     <ClInclude Include="FpDriver.h" />
     <ClInclude Include="FpDriverWorker.h" />
     <ClInclude Include="framework.h" />

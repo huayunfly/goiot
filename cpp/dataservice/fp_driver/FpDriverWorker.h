@@ -69,6 +69,8 @@ namespace goiot
 		void SetDataInfoResult(DataInfo& data_info, float fvalue, DataFlowType data_flow_type, int result);
 		// Set DataInfo result bool value
 		void SetDataInfoResult(DataInfo& data_info, uint8_t bvalue, DataFlowType data_flow_type, int result);
+		// Set DataInfo result without value
+		void SetDataInfoResult(DataInfo& data_info, DataFlowType data_flow_type, int result);
 
 	private:
 		std::once_flag _connection_init_flag;
