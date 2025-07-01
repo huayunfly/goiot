@@ -23,9 +23,7 @@ namespace goiot
 			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> reponse_queue, const std::string& driver_id) :
 			_connection_details(connection_details), _driver_manager_reponse_queue(reponse_queue), _data_map(data_map),
 			/*_connection_manager(), */_io_ctx(std::make_unique<boost::asio::io_context>()), _in_queue(10), _out_queue(10), _refresh(false), _connected(false), _driver_id(driver_id)
-		{
-
-			
+		{		
 		}
 
 		FpDriverWorker(const FpDriverWorker&) = delete;
@@ -59,18 +57,16 @@ namespace goiot
 		std::vector<unsigned short> BCDStr2Word(const std::string& data_str);
         // Unsigned integer to single BCD character.
 		std::string UInt2SingleBCDChar(unsigned int value);
-		// Handle read
-		void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
-		// Handle timeout
-		void handle_timeout(const boost::system::error_code& error);
-		// Test
-		void Test();
 		// Set DataInfo result fvalue
 		void SetDataInfoResult(DataInfo& data_info, float fvalue, DataFlowType data_flow_type, int result);
 		// Set DataInfo result bool value
 		void SetDataInfoResult(DataInfo& data_info, uint8_t bvalue, DataFlowType data_flow_type, int result);
+		// Set DataInfo result ushort value
+		void SetDataInfoResult(DataInfo& data_info, uint16_t svalue, DataFlowType data_flow_type, int result);
 		// Set DataInfo result without value
 		void SetDataInfoResult(DataInfo& data_info, DataFlowType data_flow_type, int result);
+		// Test
+		void Test();
 
 	private:
 		std::once_flag _connection_init_flag;
@@ -85,7 +81,5 @@ namespace goiot
 		bool _refresh;
 		bool _connected;
 		std::string _driver_id;
-		boost::asio::streambuf _input_buffer;
-		boost::asio::streambuf _output_buffer;
 	};
 }
