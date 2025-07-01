@@ -51,9 +51,11 @@ namespace goiot
 		std::string BCCStr2BCDStr(const std::string& val);
 		// BCC string to float
 		std::vector<float> BCDStr2Float(const std::string& data_str);
-		// Float to BCC string
-		std::string Float2BCCStr(const std::vector<float>& data_vec);
-		// BCC string to word
+		// Float to BCD string
+		std::string Float2BCDStr(const std::vector<float>& data_vec);
+		// Word to BCD string
+		std::string Word2BCDStr(const std::vector<uint16_t>& data_vec);
+		// BCD string to word
 		std::vector<unsigned short> BCDStr2Word(const std::string& data_str);
         // Unsigned integer to single BCD character.
 		std::string UInt2SingleBCDChar(unsigned int value);

@@ -617,6 +617,7 @@ namespace goiot
 	{
 		const std::string END_OF_CMD = "\r";
 		const std::string REPLY_WRITE_FLOAT_HEAD = "%01$WD";
+		const std::string REPLY_WRITE_WORD_HEAD = "%01$WD";
 		const std::string REPLY_WRITE_REGISTER_HEAD = "%01$WC";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
@@ -638,13 +639,15 @@ namespace goiot
 				return e1.first < e2.first; // Sort by DataInfo.registger_address.
 			});
         // Float registers: 2,4,6,10,14...58,68,70 => (2,4,6),(10),(14...38),(40...58),(68,70) with MAX_READ_WORD_COUNT limit
+		// Word: 1,2,3,5,14...58,68,69 => (1,2,3),(5),(14...39),(40...58),(68,69) with MAX_READ_WORD_COUNT limit
+		std::size_t word_offset = (data_info_vec->at(0).data_type == DataType::DF) ? 2 : 1;
 		std::vector<std::vector<std::pair<int, int>>> data_block_range;
 		std::size_t start = 0;
 		std::size_t end = 0;
 		for (std::size_t i = 1; i < register_data_index_vec.size(); i++)
 		{
-			if (register_data_index_vec.at(i).first == (register_data_index_vec.at(end).first + 2) &&
-				(register_data_index_vec.at(i).first - register_data_index_vec.at(start).first + 2) <= MAX_READ_WORD_COUNT)
+			if (register_data_index_vec.at(i).first == (register_data_index_vec.at(end).first + word_offset) &&
+				(register_data_index_vec.at(i).first - register_data_index_vec.at(start).first + word_offset) <= MAX_READ_WORD_COUNT)
 			{
 				end = i;
 				continue;
@@ -737,8 +740,95 @@ namespace goiot
 					throw std::runtime_error(msg);
 				}
 				break;
-			case DataType::DB:
-				req = "%01#RDB";
+			case DataType::WB:
+				// Send %01# WDD 00585 00588 0000 0000 0000 0000 5D\r
+				// Reply %01$WD13  13 is BCC checking.
+				try
+				{
+					std::vector<float> total_values;
+					for (auto& divided_range : data_block_range)
+					{
+						req = "%01#WDD";
+						req += UInt2ASCIIWithFixedDigits(divided_range.cbegin()->first, 5);
+						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first, 5);
+						std::vector<uint16_t> data_vec;
+						for (const auto& item : divided_range)
+						{
+							data_vec.push_back(static_cast<uint16_t>(data_info_vec->at(item.second).int_value));
+						}
+						req += Word2BCDStr(data_vec);
+						req += BCCStr2BCDStr(req);
+						req += END_OF_CMD;
+						// Blocking write
+						BlockingWriter writer(_connection_manager, *_io_ctx, _connection_details.response_timeout_msec);
+						bool ok = writer.Write(req);
+						if (!ok)
+						{
+#ifdef _DEBUG
+							std::cerr << "fpplc::WDD word write timeout or error." << std::endl;
+#endif // DEBUG
+							for (const auto& item : divided_range)
+							{
+								SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, ETIMEDOUT);
+							}
+							continue;
+						}
+						// Blocking read
+						std::string reply;
+						BlockingReader reader(_connection_manager, *_io_ctx, _connection_details.response_timeout_msec);
+						ok = reader.ReadUntil(END_OF_CMD, reply);
+						if (ok)
+						{
+							// Remove the tail "END_OF_CMD".
+							reply.erase(reply.end() - END_OF_CMD.size());
+							std::cout << reply << std::endl;
+							if (reply.size() <= REPLY_WRITE_WORD_HEAD.size() ||
+								reply.substr(0, REPLY_WRITE_WORD_HEAD.size()).compare(REPLY_WRITE_WORD_HEAD) != 0)
+							{
+#ifdef _DEBUG
+								std::cerr << "fpplc::WDD word reply's head is error." << std::endl;
+#endif // DEBUG
+								for (const auto& item : divided_range)
+								{
+									SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, EBADMSG);
+								}
+								continue;
+							}
+							// BCC check
+							std::string tail = reply.substr(reply.size() - 2, 2);
+							std::string bcc = BCCStr2BCDStr(reply.substr(0, reply.size() - 2/*BCC*/));
+							if (tail.compare(bcc) != 0)
+							{
+#ifdef _DEBUG
+								std::cerr << "fpplc::WDD word reply's BCC checking is error." << std::endl;
+#endif // DEBUG
+								for (const auto& item : divided_range)
+								{
+									SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, EBADMSG);
+								}
+								continue;
+							}
+							for (const auto& item : divided_range)
+							{
+								SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, 0/*S_OK*/);
+							}
+						}
+						else
+						{
+							for (const auto& item : divided_range)
+							{
+								SetDataInfoResult(data_info_vec->at(item.second), DataFlowType::WRITE_RETURN, ETIMEDOUT);
+							}
+						}
+					}
+					return data_info_vec;
+				}
+				catch (boost::system::system_error& e)
+				{
+					std::string msg = "fpplc: port r/w exception error.";
+					msg += e.what();
+					throw std::runtime_error(msg);
+				}
 				break;
 			case DataType::DF:
 				// Send %01# WDD 00700 00703 0000 0000 0000 0000 53\r
@@ -756,7 +846,7 @@ namespace goiot
 						{
 							data_vec.push_back(static_cast<float>(data_info_vec->at(item.second).float_value));
 						}
-						req += Float2BCCStr(data_vec);
+						req += Float2BCDStr(data_vec);
 						req += BCCStr2BCDStr(req);
 						req += END_OF_CMD;
 						// Blocking write
@@ -887,7 +977,7 @@ namespace goiot
 		return str;
 	}
 
-	std::string FpDriverWorker::Float2BCCStr(const std::vector<float>& data_vec)
+	std::string FpDriverWorker::Float2BCDStr(const std::vector<float>& data_vec)
 	{
 		// 1.01f -> 0x3F8147AE -> "AE47813F"
 		std::string str;
@@ -903,6 +993,21 @@ namespace goiot
 			str += char_num.at((value >> 16) & 0xF);
 			str += char_num.at((value >> 28) & 0xF);
 			str += char_num.at((value >> 24) & 0xF);
+		}
+		return str;
+	}
+
+	std::string FpDriverWorker::Word2BCDStr(const std::vector<uint16_t>& data_vec)
+	{
+		// 0x0E0F -> "0F0E"
+		std::string str;
+		std::vector<char> char_num{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		for (std::size_t i = 0; i < data_vec.size(); i++)
+		{
+			str += char_num.at((data_vec.at(i) >> 4) & 0xF);
+			str += char_num.at((data_vec.at(i) >> 0) & 0xF);
+			str += char_num.at((data_vec.at(i) >> 12) & 0xF);
+			str += char_num.at((data_vec.at(i) >> 8) & 0xF);
 		}
 		return str;
 	}
@@ -1060,6 +1165,20 @@ namespace goiot
 			item.read_write_priviledge = ReadWritePrivilege::READ_WRITE;
 		}
 		WriteData(vec);
+		
+		// Word
+		auto vec_word = std::make_shared<std::vector<DataInfo>>();
+		DataInfo w1, w2, w3, w4;
+		w1.register_address = 585;
+		w2.register_address = 586;
+		w3.register_address = 587;
+		w4.register_address = 588;
+		for (auto& item : *vec_word)
+		{
+			item.data_type = DataType::WB;
+			item.read_write_priviledge = ReadWritePrivilege::READ_WRITE;
+		}
+
 	}
 }
 
