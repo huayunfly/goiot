@@ -469,7 +469,7 @@ namespace goiot
 							std::cerr << "fpplc::RDD reply timeout or error." << std::endl;
 #endif // DEBUG
 							operation_results.insert(operation_results.end(), data_count, ETIMEDOUT);
-							total_values.insert(total_values.end(), data_count, 0.0f);
+							total_values.insert(total_values.end(), data_count, 0);
 						}
 					}
 					for (auto& data_info : *data_info_vec)
@@ -1169,16 +1169,20 @@ namespace goiot
 		// Word
 		auto vec_word = std::make_shared<std::vector<DataInfo>>();
 		DataInfo w1, w2, w3, w4;
-		w1.register_address = 585;
+		w1.register_address = 588;
 		w2.register_address = 586;
 		w3.register_address = 587;
-		w4.register_address = 588;
+		w4.register_address = 585;
 		for (auto& item : *vec_word)
 		{
 			item.data_type = DataType::WB;
 			item.read_write_priviledge = ReadWritePrivilege::READ_WRITE;
 		}
-
+		vec_word->push_back(w1);
+		vec_word->push_back(w2);
+		vec_word->push_back(w3);
+		vec_word->push_back(w4);
+		WriteData(vec_word);
 	}
 }
 
