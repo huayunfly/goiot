@@ -221,28 +221,17 @@ namespace goiot
 		const int END_LIMIT = -1;
 		const int MAX_READ_WORD_COUNT = 26;
 
-		// Find max-min index.
-		int first = START_LIMIT;
-		int last = END_LIMIT;
-		for (std::size_t i = 0; i < data_info_vec->size(); i++)
+		std::map<int, int> reg_addr_index;
+		int i = 0;
+		for (const auto& elem : *data_info_vec)
 		{
-			if (data_info_vec->at(i).register_address < first)
-			{
-				first = data_info_vec->at(i).register_address;
-			}
-			else if (data_info_vec->at(i).register_address > last)
-			{
-				last = data_info_vec->at(i).register_address;
-			}
+			// Map insertion with default sort().
+			reg_addr_index.insert({elem.register_address, i});
+			i++;
 		}
-		if (first > last)
-		{
-			for (auto& data_info : *data_info_vec)
-			{
-				SetDataInfoResult(data_info, DataFlowType::READ_RETURN, EINVAL);
-			}
-			return data_info_vec; // Mark invalid and return.
-		}
+		int first = reg_addr_index.begin()->first;
+		int last = reg_addr_index.rbegin()->first;
+
 		// Divide into some batches, a batch contains max 26 WORDs.
 		std::vector<std::pair<int, int>> data_block_range;
 		int start = 0;
