@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/asio/serial_port.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/asio.hpp>
 
 namespace goiot
@@ -27,7 +27,9 @@ namespace goiot
             boost::system::error_code ec;
             boost::asio::streambuf input_buffer;
             boost::asio::async_read_until(*_port, input_buffer, end_of_cmd,
-                std::bind(&BlockingReader::OnReadCompleted, this, std::placeholders::_1, std::placeholders::_2));
+                boost::bind(&BlockingReader::OnReadCompleted, this, 
+                    boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)
+            );
 
             _timer.expires_from_now(boost::posix_time::milliseconds(_timeout));
             _timer.async_wait(boost::bind(&BlockingReader::OnTimeout, this, boost::asio::placeholders::error));
