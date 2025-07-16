@@ -25,7 +25,7 @@ namespace goiot
             _io.restart();
             // Async write
             boost::asio::async_write(*_port, boost::asio::buffer(req),
-                std::bind(&BlockingWriter::OnWriteCompleted, this, 
+                boost::bind(&BlockingWriter::OnWriteCompleted, this, 
                     boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)
             );
 

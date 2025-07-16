@@ -27,7 +27,7 @@ namespace goiot
             boost::system::error_code ec;
             boost::asio::streambuf input_buffer;
             boost::asio::async_read_until(*_port, input_buffer, end_of_cmd,
-                std::bind(&BlockingReader::OnReadCompleted, this, 
+                boost::bind(&BlockingReader::OnReadCompleted, this, 
                     boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)
             );
 
