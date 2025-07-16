@@ -7,22 +7,697 @@
       "id": "fp2",
       "name": "fp2plc",
       "type": "fpplc",
-      "port": "/dev/ttyUSB0,19200,N,8,1",
+      "port": "/dev/ttyUSB0,19200,O,8,1",
       "response_timeout_msec": 1000,
       "refresh_interval_msec": 1000,
       "nodes": [
         {
-          "address": "expinfo",
+          "address": "1",
           "data": [
             {
-              "id": "t801pv",
-              "name": "t801pv",
-              "register": "RW4DF1000"
+              "id": "pi502_pv",
+              "name": "pi502_pv",
+              "register": "R4DF600"
             },
             {
-              "id": "t802pv",
-              "name": "t802pv",
-              "register": "RW4DF1002"
+              "id": "pi614_pv",
+              "name": "pi614_pv",
+              "register": "R4DF602"
+            },
+            {
+              "id": "xisa902",
+              "name": "xisa902",
+              "register": "R4DF604"
+            },
+            {
+              "id": "xisa903",
+              "name": "xisa903",
+              "register": "R4DF606"
+            },
+            {
+              "id": "fc102_pv",
+              "name": "fc102_pv",
+              "register": "R4DF608"
+            },
+            {
+              "id": "fc403_pv",
+              "name": "fc403_pv",
+              "register": "R4DF610"
+            },
+            {
+              "id": "fc602_pv",
+              "name": "fc602_pv",
+              "register": "R4DF612"
+            },
+            {
+              "id": "fc701_pv",
+              "name": "fc701_pv",
+              "register": "R4DF614"
+            },
+            {
+              "id": "tc103_pv",
+              "name": "tc103_pv",
+              "register": "R4DF616"
+            },
+            {
+              "id": "ti201_pv",
+              "name": "ti201_pv",
+              "register": "R4DF618"
+            },
+            {
+              "id": "ti202_pv",
+              "name": "ti202_pv",
+              "register": "R4DF620"
+            },
+            {
+              "id": "ti204_pv",
+              "name": "ti204_pv",
+              "register": "R4DF622"
+            },
+            {
+              "id": "ti204a_pv",
+              "name": "ti204a_pv",
+              "register": "R4DF624"
+            },
+            {
+              "id": "ti205_pv",
+              "name": "ti205_pv",
+              "register": "R4DF626"
+            },
+            {
+              "id": "tc206_pv",
+              "name": "tc206_pv",
+              "register": "R4DF628"
+            },
+            {
+              "id": "tc207_pv",
+              "name": "tc207_pv",
+              "register": "R4DF630"
+            },
+            {
+              "id": "tc208_pv",
+              "name": "tc208_pv",
+              "register": "R4DF632"
+            },
+            {
+              "id": "tc209_pv",
+              "name": "tc209_pv",
+              "register": "R4DF634"
+            },
+            {
+              "id": "tc210_pv",
+              "name": "tc210_pv",
+              "register": "R4DF636"
+            },
+            {
+              "id": "tc211_pv",
+              "name": "tc211_pv",
+              "register": "R4DF638"
+            },
+            {
+              "id": "ti221",
+              "name": "ti221",
+              "register": "R4DF640"
+            },
+            {
+              "id": "pc223_pv",
+              "name": "pc223_pv",
+              "register": "R4DF642"
+            },
+            {
+              "id": "ti225",
+              "name": "ti225",
+              "register": "R4DF644"
+            },
+            {
+              "id": "tc303_pv",
+              "name": "tc303_pv",
+              "register": "R4DF646"
+            },
+            {
+              "id": "tc304_pv",
+              "name": "tc304_pv",
+              "register": "R4DF648"
+            },
+            {
+              "id": "tc305_pv",
+              "name": "tc305_pv",
+              "register": "R4DF650"
+            },
+            {
+              "id": "pi307",
+              "name": "pi307",
+              "register": "R4DF652"
+            },
+            {
+              "id": "tc404_pv",
+              "name": "tc404_pv",
+              "register": "R4DF654"
+            },
+            {
+              "id": "tc405_pv",
+              "name": "tc405_pv",
+              "register": "R4DF656"
+            },
+            {
+              "id": "tc503_pv",
+              "name": "tc503_pv",
+              "register": "R4DF658"
+            },
+            {
+              "id": "tc801_pv",
+              "name": "tc801_pv",
+              "register": "R4DF660"
+            },
+            {
+              "id": "tc802_pv",
+              "name": "tc802_pv",
+              "register": "R4DF662"
+            },
+            {
+              "id": "ti803",
+              "name": "ti803",
+              "register": "R4DF664"
+            },
+            {
+              "id": "ti804",
+              "name": "ti804",
+              "register": "R4DF666"
+            },
+            {
+              "id": "hc201_pv",
+              "name": "hc201_pv",
+              "register": "R4DF668"
+            },
+            {
+              "id": "hc203_pv",
+              "name": "hc203_pv",
+              "register": "R4DF670"
+            },
+            {
+              "id": "fc102_sv",
+              "name": "fc102_sv",
+              "register": "RW4DF700"
+            },
+            {
+              "id": "fc403_sv",
+              "name": "fc403_sv",
+              "register": "RW4DF702"
+            },
+            {
+              "id": "fc602_sv",
+              "name": "fc602_sv",
+              "register": "RW4DF704"
+            },
+            {
+              "id": "fc701_sv",
+              "name": "fc701_sv",
+              "register": "RW4DF706"
+            },
+            {
+              "id": "tc103_sv",
+              "name": "tc103_sv",
+              "register": "RW4DF708"
+            },
+            {
+              "id": "tc206_sv",
+              "name": "tc206_sv",
+              "register": "RW4DF710"
+            },
+            {
+              "id": "tc207_sv",
+              "name": "tc207_sv",
+              "register": "RW4DF712"
+            },
+            {
+              "id": "tc208_sv",
+              "name": "tc208_sv",
+              "register": "RW4DF714"
+            },
+            {
+              "id": "tc209_sv",
+              "name": "tc209_sv",
+              "register": "RW4DF716"
+            },
+            {
+              "id": "tc210_sv",
+              "name": "tc210_sv",
+              "register": "RW4DF718"
+            },
+            {
+              "id": "tc211_sv",
+              "name": "tc211_sv",
+              "register": "RW4DF720"
+            },
+            {
+              "id": "pc223_sv",
+              "name": "pc223_sv",
+              "register": "RW4DF722"
+            },
+            {
+              "id": "tc303_sv",
+              "name": "tc303_sv",
+              "register": "RW4DF724"
+            },
+            {
+              "id": "tc304_sv",
+              "name": "tc304_sv",
+              "register": "RW4DF726"
+            },
+            {
+              "id": "tc305_sv",
+              "name": "tc305_sv",
+              "register": "RW4DF728"
+            },
+            {
+              "id": "tc404_sv",
+              "name": "tc404_sv",
+              "register": "RW4DF730"
+            },
+            {
+              "id": "tc405_sv",
+              "name": "tc405_sv",
+              "register": "RW4DF732"
+            },
+            {
+              "id": "pc503_sv",
+              "name": "pc503_sv",
+              "register": "RW4DF734"
+            },
+            {
+              "id": "tc801_sv",
+              "name": "tc801_sv",
+              "register": "RW4DF736"
+            },
+            {
+              "id": "tc802_sv",
+              "name": "tc802_sv",
+              "register": "RW4DF738"
+            },
+            {
+              "id": "xisa902_hh",
+              "name": "xisa902_hh",
+              "register": "RW4DF740"
+            },
+            {
+              "id": "xisa903_hh",
+              "name": "xisa903_hh",
+              "register": "RW4DF742"
+            },
+            {
+              "id": "pi502_hh",
+              "name": "pi502_hh",
+              "register": "RW4DF744"
+            },
+            {
+              "id": "pi614_hh",
+              "name": "pi614_hh",
+              "register": "RW4DF746"
+            },
+            {
+              "id": "tc103_hh",
+              "name": "tc103_hh",
+              "register": "RW4DF748"
+            },
+            {
+              "id": "tc206_hh",
+              "name": "tc206_hh",
+              "register": "RW4DF750"
+            },
+            {
+              "id": "tc207_hh",
+              "name": "tc207_hh",
+              "register": "RW4DF752"
+            },
+            {
+              "id": "tc208_hh",
+              "name": "tc208_hh",
+              "register": "RW4DF754"
+            },
+            {
+              "id": "tc209_hh",
+              "name": "tc209_hh",
+              "register": "RW4DF756"
+            },
+            {
+              "id": "tc210_hh",
+              "name": "tc210_hh",
+              "register": "RW4DF758"
+            },
+            {
+              "id": "tc211_hh",
+              "name": "tc211_hh",
+              "register": "RW4DF760"
+            },
+            {
+              "id": "tc223_hh",
+              "name": "tc223_hh",
+              "register": "RW4DF762"
+            },
+            {
+              "id": "tc303_hh",
+              "name": "tc303_hh",
+              "register": "RW4DF764"
+            },
+            {
+              "id": "tc304_hh",
+              "name": "tc304_hh",
+              "register": "RW4DF766"
+            },
+            {
+              "id": "tc305_hh",
+              "name": "tc305_hh",
+              "register": "RW4DF768"
+            },
+            {
+              "id": "pi307_hh",
+              "name": "pi307_hh",
+              "register": "RW4DF770"
+            },
+            {
+              "id": "tc404_hh",
+              "name": "tc404_hh",
+              "register": "RW4DF772"
+            },
+            {
+              "id": "tc405_hh",
+              "name": "tc405_hh",
+              "register": "RW4DF774"
+            },
+            {
+              "id": "tc801_hh",
+              "name": "tc801_hh",
+              "register": "RW4DF776"
+            },
+            {
+              "id": "tc802_hh",
+              "name": "tc802_hh",
+              "register": "RW4DF778"
+            },
+            {
+              "id": "hc201a_rt",
+              "name": "hc201a_rt",
+              "register": "RW4DF780"
+            },
+            {
+              "id": "hc201b_rt",
+              "name": "hc201b_rt",
+              "register": "RW4DF782"
+            },
+            {
+              "id": "hc201_sv",
+              "name": "hc201_sv",
+              "register": "RW4DF784"
+            },
+            {
+              "id": "hc202a_rt",
+              "name": "hc202a_rt",
+              "register": "RW4DF786"
+            },
+            {
+              "id": "hc203a_rt",
+              "name": "hc203a_rt",
+              "register": "RW4DF788"
+            },
+            {
+              "id": "hc203b_rt",
+              "name": "hc203b_rt",
+              "register": "RW4DF790"
+            },
+            {
+              "id": "hc203_sv",
+              "name": "hc203_sv",
+              "register": "RW4DF792"
+            },
+            {
+              "id": "tc224_sv",
+              "name": "tc224_sv",
+              "register": "RW4DF794"
+            },
+            {
+              "id": "diw100",
+              "name": "diw100",
+              "register": "R4WB580"
+            },
+            {
+              "id": "alm105",
+              "name": "alm105",
+              "register": "R4WB585"
+            },
+            {
+              "id": "alm106",
+              "name": "alm106",
+              "register": "R4WB586"
+            },
+            {
+              "id": "alm107",
+              "name": "alm107",
+              "register": "R4WB587"
+            },
+            {
+              "id": "alm108",
+              "name": "alm108",
+              "register": "R4WB588"
+            },
+            {
+              "id": "alm200",
+              "name": "alm200",
+              "register": "RW4WB900"
+            },
+            {
+              "id": "alm201",
+              "name": "alm201",
+              "register": "RW4WB901"
+            },
+            {
+              "id": "alm202",
+              "name": "alm202",
+              "register": "RW4WB902"
+            },
+            {
+              "id": "alm205",
+              "name": "alm205",
+              "register": "RW4WB905"
+            },
+            {
+              "id": "a_hic201_l",
+              "name": "a_hic201_l",
+              "register": "R4BT1082"
+            },
+            {
+              "id": "a_hic201_h",
+              "name": "a_hic201_h",
+              "register": "R4BT1083"
+            },
+            {
+              "id": "a_hic203_l",
+              "name": "a_hic203_l",
+              "register": "R4BT1084"
+            },
+            {
+              "id": "a_hic203_h",
+              "name": "a_hic203_h",
+              "register": "R4BT1085"
+            },
+            {
+              "id": "alm_reset",
+              "name": "alm_reset",
+              "register": "RW4BT1100"
+            },
+            {
+              "id": "k_tc_on",
+              "name": "k_tc_on",
+              "register": "RW4BT1101"
+            },
+            {
+              "id": "k_tc_off",
+              "name": "k_tc_off",
+              "register": "RW4BT1102"
+            },
+            {
+              "id": "k_tcg1_on",
+              "name": "k_tcg1_on",
+              "register": "RW4BT1103"
+            },
+            {
+              "id": "k_tcg1_off",
+              "name": "k_tcg1_off",
+              "register": "RW4BT1104"
+            },
+            {
+              "id": "k_tcg2_on",
+              "name": "k_tcg2_on",
+              "register": "RW4BT1105"
+            },
+            {
+              "id": "k_tcg2_off",
+              "name": "k_tcg2_off",
+              "register": "RW4BT1106"
+            },
+            {
+              "id": "k_tcg3_on",
+              "name": "k_tcg3_on",
+              "register": "RW4BT1107"
+            },
+            {
+              "id": "k_tcg3_off",
+              "name": "k_tcg3_off",
+              "register": "RW4BT1108"
+            },
+            {
+              "id": "k_tcg4_on",
+              "name": "k_tcg4_on",
+              "register": "RW4BT1109"
+            },
+            {
+              "id": "k_tcg4_off",
+              "name": "k_tcg4_off",
+              "register": "RW4BT110A"
+            },
+            {
+              "id": "k_tcg5_on",
+              "name": "k_tcg5_on",
+              "register": "RW4BT110B"
+            },
+            {
+              "id": "k_tcg5_off",
+              "name": "k_tcg5_off",
+              "register": "RW4BT110C"
+            },
+            {
+              "id": "k_tcg6_on",
+              "name": "k_tcg6_on",
+              "register": "RW4BT110D"
+            },
+            {
+              "id": "k_tcg6_off",
+              "name": "k_tcg6_off",
+              "register": "RW4BT110E"
+            },
+            {
+              "id": "k_jc224_on",
+              "name": "k_jc224_on",
+              "register": "RW4BT110F"
+            },
+            {
+              "id": "k_jc224_off",
+              "name": "k_jc224_off",
+              "register": "RW4BT1110"
+            },
+            {
+              "id": "jc212",
+              "name": "jc212",
+              "register": "RW4BT1111"
+            },
+            {
+              "id": "jc213",
+              "name": "jc213",
+              "register": "RW4BT1112"
+            },
+            {
+              "id": "h201a",
+              "name": "h201a",
+              "register": "RW4BT1113"
+            },
+            {
+              "id": "h201b",
+              "name": "h201b",
+              "register": "RW4BT1114"
+            },
+            {
+              "id": "h201c",
+              "name": "h201c",
+              "register": "RW4BT1115"
+            },
+            {
+              "id": "h202a",
+              "name": "h202a",
+              "register": "RW4BT1116"
+            },
+            {
+              "id": "h202c",
+              "name": "h202c",
+              "register": "RW4BT1117"
+            },
+            {
+              "id": "h203a",
+              "name": "h203a",
+              "register": "RW4BT1118"
+            },
+            {
+              "id": "h203b",
+              "name": "h203b",
+              "register": "RW4BT1119"
+            },
+            {
+              "id": "h203c",
+              "name": "h203c",
+              "register": "RW4BT111A"
+            },
+            {
+              "id": "jc205",
+              "name": "jc205",
+              "register": "RW4BT111B"
+            },
+            {
+              "id": "jc206",
+              "name": "jc206",
+              "register": "RW4BT111C"
+            },
+            {
+              "id": "jc207",
+              "name": "jc207",
+              "register": "RW4BT111D"
+            },
+            {
+              "id": "h301a",
+              "name": "h301a",
+              "register": "RW4BT111E"
+            },
+            {
+              "id": "h301b",
+              "name": "h301b",
+              "register": "RW4BT111F"
+            },
+            {
+              "id": "h301c",
+              "name": "h301c",
+              "register": "RW4BT1120"
+            },
+            {
+              "id": "h617",
+              "name": "h617",
+              "register": "RW4BT1121"
+            },
+            {
+              "id": "alm_sound",
+              "name": "alm_sound",
+              "register": "RW4BT1122"
+            },
+            {
+              "id": "alm_lamp",
+              "name": "alm_lamp",
+              "register": "RW4BT1123"
+            },
+            {
+              "id": "h201d",
+              "name": "h201d",
+              "register": "RW4BT1124"
+            },
+            {
+              "id": "h203d",
+              "name": "h203d",
+              "register": "RW4BT1125"
+            },
+            {
+              "id": "k_m301_on",
+              "name": "k_m301_on",
+              "register": "RW4BT1126"
+            },
+            {
+              "id": "k_m301_off",
+              "name": "k_m301_off",
+              "register": "RW4BT1127"
             }
           ]
         }
