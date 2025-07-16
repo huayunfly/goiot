@@ -207,6 +207,28 @@ namespace goiot
 		}
 	}
 
+	// Async write
+	int FpDriverWorker::AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id)
+	{
+		if (data_info_vec.size() > 0)
+		{
+			assert(data_info_vec.at(0).data_flow_type == DataFlowType::ASYNC_WRITE);
+			try
+			{
+				_in_queue.Put(std::make_shared<std::vector<DataInfo>>(data_info_vec),
+					true, std::chrono::milliseconds(200)); // prevent blocking DataService poll dispatch()
+			}
+			catch (const QFull&)
+			{
+#ifdef _DEBUG
+				std::cout << "fpplc_driver in_queue_ is full." << std::endl;
+#endif // _DEBUG
+				return ETIMEDOUT;
+			}
+		}
+		return 0;
+	}
+
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::ReadMultiTypeData(
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{

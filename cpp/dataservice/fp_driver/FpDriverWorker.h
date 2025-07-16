@@ -41,6 +41,8 @@ namespace goiot
 		void Request_Dispatch();
 		// Dispatch worker deals with the out_queue request, which may trasnfer data to the DataService.
 		void Response_Dispatch();
+		// Puts asynchronous write request to the out_queue. Return non zero if the queue is full.
+		int AsyncWrite(const std::vector<DataInfo>& data_info_vec, int trans_id);
 		// Read fp2 plc multi-type data 
 		std::shared_ptr<std::vector<DataInfo>> ReadMultiTypeData(std::shared_ptr<std::vector<DataInfo>> data_info_vec);
 		// Write data to fp2 plc
