@@ -232,10 +232,14 @@ namespace goiot
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::ReadMultiTypeData(
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
+		// Pre-requisition: one serial port supports ONE panasonic fpplc, 
+		// so all data_info.address is the same.
+		const std::string ADDR = std::string("%") + UInt2ASCIIWithFixedDigits(data_info_vec->cbegin()->address, 2);
+
 		const std::string END_OF_CMD = "\r";
-		const std::string REPLY_READ_FLOAT_HEAD = "%01$RD";
-		const std::string REPLY_READ_WORD_HEAD = "%01$RD";
-		const std::string REPLY_READ_REGISTER_HEAD = "%01$RC";
+		const std::string REPLY_READ_FLOAT_HEAD = ADDR + "$RD"; // "%01$RD" for example
+		const std::string REPLY_READ_WORD_HEAD = ADDR + "$RD";
+		const std::string REPLY_READ_REGISTER_HEAD = ADDR + "$RC";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
 		const std::size_t TYPE_INDEX_DF = 2;
@@ -308,7 +312,7 @@ namespace goiot
 					std::vector<int> operation_results;
 					for (auto& divided_range : data_block_range)
 					{
-						req = "%01#RCCR";
+						req = ADDR + "#RCCR";
 						req += UInt2ASCIIWithFixedDigits(divided_range.first, 4);
 						req += UInt2ASCIIWithFixedDigits(divided_range.second, 4);
 						req += BCCStr2BCDStr(req);
@@ -408,7 +412,7 @@ namespace goiot
 					std::vector<int> operation_results;
 					for (auto& divided_range : data_block_range)
 					{
-						req = "%01#RDD";
+						req = ADDR + "#RDD";
 						req += UInt2ASCIIWithFixedDigits(divided_range.first, 5);
 						req += UInt2ASCIIWithFixedDigits(divided_range.second, 5);
 						req += BCCStr2BCDStr(req);
@@ -510,7 +514,7 @@ namespace goiot
 					operation_results.reserve(128);
 					for (auto& divided_range : data_block_range)
 					{
-						req = "%01#RDD";
+						req = ADDR + "#RDD";
 						req += UInt2ASCIIWithFixedDigits(divided_range.first, 5);
 						if (divided_range.first == divided_range.second)
 						{
@@ -626,10 +630,14 @@ namespace goiot
 	std::shared_ptr<std::vector<DataInfo>> FpDriverWorker::WriteData(
 		std::shared_ptr<std::vector<DataInfo>> data_info_vec)
 	{
+		// Pre-requisition: one serial port supports ONE panasonic fpplc, 
+		// so all data_info.address is the same.
+		const std::string ADDR = std::string("%") + UInt2ASCIIWithFixedDigits(data_info_vec->cbegin()->address, 2);
+
 		const std::string END_OF_CMD = "\r";
-		const std::string REPLY_WRITE_FLOAT_HEAD = "%01$WD";
-		const std::string REPLY_WRITE_WORD_HEAD = "%01$WD";
-		const std::string REPLY_WRITE_REGISTER_HEAD = "%01$WC";
+		const std::string REPLY_WRITE_FLOAT_HEAD = ADDR + "$WD";
+		const std::string REPLY_WRITE_WORD_HEAD = ADDR + "$WD";
+		const std::string REPLY_WRITE_REGISTER_HEAD = ADDR + "$WC";
 		const std::size_t TYPE_INDEX_BT = 0;
 		const std::size_t TYPE_INDEX_DB = 1;
 		const std::size_t TYPE_INDEX_DF = 2;
@@ -689,7 +697,7 @@ namespace goiot
 				{
 					for (std::size_t i = 0; i < data_info_vec->size(); i++)
 					{
-						req = "%01#WCSR";
+						req = ADDR + "#WCSR";
 						int word_index = data_info_vec->at(i).register_address / 16;
 						unsigned short bit_index = data_info_vec->at(i).register_address % 16;
 						req += UInt2ASCIIWithFixedDigits(word_index, 3);
@@ -759,7 +767,7 @@ namespace goiot
 					std::vector<float> total_values;
 					for (auto& divided_range : data_block_range)
 					{
-						req = "%01#WDD";
+						req = ADDR + "#WDD";
 						req += UInt2ASCIIWithFixedDigits(divided_range.cbegin()->first, 5);
 						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first, 5);
 						std::vector<uint16_t> data_vec;
@@ -849,7 +857,7 @@ namespace goiot
 					std::vector<float> total_values;
 					for (auto& divided_range : data_block_range)
 					{
-						req = "%01#WDD";
+						req = ADDR + "#WDD";
 						req += UInt2ASCIIWithFixedDigits(divided_range.cbegin()->first, 5);
 						req += UInt2ASCIIWithFixedDigits(divided_range.crbegin()->first + 1, 5);
 						std::vector<float> data_vec;

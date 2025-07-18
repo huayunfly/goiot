@@ -22,7 +22,7 @@ namespace goiot
 		FpDriverWorker(const ConnectionInfo& connection_details, std::map<std::string, DataInfo>&& data_map,
 			std::shared_ptr<ThreadSafeQueue<std::shared_ptr<std::vector<DataInfo>>>> reponse_queue, const std::string& driver_id) :
 			_connection_details(connection_details), _driver_manager_reponse_queue(reponse_queue), _data_map(data_map),
-			/*_connection_manager(), */_io_ctx(std::make_unique<boost::asio::io_context>()), _in_queue(10), _out_queue(10), _refresh(false), _connected(false), _driver_id(driver_id)
+			/*_connection_manager(), */_io_ctx(std::make_unique<boost::asio::io_context>()), _in_queue(10), _out_queue(10), _refresh(false), _connected(false)
 		{		
 		}
 
@@ -84,6 +84,5 @@ namespace goiot
 		std::vector<std::thread> _threads;
 		bool _refresh;
 		bool _connected;
-		std::string _driver_id;
 	};
 }
