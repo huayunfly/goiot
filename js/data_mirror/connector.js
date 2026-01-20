@@ -30,7 +30,7 @@ class SetDataR {
         this.list = data_list;
     }
 
-    tojson()
+    toJSON()
     {
         return {name: this.name,
             operation: this.operation,
@@ -86,27 +86,28 @@ class RedisConnector extends DBConnector {
         {
             const driver_id = driver.id;
             const grp_driver_id = [group_name, driver_id].join('.'); 
-            const data_array = [];
+            const id_array = [];
             for (const node of driver.nodes) {
                 const address = node.address;
                 for (const data of node.data) {
                     if (!data.register.toUpperCase().startsWith('W')) {
-                        data_array.push([group_name, driver_id, address, data.id].join('.'));
+                        id_array.push([driver_id, address, data.id].join('.'));
                     }
                 }
             }
-            this.model_.push({ grp_driver_id: grp_driver_id, data_array: data_array });
+            this.model_.push({ grp_name: group_name, driver_id: driver_id,  id_array: id_array });
         }
     }
 
     // Callback function with obj as the parameter.
     async refresh_data(obj) {
         for (const table of obj.model_) {
-            const table_name = table.driver_id;
             // Pipeline is a kind of Multi without transaction.
+            const id_list = [];
             const pipeline = obj.db_.pipeline();
-            for (const data of table.data_array) {
-                pipeline.hmget('refresh:' + data, 'value', 'result', 'timestamp');
+            for (const data_id of table.id_array) {
+                id_list.push(data_id);               
+                pipeline.hmget('refresh:' + data_id, 'value', 'result', 'timestamp');
             }
             const reply = await pipeline.exec((err, replies) => {
                 if (err) {
@@ -114,11 +115,27 @@ class RedisConnector extends DBConnector {
                     return;
                 }
             });
+            const data_list = [];
+            var id_no = 0;
+            let t_last = Date.now() / 1000 - 15.0;
+            for (const item of reply) // item[1][2]
+            {
+                if (null != t_last && item[1][2] > t_last) {
+                    data_list.push({
+                        "id": id_list[id_no], "value": item[1][0],
+                        "result": item[1][1], "timestamp": Date.now() / 1000
+                    });
+                }
+                id_no++;
+            }
             // Value is valid if Result is '0'.  ? n[0] : 'NULL'));
-            const data_list = [{"id":"mfcpfc.1.pv", "value":"11.0", "result":"0", "timestamp": 1677154222.821000},
-            {"id":"mfcpfc.2.pv", "value":"12.1", "result":"0", "timestamp": 1677154222.839000}];
-            const body = new SetDataR('service_name', 'SetDataR', '6ac89607254a437c90c28ccc1c034706', "goiot", data_list);
-            obj.webapi_.post('', body);
+            const data_list1 = [{ "id": "mfcpfc.1.pv", "value": "11.0", "result": "0", "timestamp": 1677154221.821000 },
+            { "id": "mfcpfc.2.pv", "value": "12.1", "result": "0", "timestamp": 1677154221.839000 }];
+            if (data_list.length > 0) {
+                const body = new SetDataR('service_name', 'SetDataR',
+                    '6ac89607254a437c90c28ccc1c034706', table.grp_name, data_list);
+                obj.webapi_.post('', body);
+            }
         }
     }
 }
@@ -141,6 +158,7 @@ class WebServiceConnector {
                 'Content-Type': 'application/json',
                 'User-Agent': `nodejs/${process.version}`,
                 'Content-Encoding': 'gzip',
+                'Accept': 'application/json'
             },
             body: data
         };
