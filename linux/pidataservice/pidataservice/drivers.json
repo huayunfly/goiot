@@ -1,6 +1,7 @@
 {
   "name": "goiot",
   "redis": "127.0.0.1:6379",
+  "webapi": "http://192.168.1.31:6300/message",
   "db": "127.0.0.1:5432:8H82600:postgres:hello@123",
   "drivers": [
     {
