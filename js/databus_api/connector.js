@@ -108,7 +108,7 @@ class RedisConnector extends DBConnector {
             throw 'Undefined data configuration.';
         }
         const name = this.data_config_.name??'dummy';
-        const timestamp = new Date().getTime() / 1000.0;
+        const t_now = Date.now() / 1000.0;
         for (const driver of this.data_config_.drivers) {
             const driver_id = driver.id;
             for (const node of driver.nodes) {
@@ -116,8 +116,8 @@ class RedisConnector extends DBConnector {
                 for (const data of node.data) {
                     const id = [name, driver_id, address, data.id].join('.');
                     let ratio = 1.0;
-                    let fvalue = parseFloat(data.ratio);
-                    if (!isNaN(fvalue)) {
+                    let fvalue = Number(data.ratio);
+                    if (!Number.isNaN(fvalue)) {
                         ratio = fvalue;
                     }
                     let read_or_write = D_PRIVILEGE.READ_ONLY;
@@ -129,7 +129,7 @@ class RedisConnector extends DBConnector {
                     {
                         read_or_write = D_PRIVILEGE.WRITE_ONLY;
                     }
-                    this.model_.add(id, new DataInfo(id, data.name, 1/*dtype*/, read_or_write, ratio, 0, -1, timestamp));           
+                    this.model_.add(id, new DataInfo(id, data.name, 8/*dtype*/, read_or_write, ratio, 0, -1, t_now));           
                 }
             }
         }
@@ -159,8 +159,8 @@ class RedisConnector extends DBConnector {
             {
                 const ns_id = key_namespace + id;
                 let reply = await this.db_.hmset(ns_id, 'id', data_info.id,
-                    'name', data_info.name, 'dtype', data_info.dtype, 'privilege', data_info.privilege,
-                    'value', data_info.value, 'result', data_info.result, 'timestamp', data_info.timestamp);
+                    'name', data_info.name, 'type', data_info.type, 'rw', data_info.privilege,
+                    'value', data_info.value, 'result', data_info.result, 'time', data_info.timestamp);
                 this.check_redis_reply(id, 'add_redis_set', reply);
                 reply = await this.db_.zadd(time_namespace, data_info.timestamp, ns_id);
                 this.check_redis_reply(id, 'zadd_redis_set', reply);
@@ -232,8 +232,8 @@ class RedisConnector extends DBConnector {
             {
                 let ns_id = key_namespace + data.id;
                 transaction.hmset(
-                    ns_id, 'value', data.value, 'result', data.result, 'timestamp', data.timestamp);
-                transaction.zadd(time_namespace, data.timestamp, ns_id);
+                    ns_id, 'value', data.value, 'result', data.result, 'time', data.time);
+                transaction.zadd(time_namespace, data.time, ns_id);
             }
             // Each response follows the format `[err, result]`.
             const reply = await transaction.exec();
@@ -267,7 +267,7 @@ class RedisConnector extends DBConnector {
         // Initialize properties
         if (!props?.length)
         {
-            props = ['value', 'result', 'timestamp'];
+            props = ['value', 'result', 'time'];
         }
         // namespace
         let key_namespace, time_namespace;
@@ -337,7 +337,7 @@ class RedisConnector extends DBConnector {
                 new_data['id'] = selected[i].slice(DOMAIN_LEN);
                 for (let j = 0; j < props.length; j++)
                 {
-                    if (props[j] == 'timestamp')
+                    if (props[j] == 'time')
                     {
                         new_data[props[j]] = parseFloat(reply[i][1][j]);
                     }
