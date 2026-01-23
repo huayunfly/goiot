@@ -92,7 +92,7 @@ server.post('/message', async (req, reply) => {
             const check_set = new Set();
             for (const item of req.body.data.list)
             {
-                if (!item.id || !item.value || !item.result || isNaN(Number.parseFloat(item.timestamp)))
+                if (!item.id || !item.value || !item.result || isNaN(Number.parseFloat(item.time)))
                 {
                     throw `Invalid ${operation} data item.`;
                 }
@@ -113,7 +113,7 @@ server.post('/message', async (req, reply) => {
                 check_set.add(newid);
                 // Shadow copy.
                 data_list.push({
-                    'id': newid, 'value': item.value, 'result': item.result, 'timestamp': item.timestamp})
+                    'id': newid, 'value': item.value, 'result': item.result, 'time': item.time})
             }
             const updated_num = await service.update_data(namespace, data_list);
             return {
