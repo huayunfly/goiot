@@ -4,6 +4,7 @@ const assert = require('assert');
 const redis = require('ioredis');
 const fetch = require('node-fetch');
 const { group } = require('console');
+const { exit } = require('process');
 
 class DBConnector {
     constructor(connection_path) {
@@ -107,7 +108,7 @@ class RedisConnector extends DBConnector {
             const pipeline = obj.db_.pipeline();
             for (const data_id of table.id_array) {
                 id_list.push(data_id);               
-                pipeline.hmget('refresh:' + data_id, 'value', 'result', 'timestamp');
+                pipeline.hmget('refresh:' + data_id, 'value', 'result', 'time');
             }
             const reply = await pipeline.exec((err, replies) => {
                 if (err) {
@@ -116,21 +117,22 @@ class RedisConnector extends DBConnector {
                 }
             });
             const data_list = [];
-            var id_no = 0;
-            let t_last = Date.now() / 1000 - 15.0;
-            for (const item of reply) // item[1][2]
+            let id_no = 0;
+            const t_last = Date.now() / 1000.0 - 15.0;
+            for (const item of reply)
             {
-                if (null != t_last && item[1][2] > t_last) {
+                let t_data = Number(item[1][2]);
+                if (!Number.isNaN(t_data) && t_data > t_last) {
                     data_list.push({
                         "id": id_list[id_no], "value": item[1][0],
-                        "result": item[1][1], "timestamp": Date.now() / 1000
+                        "result": item[1][1], "time": t_data
                     });
                 }
                 id_no++;
             }
-            // Value is valid if Result is '0'.  ? n[0] : 'NULL'));
-            const data_list1 = [{ "id": "mfcpfc.1.pv", "value": "11.0", "result": "0", "timestamp": 1677154221.821000 },
-            { "id": "mfcpfc.2.pv", "value": "12.1", "result": "0", "timestamp": 1677154221.839000 }];
+
+            const data_list1 = [{ "id": "mfcpfc.1.pv", "value": "11.0", "result": "0", "time": 1677154221.821000 },
+            { "id": "mfcpfc.2.pv", "value": "12.1", "result": "0", "time": 1677154221.839000 }];
             if (data_list.length > 0) {
                 const body = new SetDataR('service_name', 'SetDataR',
                     '6ac89607254a437c90c28ccc1c034706', table.grp_name, data_list);
