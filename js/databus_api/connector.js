@@ -22,6 +22,18 @@ const D_NAMESPACE =
     'NS_POLL_TIME': 'time_p:',
 }
 
+const D_DataType =
+{
+    DF: 0,
+    WUB: 1,
+    WB: 2,
+    DUB: 3,
+    DB: 4,
+    BB: 5,
+    BT: 6,
+    STR: 7
+}
+
 class DBConnector {
     constructor(connection_path) {
         this.connection_path_ = connection_path;
@@ -120,16 +132,76 @@ class RedisConnector extends DBConnector {
                     if (!Number.isNaN(fvalue)) {
                         ratio = fvalue;
                     }
+                    if (data.register?.length <= 5)
+                    {
+                        console.log('Error data register length.');
+                        continue;
+                    }
                     let read_or_write = D_PRIVILEGE.READ_ONLY;
-                    if (data.register?.startsWith('RW'))
-                    {
+                    let start_pos = 0;
+                    if (data.register?.startsWith('RW')) {
                         read_or_write = D_PRIVILEGE.READ_WRITE;
+                        start_pos = 2;
                     }
-                    else if (data.register?.startsWith('W'))
-                    {
+                    else if (data.register?.startsWith('W')) {
                         read_or_write = D_PRIVILEGE.WRITE_ONLY;
+                        start_pos = 1;
                     }
-                    this.model_.add(id, new DataInfo(id, data.name, 8/*dtype*/, read_or_write, ratio, 0, -1, t_now));           
+                    else if (data.register?.startsWith('R')) {
+                        read_or_write = D_PRIVILEGE.READ_ONLY;
+                        start_pos = 1;
+                    }
+                    else {
+                        console.log('Error data privilege.');
+                        continue;
+                    }
+                    let int_zone = Number(data.register.substr(start_pos, 1))
+                    if (!Number.isInteger(int_zone) || 4 != int_zone)
+                    {
+                        console.log('Error data zone type.');
+                        continue;
+                    }
+                    start_pos++;
+                    ;// assign the data zone.
+                    let data_type = data.register.substr(start_pos, 3);
+                    if (data_type.startsWith('DF'))
+                    {
+                        data_type =  D_DataType.DF;
+                    }
+                    else if (data_type.startsWith('WUB'))
+                    {
+                        data_type =  D_DataType.WUB;
+                    }
+                    else if (data_type.startsWith('WB'))
+                    {
+                        data_type =  D_DataType.WB;
+                    }
+                    else if (data_type.startsWith('DUB'))
+                    {
+                        data_type =  D_DataType.DUB;
+                    }
+                    else if (data_type.startsWith('DB'))
+                    {
+                        data_type =  D_DataType.DB;
+                    }
+                    else if (data_type.startsWith('BT'))
+                    {
+                        data_type =  D_DataType.BT;
+                    }
+                    else if (data_type.startsWith('BB'))
+                    {
+                        data_type =  D_DataType.BB;
+                    }
+                    else if (data_type.startsWith('STR'))
+                    {
+                        data_type = D_DataType.STR;
+                    }
+                    else
+                    {
+                        console.log('Error data type.');
+                        continue;   
+                    }
+                    this.model_.add(id, new DataInfo(id, data.name, data_type, read_or_write, ratio, 0, -1, t_now));           
                 }
             }
         }
