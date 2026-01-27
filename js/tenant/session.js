@@ -27,7 +27,7 @@ class SessionMagager
 
     get time_now()
     {
-        return new Date().getTime() / 1000.0;
+        return Date.now() / 1000.0;
     }
 
     create_session(username)

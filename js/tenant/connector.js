@@ -61,34 +61,13 @@ class PostgreSQLConnector extends DBConnector {
         const auth_string = await digest_message(password);
         const result = await this.db_.query(`
         SELECT COUNT(*)
-        FROM public."user" WHERE "User"='${user}' and "Host"='${host}' and "authentication_string"='${auth_string}';
+        FROM public."user" WHERE "User"='${user}' and "Host"='${host}' and "AuthString"='${auth_string}';
          `);
         if (result === undefined || Number.parseInt(result.rows[0].count) == 0)
         {
             return false;
         }
         return true;
-    }
-
-    // Create DB tables if not exist.
-    create_tables(model) {
-        if (!model) {
-            throw 'Model is null.';
-        }
-        // Create table with special column name wrapped with "", like "mfcpfc.4.pv"    
-        for (const item of model) {
-            this.db_.query(`
- CREATE TABLE IF NOT EXISTS ${item.driver_id}
- (id SERIAL primary key, ${item.data_array.map(n => '"' + n + '"' + ' TEXT').join(',')}, 
- time DOUBLE PRECISION, createtime TIMESTAMP WITH TIME ZONE not null default localtimestamp(0));
- `, (err, result) => {
-                if (err) {
-                    throw err;
-                }
-                console.log(`Created table "${item.driver_id}"`);
-            });
-        }
-        this.table_created_ = true;
     }
 }
 
