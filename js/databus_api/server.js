@@ -12,7 +12,7 @@ const yargs = require('yargs');
 const { D_NAMESPACE, D_PRIVILEGE } = require('./connector');
 const RedisConnector = require('./connector').RedisConnector;
 const server = require('fastify')({ logger: true });
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '192.168.2.177';
 const PORT = process.env.PORT || 6300;
 const service_collection = {};
 
@@ -26,13 +26,17 @@ read_file(argv.f, (err, data_buffer) => {
     }
     else {
         try {
-            const data_config = JSON.parse(data_buffer.toString());
+            const data_config = JSON.parse(data_buffer.toString());         
             redis_string = '127.0.0.1:6379';
             if (data_config.redis) {
                 redis_string = data_config.redis;
             }
             const redis_connector = new RedisConnector(redis_string, data_config);
             service_collection['redis'] = redis_connector; // register service.
+            if (data_config.tenant)
+            {
+                service_collection['tenant'] = data_config.tenant;
+            }
         }
         catch (e) {
             console.error(e);
@@ -40,6 +44,57 @@ read_file(argv.f, (err, data_buffer) => {
         }
     }
 });
+
+
+class TouchRequest {
+    constructor(service_name, operation, token) {
+        this.name = service_name;
+        this.operation = operation;
+        this.token = token;
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            operation: this.operation,
+            token: this.token
+        };
+    }
+}
+
+
+async function check_id(token)
+{
+    const touch_req = new TouchRequest('tenant', 'touch', token);
+    const data = JSON.stringify(touch_req); 
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `nodejs/${process.version}`,
+            'Content-Encoding': 'gzip',
+            'Accept': 'application/json'
+        },
+        body: data
+    }
+    try
+    {
+        const id_check_req = await fetch(service_collection['tenant'], options);
+        const payload = await id_check_req.json();
+        if (payload.statusCode == '200')
+        {
+            return payload.result.username;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    catch (err)
+    {
+        return null;
+    }
+}
 
 server.get('/message', async (req, reply) => {
     console.log(`worker request pid=${process.pid}`);
@@ -70,6 +125,15 @@ server.post('/message', async (req, reply) => {
             throw 'Invalid content';
         }
         const token = req.body.token;
+        check_result = await check_id(token);
+        if (check_result == null)
+        {
+            return {
+                message: 'Message post error',
+                error: 'Invalid ID',
+                statusCode: '404'
+            };
+        }
         const operation = req.body.operation.toUpperCase();
         if (operation == 'SETDATAR' || operation == 'SETDATAP')
         {
@@ -92,7 +156,7 @@ server.post('/message', async (req, reply) => {
             const check_set = new Set();
             for (const item of req.body.data.list)
             {
-                if (!item.id || !item.value || !item.result || isNaN(Number.parseFloat(item.time)))
+                if (!item.id || !item.value || !item.result || Number.isNaN(Number(item.time)))
                 {
                     throw `Invalid ${operation} data item.`;
                 }
