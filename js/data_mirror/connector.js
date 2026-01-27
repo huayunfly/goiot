@@ -133,9 +133,9 @@ class RedisConnector extends DBConnector {
 
             const data_list1 = [{ "id": "mfcpfc.1.pv", "value": "11.0", "result": "0", "time": 1677154221.821000 },
             { "id": "mfcpfc.2.pv", "value": "12.1", "result": "0", "time": 1677154221.839000 }];
-            if (data_list.length > 0) {
+            if (data_list1.length > 0) {
                 const body = new SetDataR('service_name', 'SetDataR',
-                    '6ac89607254a437c90c28ccc1c034706', table.grp_name, data_list);
+                    '0bff36ada4d1456c965ba12288b1f97d', table.grp_name, data_list);
                 obj.webapi_.post('', body);
             }
         }
@@ -184,9 +184,13 @@ class WebServiceConnector {
 
         // fetch with "compress:true" by default
         (async () => {
-            const res = await fetch(this.api_path_ + service_path, options);
-            const payload = await res.json();
-            console.log(payload);
+            try {
+                const result = await fetch(this.api_path_ + service_path, options);
+                const body = await result.json();
+                console.log('Fetch statusCode %s', body.statusCode);
+            } catch (e) {
+                console.log('Fetch error.');
+            }
         })();
     }
 }
