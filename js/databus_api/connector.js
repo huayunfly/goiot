@@ -34,6 +34,16 @@ const D_DataType =
     STR: 7
 }
 
+const D_DataZone =
+{
+    OUTPUT_RELAY : 0,
+    INPUT_RELAY : 1,
+    INPUT_REGISTER : 3,
+    OUTPUT_REGISTER : 4,
+    PLC_DB : 5,
+    DB : 6
+};
+
 class DBConnector {
     constructor(connection_path) {
         this.connection_path_ = connection_path;
@@ -156,7 +166,37 @@ class RedisConnector extends DBConnector {
                         continue;
                     }
                     let int_zone = Number(data.register.substr(start_pos, 1))
-                    if (!Number.isInteger(int_zone) || 4 != int_zone)
+                    let data_zone = D_DataZone.INPUT_RELAY;
+                    if (!Number.isInteger(int_zone))
+                    {
+                        console.log('Error data zone type.');
+                        continue;
+                    }
+                    if (4 == int_zone)
+                    {
+                        data_zone = D_DataZone.OUTPUT_REGISTER;
+                    }
+                    else if (0 == int_zone)
+                    {
+                        data_zone = D_DataZone.INPUT_RELAY;
+                    }
+                    else if (1 == int_zone)
+                    {
+                        data_zone = D_DataZone.OUTPUT_RELAY;
+                    }
+                    else if (3 == int_zone)
+                    {
+                        data_zone = D_DataZone.INPUT_REGISTER;
+                    }
+                    else if (5 == int_zone)
+                    {
+                        data_zone = D_DataZone.PLC_DB;
+                    }
+                    else if (6 == int_zone)
+                    {
+                        data_zone = D_DataZone.DB;
+                    }
+                    else
                     {
                         console.log('Error data zone type.');
                         continue;
