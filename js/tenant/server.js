@@ -116,7 +116,7 @@ server.post('/api', async (req, reply) => {
         }
         else if (operation == 'TOUCH') 
         {
-            const token = req.body.token;
+            const token = req.body.condition?.token;
             if (!token)
             {
                 throw 'Token missing';
