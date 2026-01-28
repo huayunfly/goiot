@@ -10,6 +10,7 @@
 const read_file = require('fs').readFile;
 const yargs = require('yargs');
 const { D_NAMESPACE, D_PRIVILEGE } = require('./connector');
+const { threadCpuUsage } = require('process');
 const RedisConnector = require('./connector').RedisConnector;
 const server = require('fastify')({ logger: true });
 const HOST = process.env.HOST || '192.168.2.177';
@@ -57,12 +58,63 @@ class TouchRequest {
         return {
             name: this.name,
             operation: this.operation,
-            token: this.token
+            condition: { token: this.token }
         };
     }
 }
 
+class LoginRequest {
+    constructor(service_name, operation, username, password) {
+        this.name = service_name;
+        this.operation = operation;
+        this.username = username;
+        this.password = password;
+    }
 
+    toJSON() {
+        return {
+            name: this.name,
+            operation: this.operation,
+            condition: {
+                username: this.username,
+                password: this.password
+            }
+        }
+    }
+}
+
+class APIErrorResponse {
+    constructor(message, error, status_code) {
+        this.message = message;
+        this.error = error;
+        this.status_code = status_code;
+    }
+
+    toJSON() {
+        return {
+            message: this.message,
+            error: this.error,
+            statusCode: this.status_code
+        }
+    }
+}
+
+class APIOKResponse {
+    constructor(message, result) {
+        this.message = message;
+        this.result = result;
+    }
+
+    toJSON() {
+        return {
+            message: this.message,
+            result: this.result,
+            statusCode: '200'
+        }
+    }
+}
+
+// Calls the tenant service's touch().
 async function check_id(token)
 {
     const touch_req = new TouchRequest('tenant', 'touch', token);
@@ -96,6 +148,37 @@ async function check_id(token)
     }
 }
 
+
+// Calls the tenant service's login(), returns the token.
+async function login(username, password) {
+    const login_req = new LoginRequest('tenant', 'login', username, password);
+    const data = JSON.stringify(login_req);
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `nodejs/${process.version}`,
+            'Content-Encoding': 'gzip',
+            'Accept': 'application/json'
+        },
+        body: data
+    }
+    try {
+        const login_body = await fetch(service_collection['tenant'], options);
+        const payload = await login_body.json();
+        if (payload.statusCode == '200') {
+
+            return payload.result.token;
+        }
+        else {
+            return null;
+        }
+    }
+    catch (err) {
+        return null;
+    }
+}
+
 server.get('/message', async (req, reply) => {
     console.log(`worker request pid=${process.pid}`);
     try
@@ -120,23 +203,24 @@ server.post('/message', async (req, reply) => {
         {
             throw 'Invalid content-type';
         }
-        if (!req.body || !req.body.name || !req.body.token || !req.body.operation)
+        if (!req.body || !req.body.name || !req.body.operation)
         {
-            throw 'Invalid content';
-        }
-        const token = req.body.token;
-        check_result = await check_id(token);
-        if (check_result == null)
-        {
-            return {
-                message: 'Message post error',
-                error: 'Invalid ID',
-                statusCode: '404'
-            };
+            throw 'Invalid content'; 
         }
         const operation = req.body.operation.toUpperCase();
         if (operation == 'SETDATAR' || operation == 'SETDATAP')
         {
+            /* check ID*/
+            const token = req.body.token;
+            check_result = await check_id(token);
+            if (check_result == null)
+            {
+                return {
+                    message: 'Message post error',
+                    error: 'Invalid ID',
+                    statusCode: '404'
+                };
+            }
             let namespace = D_NAMESPACE.NS_REFRESH;
             let is_refresh = true;
             if (operation == 'SETDATAP')
@@ -201,11 +285,19 @@ server.post('/message', async (req, reply) => {
             }
         }
         */
-        else if (operation == 'GETDATAR' || operation == 'GETDATAP')
-        {
+        else if (operation == 'GETDATAR' || operation == 'GETDATAP') {
+            /* check ID*/
+            const token = req.body.token;
+            check_result = await check_id(token);
+            if (check_result == null) {
+                return {
+                    message: 'Message post error',
+                    error: 'Invalid ID',
+                    statusCode: '404'
+                };
+            }
             let namespace = D_NAMESPACE.NS_REFRESH;
-            if (operation == 'GETDATAP')
-            {
+            if (operation == 'GETDATAP') {
                 namespace = D_NAMESPACE.NS_POLL;
             }
             const batch_num = Number.parseInt(req.body.condition.batch_num);
@@ -245,14 +337,47 @@ server.post('/message', async (req, reply) => {
                     statusCode: '200'
                 };
         }
-        throw 'Unsupported operation.'
+        else if (operation == 'LOGIN')
+        {
+            const username = req.body.condition.username;
+            const password = req.body.condition.password;
+            const token = await login(username, password);
+            if (token == null) {
+                const err_response =
+                    new APIErrorResponse('Message post(LOGIN) error', 'Login failed', '404');
+                return JSON.stringify(err_response);
+            }
+            else
+            {
+                const ok_resposne = new APIOKResponse('Message post(LOGIN) ok', {token: token})
+                return JSON.stringify(ok_resposne);
+            }
+        }
+        else if (operation == 'TOUCH')
+        {
+            const token = req.body.condition.token;
+            check_result = await check_id(token);
+            if (check_result == null)
+            {
+                const err_response =
+                new APIErrorResponse('Message post(TOUCH) error', 'Invalid ID', '404');
+                return JSON.stringify(err_response);
+            }
+            else
+            {
+                const ok_resposne = new APIOKResponse('Message post(TOUCH) ok', {username: check_result})
+                return JSON.stringify(ok_resposne);
+            }
+        }
+        else
+        {
+            throw 'Unsupported operation.'
+        }
     }
     catch (err) {
-        return {
-            message: 'Message post error',
-            error: err.message??err,
-            statusCode: '404'
-        };
+        const err_response =
+            new APIErrorResponse('Message post error', err.message ?? err, '404');
+        return JSON.stringify(err_response);
     }
 });
 
