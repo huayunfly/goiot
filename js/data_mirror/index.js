@@ -30,7 +30,12 @@ read_file(argv.f, (err, data_buffer) => {
             {
                 webapi_string = data_config.webapi;
             }
-            const webapi = new WebServiceConnector(webapi_string);
+            let user_password = [null, null];
+            if (data_config.weblogin)
+            {
+                user_password = data_config.weblogin.split(':');      
+            }
+            const webapi = new WebServiceConnector(webapi_string, user_password[0], user_password[1]);
             const redis_connector = new RedisConnector(redis_string, data_config, webapi);
         }
         catch (e)

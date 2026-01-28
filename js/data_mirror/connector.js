@@ -41,6 +41,72 @@ class SetDataR {
     }
 }
 
+class LoginRequest {
+    constructor(service_name, operation, username, password) {
+        this.name = service_name;
+        this.operation = operation;
+        this.username = username;
+        this.password = password;
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            operation: this.operation,
+            condition: {
+                username: this.username,
+                password: this.password
+            }
+        }
+    }
+}
+
+class TouchRequest {
+    constructor(service_name, operation, token) {
+        this.name = service_name;
+        this.operation = operation;
+        this.token = token;
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            operation: this.operation,
+            condition: { token: this.token }
+        }
+    }
+}
+
+// Calls the tenant service's login(), returns the token.
+async function login(username, password) {
+    const login_req = new LoginRequest('tenant', 'login', username, password);
+    const data = JSON.stringify(login_req);
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `nodejs/${process.version}`,
+            'Content-Encoding': 'gzip',
+            'Accept': 'application/json'
+        },
+        body: data
+    }
+    try {
+        const login_body = await fetch(service_collection['tenant'], options);
+        const payload = await login_body.json();
+        if (payload.statusCode == '200') {
+
+            return payload.result.token;
+        }
+        else {
+            return null;
+        }
+    }
+    catch (err) {
+        return null;
+    }
+}
+
 class RedisConnector extends DBConnector {
     constructor(connection_path, data_config, webapi) {
         super(connection_path);
@@ -68,6 +134,7 @@ class RedisConnector extends DBConnector {
         this.db_.on('ready', () => {
             console.log('Redis server is ready.');
             setInterval(this.refresh_data, 5000, this);
+            setInterval(this.check_connection, 10000, this);
         });
         // If an error event is fired and no error handler is attached, 
         // the application process will throw the error and crash.
@@ -133,27 +200,59 @@ class RedisConnector extends DBConnector {
 
             const data_list1 = [{ "id": "mfcpfc.1.pv", "value": "11.0", "result": "0", "time": 1677154221.821000 },
             { "id": "mfcpfc.2.pv", "value": "12.1", "result": "0", "time": 1677154221.839000 }];
-            if (data_list1.length > 0) {
-                const body = new SetDataR('service_name', 'SetDataR',
-                    '0bff36ada4d1456c965ba12288b1f97d', table.grp_name, data_list);
-                obj.webapi_.post('', body);
+            if (data_list.length > 0 && obj.webapi_.token) {
+                const body = new SetDataR('service_name', 'SetDataR', obj.webapi_.token, table.grp_name, data_list);
+                obj.webapi_.post(body);
             }
+        }
+    }
+
+    async check_connection(obj)
+    {
+        const is_ok = await obj.webapi_.touch();
+        if (!is_ok)
+        {
+            obj.webapi_.login();
         }
     }
 }
 
 class WebServiceConnector {
-    constructor(api_path) {
-        if (!api_path)
-        {
+    constructor(api_path, username, password) {
+        if (!api_path) {
             throw 'null api_path';
         }
         // check api_path
         this.api_path_ = api_path;
+        this.username_ = username;
+        this.password_ = password;
+        this.token = null;
     }
 
-    async post(service_path, data_obj) {
-        const data = JSON.stringify(data_obj);
+    async login() {
+        const login_request = new LoginRequest('tenant', 'login', this.username_, this.password_);
+        const response = await this.post(login_request);
+        if (response?.statusCode == '200') {
+            this.token = response.result.token;
+        }
+        else {
+            this.token = null;
+        }
+    }
+
+    async touch() {
+        const touch_request = new TouchRequest('tenant', 'touch', this.token);
+        const response = await this.post(touch_request);
+        if (response?.statusCode == '200') {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    async post(data_obj) {
+        const data_str = JSON.stringify(data_obj);
         const options = {
             method: 'POST',
             headers: {
@@ -162,36 +261,18 @@ class WebServiceConnector {
                 'Content-Encoding': 'gzip',
                 'Accept': 'application/json'
             },
-            body: data
+            body: data_str
         };
 
-        // zlib.gzip(data, (err, buffer) => {
-        //     const req = https.request(options, res => {
-        //         console.log(`状态码: ${res.statusCode}`);
-        //         res.setEncoding('utf8'); // Note: not requesting or handling compressed response 
-        //         res.on('data', d => {
-        //             // ... do stuff with returned data
-        //         })
-        //     });
-
-        //     req.on('error', err => {
-        //         console.error('problem with request: ' + err.message);
-        //     });
-
-        //     req.write(buffer);
-        //     req.end();
-        // });
-
-        // fetch with "compress:true" by default
-        (async () => {
-            try {
-                const result = await fetch(this.api_path_ + service_path, options);
-                const body = await result.json();
-                console.log('Fetch statusCode %s', body.statusCode);
-            } catch (e) {
-                console.log('Fetch error.');
-            }
-        })();
+        try {
+            const response = await fetch(this.api_path_, options);
+            const body = await response.json();
+            console.log("Fetch statusCode %s", body.statusCode);
+            return body;
+        } catch (err) {
+            console.log(`Fetch error.${err}`);
+            return null;
+        }
     }
 }
 
