@@ -59,22 +59,33 @@ read_file(argv.f, (err, data_buffer) => {
     }
 });
 
-server.get('/message', async (req, reply) => {
-    console.log(`worker request pid=${process.pid}`);
-    try
-    {
-        throw 'Unsupported operation.';
+class APIResponseBase {
+    constructor(message, result, status_code) {
+        this.message = message;
+        this.result = result;
+        this.status_code = status_code;
     }
-    catch(err)
-    {
-        return {
-            message: 'Message put error',
-            error: err,
-            statusCode: '404'
-        };
-    }
-});
 
+    toJSON() {
+        return {
+            message: this.message,
+            result: this.result,
+            statusCode: this.status_code
+        }
+    }
+}
+
+class APIErrorResponse extends APIResponseBase {
+    constructor(message, error) {
+        super(message, error, '400')
+    }
+}
+
+class APIOKResponse extends APIResponseBase {
+    constructor(message, info) {
+        super(message, info, '200')
+    }
+}
 
 server.post('/api', async (req, reply) => {
     console.log(`worker request pid=${process.pid}`);
@@ -99,20 +110,13 @@ server.post('/api', async (req, reply) => {
             }
             const host = '127.0.0.1';
             const ok = await service_collection['pg'].validate_user(username, host, password);
-            if (!ok)
+            if (!ok) 
             {
-                return {
-                    message: `Api post (${operation}) failed`,
-                    error: 'Username or password error',
-                    statusCode: '400'
-                };
+                return new APIErrorResponse(
+                    `Api post (${operation}) failed`, 'Username or password error', '400');
             }
             const s_id = service_collection['session'].create_session(username); 
-            return {
-                message: `Api post (${operation}) ok`,
-                result: {'token': `${s_id}`},
-                statusCode: '200'
-            };
+            return new APIOKResponse(`Api post (${operation}) ok`, {'token': `${s_id}`});
         }
         else if (operation == 'TOUCH') 
         {
@@ -124,26 +128,18 @@ server.post('/api', async (req, reply) => {
             const username = service_collection['session'].touch_session(token);
             if (username == null)
             {
-                return {
-                    message: `Api post (${operation}) failed`,
-                    error: 'Session expired or not existed',
-                    statusCode: '404'
-                };
-            }  
-            return {
-                message: `Api post (${operation}) ok`,
-                result: {'username': `${username}`},
-                statusCode: '200'
-            };
+                return new APIErrorResponse(`Api post (${operation}) failed`, 'Session expired or not existed');
+            }
+            else
+            {
+                return new APIOKResponse(`Api post (${operation}) ok`, {'username': `${username}`});
+            }
         }
         throw 'Unsupported operation.'
     }
-    catch (err) {
-        return {
-            message: 'Message post error',
-            error: err.message??err,
-            statusCode: '404'
-        };
+    catch (err) 
+    {
+        return new APIErrorResponse('Message post error', err);
     }
 });
 
