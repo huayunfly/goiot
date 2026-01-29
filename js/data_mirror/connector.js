@@ -232,10 +232,12 @@ class WebServiceConnector {
     async login() {
         const login_request = new LoginRequest('tenant', 'login', this.username_, this.password_);
         const response = await this.post(login_request);
-        if (response?.statusCode == '200') {
+        if (response?.statusCode == '200') 
+        {
             this.token = response.result.token;
         }
-        else {
+        else 
+        {
             this.token = null;
         }
     }
@@ -243,10 +245,12 @@ class WebServiceConnector {
     async touch() {
         const touch_request = new TouchRequest('tenant', 'touch', this.token);
         const response = await this.post(touch_request);
-        if (response?.statusCode == '200') {
+        if (response?.statusCode == '200') 
+        {
             return true;
         }
-        else {
+        else 
+        {
             return false;
         }
     }
@@ -270,7 +274,7 @@ class WebServiceConnector {
             console.log("Fetch statusCode %s", body.statusCode);
             return body;
         } catch (err) {
-            console.log(`Fetch error.${err}`);
+            console.log(`Fetch error. ${err}`);
             return null;
         }
     }
