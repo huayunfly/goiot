@@ -47,70 +47,66 @@ read_file(argv.f, (err, data_buffer) => {
 });
 
 
-class TouchRequest {
-    constructor(service_name, operation, token) {
+class ApiRequestBase {
+    constructor(service_name, operation, condition) {
         this.name = service_name;
         this.operation = operation;
-        this.token = token;
+        this.condition = condition;
     }
 
     toJSON() {
         return {
             name: this.name,
             operation: this.operation,
-            condition: { token: this.token }
-        };
-    }
-}
-
-class LoginRequest {
-    constructor(service_name, operation, username, password) {
-        this.name = service_name;
-        this.operation = operation;
-        this.username = username;
-        this.password = password;
-    }
-
-    toJSON() {
-        return {
-            name: this.name,
-            operation: this.operation,
-            condition: {
-                username: this.username,
-                password: this.password
-            }
+            condition: this.condition
         }
     }
 }
 
-class APIErrorResponse {
-    constructor(message, error, status_code) {
+
+class TouchRequest extends ApiRequestBase {
+    constructor(service_name, operation, token) {
+        super(service_name, operation, { token: token });
+    }
+}
+
+class LoginRequest extends ApiRequestBase {
+    constructor(service_name, operation, username, password) {
+        super(service_name, operation, { username: username, password: password })
+    }
+}
+
+class APIResponseBase {
+    constructor(message, result, status_code) {
         this.message = message;
-        this.error = error;
+        this.result = result;
         this.status_code = status_code;
     }
 
     toJSON() {
         return {
             message: this.message,
-            error: this.error,
+            result: this.result,
             statusCode: this.status_code
         }
     }
 }
 
-class APIOKResponse {
-    constructor(message, result) {
-        this.message = message;
-        this.result = result;
+class APIErrorResponse extends APIResponseBase {
+    constructor(message, error) {
+        super(message, error, '400')
     }
+}
 
-    toJSON() {
-        return {
-            message: this.message,
-            result: this.result,
-            statusCode: '200'
-        }
+class APIOKResponse extends APIResponseBase {
+    constructor(message, info) {
+        super(message, info, '200')
+    }
+}
+
+class APIDataResponse extends APIResponseBase {
+    constructor(message, data, status_code) {
+        super(message, data, status_code)
     }
 }
 
@@ -181,17 +177,11 @@ async function login(username, password) {
 
 server.get('/message', async (req, reply) => {
     console.log(`worker request pid=${process.pid}`);
-    try
-    {
+    try {
         throw 'Unsupported operation.';
     }
-    catch(err)
-    {
-        return {
-            message: 'Message put error',
-            error: err,
-            statusCode: '404'
-        };
+    catch (err) {
+        return new APIErrorResponse('Message get error', err);
     }
 });
 
@@ -199,38 +189,30 @@ server.post('/message', async (req, reply) => {
     console.log(`worker request pid=${process.pid}`);
     try 
     {
-        if (req.headers['content-type'] != 'application/json') 
-        {
+        if (req.headers['content-type'] != 'application/json') {
             throw 'Invalid content-type';
         }
-        if (!req.body || !req.body.name || !req.body.operation)
-        {
-            throw 'Invalid content'; 
+        if (!req.body || !req.body.name || !req.body.operation) {
+            throw 'Invalid content';
         }
         const operation = req.body.operation.toUpperCase();
-        if (operation == 'SETDATAR' || operation == 'SETDATAP')
-        {
+        if (operation == 'SETDATAR' || operation == 'SETDATAP') {
             /* check ID*/
             const token = req.body.token;
             check_result = await check_id(token);
-            if (check_result == null)
+            if (check_result == null) 
             {
-                return {
-                    message: 'Message post error',
-                    error: 'Invalid ID',
-                    statusCode: '404'
-                };
+                return new APIErrorResponse('Message post error', 'Invalid ID');
             }
             let namespace = D_NAMESPACE.NS_REFRESH;
             let is_refresh = true;
-            if (operation == 'SETDATAP')
+            if (operation == 'SETDATAP') 
             {
                 namespace = D_NAMESPACE.NS_POLL;
                 is_refresh = false;
             }
-            if (!req.body.data || !req.body.data.group_name || 
-                !Array.isArray(req.body.data.list))
-            {
+            if (!req.body.data || !req.body.data.group_name ||
+                !Array.isArray(req.body.data.list)) {
                 throw `Invalid ${operation} content attributes.`;
             }
             const group_name = req.body.data.group_name;
@@ -238,37 +220,30 @@ server.post('/message', async (req, reply) => {
             const model = service.data_model();
             const data_list = [];
             const check_set = new Set();
-            for (const item of req.body.data.list)
-            {
-                if (!item.id || !item.value || !item.result || Number.isNaN(Number(item.time)))
-                {
+            for (const item of req.body.data.list) {
+                if (!item.id || !item.value || !item.result || Number.isNaN(Number(item.time))) {
                     throw `Invalid ${operation} data item.`;
                 }
                 const newid = [group_name, item.id].join('.');
                 // Distinct id
-                if (check_set.has(newid)) 
-                {
+                if (check_set.has(newid)) {
                     continue;
                 }
                 // Query data model by new id.
                 const data_info = model.query(newid);
                 // Exclude undifined and READ_ONLY data.
                 if (!data_info || (!is_refresh && data_info.privilege == D_PRIVILEGE.READ_ONLY) ||
-                (is_refresh && data_info.privilege == D_PRIVILEGE.WRITE_ONLY))
-                {
+                    (is_refresh && data_info.privilege == D_PRIVILEGE.WRITE_ONLY)) {
                     continue; //throw 'Data id does not existed.';
                 }
                 check_set.add(newid);
                 // Shadow copy.
                 data_list.push({
-                    'id': newid, 'value': item.value, 'result': item.result, 'time': item.time})
+                    'id': newid, 'value': item.value, 'result': item.result, 'time': item.time
+                })
             }
             const updated_num = await service.update_data(namespace, data_list);
-            return {
-                message: `Message post (${operation}) ok`,
-                result: {'total': updated_num},
-                statusCode: '200'
-            };
+            return new APIOKResponse(`Message post (${operation}) ok`, { 'total': updated_num });
         }
         /* GETDATA format
         {
@@ -289,15 +264,13 @@ server.post('/message', async (req, reply) => {
             /* check ID*/
             const token = req.body.token;
             check_result = await check_id(token);
-            if (check_result == null) {
-                return {
-                    message: 'Message post error',
-                    error: 'Invalid ID',
-                    statusCode: '404'
-                };
+            if (check_result == null) 
+            {
+                return new APIErrorResponse('Message post error', 'Invalid ID');
             }
             let namespace = D_NAMESPACE.NS_REFRESH;
-            if (operation == 'GETDATAP') {
+            if (operation == 'GETDATAP') 
+            {
                 namespace = D_NAMESPACE.NS_POLL;
             }
             const batch_num = Number.parseInt(req.body.condition.batch_num);
@@ -306,7 +279,7 @@ server.post('/message', async (req, reply) => {
                 !Array.isArray(req.body.condition.id_list) || 
                 !Array.isArray(req.body.condition.time_range) ||
                 !Array.isArray(req.body.condition.properties) ||
-                isNaN(batch_num) || isNaN(batch_size))
+                Number.isNaN(batch_num) || Number.isNaN(batch_size))
             {
                 throw `Invalid ${operation} content attributes.`;
             }
@@ -323,34 +296,28 @@ server.post('/message', async (req, reply) => {
                     id_list.push(x);
                 }
             });
-            let result_data = {'group_name': group_name, 'list': [], 'total': 0};  
+            let result_data = { 'group_name': group_name, 'list': [], 'total': 0 };
             // Id matched.  
-            if (!(check_set.size > 0 && id_list.length == 0))
+            if (!(check_set.size > 0 && id_list.length == 0)) 
             {
-                result_data = await service.get_data(namespace, group_name, id_list, 
-                    req.body.condition.time_range, req.body.condition.properties, 
+                result_data = await service.get_data(namespace, group_name, id_list,
+                    req.body.condition.time_range, req.body.condition.properties,
                     batch_num, batch_size);
             }
-            return {
-                    message: `Message post (${operation}) ok`,
-                    result: {'data': result_data},
-                    statusCode: '200'
-                };
+            return new APIOKResponse(`Message post (${operation}) ok`, { 'data': result_data });
         }
         else if (operation == 'LOGIN')
         {
             const username = req.body.condition.username;
             const password = req.body.condition.password;
             const token = await login(username, password);
-            if (token == null) {
-                const err_response =
-                    new APIErrorResponse('Message post(LOGIN) error', 'Login failed', '404');
-                return JSON.stringify(err_response);
+            if (token == null) 
+            {
+                return new APIErrorResponse('Message post(LOGIN) error', 'Login failed');
             }
             else
             {
-                const ok_resposne = new APIOKResponse('Message post(LOGIN) ok', {token: token})
-                return JSON.stringify(ok_resposne);
+                return new APIOKResponse('Message post(LOGIN) ok', {token: token})
             }
         }
         else if (operation == 'TOUCH')
@@ -359,14 +326,11 @@ server.post('/message', async (req, reply) => {
             check_result = await check_id(token);
             if (check_result == null)
             {
-                const err_response =
-                new APIErrorResponse('Message post(TOUCH) error', 'Invalid ID', '404');
-                return JSON.stringify(err_response);
+                return new APIErrorResponse('Message post(TOUCH) error', 'Invalid ID');
             }
             else
             {
-                const ok_resposne = new APIOKResponse('Message post(TOUCH) ok', {username: check_result})
-                return JSON.stringify(ok_resposne);
+                return new APIOKResponse('Message post(TOUCH) ok', {username: check_result})
             }
         }
         else
@@ -375,9 +339,7 @@ server.post('/message', async (req, reply) => {
         }
     }
     catch (err) {
-        const err_response =
-            new APIErrorResponse('Message post error', err.message ?? err, '404');
-        return JSON.stringify(err_response);
+        return new APIErrorResponse('Message post error', err);
     }
 });
 
