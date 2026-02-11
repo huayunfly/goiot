@@ -70,14 +70,14 @@ struct LogonButton: View {
 
 struct SettingTabView: View {
     
-    @State private var address: String = "http://192.168.2.107:6301/api"
-    @State private var username: String = "yun_hua@yashentech.com"
-    @State private var password: String = "agaeq545b3nbtg"
+    @State private var address: String = "http://192.168.2.177:6300/message"
+    @State private var username: String = "goiot"
+    @State private var password: String = "abc123"
     @State private var refreshInSecond: String = "5"
     @State private var isConnected : Bool = false
     @State private var txtLogon = TXT_LOGON
     @State private var colorLogon = COLOR_LOGON
-    
+     
     @EnvironmentObject var userData: UserData
     
     // Constants
@@ -106,9 +106,10 @@ struct SettingTabView: View {
     func logon()
     {
         Task {
-            let requestBody = ApiRequestBody(name: "tenant", token: nil, operation: "Login", condition: ["username": username, "password": password])
+            let requestBody = ApiRequestBody(name: "tenant", operation: "Login", token: nil, condition: ["username": username, "password": password])
             
             do {
+                
                 if !isConnected {
                     let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
                     guard response.statusCode == "200" else {
@@ -116,18 +117,17 @@ struct SettingTabView: View {
                         throw WebServiceError.statusError
                     }
                     userData.username = username
-                    userData.address = address
-                    userData.logon = true
-                    userData.token = response.result["token"] ?? "1-2-3-4-5-6"
+                    userData.isLoggedIn = true
+                    userData.token = response.result?["token"] ?? "1-2-3-4-5-6"
                     isConnected = true
                     txtLogon = SettingTabView.TXT_LOGOFF
                     colorLogon = SettingTabView.COLOR_LOGOFF
                     print(userData.token)
                 }
                 else {
-                    userData.logon = false
+                    userData.isLoggedIn = false
                     userData.token = ""
-                    isConnected = false;
+                    isConnected = false
                     txtLogon = SettingTabView.TXT_LOGON
                     colorLogon = SettingTabView.COLOR_LOGON
                     print("Logoff")

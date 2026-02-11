@@ -9,28 +9,35 @@ import Foundation
 
 struct ApiResultBody: Decodable {
     let message: String
-    let result: [String: String]
+    let result: [String: String]?
     let statusCode: String
-    let error: String?
 }
 
 struct ApiRequestBody: Encodable {
     let name: String
-    let token: String?
     let operation: String
+    let token: String?
     let condition: [String: String]
 }
 
 struct ApiGetDataBody {
     let name: String
-    let token: String
     let operation: String
+    let token: String
     let condition : [String: Any]
 }
 
 struct ApiSetDataBody {
     let name: String
-    let token: String
     let operation: String
+    let token: String
     let data: [String: Any]
+}
+
+struct DataItem: Identifiable, Codable  {
+    let id: String
+    let name: String
+    let fvalue: Double
+    let result: Int32
+    let timestamp: Double
 }

@@ -7,28 +7,65 @@
 
 import SwiftUI
 
+
+enum ItemStyle: Int, CaseIterable {
+    case compact
+    case standard
+    case detailed
+}
+
+
+class DataManager: ObservableObject {
+    @Published var items: [DataItem] = []
+    
+    init() {
+        let now = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+        for i in 1...20 {
+            let item = DataItem(
+                id: String(i),
+                name: "数据 \(i)",
+                fvalue: Double.random(in: 0.1...100.0),
+                result: -1,
+                timestamp: now.addingTimeInterval(-Double(i) * 86400).timeIntervalSince1970
+            )
+            items.append(item)
+        }
+    }
+}
+
 struct MonitorTabView: View {
     
     @EnvironmentObject var userData: UserData
     
+    @EnvironmentObject var dataManager: DataManager
+    
+    @State private var selectedStyle: ItemStyle = .standard
+    @StateObject var dataManagerTest: DataManager = DataManager()
+    
     var body: some View {
-        HStack(alignment: .oneThird) {
-            Rectangle()
-                .foregroundColor(Color.green)
-                .frame(width: 50, height: 200)
-            Rectangle()
-                .foregroundColor(Color.red)
-
-                .frame(width: 50, height: 200)
-            Rectangle()
-                .foregroundColor(Color.blue)
-                .frame(width: 50, height: 200)
-            Rectangle()
-                .foregroundColor(Color.orange)
-                .alignmentGuide(.oneThird,
-                     computeValue: { d in d[VerticalAlignment.top] })
-                .frame(width: 50, height: 200)
-            Text("First Content View")
+        NavigationStack {
+            VStack {
+                // 样式选择器
+                Picker("选择样式", selection: $selectedStyle) {
+                    ForEach(ItemStyle.allCases, id:\.self) { style in
+                        Text(style.rawValue.description)
+                    }
+                }
+                .pickerStyle(.menu)
+                .padding()
+                
+                // 列表
+                List {
+                    ForEach(dataManagerTest.items, id: \.id) { item in
+                        ItemRowView(item: item, style: selectedStyle)
+                    }
+                }
+                .listStyle(.grouped)
+                .navigationTitle("数据列表")
+            }
         }
     }
 }
@@ -40,8 +77,94 @@ extension VerticalAlignment {
     static let oneThird = VerticalAlignment(OneThird.self)
 }
 
+// 行视图
+struct ItemRowView: View {
+    let item: DataItem
+    let style: ItemStyle
+    
+    var body: some View {
+        HStack {
+            // ID列
+            VStack(alignment: .leading, spacing: 2) {
+                Text("#\(item.id)")
+                    .font(.headline)
+                Text(DateFormatter.localizedString(from: Date(timeIntervalSince1970: item.timestamp), dateStyle: .none, timeStyle: .short))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 8)
+            
+            // 名字列
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.name)
+                    .font(.headline)
+            }
+            .padding(.vertical, 8)
+            
+            // 时间列
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(DateFormatter.localizedString(from: Date(timeIntervalSince1970: item.timestamp), dateStyle: .medium, timeStyle: .short))
+                    .font(.headline)
+            }
+            .padding(.vertical, 8)
+            
+            // 值列
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("\(item.fvalue, specifier: "%.2f")")
+                    .font(.headline)
+                    .foregroundColor(item.fvalue > 50 ? .green : .blue)
+            }
+            .padding(.vertical, 8)
+        }
+        .padding(16)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
+        .foregroundColor(Color(.label))
+        
+        // 根据样式添加额外内容
+        if style == .detailed {
+            HStack {
+                Spacer()
+                // 详细信息按钮
+                Button(action: {
+                    // 显示详细信息
+                }) {
+                    Image(systemName: "info.circle")
+                        .symbolRenderingMode(.multicolor)
+                }
+                .padding(8)
+            }
+            .padding(.trailing, 16)
+        }
+    }
+}
+
+// 骨干视图（用于占位符）
+struct SkeletonView<T: View>: View {
+    let content: T
+    
+    init(_ type: T.Type, content: T) {
+        self.content = content
+    }
+    
+    init(content: T) {
+        self.content = content
+    }
+    
+    var body: some View {
+        content
+    }
+}
+// 颜色扩展
+extension Color {
+    static let accent = Color("accent")
+}
+
 struct MonitorTabView_Previews: PreviewProvider {
     static var previews: some View {
         MonitorTabView()
     }
 }
+
+
