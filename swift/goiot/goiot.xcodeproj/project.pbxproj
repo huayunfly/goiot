@@ -19,6 +19,7 @@
 		6CB407662A8489C10093AEF7 /* MonitorTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407652A8489C10093AEF7 /* MonitorTabView.swift */; };
 		6CB407682A848A650093AEF7 /* TrendTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407672A848A650093AEF7 /* TrendTabView.swift */; };
 		6CB4076A2A848A950093AEF7 /* SettingTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB407692A848A950093AEF7 /* SettingTabView.swift */; };
+		6CF5463F2F3C77A700EC09DF /* drivers.json in Resources */ = {isa = PBXBuildFile; fileRef = 6CF5463E2F3C77A700EC09DF /* drivers.json */; };
 		6CFAACE72A9435E70052ED7A /* ApiHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFAACE62A9435E70052ED7A /* ApiHelper.swift */; };
 		6CFAACE92A945EFB0052ED7A /* WebServiceCaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */; };
 /* End PBXBuildFile section */
@@ -56,6 +57,7 @@
 		6CB407652A8489C10093AEF7 /* MonitorTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorTabView.swift; sourceTree = "<group>"; };
 		6CB407672A848A650093AEF7 /* TrendTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendTabView.swift; sourceTree = "<group>"; };
 		6CB407692A848A950093AEF7 /* SettingTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTabView.swift; sourceTree = "<group>"; };
+		6CF5463E2F3C77A700EC09DF /* drivers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = drivers.json; sourceTree = "<group>"; };
 		6CFAACE62A9435E70052ED7A /* ApiHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiHelper.swift; sourceTree = "<group>"; };
 		6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebServiceCaller.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -109,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				6C9625B52F3471E8001DA52C /* LoginView.swift */,
+				6CF5463E2F3C77A700EC09DF /* drivers.json */,
 				6CB4073B2A8469580093AEF7 /* goiotApp.swift */,
 				6CB4073D2A8469580093AEF7 /* ContentView.swift */,
 				6CB4073F2A8469590093AEF7 /* Assets.xcassets */,
@@ -254,6 +257,7 @@
 			files = (
 				6CB407432A8469590093AEF7 /* Preview Assets.xcassets in Resources */,
 				6CB407402A8469590093AEF7 /* Assets.xcassets in Resources */,
+				6CF5463F2F3C77A700EC09DF /* drivers.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

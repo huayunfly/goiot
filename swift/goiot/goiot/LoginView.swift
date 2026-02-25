@@ -89,7 +89,8 @@ struct LoginView: View {
             
             // 登录按钮
             Button {
-                handleLogin()
+                //handleLogin()
+                handleLoad()
             } label: {
                 ZStack {
                     if isLoading {
@@ -140,6 +141,13 @@ struct LoginView: View {
     private func validatePassword(_ password: String) {
         let isValid = !password.isEmpty && password.count >= 6
         isPasswordValid = isValid
+    }
+    
+    private func handleLoad() {
+        Task{
+            let result: DriverConfig? = await JSONLoader.shared.loadData(fromFile: "drivers")
+
+        }
     }
     
     private func handleLogin() {

@@ -14,28 +14,6 @@ enum ItemStyle: Int, CaseIterable {
     case detailed
 }
 
-
-class DataManager: ObservableObject {
-    @Published var items: [DataItem] = []
-    
-    init() {
-        let now = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
-        for i in 1...20 {
-            let item = DataItem(
-                id: String(i),
-                name: "数据 \(i)",
-                fvalue: Double.random(in: 0.1...100.0),
-                result: -1,
-                timestamp: now.addingTimeInterval(-Double(i) * 86400).timeIntervalSince1970
-            )
-            items.append(item)
-        }
-    }
-}
-
 struct MonitorTabView: View {
     
     @EnvironmentObject var userData: UserData
@@ -59,7 +37,7 @@ struct MonitorTabView: View {
                 
                 // 列表
                 List {
-                    ForEach(dataManagerTest.items, id: \.id) { item in
+                    ForEach(Array(dataManagerTest.items.values), id: \.id) { item in
                         ItemRowView(item: item, style: selectedStyle)
                     }
                 }
@@ -79,7 +57,7 @@ extension VerticalAlignment {
 
 // 行视图
 struct ItemRowView: View {
-    let item: DataItem
+    let item: DataInfo
     let style: ItemStyle
     
     var body: some View {
@@ -110,9 +88,9 @@ struct ItemRowView: View {
             
             // 值列
             VStack(alignment: .trailing, spacing: 2) {
-                Text("\(item.fvalue, specifier: "%.2f")")
+                Text("\(item.fValue, specifier: "%.2f")")
                     .font(.headline)
-                    .foregroundColor(item.fvalue > 50 ? .green : .blue)
+                    .foregroundColor(item.fValue > 50 ? .green : .blue)
             }
             .padding(.vertical, 8)
         }
