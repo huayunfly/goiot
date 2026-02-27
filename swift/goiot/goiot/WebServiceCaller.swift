@@ -12,7 +12,10 @@ enum WebServiceError: Error {
     case invalidJSONEncode
     case invalidJSONDecode
     case invalidTypeConversion
+    case invalidURL
     case statusError
+    case loginError
+    case GetDataError
 }
 
 class WebServiceCaller {
@@ -24,7 +27,10 @@ class WebServiceCaller {
     /// - Parameter sendData: json to send
     /// - Returns: Data
     class func Post(to url: String, contentType reqContentType: String, with sendData: Data, timeoutInterval timeout: TimeInterval) async throws -> Data {
-        let url = URL(string: url)!
+        guard let url = URL(string: url) else {
+            print("Invalide URL")
+            throw WebServiceError.invalidURL
+        }
         var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeout)
 
         // Change the URLRequest to a POST request
@@ -79,11 +85,30 @@ class WebServiceCaller {
         }
         
         let data = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
-        
+        print(String(data: data, encoding: .utf8))
         let decoder = JSONDecoder()
         guard let response = try? decoder.decode(T2.self, from: data) else {
             throw WebServiceError.invalidJSONDecode
         }
         return response
+            
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          
     }
 }

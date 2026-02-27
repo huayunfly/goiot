@@ -9,8 +9,26 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State private var selection = 1
     @StateObject var userData: UserData = UserData()
+    
+    @StateObject var dataManager: DataManager = DataManager()
+    
+    var body: some View {
+        NavigationStack {
+            if userData.isLoggedIn {
+                MyTabView().environmentObject(userData).environmentObject(dataManager)
+            } else {
+                LoginView().environmentObject(userData)
+            }
+        }
+    }
+}
+
+struct MyTabView: View {
+    
+    @State private var selection = 1
+    @EnvironmentObject var userData: UserData
+    @EnvironmentObject var dataManager: DataManager
     
     var body: some View {
         TabView(selection: $selection) {
@@ -18,7 +36,7 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "checkerboard.rectangle")
                     Text("监视")
-                }.tag(1).environmentObject(userData)
+                }.tag(1).environmentObject(userData).environmentObject(dataManager)
             TrendTabView()
                 .tabItem {
                     Image(systemName: "chart.line.flattrend.xyaxis")
@@ -29,10 +47,10 @@ struct ContentView: View {
                     Image(systemName: "gear")
                     Text("设置")
                 }.tag(3).environmentObject(userData)
-        }
-        .font(.largeTitle)
+        }.font(.largeTitle)
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
