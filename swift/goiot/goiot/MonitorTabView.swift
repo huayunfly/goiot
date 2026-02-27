@@ -21,7 +21,7 @@ struct MonitorTabView: View {
     @EnvironmentObject var dataManager: DataManager
     
     @State private var selectedStyle: ItemStyle = .standard
-    @StateObject var dataManagerTest: DataManager = DataManager()
+    //@StateObject var dataManagerTest: DataManager = DataManager()
     
     var body: some View {
         NavigationStack {
@@ -35,9 +35,30 @@ struct MonitorTabView: View {
                 .pickerStyle(.menu)
                 .padding()
                 
+                Button{
+                    Task {
+                        do {
+                            try await dataManager.RefreshData(token: userData.token)
+                        }
+                        catch let error {
+                            print("RefreshData() error: \(error)")
+                        }
+                    }
+                }
+                label: {
+                    ZStack {
+                        Text("刷新").font(.title2)
+                    }
+                }
+                .frame(width: 300, height: 50)
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+                .padding()
+            
                 // 列表
                 List {
-                    ForEach(Array(dataManagerTest.items.values), id: \.id) { item in
+                    ForEach(Array(dataManager.dataItems.values), id: \.id) { item in
                         ItemRowView(item: item, style: selectedStyle)
                     }
                 }

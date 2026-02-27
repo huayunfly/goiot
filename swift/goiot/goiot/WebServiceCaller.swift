@@ -15,6 +15,7 @@ enum WebServiceError: Error {
     case invalidURL
     case statusError
     case loginError
+    case GetDataError
 }
 
 class WebServiceCaller {
