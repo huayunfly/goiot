@@ -181,7 +181,7 @@ server.get('/message', async (req, reply) => {
         throw 'Unsupported operation.';
     }
     catch (err) {
-        return new APIErrorResponse('Message get error', err);
+        return new APIErrorResponse('Message get error', {error: err});
     }
 });
 
@@ -202,7 +202,7 @@ server.post('/message', async (req, reply) => {
             check_result = await check_id(token);
             if (check_result == null) 
             {
-                return new APIErrorResponse('Message post error', 'Invalid ID');
+                return new APIErrorResponse('Message post error', {error: 'Invalid ID'});
             }
             let namespace = D_NAMESPACE.NS_REFRESH;
             let is_refresh = true;
@@ -266,7 +266,7 @@ server.post('/message', async (req, reply) => {
             check_result = await check_id(token);
             if (check_result == null) 
             {
-                return new APIErrorResponse('Message post error', 'Invalid ID');
+                return new APIErrorResponse('Message post error', {error: 'Invalid ID'});
             }
             let namespace = D_NAMESPACE.NS_REFRESH;
             if (operation == 'GETDATAP') 
@@ -313,7 +313,7 @@ server.post('/message', async (req, reply) => {
             const token = await login(username, password);
             if (token == null) 
             {
-                return new APIErrorResponse('Message post(LOGIN) error', 'Login failed');
+                return new APIErrorResponse('Message post(LOGIN) error', {error: 'Login failed'});
             }
             else
             {
@@ -326,7 +326,7 @@ server.post('/message', async (req, reply) => {
             check_result = await check_id(token);
             if (check_result == null)
             {
-                return new APIErrorResponse('Message post(TOUCH) error', 'Invalid ID');
+                return new APIErrorResponse('Message post(TOUCH) error', {error: 'Invalid ID'});
             }
             else
             {
@@ -339,7 +339,7 @@ server.post('/message', async (req, reply) => {
         }
     }
     catch (err) {
-        return new APIErrorResponse('Message post error', err);
+        return new APIErrorResponse('Message post error', {error: err});
     }
 });
 

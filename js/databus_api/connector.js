@@ -427,6 +427,14 @@ class RedisConnector extends DBConnector {
             batch_num = 1;
         }
         const DOMAIN_LEN = key_namespace.length + group_name.length + 1/* dot */;
+        // Initialize the return batch table.
+        let data_table = {};
+        data_table["id"] = [];
+        for (let i = 0; i < props.length; i++) 
+        {
+            data_table[props[i]] = []
+        }
+        // Query data
         for (let i = (batch_num - 1) * batch_size; i < match_ids.length;) 
         {
             let start = i;
@@ -443,26 +451,15 @@ class RedisConnector extends DBConnector {
                 transaction.hmget(ns_id, props);
             }
             const reply = await transaction.exec();
-            for (let i = 0; i < reply.length; i++)
+            // Data table implementation，all data, including float, are in string format.  
+            data_table["id"].push(...selected.map(x => x.slice(DOMAIN_LEN)));
+            for (let i = 0; i < props.length; i++) 
             {
-                const new_data = {};
-                new_data['id'] = selected[i].slice(DOMAIN_LEN);
-                for (let j = 0; j < props.length; j++)
-                {
-                    if (props[j] == 'time')
-                    {
-                        new_data[props[j]] = parseFloat(reply[i][1][j]);
-                    }
-                    else
-                    {
-                        new_data[props[j]] = reply[i][1][j];
-                    }
-                }
-                data_list.push(new_data);
+                data_table[props[i]].push(...reply.map(x => x[1][i]));
             }
             break; // One batch read finished.
         }
-        return {'group_name': group_name, 'list': data_list, 'total': match_ids.length};    
+        return {'group_name': group_name, 'table': data_table, 'total': match_ids.length};    
     }
 }
 
