@@ -113,7 +113,7 @@ server.post('/api', async (req, reply) => {
             if (!ok) 
             {
                 return new APIErrorResponse(
-                    `Api post (${operation}) failed`, 'Username or password error', '400');
+                    `Api post (${operation}) failed`, {error: 'Username or password error'});
             }
             const s_id = service_collection['session'].create_session(username); 
             return new APIOKResponse(`Api post (${operation}) ok`, {'token': `${s_id}`});
@@ -128,7 +128,7 @@ server.post('/api', async (req, reply) => {
             const username = service_collection['session'].touch_session(token);
             if (username == null)
             {
-                return new APIErrorResponse(`Api post (${operation}) failed`, 'Session expired or not existed');
+                return new APIErrorResponse(`Api post (${operation}) failed`, {error: 'Session expired or not existed'});
             }
             else
             {
@@ -139,7 +139,7 @@ server.post('/api', async (req, reply) => {
     }
     catch (err) 
     {
-        return new APIErrorResponse('Message post error', err);
+        return new APIErrorResponse('Message post error', {error: err});
     }
 });
 
