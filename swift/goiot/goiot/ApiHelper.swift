@@ -63,8 +63,7 @@ enum DataZone: Codable
     case DB
 }
 
-
-struct DataInfo: Identifiable, Codable {
+class DataInfo: Identifiable, ObservableObject {
     let id: String
     let name: String
     let ratio: Double
@@ -72,13 +71,30 @@ struct DataInfo: Identifiable, Codable {
     let readWriteType: DataReadWriteType
     let dataZone: DataZone
     let regiterAddress: Int32
-    var fValue: Double
-    var intValue: Int64
-    var byteValue: UInt8
-    var boolValue: Bool
-    var strValue: String
-    var result: Int32
-    var timestamp: Double
+    @Published var fValue: Double
+    @Published var intValue: Int64
+    @Published var byteValue: UInt8
+    @Published var boolValue: Bool
+    @Published var strValue: String
+    @Published var result: Int32
+    @Published var timestamp: Double
+    
+    init(id: String, name: String, ratio: Double, dtype: DataType, readWriteType: DataReadWriteType, dataZone: DataZone, regiterAddress: Int32, fValue: Double, intValue: Int64, byteValue: UInt8, boolValue: Bool, strValue: String, result: Int32, timestamp: Double) {
+        self.id = id
+        self.name = name
+        self.ratio = ratio
+        self.dtype = dtype
+        self.readWriteType = readWriteType
+        self.dataZone = dataZone
+        self.regiterAddress = regiterAddress
+        self.fValue = fValue
+        self.intValue = intValue
+        self.byteValue = byteValue
+        self.boolValue = boolValue
+        self.strValue = strValue
+        self.result = result
+        self.timestamp = timestamp
+    }
 }
 
 // Driver data configuration structure
@@ -205,14 +221,20 @@ class JSONLoader {
 
 
 class DataManager: ObservableObject {
-    @Published var dataItems: [String: DataInfo] = [:]
-    @Published var dataGroups: [String: [String: DataInfo]] = [:]
+    //@Published var dataItems: [String: DataInfo] = [:]
+    //@Published var dataGroups: [String: [String: DataInfo]] = [:]
+    @Published var dataGroupIndexMap: [String: [String: [String: Int]]] = [:]
+    @Published var dataArray: [DataInfo] = []
+    
+    private var timer: Timer?
+    @Published var count = 0
     
     init() {
         let now = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
+        dataGroupIndexMap["Test"] = [:]
+        var uiDemoGroup: [String: Int] = [:]
         for i in 1...20 {
             let item = DataInfo(
                 id: String(i),
@@ -230,13 +252,17 @@ class DataManager: ObservableObject {
                 result: 0,
                 timestamp: now.addingTimeInterval(-Double(i) * 86400).timeIntervalSince1970
             )
-            dataItems[String(i)] = item
+            uiDemoGroup[String(i)] = i - 1
+            dataArray.append(item)
         }
+        dataGroupIndexMap["Test"] = ["UIDemo": uiDemoGroup]
         Task {
             await loadJSONConfig(fromFile: "drivers")
         }
+        print("init datamanager()")
     }
-    
+
+    // Load JSON file
     func loadJSONConfig(fromFile named: String) async
     {
         guard let config: DriverConfig = await JSONLoader.shared.loadData(fromFile: named) else {
@@ -244,13 +270,21 @@ class DataManager: ObservableObject {
         }
         
         let groupName = config.name
-        var items: [String: DataInfo] = [:]
+        if dataGroupIndexMap[groupName] != nil {
+            return
+        }
+        
+        var newDataGroupIndex: [String: [String: Int]] = [:]
+        var startIndex = dataArray.count
+        //var items: [String: DataInfo] = [:]
+        
+
+        print("driver count: \(config.drivers.count)")
         
         for driver in config.drivers {
-            //let driverID = driver.id
-            //let driverName = driver.name
+            let driverID = driver.id
+            var driverGroupIndex: [String: Int] = [:]
             for node in driver.nodes {
-                //let nodeID = node.address
                 for dataItem in node.data {
                     guard dataItem.register.count > 5 && !dataItem.id.isEmpty else {
                         continue
@@ -356,7 +390,8 @@ class DataManager: ObservableObject {
                     guard let registerAddress = Int32(dataItem.register[start..<dataItem.register.endIndex]) else {
                         continue
                     }
-                    items[dataID] = DataInfo (
+                    driverGroupIndex[dataID] = startIndex
+                    dataArray.append(DataInfo (
                         id: dataID,
                         name: dataItem.name,
                         ratio: dataRatio,
@@ -371,18 +406,49 @@ class DataManager: ObservableObject {
                         strValue: "",
                         result: -1,
                         timestamp: Date().timeIntervalSince1970
-                    )
+                    ))
+                    startIndex+=1
+                }
+            }
+            newDataGroupIndex[driverID] = driverGroupIndex
+        }
+        dataGroupIndexMap[groupName] = newDataGroupIndex
+    }
+    
+    // Start a timer to refresh data with 5 seconds interval.
+    @MainActor
+    func StartRefreshData(token tokenID: String, withTimeInterval timeInterval: Double) {
+        timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
+            DispatchQueue.global().async {
+                Task {
+                    do {
+                        try await self.RefreshData(token: tokenID)
+                        DispatchQueue.main.async { //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
+                            self.count += 1
+                        }
+                    } catch {
+                        print("Error in RefreshData().")
+                    }
                 }
             }
         }
-        
-        if dataGroups[groupName] == nil {
-            dataGroups[groupName]  = items
-            dataItems = items        }
+    }
+
+    // Stop a timer.
+    func StopRefreshData() {
+        timer?.invalidate()
+        timer = nil
     }
     
     func RefreshData(token tokenID: String) async throws {
-        let dataIDList = ["mfcpfc.1.pv", "mfcpfc.2.pv","fp2.1.tc801_pv"]
+        guard let dataGroup: [String: [String: Int]] = dataGroupIndexMap["goiot"] else {
+            return
+        }
+        guard let nodeGroup: [String: Int] = dataGroup["fp2"] else {
+            return
+        }
+        let dataIDList = Array(nodeGroup.keys)
+        //let dataIDList = ["mfcpfc.1.pv", "mfcpfc.2.pv","fp2.1.tc801_pv"]
         let requestCondition = RequestConditionBody(groupName: "goiot",
                                                     idList: dataIDList,
                                                     timeRange: [1677154221, 2677154223],
@@ -404,7 +470,7 @@ class DataManager: ObservableObject {
             throw WebServiceError.GetDataError
         }
         if resultData.total < 1 { return }
-        guard let dataGroup = dataGroups[resultData.groupName] else { return }
+        guard let dataGroup = dataGroupIndexMap[resultData.groupName] else { return }
         guard let idList = resultData.table["id"] else { return }
         guard let valueList = resultData.table["value"] else { return }
         guard let resultList = resultData.table["result"] else { return }
@@ -416,23 +482,26 @@ class DataManager: ObservableObject {
         }
         var num = 0
         for dataID in idList {
-            if var dataItem = dataGroup[dataID] {
-                // value
-                switch (dataItem.dtype) {
-                case .DF:
-                    dataItem.fValue = Double(valueList[num]) ?? 0.0
-                case .WB, .WUB, .DB, .DUB:
-                    dataItem.intValue = Int64(valueList[num]) ?? 0
-                case .BB:
-                    dataItem.byteValue = UInt8(valueList[num]) ?? 0
-                case .BT:
-                    dataItem.boolValue = (Int32(valueList[num]) ?? 0) > 0 ? true : false
-                default:
-                    assert(false, "Match DataType \(dataItem.dtype) error.")
-                    continue
+            if let dotIndex = dataID.firstIndex(of: ".") {
+                let firstPart = String(dataID[..<dotIndex])
+                if let dataIndex = dataGroup[firstPart]?[dataID] {
+                    var dataItem = dataArray[dataIndex]
+                    switch (dataItem.dtype) {
+                    case .DF:
+                        dataItem.fValue = Double(valueList[num]) ?? 0.0
+                    case .WB, .WUB, .DB, .DUB:
+                        dataItem.intValue = Int64(valueList[num]) ?? 0
+                    case .BB:
+                        dataItem.byteValue = UInt8(valueList[num]) ?? 0
+                    case .BT:
+                        dataItem.boolValue = (Int32(valueList[num]) ?? 0) > 0 ? true : false
+                    default:
+                        assert(false, "Match DataType \(dataItem.dtype) error.")
+                        continue
+                    }
+                    dataItem.result = Int32(resultList[num]) ?? -1
+                    dataItem.timestamp = Double(timeList[num]) ?? Date().timeIntervalSince1970
                 }
-                dataItem.result = Int32(resultList[num]) ?? -1
-                dataItem.timestamp = Double(timeList[num]) ?? Date().timeIntervalSince1970
             }
             num+=1
         }

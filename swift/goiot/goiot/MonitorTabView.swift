@@ -14,18 +14,57 @@ enum ItemStyle: Int, CaseIterable {
     case detailed
 }
 
+
+//struct MonitorTabView2: View {
+//    @StateObject private var viewModel = GroupViewModel()
+//    
+//    var body: some View {
+//        ScrollView(.vertical, showsIndicators: false) {
+//            VStack(spacing: 20) {
+//                GroupHeader(title: "系统设备", isExpanded: $viewModel.weatherExpanded)
+//                if viewModel.weatherExpanded {
+//                    ForEach(viewModel.weatherItems, id: \.self) { item in
+//                        WeatherRow(city: item)
+//                    }
+//                }
+//                
+//                GroupHeader(title: "事件", isExpanded: $viewModel.eventsExpanded)
+//                if viewModel.eventsExpanded {
+//                    ForEach(viewModel.eventsItems, id: \.self) { item in
+//                        EventRow(event: item)
+//                    }
+//                }
+//            }
+//            .padding()
+//        }
+//        .navigationTitle("折叠分组列表")
+//    }
+//}
+//
+//
+//class GroupViewModel: ObservableObject {
+//    @Published var weatherExpanded = true
+//    @Published var eventsExpanded = false
+//    
+//    var weatherItems = ["北京", "上海", "广州"]
+//    var eventsItems = ["会议", "生日派对"]
+//}
+
+
 struct MonitorTabView: View {
+    @State private var isWeatherExpanded = false
+    @State private var isEventsExpanded = false
     
     @EnvironmentObject var userData: UserData
-    
     @EnvironmentObject var dataManager: DataManager
     
     @State private var selectedStyle: ItemStyle = .standard
-    //@StateObject var dataManagerTest: DataManager = DataManager()
-    
+    //@State var dataManagerTest: DataManager = DataManager()
+
+
     var body: some View {
-        NavigationStack {
-            VStack {
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: 20) {
                 // 样式选择器
                 Picker("选择样式", selection: $selectedStyle) {
                     ForEach(ItemStyle.allCases, id:\.self) { style in
@@ -36,14 +75,7 @@ struct MonitorTabView: View {
                 .padding()
                 
                 Button{
-                    Task {
-                        do {
-                            try await dataManager.RefreshData(token: userData.token)
-                        }
-                        catch let error {
-                            print("RefreshData() error: \(error)")
-                        }
-                    }
+                    dataManager.StartRefreshData(token: userData.token, withTimeInterval: 5)
                 }
                 label: {
                     ZStack {
@@ -55,17 +87,104 @@ struct MonitorTabView: View {
                 .foregroundColor(.white)
                 .cornerRadius(12)
                 .padding()
-            
-                // 列表
-                List {
-                    ForEach(Array(dataManager.dataItems.values), id: \.id) { item in
-                        ItemRowView(item: item, style: selectedStyle)
+                // 设备分组
+                GroupHeader(title: "系统设备", isExpanded: $isWeatherExpanded)
+                if isWeatherExpanded {
+                    ForEach(["dsfafdaf", "mfec", "mfc.pdc.1"], id: \.self) { city in
+                        WeatherRow(city: city)
                     }
                 }
-                .listStyle(.grouped)
-                .navigationTitle("数据列表")
+
+                // 事件分组
+                GroupHeader(title: "事件", isExpanded: $isEventsExpanded)
+                if isEventsExpanded {
+                    if let indices = dataManager.dataGroupIndexMap["goiot"]?["fp2"]?.values {
+                        let dataGroup = indices.compactMap { index in
+                            if index < dataManager.dataArray.count {
+                                return dataManager.dataArray[index]
+                            } else {
+                                return nil
+                            }
+                        }
+                        ForEach(dataGroup, id: \.id) { item in
+                            ItemRowView(item: item, style: selectedStyle)
+                        }
+                    }
+                }
             }
+            .padding()
         }
+        .navigationTitle("折叠分组列表")
+    }
+}
+
+struct GroupHeader: View {
+    let title: String
+    @Binding var isExpanded: Bool
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+                .background(Color.blue.opacity(0.2))
+                .cornerRadius(8)
+            
+            Spacer()
+            
+            Button(action: {
+                isExpanded.toggle()
+            }) {
+                HStack {
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.title2)
+                        .foregroundColor(.blue)
+                    Text(isExpanded ? "收起" : "展开")
+                        .font(.caption)
+                }
+                .padding(.trailing, 8)
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(8)
+                .padding(.vertical, 4)
+            }
+            .animation(.spring(), value: isExpanded)
+        }
+    }
+}
+
+struct WeatherRow: View {
+    let city: String
+    var body: some View {
+        HStack {
+            Image(systemName: "cloud")
+                .font(.title3)
+                .foregroundColor(.blue)
+            Text(city)
+                .font(.headline)
+            Spacer()
+        }
+        .padding(8)
+        .background(Color.white)
+        .cornerRadius(8)
+        .shadow(radius: 4)
+    }
+}
+
+struct EventRow: View {
+    let event: String
+    var body: some View {
+        HStack {
+            Image(systemName: "calendar")
+                .font(.title3)
+                .foregroundColor(.green)
+            Text(event)
+                .font(.headline)
+        }
+        .padding(8)
+        .background(Color.white)
+        .cornerRadius(8)
+        .shadow(radius: 4)
     }
 }
 
@@ -78,8 +197,9 @@ extension VerticalAlignment {
 
 // 行视图
 struct ItemRowView: View {
-    let item: DataInfo
+    @StateObject var item: DataInfo
     let style: ItemStyle
+    
     
     var body: some View {
         HStack {
@@ -87,7 +207,7 @@ struct ItemRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("#\(item.id)")
                     .font(.headline)
-                Text(DateFormatter.localizedString(from: Date(timeIntervalSince1970: item.timestamp), dateStyle: .none, timeStyle: .short))
+                Text(DateFormatter.localizedString(from: Date(timeIntervalSince1970: item.timestamp), dateStyle: .none, timeStyle: .medium))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -155,6 +275,7 @@ struct SkeletonView<T: View>: View {
         content
     }
 }
+
 // 颜色扩展
 extension Color {
     static let accent = Color("accent")

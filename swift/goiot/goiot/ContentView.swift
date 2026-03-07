@@ -10,7 +10,6 @@ import SwiftUI
 struct ContentView: View {
     
     @StateObject var userData: UserData = UserData()
-    
     @StateObject var dataManager: DataManager = DataManager()
     
     var body: some View {
