@@ -211,36 +211,52 @@ server.post('/message', async (req, reply) => {
                 namespace = D_NAMESPACE.NS_POLL;
                 is_refresh = false;
             }
-            if (!req.body.data || !req.body.data.group_name ||
-                !Array.isArray(req.body.data.list)) {
-                throw `Invalid ${operation} content attributes.`;
+            if (!req.body.data || !req.body.data.group_name || !req.body.data.table ||
+                !Array.isArray(req.body.data.table.id_list) ||
+                !Array.isArray(req.body.data.table.value_list) ||
+                !Array.isArray(req.body.data.table.result_list) ||
+                !Array.isArray(req.body.data.table.time_list) ||
+                req.body.data.table.id_list.length != req.body.data.table.value_list.length ||
+                req.body.data.table.id_list.length != req.body.data.table.result_list.length ||
+                req.body.data.table.id_list.length != req.body.data.table.time_list.length) {
+                throw `Invalid ${operation} content.`;
             }
             const group_name = req.body.data.group_name;
             const service = service_collection['redis'];
             const model = service.data_model();
             const data_list = [];
             const check_set = new Set();
-            for (const item of req.body.data.list) {
-                if (!item.id || !item.value || !item.result || Number.isNaN(Number(item.time))) {
+            let idx = 0;
+            for (const item of req.body.data.table.id_list) {
+                if (!item ||
+                    !req.body.data.table.value_list[idx] ||
+                    !req.body.data.table.value_list[idx] ||
+                    !req.body.data.table.result_list[idx] ||
+                    Number.isNaN(Number(req.body.data.table.time_list[idx]))
+                    ) {
                     throw `Invalid ${operation} data item.`;
                 }
-                const newid = [group_name, item.id].join('.');
-                // Distinct id
+
+                const newid = [group_name, item].join('.');
+                // Distinct id                
                 if (check_set.has(newid)) {
-                    continue;
+                    return;
                 }
                 // Query data model by new id.
                 const data_info = model.query(newid);
                 // Exclude undifined and READ_ONLY data.
                 if (!data_info || (!is_refresh && data_info.privilege == D_PRIVILEGE.READ_ONLY) ||
                     (is_refresh && data_info.privilege == D_PRIVILEGE.WRITE_ONLY)) {
+                    idx += 1;
                     continue; //throw 'Data id does not existed.';
                 }
                 check_set.add(newid);
                 // Shadow copy.
                 data_list.push({
-                    'id': newid, 'value': item.value, 'result': item.result, 'time': item.time
+                    'id': newid, 'value': req.body.data.table.value_list[idx],
+                    'result': req.body.data.table.result_list[idx], 'time': req.body.data.table.time_list[idx]
                 })
+                idx += 1;
             }
             const updated_num = await service.update_data(namespace, data_list);
             return new APIOKResponse(`Message post (${operation}) ok`, { 'total': updated_num });
@@ -296,7 +312,7 @@ server.post('/message', async (req, reply) => {
                     id_list.push(x);
                 }
             });
-            let result_data = { 'group_name': group_name, 'list': [], 'total': 0 };
+            let result_data = { 'group_name': group_name, 'table': [], 'total': 0 };
             // Id matched.  
             if (!(check_set.size > 0 && id_list.length == 0)) 
             {
