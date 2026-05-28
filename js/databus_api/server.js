@@ -212,13 +212,13 @@ server.post('/message', async (req, reply) => {
                 is_refresh = false;
             }
             if (!req.body.data || !req.body.data.group_name || !req.body.data.table ||
-                !Array.isArray(req.body.data.table.id_list) ||
-                !Array.isArray(req.body.data.table.value_list) ||
-                !Array.isArray(req.body.data.table.result_list) ||
-                !Array.isArray(req.body.data.table.time_list) ||
-                req.body.data.table.id_list.length != req.body.data.table.value_list.length ||
-                req.body.data.table.id_list.length != req.body.data.table.result_list.length ||
-                req.body.data.table.id_list.length != req.body.data.table.time_list.length) {
+                !Array.isArray(req.body.data.table.id) ||
+                !Array.isArray(req.body.data.table.value) ||
+                !Array.isArray(req.body.data.table.result) ||
+                !Array.isArray(req.body.data.table.time) ||
+                req.body.data.table.id.length != req.body.data.table.value.length ||
+                req.body.data.table.id.length != req.body.data.table.result.length ||
+                req.body.data.table.id.length != req.body.data.table.time.length) {
                 throw `Invalid ${operation} content.`;
             }
             const group_name = req.body.data.group_name;
@@ -227,12 +227,12 @@ server.post('/message', async (req, reply) => {
             const data_list = [];
             const check_set = new Set();
             let idx = 0;
-            for (const item of req.body.data.table.id_list) {
+            for (const item of req.body.data.table.id) {
                 if (!item ||
-                    !req.body.data.table.value_list[idx] ||
-                    !req.body.data.table.value_list[idx] ||
-                    !req.body.data.table.result_list[idx] ||
-                    Number.isNaN(Number(req.body.data.table.time_list[idx]))
+                    !req.body.data.table.value[idx] ||
+                    !req.body.data.table.value[idx] ||
+                    !req.body.data.table.result[idx] ||
+                    Number.isNaN(Number(req.body.data.table.time[idx]))
                     ) {
                     throw `Invalid ${operation} data item.`;
                 }
@@ -253,8 +253,8 @@ server.post('/message', async (req, reply) => {
                 check_set.add(newid);
                 // Shadow copy.
                 data_list.push({
-                    'id': newid, 'value': req.body.data.table.value_list[idx],
-                    'result': req.body.data.table.result_list[idx], 'time': req.body.data.table.time_list[idx]
+                    'id': newid, 'value': req.body.data.table.value[idx],
+                    'result': req.body.data.table.result[idx], 'time': req.body.data.table.time[idx]
                 })
                 idx += 1;
             }
@@ -264,7 +264,7 @@ server.post('/message', async (req, reply) => {
         /* GETDATA format
         {
             "name": "service_name",
-            "operation": "GetData",
+            "operation": "GetDataR",
             "token": "6ac89607254a437c90c28ccc1c034706",
             "condition": {
                 "group_name": "goiot",
