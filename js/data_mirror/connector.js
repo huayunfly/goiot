@@ -41,6 +41,31 @@ class SetDataR {
     }
 }
 
+class GetDataP {
+    constructor(service_name, operation, token, group_name, id_list, time_range, properties, batch_size = 128, batch_num = 1)
+    {
+        this.name = service_name;
+        this.operation = 'GetDataP';
+        this.token = token;
+        this.group_name = group_name;
+        this.id_list = id_list;
+        this.time_range = time_range;
+        this.properties = properties;
+        this.batch_size = batch_size;
+        this.batch_num = batch_num;
+    }
+
+    toJSON()
+    {
+        return {name: this.name,
+            operation: this.operation,
+            token: this.token,
+            data: {group_name: this.group_name, id_list: this.id_list, time_range: this.time_range, 
+                properties: this.properties, batch_size: this.batch_size, batch_num: this.batch_num }
+        };
+    }
+}
+
 class LoginRequest {
     constructor(service_name, operation, username, password) {
         this.name = service_name;
@@ -113,6 +138,7 @@ class RedisConnector extends DBConnector {
         this.data_config_ = data_config;
         this.keep_running_ = true;
         this.model_ = [];
+        this.model_write_ = [];
         this.webapi_ = webapi;
         this.open();
     }
@@ -134,6 +160,7 @@ class RedisConnector extends DBConnector {
         this.db_.on('ready', () => {
             console.log('Redis server is ready.');
             setInterval(this.refresh_data, 5000, this);
+            setInterval(this.poll_data, 1000, this);
             setInterval(this.check_connection, 10000, this);
         });
         // If an error event is fired and no error handler is attached, 
@@ -155,15 +182,20 @@ class RedisConnector extends DBConnector {
             const driver_id = driver.id;
             const grp_driver_id = [group_name, driver_id].join('.'); 
             const id_array = [];
+            const id_array_write = [];
             for (const node of driver.nodes) {
                 const address = node.address;
                 for (const data of node.data) {
-                    if (!data.register.toUpperCase().startsWith('W')) {
+                    if (data.register.toUpperCase().includes('R')) {
                         id_array.push([driver_id, address, data.id].join('.'));
+                    }
+                    else if (data.register.toUpperCase().includes('W')) {
+                        id_array_write.push([driver_id, address, data.id].join('.'));
                     }
                 }
             }
-            this.model_.push({ grp_name: group_name, driver_id: driver_id,  id_array: id_array });
+            this.model_.push({ grp_name: group_name, driver_id: driver_id, id_array: id_array });
+            this.model_write_.push({ grp_name: group_name, driver_id: driver_id, id_array: id_array_write });
         }
     }
 
@@ -203,6 +235,56 @@ class RedisConnector extends DBConnector {
             if (data_list.length > 0 && obj.webapi_.token) {
                 const body = new SetDataR('service_name', 'SetDataR', obj.webapi_.token, table.grp_name, data_list);
                 obj.webapi_.post(body);
+            }
+        }
+    }
+
+    // Callback function for polling data from databus api.
+    async poll_data() {
+        for (const table of this.model_write_) {
+            const id_list = [];
+            for (const data_id of table.id_array) {
+                id_list.push(data_id);
+            }
+            if (id_list.length > 0 && this.webapi_.token) {
+                let batch_count = Math.ceil(id_list.length / 128);
+                for (let batch_num = 0; batch_num < batch_count; batch_num++) {
+                    // One batch = 128 items
+                    const id_list_batch = id_list.slice(batch_num * 128, (batch_num + 1) * 128);
+                    const time_last = Date.now() / 1000.0
+                    const time_range = [time_last - 15.0, time_last];
+                    const properties = ['value', 'result', 'time'];
+                    // Call databus api to get data, using a constant batch size of 128 to control the request size.
+                    const body = new GetDataP('service_name', 'GetDataP', this.webapi_.token, table.grp_name, id_list_batch, time_range, properties, 128, 1);
+                    const response = await this.webapi_.post(body);
+                    if (response?.statusCode == '200' && response.result?.data?.table?.id?.length > 0) {
+                        if (response.result.data.table.id.length != response.result.data.table.value.length ||
+                            response.result.data.table.id.length != response.result.data.table.result.length ||
+                            response.result.data.table.id.length != response.result.data.table.time.length
+                        ) {
+                            console.error('Data size mismatch.');
+                            continue;
+                        }
+                        const pipeline = this.db_.pipeline();
+                        for (let i = 0; i < response.result.data.table.id.length; i++) {
+                            const data_id = response.result.data.table.id[i];
+                            const value = response.result.data.table.value[i];
+                            const result = response.result.data.table.result[i];
+                            const time = response.result.data.table.time[i];
+                            if (!data_id || !value || !result || Number.isNaN(Number(time))) {
+                                console.error('Invalid data found.');
+                                continue;
+                            }
+                            pipeline.hmset('poll:' + data_id, 'value', value, 'result', result, 'time', time);
+                        }
+                        const reply = await pipeline.exec((err, replies) => {
+                            if (err) {
+                                console.err('Write data to redis failed.');
+                                return;
+                            }
+                        });
+                    }
+                }
             }
         }
     }
