@@ -82,8 +82,8 @@ namespace YashenWebApp.Services
             ApiGetDataBody dataBody = new()
             {
                 Name = "tenant",
-                Token = token,
-                Operation = "Touch"
+                Operation = "Touch",
+                Condition = new Dictionary<string, object> { { "token", token } }
             };
             JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
             {
