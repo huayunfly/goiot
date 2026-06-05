@@ -68,7 +68,6 @@ namespace YashenWebApp.Controllers
                         result = new { token },
                         statusCode = "200"
                     };
-                    //string content = JsonSerializer.Serialize(obj); // Create escaped string.
                     return Ok(obj);
                 }
                 else
@@ -77,9 +76,9 @@ namespace YashenWebApp.Controllers
                     {
                         message = $"Api post {nameof(PostForm)} failed",
                         error = "Username or password error",
-                        statusCode = "404"
+                        statusCode = "401"
                     };
-                    return NotFound(obj);
+                    return Unauthorized(obj);
                 }
             }
             else

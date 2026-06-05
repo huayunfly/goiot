@@ -77,8 +77,12 @@
                 // 兼容原有后端返回结构
                 if (response.status === 200 && data?.result?.token) {
                     window.location.href = `Management/Entry/${data.result.token}`;
-                } else {
-                    throw new Error(data?.message || '无效的用户名或密码，请重试。');
+                }
+                else if (response.status == 401){
+                    throw new Error('用户名或密码无效。')
+                }
+                else {
+                    throw new Error(data?.message || '登录错误。');
                 }
             } catch (err) {
                 alertBox.textContent = err.message;

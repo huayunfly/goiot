@@ -27,7 +27,6 @@ namespace YashenWebApp.Services
             ApiGetDataBody dataBody = new()
             {
                 Name = "tenant",
-                Token = string.Empty,
                 Operation = "Login",
                 Condition = new Dictionary<string, object>() {
                 { "username", login.Username }, { "password", login.Password } }
