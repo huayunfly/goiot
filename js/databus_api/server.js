@@ -128,9 +128,9 @@ async function check_id(token)
     try
     {
         const id_check_req = await fetch(service_collection['tenant'], options);
-        const payload = await id_check_req.json();
-        if (payload.statusCode == '200')
+        if (id_check_req.status == 200)
         {
+            const payload = await id_check_req.json();
             return payload.result.username;
         }
         else
@@ -161,9 +161,8 @@ async function login(username, password) {
     }
     try {
         const login_body = await fetch(service_collection['tenant'], options);
-        const payload = await login_body.json();
-        if (payload.statusCode == '200') {
-
+        if (login_body.status == 200) {
+            const payload = await login_body.json();
             return payload.result.token;
         }
         else {
