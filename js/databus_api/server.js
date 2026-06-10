@@ -64,7 +64,7 @@ fastify.post('/message', {
                 if (!token) {
                     return reply.code(401).send({ message: 'Username or password incorrect', error: 'AUTH_FAILED' });
                 }
-                return reply.code(200).send({ message: 'LOGIN ok', data: { token } });
+                return reply.code(200).send({ message: 'LOGIN ok', result: { token } });
             }
 
             if (op === 'TOUCH') {
