@@ -76,7 +76,7 @@ fastify.post('/message', {
                 if (!username) {
                     return reply.code(401).send({ message: 'Session expired or invalid token', error: 'SESSION_EXPIRED' });
                 }
-                return reply.code(200).send({ message: 'TOUCH ok', data: { username } });
+                return reply.code(200).send({ message: 'TOUCH ok', result: { username } });
             }
         } catch (err) {
             req.log.error({ err, operation: op }, 'Tenant service error');
