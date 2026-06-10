@@ -63,7 +63,7 @@ class DatabusClient {
         operation: 'LOGIN',
         condition: { username: this.username, password: this.password }
       });
-      this.token = res.data?.token || null;
+      this.token = res.result?.token || null;
       return !!this.token;
     } catch (err) {
       console.error('🔐 登录失败:', err.message);
@@ -79,7 +79,7 @@ class DatabusClient {
         operation: 'TOUCH',
         condition: { token: this.token }
       });
-      return !!res.data?.username;
+      return !!res.result?.username;
     } catch (err) {
       console.warn('🔄 Token 续期失败:', err.message);
       this.token = null;
