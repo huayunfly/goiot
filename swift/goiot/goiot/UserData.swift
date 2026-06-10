@@ -20,16 +20,18 @@ class UserData : ObservableObject {
     
     func login(username: String, password: String) async throws {
         // DataBus API request
-        let requestBody = ApiRequestBody(name: "tenant", operation: "Login", token: nil, condition: ["username": username, "password": password])
+        let requestBody = ApiRequestBody(name: "tenant", operation: "login", token: nil, condition: ["username": username, "password": password])
         let address: String = "http://192.168.2.177:6300/message"
-        let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
-        guard response.statusCode == "200" else {
+        do {
+            let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
+            isLoggedIn = true
+            self.username = username
+            token = response.result?["token"] ?? "1-2-3-4-5-6"
+        } catch {
+            print("WebServiceCaller.PostJSON error: \(error)")
             isLoggedIn = false
             throw WebServiceError.loginError
         }
-        isLoggedIn = true
-        self.username = username
-        token = response.result?["token"] ?? "1-2-3-4-5-6"
     }
     
     func logout() {

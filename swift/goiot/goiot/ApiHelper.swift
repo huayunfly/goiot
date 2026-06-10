@@ -6,11 +6,11 @@
 //
 
 import Foundation
+import CoreData
 
 struct ApiResultBody: Decodable {
     let message: String
     let result: [String: String]?
-    let statusCode: String
 }
 
 struct ApiRequestBody: Encodable {
@@ -223,13 +223,20 @@ class JSONLoader {
 class DataManager: ObservableObject {
     //@Published var dataItems: [String: DataInfo] = [:]
     //@Published var dataGroups: [String: [String: DataInfo]] = [:]
-    @Published var dataGroupIndexMap: [String: [String: [String: Int]]] = [:]
+    var dataGroupIndexMap: [String: [String: [String: Int]]] = [:]
     @Published var dataArray: [DataInfo] = []
     
     private var timer: Timer?
-    @Published var count = 0
+    private let persistentContainer: NSPersistentContainer
     
     init() {
+        persistentContainer = NSPersistentContainer(name: "DataModel")
+        persistentContainer.loadPersistentStores { (storeDescription, error) in
+            if let error = error as NSError? {
+                print("Core Data init failed: \(error)")
+            }
+        }
+        
         let now = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -416,16 +423,14 @@ class DataManager: ObservableObject {
     }
     
     // Start a timer to refresh data with 5 seconds interval.
-    @MainActor
     func StartRefreshData(token tokenID: String, withTimeInterval timeInterval: Double) {
         timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
             DispatchQueue.global().async {
                 Task {
                     do {
                         try await self.RefreshData(token: tokenID)
-                        DispatchQueue.main.async { //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
-                            self.count += 1
-                        }
+//                        DispatchQueue.main.async { //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
+//                            self.count += 1           //                        }
                     } catch {
                         print("Error in RefreshData().")
                     }
@@ -470,40 +475,74 @@ class DataManager: ObservableObject {
             throw WebServiceError.GetDataError
         }
         if resultData.total < 1 { return }
-        guard let dataGroup = dataGroupIndexMap[resultData.groupName] else { return }
-        guard let idList = resultData.table["id"] else { return }
-        guard let valueList = resultData.table["value"] else { return }
-        guard let resultList = resultData.table["result"] else { return }
-        guard let timeList = resultData.table["time"] else { return }
         
-        let counts = [idList.count, valueList.count, resultList.count, timeList.count]
-        if (counts.min() != counts.max()) {
-            return
-        }
-        var num = 0
-        for dataID in idList {
-            if let dotIndex = dataID.firstIndex(of: ".") {
-                let firstPart = String(dataID[..<dotIndex])
-                if let dataIndex = dataGroup[firstPart]?[dataID] {
-                    var dataItem = dataArray[dataIndex]
-                    switch (dataItem.dtype) {
-                    case .DF:
-                        dataItem.fValue = Double(valueList[num]) ?? 0.0
-                    case .WB, .WUB, .DB, .DUB:
-                        dataItem.intValue = Int64(valueList[num]) ?? 0
-                    case .BB:
-                        dataItem.byteValue = UInt8(valueList[num]) ?? 0
-                    case .BT:
-                        dataItem.boolValue = (Int32(valueList[num]) ?? 0) > 0 ? true : false
-                    default:
-                        assert(false, "Match DataType \(dataItem.dtype) error.")
-                        continue
-                    }
-                    dataItem.result = Int32(resultList[num]) ?? -1
-                    dataItem.timestamp = Double(timeList[num]) ?? Date().timeIntervalSince1970
-                }
+        //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
+        DispatchQueue.main.async {
+            guard let dataGroup = self.dataGroupIndexMap[resultData.groupName] else { return }
+            guard let idList = resultData.table["id"] else { return }
+            guard let valueList = resultData.table["value"] else { return }
+            guard let resultList = resultData.table["result"] else { return }
+            guard let timeList = resultData.table["time"] else { return }
+            
+            let counts = [idList.count, valueList.count, resultList.count, timeList.count]
+            if (counts.min() != counts.max()) {
+                return
             }
-            num+=1
+
+            var num = 0
+            for dataID in idList {
+                if let dotIndex = dataID.firstIndex(of: ".") {
+                    let firstPart = String(dataID[..<dotIndex])
+                    if let dataIndex = dataGroup[firstPart]?[dataID] {
+                        var dataItem = self.dataArray[dataIndex]
+                        switch (dataItem.dtype) {
+                        case .DF:
+                            dataItem.fValue = Double(valueList[num]) ?? 0.0
+                        case .WB, .WUB, .DB, .DUB:
+                            dataItem.intValue = Int64(valueList[num]) ?? 0
+                        case .BB:
+                            dataItem.byteValue = UInt8(valueList[num]) ?? 0
+                        case .BT:
+                            dataItem.boolValue = (Int32(valueList[num]) ?? 0) > 0 ? true : false
+                        default:
+                            assert(false, "Match DataType \(dataItem.dtype) error.")
+                            continue
+                        }
+                        dataItem.result = Int32(resultList[num]) ?? -1
+                        dataItem.timestamp = Double(timeList[num]) ?? Date().timeIntervalSince1970
+                    }
+                }
+                num+=1
+            }
+        }
+    }
+    
+    func saveToCoreData() {
+        let managedObjectContext = persistentContainer.viewContext
+
+        // 清除旧数据（可选）
+        let fetchRequest: NSFetchRequest<DataInfoEntity> = DataInfoEntity.fetchRequest()
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for result in results {
+                managedObjectContext.delete(result)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("删除数据失败: $error)")
+        }
+
+        // 保存新数据
+        for dataInfo in dataArray {
+            let entity = DataInfoEntity(context: managedObjectContext)
+            entity.id = dataInfo.id
+            entity.timestamp = dataInfo.timestamp
+        }
+
+        do {
+            try managedObjectContext.save()
+        } catch let error {
+            print("Save a managed data failed: \(error)")
         }
     }
 }

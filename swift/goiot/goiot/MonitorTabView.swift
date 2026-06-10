@@ -15,42 +15,6 @@ enum ItemStyle: Int, CaseIterable {
 }
 
 
-//struct MonitorTabView2: View {
-//    @StateObject private var viewModel = GroupViewModel()
-//    
-//    var body: some View {
-//        ScrollView(.vertical, showsIndicators: false) {
-//            VStack(spacing: 20) {
-//                GroupHeader(title: "系统设备", isExpanded: $viewModel.weatherExpanded)
-//                if viewModel.weatherExpanded {
-//                    ForEach(viewModel.weatherItems, id: \.self) { item in
-//                        WeatherRow(city: item)
-//                    }
-//                }
-//                
-//                GroupHeader(title: "事件", isExpanded: $viewModel.eventsExpanded)
-//                if viewModel.eventsExpanded {
-//                    ForEach(viewModel.eventsItems, id: \.self) { item in
-//                        EventRow(event: item)
-//                    }
-//                }
-//            }
-//            .padding()
-//        }
-//        .navigationTitle("折叠分组列表")
-//    }
-//}
-//
-//
-//class GroupViewModel: ObservableObject {
-//    @Published var weatherExpanded = true
-//    @Published var eventsExpanded = false
-//    
-//    var weatherItems = ["北京", "上海", "广州"]
-//    var eventsItems = ["会议", "生日派对"]
-//}
-
-
 struct MonitorTabView: View {
     @State private var isWeatherExpanded = false
     @State private var isEventsExpanded = false
@@ -106,7 +70,10 @@ struct MonitorTabView: View {
                                 return nil
                             }
                         }
-                        ForEach(dataGroup, id: \.id) { item in
+                        let sortedDataGroup = dataGroup.sorted {
+                            $0.id < $1.id
+                        }
+                        ForEach(sortedDataGroup, id: \.id) { item in
                             ItemRowView(item: item, style: selectedStyle)
                         }
                     }
@@ -157,9 +124,13 @@ struct WeatherRow: View {
     let city: String
     var body: some View {
         HStack {
-            Image(systemName: "cloud")
-                .font(.title3)
-                .foregroundColor(.blue)
+            Image("temperature_controller")
+                .resizable()
+                .frame(width: 60, height: 28)
+                .foregroundColor(.primary)
+                .scaleEffect(1.0, anchor: .leading)
+                .position(x: 0, y: 14)
+
             Text(city)
                 .font(.headline)
             Spacer()

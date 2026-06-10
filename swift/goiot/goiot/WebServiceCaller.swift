@@ -39,14 +39,20 @@ class WebServiceCaller {
         request.addValue(reqContentType, forHTTPHeaderField: "Content-Type")
         request.addValue("utf-8", forHTTPHeaderField: "charset")
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-                 httpResponse.statusCode == 200 else {
-               throw WebServiceError.invalidServerResponse
-           }
-        
-        return data;
+        do{
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse,
+                     httpResponse.statusCode == 200 else {
+                   throw WebServiceError.invalidServerResponse
+               }
+            
+            return data
+        }
+        catch
+        {
+            print("请求失败: \(error)")
+            return Data()
+        }
     }
     
     /// Post JSON object in [String: Any]
@@ -85,11 +91,12 @@ class WebServiceCaller {
         }
         
         let data = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
-        print(String(data: data, encoding: .utf8))
+        print(String(data: data, encoding: .utf8))  // -------- LOG ----------
         let decoder = JSONDecoder()
         guard let response = try? decoder.decode(T2.self, from: data) else {
             throw WebServiceError.invalidJSONDecode
         }
+        print("guard let response")
         return response
             
         

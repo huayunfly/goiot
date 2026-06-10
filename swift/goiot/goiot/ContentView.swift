@@ -30,6 +30,7 @@ struct MyTabView: View {
     @EnvironmentObject var dataManager: DataManager
     
     var body: some View {
+        
         TabView(selection: $selection) {
             MonitorTabView()
                 .tabItem {
@@ -56,3 +57,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+  
