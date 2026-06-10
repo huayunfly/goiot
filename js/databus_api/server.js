@@ -7,367 +7,226 @@
 // 4. Extend the microservice to data bus.
 // @date 2023.02.10
 
-const read_file = require('fs').readFile;
-const yargs = require('yargs');
-const { D_NAMESPACE, D_PRIVILEGE } = require('./connector');
-const { threadCpuUsage } = require('process');
-const RedisConnector = require('./connector').RedisConnector;
-const server = require('fastify')({ logger: true });
-const HOST = process.env.HOST || '192.168.2.177';
-const PORT = process.env.PORT || 6300;
-const service_collection = {};
 
-const argv = yargs.demandOption('f').nargs('f', 1).describe('f', 'JSON file to parse').argv;
-const file = argv.f;
+// Databus API Server
+// Modern Fastify architecture with schema validation, auth hooks, and graceful shutdown.
+// @date 2026.06.08 
 
-read_file(argv.f, (err, data_buffer) => {
-    if (err) {
-        console.error(`ERROR: ${err.message}`);
+const fs = require('node:fs').promises;
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const fastify = require('fastify')({ logger: { level: 'info' } });
+
+const { RedisConnector } = require('./connector');
+const TenantClient = require('./tenant-client');
+
+const HOST = process.env.HOST || '0.0.0.0';
+const PORT = parseInt(process.env.PORT, 10) || 6300;
+
+let redisService;
+let tenantClient;
+
+// ================= 1. 统一请求体校验 Schema =================
+const messageSchema = {
+    type: 'object',
+    required: ['name', 'operation'],
+    properties: {
+        operation: {
+            type: 'string',
+            enum: ['LOGIN', 'TOUCH', 'SETDATAR', 'SETDATAP', 'GETDATAR', 'GETDATAP', 'login', 'touch', 'setdatar', 'setdatap', 'getdatar', 'getdatap']
+        },
+        token: { type: 'string' },
+        condition: { type: 'object' },
+        data: { type: 'object' }
+    },
+    additionalProperties: false // 拦截未知字段，防注入攻击
+};
+
+// ================= 2. 路由定义（解决重复注册报错） =================
+fastify.post('/message', {
+    schema: { body: messageSchema },
+    logLevel: 'info'
+}, async (req, reply) => {
+    const op = req.body.operation.toUpperCase();
+
+    // 🔹 分支 A：认证类操作（跳过 Token 校验，直连租户服务）
+    if (op === 'LOGIN' || op === 'TOUCH') {
+        if (!tenantClient) {
+            return reply.code(503).send({ message: 'Tenant service not configured', error: 'TENANT_NOT_CONFIGURED' });
+        }
+        try {
+            if (op === 'LOGIN') {
+                const { username, password } = req.body.condition || {};
+                if (!username || !password) {
+                    return reply.code(400).send({ message: 'Username or password required', error: 'MISSING_CREDENTIALS' });
+                }
+                const token = await tenantClient.login(username, password);
+                if (!token) {
+                    return reply.code(401).send({ message: 'Username or password incorrect', error: 'AUTH_FAILED' });
+                }
+                return reply.code(200).send({ message: 'LOGIN ok', data: { token } });
+            }
+
+            if (op === 'TOUCH') {
+                const token = req.body.condition?.token;
+                if (!token) {
+                    return reply.code(400).send({ message: 'Token required', error: 'MISSING_TOKEN' });
+                }
+                const username = await tenantClient.touch(token);
+                if (!username) {
+                    return reply.code(401).send({ message: 'Session expired or invalid token', error: 'SESSION_EXPIRED' });
+                }
+                return reply.code(200).send({ message: 'TOUCH ok', data: { username } });
+            }
+        } catch (err) {
+            req.log.error({ err, operation: op }, 'Tenant service error');
+            return reply.code(503).send({ message: 'Tenant service unavailable', error: 'TENANT_UNAVAILABLE' });
+        }
+    }
+
+    // 分支 B：数据操作类（强制 Token 鉴权）
+    if (!req.body.token) {
+        return reply.code(401).send({ message: 'Token required', error: 'MISSING_TOKEN'});
+    }
+
+    try {
+        if (!tenantClient) {
+            throw new Error('Tenant client not initialized');
+        }
+        const username = await tenantClient.touch(req.body.token);
+        if (!username) {
+            return reply.code(401).send({ messge: 'Invalid or expired token', error: 'INVALID_TOKEN'});
+        }
+        req.username = username; // 注入请求上下文
+    } catch (err) {
+        req.log.error({ err }, 'Token validation failed');
+        return reply.code(503).send({ message: 'Tenant service unavailable', error: 'TENANT_UNAVAILABLE' });
+    }
+
+    // 分支 C：核心数据读写逻辑
+    try {
+        if (op.startsWith('SETDATA')) {
+            const { groupName, table } = req.body.data || {};
+            const namespace = (op === 'SETDATAP' ? 'poll' : 'refresh');
+
+            if (!groupName || !table || !Array.isArray(table.id) || !Array.isArray(table.value) ||
+                !Array.isArray(table.result) || !Array.isArray(table.time)) {
+                return reply.code(400).send({ message: 'Invalid data table structure',  error: 'INVALID_PAYLOAD'});
+            }
+            if (table.id.length !== table.value.length || table.id.length !== table.result.length || table.id.length !== table.time.length) {
+                return reply.code(400).send({ message: 'Data table arrays have inconsistent lengths', code: 'ARRAY_MISMATCH'});
+            }
+
+            const dataList = table.id.map((id, i) => ({
+                id: `${groupName}.${id}`,
+                value: table.value[i],
+                result: table.result[i],
+                time: table.time[i]
+            }));
+
+            const count = await redisService.updateData(namespace, dataList);
+            return reply.code(200).send({ message: `SETDATA ${namespace} ok`, data: { updated: count } });
+        }
+
+        if (op.startsWith('GETDATA')) {
+            const condition = req.body.condition || {};
+            const { groupName, idList, timeRange, properties, batchSize, batchNum } = condition;
+            const namespace = (op === 'GETDATAP' ? 'poll' : 'refresh');
+
+            if (!groupName || !Array.isArray(idList) || idList.length === 0) {
+                return reply.code(400).send({ message: 'Missing groupName or idList', error: 'INVALID_PAYLOAD' });
+            }
+
+            const data = await redisService.getData(
+                namespace,
+                groupName,
+                idList,
+                timeRange,
+                properties,
+                batchNum || 1,
+                batchSize || 128
+            );
+            return reply.code(200).send({ message: `GETDATA ${namespace} ok`, data });
+        }
+    } catch (err) {
+        req.log.error({ err, operation: op }, '数据操作执行失败');
+        return reply.code(500).send({ error: { code: 'INTERNAL_ERROR', message: '业务处理失败' } });
+    }
+});
+
+// ================= 3. 健康检查端点（现代 API 标配） =================
+fastify.get('/health', async () => ({
+    message: 'Databus API is healthy',
+    result: {
+        status: 'ok',
+        timestamp: Date.now(),
+        redis: redisService ? 'connected' : 'uninitialized',
+        tenant: tenantClient ? 'configured' : 'unconfigured'
+    }
+}));
+
+// ================= 4. 全局错误处理器 =================
+fastify.setErrorHandler((err, req, reply) => {
+    req.log.error(err);
+    if (!reply.sent) {
+        const statusCode = err.statusCode || 500;
+        reply.code(statusCode).send({
+            message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+            error: err.code || 'SERVER_ERROR'
+        });
+    }
+});
+
+// ================= 5. 优雅关闭机制 =================
+async function closeServer() {
+    fastify.log.info('🛑 Graceful shutdown initiated...');
+    try {
+        await fastify.close();
+        await redisService?.close();
+        fastify.log.info('✅ Server closed successfully.');
+        process.exit(0);
+    } catch (err) {
+        fastify.log.error('❌ Failed to close server:', err);
         process.exit(1);
     }
-    else {
-        try {
-            const data_config = JSON.parse(data_buffer.toString());         
-            redis_string = '127.0.0.1:6379';
-            if (data_config.redis) {
-                redis_string = data_config.redis;
-            }
-            const redis_connector = new RedisConnector(redis_string, data_config);
-            service_collection['redis'] = redis_connector; // register service.
-            if (data_config.tenant)
-            {
-                service_collection['tenant'] = data_config.tenant;
-            }
-        }
-        catch (e) {
-            console.error(e);
-            process.exit(1);
-        }
-    }
-});
-
-
-class ApiRequestBase {
-    constructor(service_name, operation, condition) {
-        this.name = service_name;
-        this.operation = operation;
-        this.condition = condition;
-    }
-
-    toJSON() {
-        return {
-            name: this.name,
-            operation: this.operation,
-            condition: this.condition
-        }
-    }
 }
 
+process.on('SIGINT', closeServer);
+process.on('SIGTERM', closeServer);
 
-class TouchRequest extends ApiRequestBase {
-    constructor(service_name, operation, token) {
-        super(service_name, operation, { token: token });
-    }
-}
-
-class LoginRequest extends ApiRequestBase {
-    constructor(service_name, operation, username, password) {
-        super(service_name, operation, { username: username, password: password })
-    }
-}
-
-class APIResponseBase {
-    constructor(message, result, status_code) {
-        this.message = message;
-        this.result = result;
-        this.status_code = status_code;
-    }
-
-    toJSON() {
-        return {
-            message: this.message,
-            result: this.result,
-            statusCode: this.status_code
-        }
-    }
-}
-
-class APIErrorResponse extends APIResponseBase {
-    constructor(message, error) {
-        super(message, error, '400')
-    }
-}
-
-class APIOKResponse extends APIResponseBase {
-    constructor(message, info) {
-        super(message, info, '200')
-    }
-}
-
-class APIDataResponse extends APIResponseBase {
-    constructor(message, data, status_code) {
-        super(message, data, status_code)
-    }
-}
-
-// Calls the tenant service's touch().
-async function check_id(token)
-{
-    const touch_req = new TouchRequest('tenant', 'touch', token);
-    const data = JSON.stringify(touch_req); 
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': `nodejs/${process.version}`,
-            'Content-Encoding': 'gzip',
-            'Accept': 'application/json'
-        },
-        body: data
-    }
-    try
-    {
-        const id_check_req = await fetch(service_collection['tenant'], options);
-        if (id_check_req.status == 200)
-        {
-            const payload = await id_check_req.json();
-            return payload.result.username;
-        }
-        else
-        {
-            return null;
-        }
-    }
-    catch (err)
-    {
-        return null;
-    }
-}
-
-
-// Calls the tenant service's login(), returns the token.
-async function login(username, password) {
-    const login_req = new LoginRequest('tenant', 'login', username, password);
-    const data = JSON.stringify(login_req);
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': `nodejs/${process.version}`,
-            'Content-Encoding': 'gzip',
-            'Accept': 'application/json'
-        },
-        body: data
-    }
+// ================= 6. 启动流程 =================
+async function main() {
     try {
-        const login_body = await fetch(service_collection['tenant'], options);
-        if (login_body.status == 200) {
-            const payload = await login_body.json();
-            return payload.result.token;
+        const argv = yargs(hideBin(process.argv))
+            .demandOption('f', 'Service config file is required')
+            .nargs('f', 1)
+            .describe('f', 'Path to service config JSON file')
+            .argv;
+
+        const config_str = await fs.readFile(argv.f, 'utf-8');
+        const config = JSON.parse(config_str);
+
+        // 初始化 Redis 连接器
+        const redisHost = config.redis || '127.0.0.1:6379';
+        redisService = new RedisConnector(redisHost, config);
+        await redisService.init();
+        fastify.log.info('✅ Redis connector initialized');
+
+        // 初始化租户客户端
+        if (config.tenant) {
+            tenantClient = new TenantClient(config.tenant);
+            fastify.log.info('✅ Tenant client initialized');
+        } else {
+            fastify.log.warn('⚠️ Tenant service URL not configured. LOGIN/TOUCH operations will return 503.');
         }
-        else {
-            return null;
-        }
-    }
-    catch (err) {
-        return null;
+
+        await fastify.listen({ port: PORT, host: HOST });
+        fastify.log.info(`Databus API running at http://${HOST}:${PORT}`);
+    } catch (err) {
+        fastify.log.error('Fatal startup error:', err);
+        process.exit(1);
     }
 }
 
-server.get('/message', async (req, reply) => {
-    console.log(`worker request pid=${process.pid}`);
-    try {
-        throw 'Unsupported operation.';
-    }
-    catch (err) {
-        return new APIErrorResponse('Message get error', {error: err});
-    }
-});
+main();
 
-server.post('/message', async (req, reply) => {
-    console.log(`worker request pid=${process.pid}`);
-    try 
-    {
-        if (req.headers['content-type'] != 'application/json') {
-            throw 'Invalid content-type';
-        }
-        if (!req.body || !req.body.name || !req.body.operation) {
-            throw 'Invalid content';
-        }
-        const operation = req.body.operation.toUpperCase();
-        if (operation == 'SETDATAR' || operation == 'SETDATAP') {
-            /* check ID*/
-            const token = req.body.token;
-            check_result = await check_id(token);
-            if (check_result == null) 
-            {
-                return new APIErrorResponse('Message post error', {error: 'Invalid ID'});
-            }
-            let namespace = D_NAMESPACE.NS_REFRESH;
-            let is_refresh = true;
-            if (operation == 'SETDATAP') 
-            {
-                namespace = D_NAMESPACE.NS_POLL;
-                is_refresh = false;
-            }
-            if (!req.body.data || !req.body.data.group_name || !req.body.data.table ||
-                !Array.isArray(req.body.data.table.id) ||
-                !Array.isArray(req.body.data.table.value) ||
-                !Array.isArray(req.body.data.table.result) ||
-                !Array.isArray(req.body.data.table.time) ||
-                req.body.data.table.id.length != req.body.data.table.value.length ||
-                req.body.data.table.id.length != req.body.data.table.result.length ||
-                req.body.data.table.id.length != req.body.data.table.time.length) {
-                throw `Invalid ${operation} content.`;
-            }
-            const group_name = req.body.data.group_name;
-            const service = service_collection['redis'];
-            const model = service.data_model();
-            const data_list = [];
-            const check_set = new Set();
-            let idx = 0;
-            for (const item of req.body.data.table.id) {
-                if (!item ||
-                    !req.body.data.table.value[idx] ||
-                    !req.body.data.table.value[idx] ||
-                    !req.body.data.table.result[idx] ||
-                    Number.isNaN(Number(req.body.data.table.time[idx]))
-                    ) {
-                    throw `Invalid ${operation} data item.`;
-                }
-
-                const newid = [group_name, item].join('.');
-                // Distinct id                
-                if (check_set.has(newid)) {
-                    return;
-                }
-                // Query data model by new id.
-                const data_info = model.query(newid);
-                // Exclude undifined and READ_ONLY data.
-                if (!data_info || (!is_refresh && data_info.privilege == D_PRIVILEGE.READ_ONLY) ||
-                    (is_refresh && data_info.privilege == D_PRIVILEGE.WRITE_ONLY)) {
-                    idx += 1;
-                    continue; //throw 'Data id does not existed.';
-                }
-                check_set.add(newid);
-                // Shadow copy.
-                data_list.push({
-                    'id': newid, 'value': req.body.data.table.value[idx],
-                    'result': req.body.data.table.result[idx], 'time': req.body.data.table.time[idx]
-                })
-                idx += 1;
-            }
-            const updated_num = await service.update_data(namespace, data_list);
-            return new APIOKResponse(`Message post (${operation}) ok`, { 'total': updated_num });
-        }
-        /* GETDATA format
-        {
-            "name": "service_name",
-            "operation": "GetDataR",
-            "token": "6ac89607254a437c90c28ccc1c034706",
-            "condition": {
-                "group_name": "goiot",
-                "id_list": ["mfcpfc.1.pv", "mfcpfc.2.pv"],
-                "time_range": [1677154222.8210001, 1677154222.8410001],
-                "properties": ["value", "result", "timestamp"],
-                "batch_size":128,
-                "batch_num": 1
-            }
-        }
-        */
-        else if (operation == 'GETDATAR' || operation == 'GETDATAP') {
-            /* check ID*/
-            const token = req.body.token;
-            check_result = await check_id(token);
-            if (check_result == null) 
-            {
-                return new APIErrorResponse('Message post error', {error: 'Invalid ID'});
-            }
-            let namespace = D_NAMESPACE.NS_REFRESH;
-            if (operation == 'GETDATAP') 
-            {
-                namespace = D_NAMESPACE.NS_POLL;
-            }
-            const batch_num = Number.parseInt(req.body.condition.batch_num);
-            const batch_size = Number.parseInt(req.body.condition.batch_size);
-            if (!req.body.condition || !req.body.condition.group_name || 
-                !Array.isArray(req.body.condition.id_list) || 
-                !Array.isArray(req.body.condition.time_range) ||
-                !Array.isArray(req.body.condition.properties) ||
-                Number.isNaN(batch_num) || Number.isNaN(batch_size))
-            {
-                throw `Invalid ${operation} content attributes.`;
-            }
-            const service = service_collection['redis'];
-            const model = service.data_model();
-            const group_name = req.body.condition.group_name;
-            // Distinct id
-            const check_set = new Set(req.body.condition.id_list.map(
-                x => [group_name, x].join('.')));
-            // Check ids in model
-            const id_list = [];
-            check_set.forEach(x => {
-                if (model.has(x)) {
-                    id_list.push(x);
-                }
-            });
-            let result_data = { 'group_name': group_name, 'table': [], 'total': 0 };
-            // Id matched.  
-            if (!(check_set.size > 0 && id_list.length == 0)) 
-            {
-                result_data = await service.get_data(namespace, group_name, id_list,
-                    req.body.condition.time_range, req.body.condition.properties,
-                    batch_num, batch_size);
-            }
-            return new APIOKResponse(`Message post (${operation}) ok`, { 'data': result_data });
-        }
-        else if (operation == 'LOGIN')
-        {
-            const username = req.body.condition.username;
-            const password = req.body.condition.password;
-            const token = await login(username, password);
-            if (token == null) 
-            {
-                return new APIErrorResponse('Message post(LOGIN) error', {error: 'Login failed'});
-            }
-            else
-            {
-                return new APIOKResponse('Message post(LOGIN) ok', {token: token})
-            }
-        }
-        else if (operation == 'TOUCH')
-        {
-            const token = req.body.condition.token;
-            check_result = await check_id(token);
-            if (check_result == null)
-            {
-                return new APIErrorResponse('Message post(TOUCH) error', {error: 'Invalid ID'});
-            }
-            else
-            {
-                return new APIOKResponse('Message post(TOUCH) ok', {username: check_result})
-            }
-        }
-        else
-        {
-            throw 'Unsupported operation.'
-        }
-    }
-    catch (err) {
-        return new APIErrorResponse('Message post error', {error: err});
-    }
-});
-
-const start = async () => {
-    try {
-        await server.listen({ port: PORT, host: HOST }, () => {
-            console.log(`Databus api running at http://${HOST}:${PORT}`);
-        })
-    }
-    catch (err) {
-        server.log.error(err)
-        process.exit(1)
-    }
-}
-
-start();
