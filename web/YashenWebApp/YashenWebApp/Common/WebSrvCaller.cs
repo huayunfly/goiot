@@ -177,7 +177,7 @@ namespace YashenWebApp.Common
         /// <returns>Response byte array, response content-type, response content-disposition(can be NULL).
         /// response Content-Encoding(gzip signal, can be NULL).
         /// </returns>
-        public static async Task<Tuple<byte[], string, string, string>> PostAsync(string url, string reqContentType, string strContent, CancellationToken token)
+        public static async Task<Tuple<byte[], string, string, string, uint>> PostAsync(string url, string reqContentType, string strContent, CancellationToken token)
         {
             return await PostAsync(url, reqContentType, Encoding.UTF8.GetBytes(strContent), token);
         }
@@ -192,7 +192,7 @@ namespace YashenWebApp.Common
         /// <returns>Response byte array, response content-type, response content-disposition(can be NULL).
         /// response Content-Encoding(gzip signal, can be NULL).
         /// </returns>
-        public static async Task<Tuple<byte[], string, string, string>> PostAsync(string url, string reqContentType, byte[] byteContent, CancellationToken token)
+        public static async Task<Tuple<byte[], string, string, string, uint>> PostAsync(string url, string reqContentType, byte[] byteContent, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(reqContentType) ||
                 byteContent == null)
@@ -201,6 +201,7 @@ namespace YashenWebApp.Common
             }
             HttpResponseMessage resp;
             byte[] byteArray;
+            HttpStatusCode statusCode = HttpStatusCode.OK;
             try
             {
                 HttpContent content = new ByteArrayContent(byteContent);
@@ -208,6 +209,7 @@ namespace YashenWebApp.Common
                 resp = await _httpClient.PostAsync(url, content, cancellationToken: token).ConfigureAwait(false);
                 resp.EnsureSuccessStatusCode();
                 byteArray = await resp.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                statusCode = resp.StatusCode;
             }
             catch (HttpRequestException ex)
             {
@@ -236,7 +238,7 @@ namespace YashenWebApp.Common
             {
                 respContentEncoding = enumContentEncoding.FirstOrDefault();
             }
-            return new Tuple<byte[], string, string, string>(byteArray, respContentType, respContentDisposition, respContentEncoding);
+            return new Tuple<byte[], string, string, string, uint>(byteArray, respContentType, respContentDisposition, respContentEncoding, (uint)statusCode);
         }
 
         public static async Task<XmlDocument> QuerySoapWebServiceAsync(WebRequestResponseMeta meta, CancellationToken token)
