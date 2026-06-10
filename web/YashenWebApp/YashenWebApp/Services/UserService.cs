@@ -27,7 +27,7 @@ namespace YashenWebApp.Services
             ApiGetDataBody dataBody = new()
             {
                 Name = "tenant",
-                Operation = "Login",
+                Operation = "login",
                 Condition = new Dictionary<string, object>() {
                 { "username", login.Username }, { "password", login.Password } }
             };
@@ -39,7 +39,7 @@ namespace YashenWebApp.Services
             var cts = new CancellationTokenSource(TIMEOUT_IN_MS);
             try
             {
-                Tuple<byte[], string, string, string> resPost = 
+                Tuple<byte[], string, string, string, uint> resPost = 
                     await WebSvcCaller.PostAsync(url, contentType, strContent, cts.Token).ConfigureAwait(false);
                 if (resPost == null || resPost.Item1 == null)
                 {
@@ -56,7 +56,7 @@ namespace YashenWebApp.Services
                     throw new ArgumentNullException(nameof(resBody));
                 }
                 object token = null;
-                if (resBody.StatusCode != "200" || resBody.Result == null || 
+                if (resPost.Item5 != 200 || resBody.Result == null || 
                     !resBody.Result.TryGetValue("token", out token))
                 {
                     return null;
@@ -81,7 +81,7 @@ namespace YashenWebApp.Services
             ApiGetDataBody dataBody = new()
             {
                 Name = "tenant",
-                Operation = "Touch",
+                Operation = "touch",
                 Condition = new Dictionary<string, object> { { "token", token } }
             };
             JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
@@ -92,7 +92,7 @@ namespace YashenWebApp.Services
             var cts = new CancellationTokenSource(TIMEOUT_IN_MS);
             try
             {
-                Tuple<byte[], string, string, string> resPost =
+                Tuple<byte[], string, string, string, uint> resPost =
                     await WebSvcCaller.PostAsync(url, contentType, strContent, cts.Token).ConfigureAwait(false);
                 if (resPost == null || resPost.Item1 == null)
                 {
@@ -109,7 +109,7 @@ namespace YashenWebApp.Services
                     throw new ArgumentNullException(nameof(resBody));
                 }
                 object username = null;
-                if (resBody.StatusCode != "200" || resBody.Result == null ||
+                if (resPost.Item5 != 200 || resBody.Result == null ||
                     !resBody.Result.TryGetValue("username", out username))
                 {
                     return null;
