@@ -66,7 +66,6 @@ namespace YashenWebApp.Controllers
                     {
                         message = $"Api post {nameof(PostForm)} ok",
                         result = new { token },
-                        statusCode = "200"
                     };
                     return Ok(obj);
                 }
@@ -76,7 +75,6 @@ namespace YashenWebApp.Controllers
                     {
                         message = $"Api post {nameof(PostForm)} failed",
                         error = "Username or password error",
-                        statusCode = "401"
                     };
                     return Unauthorized(obj);
                 }
@@ -87,7 +85,6 @@ namespace YashenWebApp.Controllers
                 {
                     message = $"Api post {nameof(PostForm)} failed",
                     error = "Username or password error",
-                    statusCode = "400"
                 };
                 return BadRequest(obj);
             }
