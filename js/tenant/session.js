@@ -1,99 +1,76 @@
 // Session manager
 // @date 2023.04.26
 
+const crypto = require('node:crypto');
 
-class Session
-{
-    s_id;
-    last_access_time;
-    username;
-    constructor(id, lasttime, username)
-    {
-        this.s_id = id;
-        this.last_access_time = lasttime;
+class Session {
+    constructor(id, lastAccessTime, username) {
+        this.id = id;
+        this.lastAccessTime = lastAccessTime;
         this.username = username;
+        this.data = new Map();
     }
 }
 
-
-class SessionMagager
-{
-    constructor()
-    {
-        this.sessions_ = new Map();
-        this.session_data_ = new Map();
-        this.session_timeout_ = 600; // in second
+class SessionManager {
+    constructor(timeoutSeconds = 600) {
+        this.sessions_ = new Map();           // id -> Session
+        this.timeoutMs_ = timeoutSeconds * 1000;
     }
 
-    get time_now()
-    {
-        return Date.now() / 1000.0;
-    }
-
-    create_session(username)
-    {
-        const s_id = this.create_guid();
-        this.sessions_.set(s_id, new Session(s_id, this.time_now, username));
+    createSession(username) {
+        if (!username) throw new Error('Username is required');
+        const s_id = crypto.randomUUID().replaceAll("-", "");
+        this.sessions_.set(s_id, new Session(s_id, Date.now(), username));
         return s_id;
     }
 
-    create_guid()
-    {
-        return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-    }
+    touchSession(s_id) {
+        const session = this.sessions_.get(s_id);
+        if (!session) return null;
 
-    cleanup_session(s_id)
-    {
-        this.session_data_.delete(s_id);
-        this.sessions_.delete(s_id);
-    }
-
-    cleanup_all_sessions()
-    {
-        for (let s of this.sessions_)
-        {
-            if (s[1].last_access_time + this.session_timeout_ < this.time_now)
-            {
-                this.cleanup_session(s[0]);
-            }
-        }
-    }
-
-    touch_session(s_id)
-    {
-        let s = this.sessions_.get(s_id);
-        if (s === undefined)
-        {
+        // Outdated session, remove it and return null to indicate invalid session.
+        if (Date.now() - session.lastAccessTime > this.timeoutMs_) {
+            this.sessions_.delete(s_id);
             return null;
         }
-        s.last_access_time = this.time_now;
-        return s.username;
+
+        session.lastAccessTime = Date.now();
+        return session.username;
     }
 
-    set_session_data(s_id, key, value)
-    {
-        const s_d = this.session_data_.get(s_id);
-        if (s_d === undefined)
-        {
-            const data = new Map();
-            data.set(key, value);
-            this.session_data_.set(s_id, data);
+    setSessionData(s_id, key, value) {
+        const session = this.sessions_.get(s_id);
+        if (!session) return false;
+        session.data.set(key, value);
+        return true;
+    }
+
+    getSessionData(s_id, key) {
+        const session = this.sessions_.get(s_id);
+        return session ? session.data.get(key) : undefined;
+    }
+
+    cleanupAllSessions() {
+        const now = Date.now();
+        const expiredIds = [];
+        
+        // Firstly collect expired session IDs to avoid the map iteration error.
+        for (const [s_id, session] of this.sessions_) {
+            if (now - session.lastAccessTime > this.timeoutMs_) {
+                expiredIds.push(s_id);
+            }
         }
-        else
-        {
-            s_d.set(key, value); // new or update key-value
+        
+        for (const id of expiredIds) {
+            this.sessions_.delete(id);
         }
     }
 
-    // Get the session data by ID and key, return undefined if the ID does not exist.
-    get_session_data(s_id, key)
-    {
-        let s_d = this.session_data_.get(s_id);
-        return (s_d === undefined) ? undefined : s_d.get(key);
+    // Display active session count.
+    get activeCount() {
+        return this.sessions_.size;
     }
 }
 
-module.exports.SessionMagager = SessionMagager;
+module.exports.SessionManager = SessionManager;

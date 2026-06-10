@@ -4,72 +4,69 @@
     ViewData["Title"] = "联系支持";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container py-4">
+    <h1 class="display-5 fw-bold mb-4">@ViewData["Title"]</h1>
 
+    <!-- 🖼️ 企业实景展示 -->
+    <section class="mb-5">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <figure class="figure h-100 bg-light p-2 rounded-3 shadow-sm">
+                    <img src="~/img/kejiyuan.jpg" class="figure-img img-fluid rounded" alt="ImgBuilding" style="object-fit: cover; aspect-ratio: 16/9;">
+                    <figcaption class="figure-caption text-center mt-2">科技园</figcaption>
+                </figure>
+            </div>
+            <div class="col-md-6">
+                <figure class="figure h-100 bg-light p-2 rounded-3 shadow-sm">
+                    <img src="~/img/yashenweizhi.jpg" class="figure-img img-fluid rounded" alt="ImgLocation" style="object-fit: cover; aspect-ratio: 16/9;">
+                    <figcaption class="figure-caption text-center mt-2">亚申公司-G92国家高速柯桥出口500米</figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
 
-<div class="container-fluid p-0 mt-3">
-    <div class="row text-left">
-        <div class="figure col-md-6">
-            <img src="./img/kejiyuan.jpg" class="m-0 figure-img img-fluid rounded float-left" alt="kejiyuan">
+    <!-- 📍 联系方式 -->
+    <section class="mb-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="h4 fw-semibold mb-3">我们在这</h2>
+                <ul class="list-unstyled mb-0">
+                    <li class="py-2 border-bottom">
+                        <span class="fw-bold text-dark">亚申科技（浙江）有限公司</span>
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">📍</span>
+                        <div>
+                            <span class="d-block fw-medium">地址：浙江省绍兴市柯桥经济开发区管湖沿路68号</span>
+                            <small class="text-muted">邮编：312030</small>
+                        </div>
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-center">
+                        <span class="text-primary me-2 fs-5">📧</span>
+                        <a href="mailto:shangwu@yashentech.com" class="text-decoration-none">电子邮件：shangwu@yashentech.com</a>
+                    </li>
+                    <li class="py-2 d-flex align-items-center">
+                        <span class="text-primary me-2 fs-5">📞</span>
+                        <a href="tel:0575-85666000" class="text-decoration-none">电话：575-85666000</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="figure col-md-6">
-            <img src="./img/yashenweizhi.jpg" class="m-0 figure-img img-fluid rounded float-left" alt="yashenweizhi">
+    </section>
+
+    <!-- 🌐 社交媒体与快速入口 -->
+    <section class="text-center py-4 bg-light rounded-3 border mb-5">
+        <p class="text-muted mb-3">FollowUs</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="#" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <span class="me-1">💬</span> WeChat
+            </a>
+            <a href="#" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <span class="me-1">🎵</span> Douyin
+            </a>
+            <a href="#" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <span class="me-1">📖</span> Zhihu
+            </a>
         </div>
-    </div>
-    
-    <div class="row">
-        <ul class="list-unstyled col-md-4 col-md-offset-4 h6">
-            <li class="mt-2"><strong>亚申科技（浙江）有限公司</strong></li>
-            <li class="mt-2">浙江省绍兴市柯桥经济开发区管湖沿路68号</li>
-            <li class="mt-2">邮编：312030</li>
-            <li class="mt-2">电子邮件：shangwu@yashentech.com</li>
-            <li class="mt-2">电话：0575-85666000</li>
-        </ul>
-    </div>
-@*     <p>
-        <a class="btn btn-default btn-sm" href="#">
-            <img src="./img/common/icon32_appwx_logo.png" class="float-left" alt="appwx" />
-        </a>
-        <a class="btn btn-default btn-sm" href="#">
-            <img src="./img/common/icon32_douyin_logo.png" class="float-left" alt="douying" />
-        </a>
-        <a class="btn btn-default btn-sm" href="#">
-            <img src="./img/common/icon32_zhihu_logo.png" class="float-left" alt="zhihu" />
-        </a>
-    </p> *@
+    </section>
 </div>
-
-<!-- Reference to the Bing Maps SDK -->
-<script type='text/javascript'
-        src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap'
-        async defer></script>
-
-<script type='text/javascript'>
-    function GetMap() {
-        var map = new Microsoft.Maps.Map('#myMap', {
-            credentials: 'An5ICemJvHbPKFvTDDiIlHgpV-emSVyYGZ1d9T8_VAvQi3JVYw7aZY1v6Ehux1aB',
-            center: new Microsoft.Maps.Location(30.13573769441755, 120.5357945433988),
-            zoom: 15
-        });
-        var center = map.getCenter();
-        //Create custom Pushpin
-        var pin = new Microsoft.Maps.Pushpin(center, {
-            title: '亚申科技',
-            subTitle: '绍兴柯桥',
-            text: '1'
-        });
-        //Add the pushpin to the map
-        map.entities.push(pin);
-    }
-</script>
-
-
-
-
-
-
-
-
-
-
-

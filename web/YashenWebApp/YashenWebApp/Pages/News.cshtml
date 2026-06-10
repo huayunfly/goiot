@@ -4,65 +4,94 @@
     ViewData["Title"] = "新闻";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container py-4">
+    <h1 class="display-5 fw-bold mb-4">@ViewData["Title"]</h1>
 
-@foreach (var item in Model.NewsItems.Where(
-    i => !string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted).OrderByDescending(i => i.PublishDate))
-{
-    <div class="card mb-3" style="max-width: 800px;">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img src=@Html.DisplayFor(inputModel => item.PicturePath) alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">@Html.DisplayFor(inputModel => item.Title)</h5>
-                    @{
-                        var paras = item.Content.Split(
-                        "@@", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    }
-                    @foreach (var para in paras)
-                    {
-                        <p class="card-text">@Html.DisplayFor(inputModel => para)</p>
-                    }  
-                    @{
-                        var days = (DateTime.Now - item.PublishDate).TotalDays;
-                        var monthsOrDays = days > 30 ? Math.Round(days / 30) : Math.Round(days);
-                        var timeUnit = days > 30 ? "个月" : "天";
-                    }
-                    <p class="card-text">
-                        <small class="text-muted">@monthsOrDays@timeUnit 前更新</small>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+    <!-- 📰 图文新闻 -->
+    @if (Model.NewsItems.Any(i => !string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted))
+    {
+        <section class="mb-5">
+            <h2 class="h4 fw-semibold mb-3 text-primary border-start border-4 border-primary ps-3">图文资讯</h2>
+            <div class="row justify-content-center">
+                @foreach (var item in Model.NewsItems.Where(i => !string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted).OrderByDescending(i => i.PublishDate))
+                {
+                    var days = (DateTime.Now - item.PublishDate).TotalDays;
+                    var timeText = days > 30 ? $"{(int)(days / 30)} 个月" : $"{(int)days} 天";
+                    var paragraphs = item.Content?.Split("@@", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
 
-@foreach (var item in Model.NewsItems.Where(
-   i => string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted).OrderByDescending(i => i.PublishDate))
-{   
-    <div class="panel-group" id="accordion">
-        <div class="panel panel-default p-1">
-            <div class="panel-heading">
-                <h5 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#@item.Id">
-                        @Html.DisplayFor(inputModel => item.Title)
-                    </a>
-                </h5>
+                    <div class="col-lg-10 mb-4">
+                        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="@item.PicturePath" class="img-fluid rounded-start h-100" alt="@item.Title" style="object-fit: cover;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body p-4">
+                                        <h5 class="card-title fw-bold mb-3">@item.Title</h5>
+                                        @foreach (var para in paragraphs)
+                                        {
+                                            <p class="card-text text-muted mb-2">@para</p>
+                                        }
+                                        <p class="card-text mb-0">
+                                            <small class="text-muted">🕒 @timeText 前更新</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
-            <div id="@item.Id" class="panel-collapse collapse in">
-                <div class="panel-body w-75">
-                    @{
-                        var paras = item.Content.Split(
-                            "@@", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    }
-                    @foreach (var para in paras)
-                    {
-                        <p>@Html.DisplayFor(inputModel => para)</p>   
-                    }
-                </div>
+        </section>
+    }
+
+    <!-- 📜 纯文本/归档新闻 -->
+    @if (Model.NewsItems.Any(i => string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted))
+    {
+        <section class="mb-5">
+            <h2 class="h4 fw-semibold mb-3 text-primary border-start border-4 border-primary ps-3">历史归档</h2>
+            <div class="accordion" id="newsAccordion">
+                @{
+                    int index = 0;
+                }
+                @foreach (var item in Model.NewsItems.Where(i => string.IsNullOrWhiteSpace(i.PicturePath) && !i.Deleted).OrderByDescending(i => i.PublishDate))
+                {
+                    var days = (DateTime.Now - item.PublishDate).TotalDays;
+                    var timeText = days > 30 ? $"{(int)(days / 30)} 个月" : $"{(int)days} 天";
+                    var paragraphs = item.Content?.Split("@@", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3">
+                        <h2 class="accordion-header" id="heading@item.Id">
+                            <button class="accordion-button @(index == 0 ? "" : "collapsed") fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapse@item.Id"
+                                    aria-expanded="@(index == 0)" aria-controls="collapse@item.Id">
+                                📄 @item.Title
+                            </button>
+                        </h2>
+                        <div id="collapse@item.Id" class="accordion-collapse collapse @(index == 0 ? "show" : "")"
+                             aria-labelledby="heading@item.Id">
+                            <div class="accordion-body p-4">
+                                @foreach (var para in paragraphs)
+                                {
+                                    <p class="text-muted mb-2">@para</p>
+                                }
+                                <p class="text-muted mb-0 mt-3">
+                                    <small class="text-secondary">🕒 @timeText 前更新</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    index++;
+                }
             </div>
+        </section>
+    }
+
+    <!-- 🔹 空状态提示 -->
+    @if (!Model.NewsItems.Any(i => !i.Deleted))
+    {
+        <div class="text-center py-5 text-muted">
+            <p class="fs-5">暂无新闻内容，敬请期待。</p>
         </div>
-    </div>
-}
+    }
+</div>

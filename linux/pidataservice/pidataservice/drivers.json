@@ -176,6 +176,11 @@
               "register": "R4DF662"
             },
             {
+              "id": "tc805_pv",
+              "name": "tc805_pv",
+              "register": "R4DF672"
+            },
+            {
               "id": "ti803",
               "name": "ti803",
               "register": "R4DF664"
@@ -281,11 +286,6 @@
               "register": "RW4DF732"
             },
             {
-              "id": "pc503_sv",
-              "name": "pc503_sv",
-              "register": "RW4DF734"
-            },
-            {
               "id": "tc801_sv",
               "name": "tc801_sv",
               "register": "RW4DF736"
@@ -294,6 +294,11 @@
               "id": "tc802_sv",
               "name": "tc802_sv",
               "register": "RW4DF738"
+            },
+            {
+              "id": "tc805_sv",
+              "name": "tc805_sv",
+              "register": "RW4DF734"
             },
             {
               "id": "xisa902_hh",
@@ -394,6 +399,11 @@
               "id": "tc802_hh",
               "name": "tc802_hh",
               "register": "RW4DF778"
+            },
+            {
+              "id": "tc805_hh",
+              "name": "tc805_hh",
+              "register": "RW4DF796"
             },
             {
               "id": "hc201a_rt",

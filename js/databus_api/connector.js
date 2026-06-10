@@ -1,520 +1,167 @@
 // @date 2023.03.03
-const https = require('https');
-const zlib = require('zlib');
-const assert = require('assert');
-const redis = require('ioredis');
-const { time } = require('console');
-const fetch = require('node-fetch');
 
+// Databus API connector.
+// @date 2026.06.08
+const Redis = require('ioredis');
+const crypto = require('node:crypto');
 
-const D_PRIVILEGE =
-{
-    'READ_ONLY': 0,
-    'WRITE_ONLY': 1,
-    'READ_WRITE': 2,
-}
+// 常量定义（保持与原逻辑兼容）
+const D_NAMESPACE = { NS_REFRESH: 'refresh:', NS_POLL: 'poll:', NS_REFRESH_TIME: 'time_r:', NS_POLL_TIME: 'time_p:' };
+const D_PRIVILEGE = { READ_ONLY: 0, WRITE_ONLY: 1, READ_WRITE: 2 };
 
-const D_NAMESPACE =
-{
-    'NS_REFRESH': 'refresh:',
-    'NS_POLL': 'poll:',
-    'NS_REFRESH_TIME': 'time_r:',
-    'NS_POLL_TIME': 'time_p:',
-}
-
-const D_DataType =
-{
-    DF: 0,
-    WUB: 1,
-    WB: 2,
-    DUB: 3,
-    DB: 4,
-    BB: 5,
-    BT: 6,
-    STR: 7
-}
-
-const D_DataZone =
-{
-    OUTPUT_RELAY : 0,
-    INPUT_RELAY : 1,
-    INPUT_REGISTER : 3,
-    OUTPUT_REGISTER : 4,
-    PLC_DB : 5,
-    DB : 6
-};
-
-class DBConnector {
-    constructor(connection_path) {
-        this.connection_path_ = connection_path;
-        this.db_ = null;
-    }
-
-    open() {
-
-    }
-
-    close() {
-
-    }
+class DataInfo {
+  constructor(id, name, type, privilege, ratio, value, result, timestamp) {
+    this.id = id; this.name = name; this.type = type; this.privilege = privilege;
+    this.ratio = ratio; this.value = value; this.result = result; this.timestamp = timestamp;
+  }
 }
 
 class DataModel {
-    constructor() {
-        this.model_ = new Map();
-    }
-
-    // Adds a new element with a specified key and value to the Map. 
-    // If an element with the same key already exists, the element will be updated.
-    add(key, value) {
-        this.model_.set(key, value);
-    }
-
-    // Get value by key or return undefined.
-    query(key) {
-        return this.model_.get(key)
-    }
-
-    // Return boolean.
-    has(key) {
-        return this.model_.has(key);
-    }
-
-    // Return keys iterator.
-    keys() {
-        return this.model_.keys();
-    }
+  constructor() { this.store = new Map(); }
+  add(key, value) { this.store.set(key, value); }
+  query(key) { return this.store.get(key); }
+  has(key) { return this.store.has(key); }
+  keys() { return this.store.keys(); }
 }
 
-class RedisConnector extends DBConnector {
-    constructor(connection_path, data_config) {
-        super(connection_path);
-        this.data_config_ = data_config;
-        this.keep_running_ = true;
-        this.model_ = new DataModel();
-        this.open();
+class RedisConnector {
+  constructor(redisStr, dataConfig) {
+    this.client = null;
+    this.model = new DataModel();
+    this.config = dataConfig;
+    const [host, port] = redisStr.split(':');
+    this.redisUrl = { host, port: Number(port) };
+  }
+
+  async init() {
+    this.client = new Redis(this.redisUrl, { maxRetriesPerRequest: 3, retryDelayOnFailover: 100 });
+
+    // 监听连接状态
+    this.client.on('connect', () => console.log('✅ Redis connected'));
+    this.client.on('error', (err) => console.error('❌ Redis error:', err));
+
+    if (this.config?.drivers) {
+      this._buildModel();
+    }
+    await this._syncExistingData();
+  }
+
+  _buildModel() {
+    const tNow = Date.now() / 1000;
+    const baseName = this.config.name ?? 'dummy';
+    for (const driver of this.config.drivers) {
+      for (const node of driver.nodes) {
+        for (const data of node.data) {
+          const id = `${baseName}.${driver.id}.${node.address}.${data.id}`;
+          const ratio = Number.isFinite(Number(data.ratio)) ? Number(data.ratio) : 1.0;
+
+          if (!data.register?.startsWith?.('R', 0) && !data.register?.startsWith?.('W', 0)) continue;
+
+          let privilege = D_PRIVILEGE.READ_ONLY;
+          let startIdx = 1;
+          if (data.register.startsWith('RW')) { privilege = D_PRIVILEGE.READ_WRITE; startIdx = 2; }
+          else if (data.register.startsWith('W')) { privilege = D_PRIVILEGE.WRITE_ONLY; }
+
+          const zoneType = Number(data.register[startIdx]);
+          if (isNaN(zoneType) || !Number.isInteger(zoneType)) continue;
+
+          let typeStr = data.register.slice(startIdx + 1, startIdx + 4);
+          typeStr = (typeStr.length === 3 && Number.isInteger(Number(typeStr[2]))) ? typeStr.slice(0, 2) : typeStr;  // Remove the trail number
+          const typeMap = { DF: 0, WUB: 1, WB: 2, DUB: 3, DB: 4, BB: 5, BT: 6, STR: 7 };
+          const dtype = typeMap[typeStr] ?? -1;
+          if (dtype === -1) continue;
+
+          this.model.add(id, new DataInfo(id, data.name, dtype, privilege, ratio, 0, '-1', tNow));
+        }
+      }
+    }
+  }
+
+  async _syncExistingData() {
+    for (const ns of ['refresh', 'poll']) {
+      const timeKey = ns === 'refresh' ? D_NAMESPACE.NS_REFRESH_TIME : D_NAMESPACE.NS_POLL_TIME;
+      const dataKey = ns === 'refresh' ? D_NAMESPACE.NS_REFRESH : D_NAMESPACE.NS_POLL;
+      const existing = await this.client.zrange(timeKey, 0, -1);
+      const newIds = new Set(this.model.keys());
+      existing.forEach(k => newIds.delete(k.slice(dataKey.length)));
+
+      const pipeline = this.client.pipeline();
+      for (const id of newIds) {
+        const info = this.model.query(id);
+        if (ns === 'poll' && info.privilege === D_PRIVILEGE.READ_ONLY) continue;
+        const nsId = `${dataKey}${id}`;
+        pipeline.hmset(nsId, { id: info.id, name: info.name, type: info.type, rw: info.privilege, value: info.value, result: info.result, time: info.timestamp });
+        pipeline.zadd(timeKey, info.timestamp, nsId);
+      }
+      if (newIds.size > 0) {
+        await pipeline.exec();
+      }
+    }
+  }
+
+  async updateData(namespace, dataList) {
+    if (!dataList?.length) {
+      return 0;
+    }
+    const isRefresh = (namespace === 'refresh');
+    const keyNs = isRefresh ? D_NAMESPACE.NS_REFRESH : D_NAMESPACE.NS_POLL;
+    const timeNs = isRefresh ? D_NAMESPACE.NS_REFRESH_TIME : D_NAMESPACE.NS_POLL_TIME;
+
+    let updated = 0;
+    const batchSize = 64;
+    for (let i = 0; i < dataList.length; i += batchSize) {
+      const chunk = dataList.slice(i, i + batchSize);
+      const pipe = this.client.pipeline();
+      chunk.forEach(d => {
+        const nsId = `${keyNs}${d.id}`;
+        pipe.hmset(nsId, { value: d.value, result: d.result, time: d.time });
+        pipe.zadd(timeNs, d.time, nsId);
+      });
+      const res = await pipe.exec();
+      updated += res.filter(r => r[1] === 'OK').length;
+    }
+    return updated;
+  }
+
+  async getData(namespace, groupPrefix, idList, timeRange, props, batchNum, batchSize) {
+    const isRefresh = namespace === 'refresh';
+    const keyNs = isRefresh ? D_NAMESPACE.NS_REFRESH : D_NAMESPACE.NS_POLL;
+    const timeNs = isRefresh ? D_NAMESPACE.NS_REFRESH_TIME : D_NAMESPACE.NS_POLL_TIME;
+
+    const [tStart, tEnd] = timeRange?.length === 2 ? timeRange : [Date.now() / 1000 - 5, Date.now() / 1000];
+    const fields = props?.length ? props : ['value', 'result', 'time'];
+
+    const candidates = await this.client.zrangebyscore(timeNs, tStart, tEnd);
+    const filterIds = idList?.length ? candidates.filter(k => idList.some(id => k.endsWith(`${groupPrefix}.${id}`))) : candidates;
+
+    // 分页支持
+    const offset = (batchNum - 1) * batchSize;
+    const page = filterIds.slice(offset, offset + batchSize);
+
+    if (!page.length) {
+      return { groupName: groupPrefix, table: { id: [], ...Object.fromEntries(fields.map(f => [f, []])) }, total: 0 };
     }
 
-    open() {
-        // Parse arguments.
-        const vars = this.connection_path_.split(':');
-        assert.strictEqual(2, vars.length);
-        const host = vars[0];
-        const port = Number(vars[1]);
-        // Create model
-        this.create_model();
-        // Create redis client.
-        this.db_ = new redis(port, host);
-        // If the connection fails and an error handler is supplied, 
-        // the Redis client will attempt to retry the connection.
-        this.db_.on('connect', () => {
-            console.log('Redis client connected to server.');
-            this.add_redis_set(D_NAMESPACE.NS_REFRESH_TIME, D_NAMESPACE.NS_REFRESH, false);
-            this.add_redis_set(D_NAMESPACE.NS_POLL_TIME, D_NAMESPACE.NS_POLL, true)
-        });
+    const pipe = this.client.pipeline();
+    page.forEach(id => pipe.hmget(id, fields));
+    const results = await pipe.exec();
 
-        this.db_.on('ready', () => {
-            console.log('Redis server is ready.');
-        });
-        // If an error event is fired and no error handler is attached, 
-        // the application process will throw the error and crash.
-        this.db_.on('error', err => console.error('Redis error', err));
-    }
+    const table = { id: [], ...Object.fromEntries(fields.map(f => [f, []])) };
+    results.forEach((res, i) => {
+      if (res[0]) {
+        return table.id.push(page[i].slice(keyNs.length + groupPrefix.length + 1));
+      }
+      const val = res[1];
+      table.id.push(page[i].slice(keyNs.length + groupPrefix.length + 1));
+      fields.forEach((f, fi) => table[f].push(val[fi]));
+    });
 
-    close() {
-        console.log('redis_connector close()');
-    }
+    return { groupName: groupPrefix, table, total: filterIds.length };
+  }
 
-    create_model() {
-        if (!this.data_config_) {
-            throw 'Undefined data configuration.';
-        }
-        const name = this.data_config_.name??'dummy';
-        const t_now = Date.now() / 1000.0;
-        for (const driver of this.data_config_.drivers) {
-            const driver_id = driver.id;
-            for (const node of driver.nodes) {
-                const address = node.address;
-                for (const data of node.data) {
-                    const id = [name, driver_id, address, data.id].join('.');
-                    let ratio = 1.0;
-                    let fvalue = Number(data.ratio);
-                    if (!Number.isNaN(fvalue)) {
-                        ratio = fvalue;
-                    }
-                    if (data.register?.length <= 5)
-                    {
-                        console.log('Error data register length.');
-                        continue;
-                    }
-                    let read_or_write = D_PRIVILEGE.READ_ONLY;
-                    let start_pos = 0;
-                    if (data.register?.startsWith('RW')) {
-                        read_or_write = D_PRIVILEGE.READ_WRITE;
-                        start_pos = 2;
-                    }
-                    else if (data.register?.startsWith('W')) {
-                        read_or_write = D_PRIVILEGE.WRITE_ONLY;
-                        start_pos = 1;
-                    }
-                    else if (data.register?.startsWith('R')) {
-                        read_or_write = D_PRIVILEGE.READ_ONLY;
-                        start_pos = 1;
-                    }
-                    else {
-                        console.log('Error data privilege.');
-                        continue;
-                    }
-                    let int_zone = Number(data.register.substr(start_pos, 1))
-                    let data_zone = D_DataZone.INPUT_RELAY;
-                    if (!Number.isInteger(int_zone))
-                    {
-                        console.log('Error data zone type.');
-                        continue;
-                    }
-                    if (4 == int_zone)
-                    {
-                        data_zone = D_DataZone.OUTPUT_REGISTER;
-                    }
-                    else if (0 == int_zone)
-                    {
-                        data_zone = D_DataZone.INPUT_RELAY;
-                    }
-                    else if (1 == int_zone)
-                    {
-                        data_zone = D_DataZone.OUTPUT_RELAY;
-                    }
-                    else if (3 == int_zone)
-                    {
-                        data_zone = D_DataZone.INPUT_REGISTER;
-                    }
-                    else if (5 == int_zone)
-                    {
-                        data_zone = D_DataZone.PLC_DB;
-                    }
-                    else if (6 == int_zone)
-                    {
-                        data_zone = D_DataZone.DB;
-                    }
-                    else
-                    {
-                        console.log('Error data zone type.');
-                        continue;
-                    }
-                    start_pos++;
-                    ;// assign the data zone.
-                    let data_type = data.register.substr(start_pos, 3);
-                    if (data_type.startsWith('DF'))
-                    {
-                        data_type =  D_DataType.DF;
-                    }
-                    else if (data_type.startsWith('WUB'))
-                    {
-                        data_type =  D_DataType.WUB;
-                    }
-                    else if (data_type.startsWith('WB'))
-                    {
-                        data_type =  D_DataType.WB;
-                    }
-                    else if (data_type.startsWith('DUB'))
-                    {
-                        data_type =  D_DataType.DUB;
-                    }
-                    else if (data_type.startsWith('DB'))
-                    {
-                        data_type =  D_DataType.DB;
-                    }
-                    else if (data_type.startsWith('BT'))
-                    {
-                        data_type =  D_DataType.BT;
-                    }
-                    else if (data_type.startsWith('BB'))
-                    {
-                        data_type =  D_DataType.BB;
-                    }
-                    else if (data_type.startsWith('STR'))
-                    {
-                        data_type = D_DataType.STR;
-                    }
-                    else
-                    {
-                        console.log('Error data type.');
-                        continue;   
-                    }
-                    this.model_.add(id, new DataInfo(id, data.name, data_type, read_or_write, ratio, 0, -1, t_now));           
-                }
-            }
-        }
-    }
-
-    async add_redis_set(time_namespace, key_namespace, is_poll)
-    {
-        if (!time_namespace || !key_namespace)
-        {
-            throw new Error('Parameter is empty.');
-        }
-        const existed_keys = await this.db_.zrange(time_namespace, 0, -1); // withscores
-        const data_info_ids = new Set(this.model_.keys());
-        for (let key of existed_keys)
-        {
-            key = key.substring(key_namespace.length);
-            if (data_info_ids.has(key))
-            {
-                data_info_ids.delete(key);
-            }
-        }
-        let add_num = 0;
-        for (let id of data_info_ids)
-        {
-            const data_info = this.model_.query(id);
-            if (!is_poll || (is_poll && data_info.privilege != D_PRIVILEGE.READ_ONLY))
-            {
-                const ns_id = key_namespace + id;
-                let reply = await this.db_.hmset(ns_id, 'id', data_info.id,
-                    'name', data_info.name, 'type', data_info.type, 'rw', data_info.privilege,
-                    'value', data_info.value, 'result', data_info.result, 'time', data_info.timestamp);
-                this.check_redis_reply(id, 'add_redis_set', reply);
-                reply = await this.db_.zadd(time_namespace, data_info.timestamp, ns_id);
-                this.check_redis_reply(id, 'zadd_redis_set', reply);
-                add_num++;
-            }
-        }
-        const zone = is_poll ? 'poll' : 'refresh';
-        if (add_num > 0)
-        {
-            console.log(`Adding ${add_num} ${zone} set to redis finished`);
-        }
-    }
-
-    check_redis_reply(id, op_name, reply)
-    {
-        if (reply != 'OK' && reply != 1)
-        {
-            console.log(`Redis reply error: [${id}] [${op_name}] ${reply}`);
-        }
-    }
-
-    // Return the in-memory data model.
-    data_model ()
-    {
-        return this.model_;
-    }
-
-    // @param <namespace> set data namespace indicating manipulation, poll or refresh.
-    // @param <data_list> data list.
-    // Return updated data number.
-    async update_data(namespace, data_list) 
-    {
-        if (!data_list?.length)
-        {
-            return 0;
-        }
-
-        // namespace
-        let key_namespace, time_namespace;
-        if (namespace == D_NAMESPACE.NS_REFRESH) 
-        {
-            key_namespace = D_NAMESPACE.NS_REFRESH;
-            time_namespace = D_NAMESPACE.NS_REFRESH_TIME;
-        }
-        else if (namespace == D_NAMESPACE.NS_POLL) 
-        {
-            key_namespace = D_NAMESPACE.NS_POLL;
-            time_namespace = D_NAMESPACE.NS_POLL_TIME;
-        }
-        else 
-        {
-            throw 'Unsupported namespace.';
-        }
-
-        const batch_size = 64;
-        let ok_num = 0;
-        for (let i = 0; i < data_list.length;) 
-        {
-            let start = i;
-            let end = start + batch_size;
-            if (end > data_list.length)
-            {
-                end = start + data_list.length % batch_size;
-            }
-            i = end;
-            const selected = data_list.slice(start, end);
-            const transaction = this.db_.multi();
-            for (const data of selected) 
-            {
-                let ns_id = key_namespace + data.id;
-                transaction.hmset(
-                    ns_id, 'value', data.value, 'result', data.result, 'time', data.time);
-                transaction.zadd(time_namespace, data.time, ns_id);
-            }
-            // Each response follows the format `[err, result]`.
-            const reply = await transaction.exec();
-            for (const item of reply) 
-            {
-                if (item[1] == 'OK') {
-                    ok_num++;
-                }
-            }
-        }
-        return ok_num;
-    }
-
-    // Get data from redis.
-    // @param <namespace> get data namespace indicating manipulation, poll or refresh.
-    // @param <group_name> group name like goiot.
-    // @param <id_list> data ID with 'group_name.' prefix. Empty array covers all data.
-    // @param <time_range> start and stop time array in second. [0, -1] covers all time.
-    // @return A data list whose ID removed <group_name>.
-    async get_data(namespace, group_name, id_list, time_range, props, batch_num, batch_size)
-    {
-        const data_list = [];
-        // Initialize time_range [now - 5s, now]
-        let t_end = Date.now() / 1000;
-        let t_start = t_end - 5.0;
-        if (time_range?.length && time_range.length >= 2)
-        {
-            t_end = parseFloat(time_range[1]);
-            t_start = parseFloat(time_range[0]);
-        }
-        // Initialize properties
-        if (!props?.length)
-        {
-            props = ['value', 'result', 'time'];
-        }
-        // namespace
-        let key_namespace, time_namespace;
-        if (namespace == D_NAMESPACE.NS_REFRESH)
-        {
-            key_namespace = D_NAMESPACE.NS_REFRESH;
-            time_namespace = D_NAMESPACE.NS_REFRESH_TIME;
-        }
-        else if (namespace == D_NAMESPACE.NS_POLL)
-        {
-            key_namespace = D_NAMESPACE.NS_POLL;
-            time_namespace = D_NAMESPACE.NS_POLL_TIME;
-        }
-        else
-        {
-            throw 'Unsupported namespace.';
-        }
-        // ZRANGEBYSCORE 
-        const id_by_time = await this.db_.zrangebyscore(time_namespace, t_start, t_end);
-        const match_ids = [];
-        // ID matching
-        if (!id_list?.length)
-        {
-            match_ids.push(...id_by_time);
-        }
-        else
-        {
-            const set_by_time = new Set(id_by_time);
-            id_list.forEach(x => {
-                const new_id = key_namespace + x;
-                if (set_by_time.has(new_id))
-                {
-                    match_ids.push(new_id);
-                }
-            });
-        }
-        // Batch read with default value.
-        if (batch_size <= 0)
-        {
-            batch_size = 128;
-        }
-        // Batch number with default value 1 (start).
-        if (batch_num <= 0)
-        {
-            batch_num = 1;
-        }
-        const DOMAIN_LEN = key_namespace.length + group_name.length + 1/* dot */;
-        // Initialize the return batch table.
-        let data_table = {};
-        data_table["id"] = [];
-        for (let i = 0; i < props.length; i++) 
-        {
-            data_table[props[i]] = []
-        }
-        // Query data
-        for (let i = (batch_num - 1) * batch_size; i < match_ids.length;) 
-        {
-            let start = i;
-            let end = start + batch_size;
-            if (end > match_ids.length)
-            {
-                end = start + match_ids.length % batch_size;
-            }
-            i = end;
-            const selected = match_ids.slice(start, end);
-            const transaction = this.db_.multi();
-            for (const ns_id of selected) 
-            {
-                transaction.hmget(ns_id, props);
-            }
-            const reply = await transaction.exec();
-            // Data table implementation，all data, including float, are in string format.  
-            data_table["id"].push(...selected.map(x => x.slice(DOMAIN_LEN)));
-            for (let i = 0; i < props.length; i++) 
-            {
-                data_table[props[i]].push(...reply.map(x => x[1][i]));
-            }
-            break; // One batch read finished.
-        }
-        return {'group_name': group_name, 'table': data_table, 'total': match_ids.length};    
-    }
+  close() {
+    return this.client?.quit();
+  }
 }
 
-class DataInfo {
-    constructor(id, name, dtype, privilege, ratio, value, result, timestamp) {
-        this.id = id;
-        this.name = name;
-        this.type = dtype;
-        this.privilege = privilege;
-        this.ratio = ratio;
-        this.value = value;
-        this.result = result;
-        this.timestamp = timestamp;
-    }
-}
-
-class WebServiceConnector {
-    constructor(hostname, port, path) {
-        this.hostname_ = hostname;
-        this.port_ = port;
-    }
-
-    post(service_path, data_obj) {
-        const data = JSON.stringify(data_obj);
-        const options = {
-            hostname: this.hostname_,
-            port: this.port_,
-            path: service_path,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Encoding': 'gzip',
-            }
-        };
-
-        zlib.gzip(data, (err, buffer) => {
-            const req = https.request(options, res => {
-                console.log(`状态码: ${res.statusCode}`);
-                res.setEncoding('utf8'); // Note: not requesting or handling compressed response
-                res.on('data', d => {
-                    // ... do stuff with returned data
-                })
-            });
-
-            req.on('error', err => {
-                console.error('problem with request: ' + err.message);
-            });
-
-            req.write(buffer);
-            req.end();
-        });
-    }
-}
-
-module.exports.RedisConnector = RedisConnector;
-module.exports.WebServiceConnector = WebServiceConnector;
-module.exports.D_NAMESPACE = D_NAMESPACE;
-module.exports.D_PRIVILEGE = D_PRIVILEGE;
+module.exports = { RedisConnector, D_NAMESPACE, D_PRIVILEGE };

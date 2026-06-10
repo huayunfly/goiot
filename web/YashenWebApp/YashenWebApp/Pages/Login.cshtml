@@ -4,65 +4,93 @@
     ViewData["Title"] = "登录亚申网站";
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-4 offset-md-4">
-            <img src="./img/common/yashen_logo_chs.png" height="39" width="142" class="d-block mx-auto mt-4" alt="yashen">
-            <h3 class="text-center mt-4 text-black-50">@ViewData["Title"]</h3>
-        </div>
-    </div>
-    <div class="row mt-3" id="message">
-        <!-- To be filled -->
-    </div>
-    <div class="row mt-3">
-        <div class="col-md-4 offset-md-4 border border-secondary rounded bg-light">
-            <form class="m-2" id="formlogin" action="api/login" method="post" enctype="application/x-www-form-urlencoded">
-                <!-- Username input -->
-                <div class="form-group mt-3">
-                    <label class="form-label" for="usernameInput">邮件地址</label>
-                    <input type="email" id="usernameInput" name="username" class="form-control" />
-                </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+            <!-- 🖼️ Logo 与标题 -->
+            <div class="text-center mb-4">
+                <img src="~/img/common/yashen_logo_chs.png" alt="亚申科技 Logo" class="mb-3" style="max-height: 40px;">
+                <h3 class="fw-bold text-secondary">@ViewData["Title"]</h3>
+            </div>
 
-                <!-- Password input -->
-                <div class="form-group mt-3">
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="form-label" for="passwordInput">密码</label>
+            <!-- ⚠️ 错误提示容器 -->
+            <div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
+
+            <!-- 📦 登录表单卡片 -->
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <form id="formlogin" novalidate>
+                        <!-- 邮箱输入 -->
+                        <div class="mb-3">
+                            <label for="usernameInput" class="form-label">邮箱地址</label>
+                            <input type="email" id="usernameInput" name="username" class="form-control form-control-lg" required autocomplete="email">
                         </div>
-                        <div class="col-6">
-                            <!-- Forget me link -->
-                            <a class="float-right" href="#!">忘记密码?</a>
+
+                        <!-- 密码输入 -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="passwordInput" class="form-label mb-0">密码</label>
+                                <a href="#" class="text-decoration-none small text-primary">忘记密码?</a>
+                            </div>
+                            <input type="password" id="passwordInput" name="password" class="form-control form-control-lg" required autocomplete="current-password">
                         </div>
-                    </div>
-                    <input type="password" id="passwordInput" name="password" class="form-control" />
+
+                        <!-- 🔑 登录按钮（已解决居中问题） -->
+                        <button type="submit" class="btn btn-success btn-lg w-100 mt-2">登录</button>
+                    </form>
                 </div>
-                <!-- Login buttons -->
-                <button type="submit" class="btn btn-success btn-block mt-3">登录</button>
-            </form>
-        </div>
-    </div>
-    <!-- Register buttons -->
-    <div class="row mt-3">
-        <div class="col-md-4 offset-md-4 border border-secondary rounded bg-light">
-            <p class="m-2 text-center">亚申科技的新用户? <a href="#!">注册</a></p>
+            </div>
+
+            <!-- 📝 注册引导 -->
+            <div class="text-center mt-3">
+                <p class="text-muted">亚申科技的新用户? <a href="#" class="text-decoration-none fw-semibold">立即注册</a></p>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="./lib/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript">
-    $("#formlogin").submit(function () {
-        var jqxhr = $.post("api/login", $("#formlogin").serialize())
-            .done(function (response) {
-                if (response?.statusCode == "200" && response?.result?.token) {
-                    window.location.href = `Management/Entry/${response.result.token}`;
-                }
-            })
-            .fail(function () {
-                const a = $('<div class="col-md-4 offset-md-4 border border-secondary rounded bg-warning"><label class="m-2 text-center text-black-50">无效的用户名或密码。</label></div>');
-                    $('#message').html(a);
-                });
-            return false;
-        });
-</script>
+<!-- 🌐 原生 JS 替代 jQuery，无依赖、更轻量 -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('formlogin');
+        const alertBox = document.getElementById('loginAlert');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
 
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // 隐藏旧提示，按钮加载态
+            alertBox.classList.add('d-none');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '验证中...';
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // 兼容原有后端返回结构
+                if (response.status === 200 && data?.result?.token) {
+                    window.location.href = `Management/Entry/${data.result.token}`;
+                }
+                else if (response.status == 401){
+                    throw new Error('用户名或密码无效。')
+                }
+                else {
+                    throw new Error(data?.message || '登录错误。');
+                }
+            } catch (err) {
+                alertBox.textContent = err.message;
+                alertBox.classList.remove('d-none');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+    });
+</script>

@@ -1,45 +1,94 @@
 ﻿@page
-@model YashenWebApp.Pages.HTDModel
+@model YashenWebApp.Pages.GasifierModel
 @{
     ViewData["Title"] = "直接气化装置GH-401";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p class="w-75 mt-3">采用亚申专有移动床技术设计和建造的煤炭、生物质、城市废质=>直接气化制氢、CO装置。</p>
+<!-- 📦 统一容器：控制响应式边距，防止内容压线 -->
+<div class="container py-4">
+    <h1 class="display-5 fw-bold mb-4">@ViewData["Title"]</h1>
 
-<div class="">
-    <img decoding="async" src="./img/gasifier_1.jpg" class="rounded-0 w-75" alt="gasifier_1">
+    <!-- 📖 技术概述 -->
+    <section class="mb-5">
+        <p class="lead text-muted mb-4">
+            采用亚申专有移动床技术设计和建造的煤炭、生物质、城市废弃物 => 直接气化制氢、CO装置。
+        </p>
+        <img src="~/img/gasifier_1.jpg" class="img-fluid rounded-3 shadow-sm w-100" alt="气化装置外观" style="aspect-ratio: 16/9; object-fit: cover;">
+    </section>
+
+    <!-- ⚙️ 系统组成清单 -->
+    <section class="mb-5">
+        <h2 class="h4 fw-semibold mb-3 text-success">典型 1~10kg/Hr 处理量的高温、高压气化系统组成</h2>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <ul class="list-unstyled mb-0">
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 典型1~10kg/Hr自动进料器（原料为干湿煤粉颗粒，破碎后有机生物质，城市废弃物等）K-701
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 进气模块 FICA-102
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 平衡气模块 FICA-602
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 进液（水）模块 FICA-403
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> Max. 1090℃高温加热器模块 TICA-801
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> Max. 2MPa压力控制模块 PCV-503
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 1、2级换热器模块 E-203、E-204
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 除尘模块（布袋，静电）TICA-210、211
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 200℃气体循环泵和气体循环模块 HIC-301
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 气液分离模块 V-502
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 尾气燃烧模块（PFD图未包含）
+                    </li>
+                    <li class="py-2 border-bottom d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> H2、CO气体检测器
+                    </li>
+                    <li class="py-2 d-flex align-items-start">
+                        <span class="text-primary me-2 fs-5">🔹</span> 安全保护系统
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🏭 核心部件与实物图 -->
+    <section class="mb-5">
+        <img src="~/img/gasifier_2.jpg" class="img-fluid rounded-3 shadow-sm w-100 mb-4" alt="气化装置系统/内部结构" style="aspect-ratio: 16/9; object-fit: cover;">
+        <p class="text-muted mb-0">
+            亚申气化装置GH-401高温区材质为正品310不锈钢、哈氏合金。主要器件为业界知名品牌产品：Bronkhorst气体质量控制器、Swagelok管阀、Watlow加热器、Omega测温元件、依博罗刀闸阀、松下控制器、台达伺服。
+        </p>
+    </section>
+
+    <!-- 🛡️ 安全与服务保障 -->
+    <section class="mb-5">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="bg-light p-4 rounded-3 border h-100">
+                    <p class="fw-bold text-success mb-2">🛡️ 多层级安全保护</p>
+                    <p class="text-muted mb-0">亚申气化装置GH-401配备完备、多层级的安全保护系统，确保高温高压工况下的绝对运行安全。</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bg-light p-4 rounded-3 border h-100">
+                    <p class="fw-bold text-success mb-2">🔧 7×24h 技术服务</p>
+                    <p class="text-muted mb-0">亚申为中国大陆境内装置提供全天候运行保障，包含完善的技术支持、远程诊断与备品备件快速供应。</p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
-
-<p class="w-75 p-0 mt-3 lead text-success">
-    典型 1~10kg/Hr 处理量的高温、高压气化系统组成：
-    <ul>
-        <li class="w-75">典型1~10kg/Hr自动进料器（原料为干湿煤粉颗粒，破碎后有机生物质，城市废质等）K-701</li>
-        <li class="w-75">进气模块FICA-102</li>
-        <li class="w-75">平衡气模块FICA-602</li>
-        <li class="w-75">进液（水）模块FICA-403</li>
-        <li class="w-75">Max. 1090℃高温加热器模块TICA-801</li>
-        <li class="w-75">Max. 2MPa压力控制模块PCV-503</li>
-        <li class="w-75">1、2级换热器模块E-203、204</li>
-        <li class="w-75">除尘模块（布袋，静电）TICA-210、211</li>
-        <li class="w-75">200℃气体循环泵和气体循环模块HIC-301</li>
-        <li class="w-75">气液分离模块V-502</li>
-        <li class="w-75">尾气燃烧模块（PFD图未包含）</li>
-        <li class="w-75">H2、CO气体检测器</li>
-        <li class="w-75">安全保护系统</li>
-    </ul>
-</p>
-
-<div class="">
-    <img decoding="async" src="./img/gasifier_2.jpg" class="rounded-0 w-75" alt="gasifier_2">
-</div>
-
-<p class="w-75 mt-3">
-    亚申气化装置GH-401高温区材质为正品310不锈钢、哈氏合金。主要器件为业界知名品牌产品，Bronkhorst气体质量控制器、Swagelok管阀、Watlow加热器、Omega测温元件、依博罗刀闸阀、松下控制器、台达伺服。
-</p>
-<p class="w-75 mt-3">亚申气化装置GH-401配备完备、多层级的安全保护系统。</p>
-<p class="w-75 mt-3">亚申为中国大陆境内装置7*24小时运行，提供完善的技术服务，备品备件供应。</p>
-
-
-    
-    

@@ -4,20 +4,77 @@
     ViewData["Title"] = "官方网站";
 }
 
-<div class="col">
-    <div class="text-center">
-        <h1 class="display-5">高通量设备</h1>
-        <p>了解<a asp-area="" asp-page="/HTD">加速新能源新材料的创新</a>.</p>
+<!-- 🌟 全宽 Hero 首屏横幅 (GitHub 风格) -->
+<section class="hero-bg text-white py-5">
+    <div class="container text-center py-md-5">
+        <h1 class="display-4 fw-bold mb-3">驱动新能源与新材料创新</h1>
+        <p class="lead mb-4 mx-auto" style="max-width: 700px;">
+            高通量计算与实验设备 · 自主产业化技术 · 全球战略合作<br>
+            让前沿科技快速走向现实应用
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a asp-page="/HTD" class="btn btn-primary btn-lg px-4">探索核心产品</a>
+            <a asp-page="/Company" class="btn btn-outline-light btn-lg px-4">了解亚申科技</a>
+        </div>
     </div>
-    <div class="row"><img decoding="async" src="~/img/1_1.jpg" class="rounded-lg" alt="HTD"></div>
-    <div class="text-center mt-2">
-        <h1 class="display-5">产业化应用</h1>
-        <p>具有完全自主知识产权的<a asp-area="" asp-page="/FTS">费托合成</a>、<a asp-area="" asp-page="/DMC">柴油酯生产</a>、<a asp-area="" asp-page="/SootlessDiesel">无烟柴油(Sootless Diesel)生产</a>.</p>
+</section>
+
+<!-- 📐 核心业务分区 (响应式图文交错) -->
+<div class="container py-5">
+    <!-- 分区 1: 高通量设备 -->
+    <div class="row align-items-center g-4 g-lg-5 py-4 section-card rounded-3 bg-white p-3 p-md-4 mb-4">
+        <div class="col-lg-6 order-lg-1">
+            <span class="badge bg-primary-subtle text-primary mb-2">核心设备</span>
+            <h2 class="display-5 fw-bold mb-3">高通量设备</h2>
+            <p class="text-muted lead mb-4">
+                加速新能源新材料的创新研发进程。我们的设备提供高效、精准、可重复的实验平台，助力科研与产业化快速迭代，缩短从实验室到量产的距离。
+            </p>
+            <a asp-page="/HTE" class="btn btn-outline-primary">查看技术参数 →</a>
+        </div>
+        <div class="col-lg-6 order-lg-2">
+            <img src="~/img/1_1.jpg" class="img-fluid rounded-3 shadow-sm" alt="高通量设备" style="object-fit: cover; min-height: 280px;">
+        </div>
     </div>
-    <div class="row"><img decoding="async" src="~/img/1_2.jpg" class="rounded-lg" alt="Industrialization"></div>
-    <div class="text-center mt-2">
-        <h1 class="display-5">国际国内战略合作</h1>
-        <p>持续创新<a asp-area="" asp-page="/Innovation">为实现技术成果的产业化奠定坚实基础</a>.</p>
+
+    <!-- 分区 2: 产业化应用 -->
+    <div class="row align-items-center g-4 g-lg-5 py-4 section-card rounded-3 bg-white p-3 p-md-4 mb-4">
+        <div class="col-lg-6 order-lg-2">
+            <span class="badge bg-success-subtle text-success mb-2">自主技术</span>
+            <h2 class="display-5 fw-bold mb-3">产业化应用</h2>
+            <p class="text-muted lead mb-3">拥有完全自主知识产权的核心技术体系，覆盖清洁能源转化全链路：</p>
+            <ul class="list-unstyled mb-4">
+                <li class="mb-2 d-flex align-items-center">
+                    <span class="bi bi-check-circle-fill text-success me-2"></span>
+                    <a asp-page="/FTS" class="text-decoration-none text-dark fw-medium hover-primary">费托合成 (FTS)</a>
+                </li>
+                <li class="mb-2 d-flex align-items-center">
+                    <span class="bi bi-check-circle-fill text-success me-2"></span>
+                    <a asp-page="/SootlessDiesel" class="text-decoration-none text-dark fw-medium hover-primary">无烟柴油生产</a>
+                </li>
+                <li class="mb-2 d-flex align-items-center">
+                    <span class="bi bi-check-circle-fill text-success me-2"></span>
+                    <a asp-page="/DMC" class="text-decoration-none text-dark fw-medium hover-primary">柴油酯生产</a>
+                </li>
+            </ul>
+            <a asp-page="/FTS" class="btn btn-outline-success">了解产业化方案 →</a>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+            <img src="~/img/1_2.jpg" class="img-fluid rounded-3 shadow-sm" alt="产业化应用" style="object-fit: cover; min-height: 280px;">
+        </div>
     </div>
-    <div class="row"><img decoding="async" src="~/img/1_3.jpg" class="rounded-lg" alt="Partnership"></div>
+
+    <!-- 分区 3: 战略合作 -->
+    <div class="row align-items-center g-4 g-lg-5 py-4 section-card rounded-3 bg-white p-3 p-md-4">
+        <div class="col-lg-6 order-lg-1">
+            <span class="badge bg-info-subtle text-info mb-2">生态合作</span>
+            <h2 class="display-5 fw-bold mb-3">国际国内战略合作</h2>
+            <p class="text-muted lead mb-4">
+                持续创新，构建产学研用深度融合的生态体系。与全球顶尖高校、科研机构及产业伙伴携手，为技术成果的规模化产业化奠定坚实基础。
+            </p>
+            <a asp-page="/Innovation" class="btn btn-outline-info">查看合作案例 →</a>
+        </div>
+        <div class="col-lg-6 order-lg-2">
+            <img src="~/img/1_3.jpg" class="img-fluid rounded-3 shadow-sm" alt="战略合作" style="object-fit: cover; min-height: 280px;">
+        </div>
+    </div>
 </div>

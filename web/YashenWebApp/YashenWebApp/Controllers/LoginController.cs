@@ -52,7 +52,9 @@ namespace YashenWebApp.Controllers
 
         // POST api/<LoginController>
         [HttpPost]
-        [Consumes("application/x-www-form-urlencoded")]
+        //[Consumes("application/x-www-form-urlencoded")] // jQuery 的 $.post 默认发送 application/x-www-form-urlencoded
+        //[Consumes("application/json")] // 默认情况下，操作支持所有可用的请求内容类型。此为限定
+        // 原生JS fetch 搭配 FormData 默认发送 multipart/form-data。Razor Webapi默认支持 multipart 格式 （不配置[Consumes("application/x-www-form-urlencoded")]）。
         public async Task<ActionResult<string>> PostForm([FromForm] LoginInfo info)
         {
             if (info != null)
@@ -64,9 +66,7 @@ namespace YashenWebApp.Controllers
                     {
                         message = $"Api post {nameof(PostForm)} ok",
                         result = new { token },
-                        statusCode = "200"
                     };
-                    //string content = JsonSerializer.Serialize(obj); // Create escaped string.
                     return Ok(obj);
                 }
                 else
@@ -75,9 +75,8 @@ namespace YashenWebApp.Controllers
                     {
                         message = $"Api post {nameof(PostForm)} failed",
                         error = "Username or password error",
-                        statusCode = "404"
                     };
-                    return NotFound(obj);
+                    return Unauthorized(obj);
                 }
             }
             else
@@ -86,7 +85,6 @@ namespace YashenWebApp.Controllers
                 {
                     message = $"Api post {nameof(PostForm)} failed",
                     error = "Username or password error",
-                    statusCode = "400"
                 };
                 return BadRequest(obj);
             }
