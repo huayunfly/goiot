@@ -147,42 +147,32 @@ struct RequestConditionBody: Codable {
     let batchNum: Int32
     
     enum CodingKeys: String, CodingKey {
-        case groupName = "group_name"
-        case idList = "id_list"
-        case timeRange = "time_range"
+        case groupName = "groupName"
+        case idList = "idList"
+        case timeRange = "timeRange"
         case properties
-        case batchSize = "batch_size"
-        case batchNum = "batch_num"
-    }
-}
-
-// JSON response structure
-struct DataModelBody: Decodable {
-    let groupName: String
-    let table: [String: [String]]
-    let total: Int32
-    
-    enum CodingKeys: String, CodingKey {
-        case groupName = "group_name"
-        case table
-        case total
+        case batchSize = "batchSize"
+        case batchNum = "batchNum"
     }
 }
 
 struct ResultModelBody: Decodable {
-    let data: DataModelBody?
-    let error: String?
+    let groupName: String
+    let table: [String: [String]]
+    
+    enum CodingKeys: String, CodingKey {
+        case groupName = "groupName"
+        case table
+    }
 }
 
 struct ApiGetDataResponse: Decodable {
     let message: String
     let result: ResultModelBody
-    let statusCode: String
     
     enum CodingKeys: String, CodingKey {
         case message
         case result
-        case statusCode = "statusCode"
     }
 }
 
@@ -453,29 +443,20 @@ class DataManager: ObservableObject {
             return
         }
         let dataIDList = Array(nodeGroup.keys)
-        //let dataIDList = ["mfcpfc.1.pv", "mfcpfc.2.pv","fp2.1.tc801_pv"]
         let requestCondition = RequestConditionBody(groupName: "goiot",
                                                     idList: dataIDList,
                                                     timeRange: [1677154221, 2677154223],
                                                     properties: ["value", "result", "time"],
                                                     batchSize: 128, batchNum: 1)
         let getDataRequest = ApiGeneralRequest(name: "service_name",
-                                               operation: "GetDataR",
+                                               operation: "GETDATAR",
                                                token: tokenID,
                                                condition: requestCondition)
         
         let address: String = "http://192.168.2.177:6300/message"
         let response: ApiGetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: getDataRequest, timeoutInterval: 5)
-        guard response.statusCode == "200" else {
-            print("GetData error: \(response.result.error ?? "unknown error")")
-            throw WebServiceError.GetDataError
-        }
-        guard let resultData = response.result.data else {
-            print("GetData error: resultData nil")
-            throw WebServiceError.GetDataError
-        }
-        if resultData.total < 1 { return }
-        
+        let resultData = response.result
+
         //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
         DispatchQueue.main.async {
             guard let dataGroup = self.dataGroupIndexMap[resultData.groupName] else { return }

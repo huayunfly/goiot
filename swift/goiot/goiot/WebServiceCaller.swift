@@ -96,7 +96,6 @@ class WebServiceCaller {
         guard let response = try? decoder.decode(T2.self, from: data) else {
             throw WebServiceError.invalidJSONDecode
         }
-        print("guard let response")
         return response
             
         

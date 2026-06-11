@@ -7,255 +7,313 @@
 
 import SwiftUI
 
-
-enum ItemStyle: Int, CaseIterable {
-    case compact
-    case standard
-    case detailed
+// MARK: - 样式枚举
+enum ItemStyle: String, CaseIterable, Identifiable {
+    case compact = "紧凑"
+    case standard = "标准"
+    case detailed = "详细"
+    var id: String { self.rawValue }
 }
 
-
+// MARK: - 主视图
 struct MonitorTabView: View {
-    @State private var isWeatherExpanded = false
-    @State private var isEventsExpanded = false
-    
     @EnvironmentObject var userData: UserData
     @EnvironmentObject var dataManager: DataManager
     
     @State private var selectedStyle: ItemStyle = .standard
-    //@State var dataManagerTest: DataManager = DataManager()
-
-
+    @State private var isRefreshing = false
+    @State private var isExpanded = true
+    
+    // 安全提取数据，避免越界
+    private var monitorData: [DataInfo] {
+        guard let indices = dataManager.dataGroupIndexMap["goiot"]?["fp2"]?.values else { return [] }
+        return indices.compactMap { index in
+            dataManager.dataArray.indices.contains(index) ? dataManager.dataArray[index] : nil
+        }.sorted { $0.id < $1.id }
+    }
+    
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 20) {
-                // 样式选择器
-                Picker("选择样式", selection: $selectedStyle) {
-                    ForEach(ItemStyle.allCases, id:\.self) { style in
-                        Text(style.rawValue.description)
+        NavigationStack {
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    
+                    Button {
+                        isRefreshing = true
+                        dataManager.StartRefreshData(token: userData.token, withTimeInterval: 5)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            isRefreshing = false
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .rotationEffect(.degrees(isRefreshing ? 360 : 0))
+                            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: isRefreshing), value: isRefreshing)
+                    }
+                    // 数据分组卡片
+                    CollapsibleSection(
+                        title: "实时监测数据",
+                        icon: "chart.xyaxis.line",
+                        isExpanded: $isExpanded,
+                        items: monitorData
+                    ) { dataInfo in
+                        DataInfoCard(dataInfo: dataInfo, style: selectedStyle)
+                    }
+                    
+                    // 空状态提示
+                    if monitorData.isEmpty {
+                        EmptyStateView()
                     }
                 }
-                .pickerStyle(.menu)
-                .padding()
+                .padding(.horizontal)
+                .padding(.bottom, 30)
+            }
+            .navigationTitle("设备监控中心")
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    Button {
+                        isRefreshing = true
+                        dataManager.StartRefreshData(token: userData.token, withTimeInterval: 5)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            isRefreshing = false
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .rotationEffect(.degrees(isRefreshing ? 360 : 0))
+                            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: isRefreshing), value: isRefreshing)
+                    }
+                }
                 
-                Button{
-                    dataManager.StartRefreshData(token: userData.token, withTimeInterval: 5)
-                }
-                label: {
-                    ZStack {
-                        Text("刷新").font(.title2)
-                    }
-                }
-                .frame(width: 300, height: 50)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .padding()
-                // 设备分组
-                GroupHeader(title: "系统设备", isExpanded: $isWeatherExpanded)
-                if isWeatherExpanded {
-                    ForEach(["dsfafdaf", "mfec", "mfc.pdc.1"], id: \.self) { city in
-                        WeatherRow(city: city)
-                    }
-                }
-
-                // 事件分组
-                GroupHeader(title: "事件", isExpanded: $isEventsExpanded)
-                if isEventsExpanded {
-                    if let indices = dataManager.dataGroupIndexMap["goiot"]?["fp2"]?.values {
-                        let dataGroup = indices.compactMap { index in
-                            if index < dataManager.dataArray.count {
-                                return dataManager.dataArray[index]
-                            } else {
-                                return nil
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        ForEach(ItemStyle.allCases) { style in
+                            Button {
+                                selectedStyle = style
+                            } label: {
+                                Label(style.rawValue, systemImage: style == selectedStyle ? "checkmark.circle.fill" : "circle")
                             }
                         }
-                        let sortedDataGroup = dataGroup.sorted {
-                            $0.id < $1.id
-                        }
-                        ForEach(sortedDataGroup, id: \.id) { item in
-                            ItemRowView(item: item, style: selectedStyle)
-                        }
+                    } label: {
+                        Image(systemName: "slider.horizontal.3")
                     }
                 }
             }
-            .padding()
         }
-        .navigationTitle("折叠分组列表")
     }
 }
 
-struct GroupHeader: View {
+// MARK: - 可折叠分组容器
+struct CollapsibleSection<Content: View>: View {
     let title: String
+    let icon: String
     @Binding var isExpanded: Bool
+    let items: [DataInfo]
+    let content: (DataInfo) -> Content
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            SectionHeader(title: title, icon: icon, isExpanded: $isExpanded, count: items.count)
+            
+            if isExpanded {
+                ForEach(items, id: \.id) { item in
+                    content(item)
+                }
+            }
+        }
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isExpanded)
+    }
+}
 
+// MARK: - 分组头部
+struct SectionHeader: View {
+    let title: String
+    let icon: String
+    @Binding var isExpanded: Bool
+    let count: Int
+    
     var body: some View {
         HStack {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(.white)
+                .padding(10)
+                .background(Color.blue.gradient)
+                .cornerRadius(10)
+            
             Text(title)
                 .font(.headline)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 16)
-                .background(Color.blue.opacity(0.2))
-                .cornerRadius(8)
-            
-            Spacer()
-            
-            Button(action: {
-                isExpanded.toggle()
-            }) {
-                HStack {
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.title2)
-                        .foregroundColor(.blue)
-                    Text(isExpanded ? "收起" : "展开")
-                        .font(.caption)
-                }
-                .padding(.trailing, 8)
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(8)
-                .padding(.vertical, 4)
-            }
-            .animation(.spring(), value: isExpanded)
-        }
-    }
-}
-
-struct WeatherRow: View {
-    let city: String
-    var body: some View {
-        HStack {
-            Image("temperature_controller")
-                .resizable()
-                .frame(width: 60, height: 28)
                 .foregroundColor(.primary)
-                .scaleEffect(1.0, anchor: .leading)
-                .position(x: 0, y: 14)
-
-            Text(city)
-                .font(.headline)
+            
             Spacer()
+            
+            Text("\(count) 项")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+            
+            Button(action: { isExpanded.toggle() }) {
+                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
         }
-        .padding(8)
-        .background(Color.white)
-        .cornerRadius(8)
-        .shadow(radius: 4)
+        .padding(.vertical, 8)
     }
 }
 
-struct EventRow: View {
-    let event: String
-    var body: some View {
-        HStack {
-            Image(systemName: "calendar")
-                .font(.title3)
-                .foregroundColor(.green)
-            Text(event)
-                .font(.headline)
-        }
-        .padding(8)
-        .background(Color.white)
-        .cornerRadius(8)
-        .shadow(radius: 4)
-    }
-}
-
-extension VerticalAlignment {
-    private enum OneThird : AlignmentID {
-        static func defaultValue(in d: ViewDimensions) -> CGFloat {
-     return d.height / 4 }   }
-    static let oneThird = VerticalAlignment(OneThird.self)
-}
-
-// 行视图
-struct ItemRowView: View {
-    @StateObject var item: DataInfo
+// MARK: - 数据卡片行视图
+struct DataInfoCard: View {
+    @ObservedObject var dataInfo: DataInfo
     let style: ItemStyle
     
+    private var displayValue: String {
+        switch dataInfo.dtype {
+        case .DF: return String(format: "%.2f", dataInfo.fValue)
+        case .WUB, .WB, .DUB, .DB: return String(dataInfo.intValue)
+        case .BB: return String(dataInfo.byteValue)
+        case .BT: return dataInfo.boolValue ? "ON" : "OFF"
+        case .STR: return dataInfo.strValue
+        }
+    }
+    
+    private var statusColor: Color {
+        dataInfo.result >= 0 ? .green : .red
+    }
+    
+    private var typeDisplay: String {
+        switch dataInfo.dtype {
+        case .DF: return "浮点"
+        case .WUB: return "无符号16位"
+        case .WB: return "有符号16位"
+        case .DUB: return "无符号32位"
+        case .DB: return "有符号32位"
+        case .BB: return "字节"
+        case .BT: return "位状态"
+        case .STR: return "字符串"
+        }
+    }
+    
+    private func valueText(_ value: String) -> some View {
+        Text(value)
+            .font(.system(.callout, design: .monospaced))
+            .foregroundColor(.primary)
+    }
     
     var body: some View {
-        HStack {
-            // ID列
-            VStack(alignment: .leading, spacing: 2) {
-                Text("#\(item.id)")
-                    .font(.headline)
-                Text(DateFormatter.localizedString(from: Date(timeIntervalSince1970: item.timestamp), dateStyle: .none, timeStyle: .medium))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                // 状态指示灯
+                Circle()
+                    .fill(statusColor)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: statusColor.opacity(0.5), radius: 3)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(dataInfo.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    if style != .compact {
+                        Text(dataInfo.id)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+ 
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(displayValue)
+                        .font(style == .compact ? .title3 : .title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(statusColor)
+                    
+                    if style != .compact {
+                        Text(formatTimestamp(dataInfo.timestamp))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
-            .padding(.vertical, 8)
+            .padding(16)
             
-            // 名字列
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.name)
-                    .font(.headline)
+            // 详细模式扩展信息
+            if style == .detailed {
+                HStack(spacing: 12) {
+                    InfoTag(title: "类型", value: typeDisplay)
+                    InfoTag(title: "地址", value: String(dataInfo.regiterAddress))
+                    InfoTag(title: "读写", value: dataInfo.readWriteType == .readOnly ? "只读" : "读写")
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
             }
-            .padding(.vertical, 8)
-            
-            // 时间列
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(DateFormatter.localizedString(from: Date(timeIntervalSince1970: item.timestamp), dateStyle: .medium, timeStyle: .short))
-                    .font(.headline)
-            }
-            .padding(.vertical, 8)
-            
-            // 值列
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("\(item.fValue, specifier: "%.2f")")
-                    .font(.headline)
-                    .foregroundColor(item.fValue > 50 ? .green : .blue)
-            }
-            .padding(.vertical, 8)
         }
-        .padding(16)
         .background(Color(.systemBackground))
         .cornerRadius(12)
-        .shadow(radius: 2)
-        .foregroundColor(Color(.label))
-        
-        // 根据样式添加额外内容
-        if style == .detailed {
-            HStack {
-                Spacer()
-                // 详细信息按钮
-                Button(action: {
-                    // 显示详细信息
-                }) {
-                    Image(systemName: "info.circle")
-                        .symbolRenderingMode(.multicolor)
-                }
-                .padding(8)
-            }
-            .padding(.trailing, 16)
-        }
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.15), lineWidth: 1)
+        )
     }
 }
 
-// 骨干视图（用于占位符）
-struct SkeletonView<T: View>: View {
-    let content: T
-    
-    init(_ type: T.Type, content: T) {
-        self.content = content
-    }
-    
-    init(content: T) {
-        self.content = content
-    }
+// MARK: - 信息标签
+struct InfoTag: View {
+    let title: String
+    let value: String
     
     var body: some View {
-        content
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            Text(value)
+                .font(.caption)
+                .fontWeight(.medium)
+                .foregroundColor(.primary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-// 颜色扩展
-extension Color {
-    static let accent = Color("accent")
+// MARK: - 空状态视图
+struct EmptyStateView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "wrench.and.adjustments")
+                .font(.largeTitle)
+                .foregroundColor(.gray)
+            Text("暂无监测数据")
+                .font(.headline)
+                .foregroundColor(.secondary)
+            Text("请检查设备连接或点击左上角刷新")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(40)
+        .background(Color(.systemGray6))
+        .cornerRadius(16)
+    }
 }
 
+// MARK: - 辅助函数
+func formatTimestamp(_ timestamp: Double) -> String {
+    let date = Date(timeIntervalSince1970: timestamp)
+    let formatter = DateFormatter()
+    formatter.dateFormat = "HH:mm:ss"
+    return formatter.string(from: date)
+}
+
+// MARK: - 预览
 struct MonitorTabView_Previews: PreviewProvider {
     static var previews: some View {
         MonitorTabView()
+            .environmentObject(UserData())
+            .environmentObject(DataManager())
     }
 }
-
-
