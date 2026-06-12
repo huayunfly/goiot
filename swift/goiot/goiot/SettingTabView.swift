@@ -111,18 +111,19 @@ struct SettingTabView: View {
             do {
                 
                 if !isConnected {
-                    let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
-                    guard response.statusCode == "200" else {
-                        print("Login return status error.")
+                    do {
+                        let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
+                        userData.username = username
+                        userData.isLoggedIn = true
+                        userData.token = response.result?["token"] ?? "1-2-3-4-5-6"
+                        isConnected = true
+                        txtLogon = SettingTabView.TXT_LOGOFF
+                        colorLogon = SettingTabView.COLOR_LOGOFF
+                        print(userData.token)
+                    } catch {
+                        print("Login api call error: \(error)")
                         throw WebServiceError.statusError
                     }
-                    userData.username = username
-                    userData.isLoggedIn = true
-                    userData.token = response.result?["token"] ?? "1-2-3-4-5-6"
-                    isConnected = true
-                    txtLogon = SettingTabView.TXT_LOGOFF
-                    colorLogon = SettingTabView.COLOR_LOGOFF
-                    print(userData.token)
                 }
                 else {
                     userData.isLoggedIn = false
