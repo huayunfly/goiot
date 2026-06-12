@@ -194,7 +194,7 @@ class RedisSyncManager {
 
         if (validData.length > 0) {
           await this.client.postData('databus', 'SETDATAR', {
-            data: {
+            condition: {
               groupName: table.group,
               table: {
                 id: validData.map(d => d.id),
@@ -236,8 +236,8 @@ class RedisSyncManager {
             }
           });
 
-          if (res?.data?.table?.id?.length) {
-            const t = res.data.table;
+          if (res?.result?.table?.id?.length) {
+            const t = res.result.table;
             if (t.id.length !== t.value.length || t.id.length !== t.result.length || t.id.length !== t.time.length) {
               console.warn('⚠️ 数据表字段长度不一致，跳过批次');
               continue;
