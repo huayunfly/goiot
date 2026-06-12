@@ -95,7 +95,7 @@ fastify.post('/message', {
         }
         const username = await tenantClient.touch(req.body.token);
         if (!username) {
-            return reply.code(401).send({ messge: 'Invalid or expired token', error: 'INVALID_TOKEN'});
+            return reply.code(401).send({ message: 'Invalid or expired token', error: 'INVALID_TOKEN'});
         }
         req.username = username; // 注入请求上下文
     } catch (err) {
@@ -106,7 +106,7 @@ fastify.post('/message', {
     // 分支 C：核心数据读写逻辑
     try {
         if (op.startsWith('SETDATA')) {
-            const { groupName, table } = req.body.data || {};
+            const { groupName, table } = req.body.condition || {};
             const namespace = (op === 'SETDATAP' ? 'poll' : 'refresh');
 
             if (!groupName || !table || !Array.isArray(table.id) || !Array.isArray(table.value) ||
@@ -125,7 +125,7 @@ fastify.post('/message', {
             }));
 
             const count = await redisService.updateData(namespace, dataList);
-            return reply.code(200).send({ message: `SETDATA ${namespace} ok`, data: { updated: count } });
+            return reply.code(200).send({ message: `SETDATA ${namespace} ok`, result: { updated: `${count}` } });
         }
 
         if (op.startsWith('GETDATA')) {
@@ -146,7 +146,7 @@ fastify.post('/message', {
                 batchNum || 1,
                 batchSize || 128
             );
-            return reply.code(200).send({ message: `GETDATA ${namespace} ok`, data });
+            return reply.code(200).send({ message: `GETDATA ${namespace} ok`, result: data });
         }
     } catch (err) {
         req.log.error({ err, operation: op }, '数据操作执行失败');
