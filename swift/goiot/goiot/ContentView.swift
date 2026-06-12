@@ -31,7 +31,7 @@ struct MyTabView: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            MonitorTabView()
+            MonitorControlTabView()
                 .tabItem {
                     Image(systemName: "checkerboard.rectangle")
                     Text("监视")
