@@ -8,31 +8,19 @@
 import Foundation
 import CoreData
 
-struct ApiResultBody: Decodable {
-    let message: String
-    let result: [String: String]?
-}
-
-struct ApiRequestBody: Encodable {
-    let name: String
-    let operation: String
-    let token: String?
-    let condition: [String: String]
-}
-
-struct ApiGetDataBody {
-    let name: String
-    let operation: String
-    let token: String
-    let condition : [String: Any]
-}
-
-struct ApiSetDataBody: Encodable {
-    let name: String
-    let operation: String
-    let token: String
-    let data: [String: [String]]
-}
+//struct ApiGetDataBody {
+//    let name: String
+//    let operation: String
+//    let token: String
+//    let condition : [String: Any]
+//}
+//
+//struct ApiSetDataBody: Encodable {
+//    let name: String
+//    let operation: String
+//    let token: String
+//    let data: [String: [String]]
+//}
 
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // BB(byte), BT (bit), STR(string)
@@ -127,6 +115,19 @@ struct DriverConfig: Decodable {
     let db: String
     let tenant: String?
     let drivers: [DriverBody]
+}
+
+// ApiGeneralRequest
+struct ApiGeneralRequest: Encodable {
+    let name: String
+    let operation: String
+    let token: String?
+    let condition: [String: String]
+}
+
+struct ApiGeneralResponse: Decodable {
+    let message: String
+    let result: [String: String]?
 }
 
 // ApiGetDataRequest

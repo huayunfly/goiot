@@ -106,13 +106,13 @@ struct SettingTabView: View {
     func logon()
     {
         Task {
-            let requestBody = ApiRequestBody(name: "tenant", operation: "Login", token: nil, condition: ["username": username, "password": password])
+            let requestBody = ApiGeneralRequest(name: "tenant", operation: "Login", token: nil, condition: ["username": username, "password": password])
             
             do {
                 
                 if !isConnected {
                     do {
-                        let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
+                        let response: ApiGeneralResponse = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
                         userData.username = username
                         userData.isLoggedIn = true
                         userData.token = response.result?["token"] ?? "1-2-3-4-5-6"
