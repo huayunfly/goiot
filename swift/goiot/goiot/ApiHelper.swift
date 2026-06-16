@@ -8,20 +8,6 @@
 import Foundation
 import CoreData
 
-//struct ApiGetDataBody {
-//    let name: String
-//    let operation: String
-//    let token: String
-//    let condition : [String: Any]
-//}
-//
-//struct ApiSetDataBody: Encodable {
-//    let name: String
-//    let operation: String
-//    let token: String
-//    let data: [String: [String]]
-//}
-
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // BB(byte), BT (bit), STR(string)
 enum DataType: Codable {
@@ -54,6 +40,7 @@ enum DataZone: Codable
 class DataInfo: Identifiable, ObservableObject {
     let id: String
     let name: String
+    let displayName: String
     let ratio: Double
     let dtype: DataType
     let readWriteType: DataReadWriteType
@@ -67,9 +54,10 @@ class DataInfo: Identifiable, ObservableObject {
     @Published var result: Int32
     @Published var timestamp: Double
     
-    init(id: String, name: String, ratio: Double, dtype: DataType, readWriteType: DataReadWriteType, dataZone: DataZone, regiterAddress: Int32, fValue: Double, intValue: Int64, byteValue: UInt8, boolValue: Bool, strValue: String, result: Int32, timestamp: Double) {
+    init(id: String, name: String, displayName: String, ratio: Double, dtype: DataType, readWriteType: DataReadWriteType, dataZone: DataZone, regiterAddress: Int32, fValue: Double, intValue: Int64, byteValue: UInt8, boolValue: Bool, strValue: String, result: Int32, timestamp: Double) {
         self.id = id
         self.name = name
+        self.displayName = displayName
         self.ratio = ratio
         self.dtype = dtype
         self.readWriteType = readWriteType
@@ -89,6 +77,7 @@ class DataInfo: Identifiable, ObservableObject {
 struct DriverDataItem: Decodable {
     let id: String
     let name: String
+    let displayName: String?
     let register: String
     let ratio: Double?
 }
@@ -274,6 +263,7 @@ class DataManager: ObservableObject {
             let item = DataInfo(
                 id: String(i),
                 name: "数据 \(i)",
+                displayName: "显示数据 \(i)",
                 ratio: 1.0,
                 dtype: .DF,
                 readWriteType: .readOnly,
@@ -429,6 +419,7 @@ class DataManager: ObservableObject {
                     dataArray.append(DataInfo (
                         id: dataID,
                         name: dataItem.name,
+                        displayName: dataItem.displayName ?? "NULL",
                         ratio: dataRatio,
                         dtype: dataType,
                         readWriteType: readWriteType,

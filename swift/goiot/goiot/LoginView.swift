@@ -3,212 +3,223 @@
 //  goiot
 //
 //  Created by YUN HUA on 2026/2/5.
+//  updated UI style on 2026-06-16
 //
 
 import SwiftUI
-import Combine
 
 struct LoginView: View {
-    // 登录状态和数据模型
+    @EnvironmentObject var userData: UserData
+    
     @State private var username = ""
     @State private var password = ""
-    @State private var error: String?
+    @State private var serviceAddress = NetworkConfig.baseURL
+    
+    @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var isLoggedIn = false
     
-    // 表单验证状态
-    @State private var isUsernameValid = true
-    @State private var isPasswordValid = true
+    @FocusState private var focusedField: FormField?
     
-    @EnvironmentObject var userData: UserData
-    
-    // 用于取消订阅的发布者
-    private var cancellables = Set<AnyCancellable>()
+    enum FormField: Hashable {
+        case username
+        case password
+        case address
+    }
     
     var body: some View {
-        VStack(spacing: 20) {
-            // 标题
-            Image(systemName: "person.crop.circle")
-                .font(.title)
-            Text("欢迎登录")
-                .font(.title)
-                .foregroundColor(.primary)
-                .padding(.top, 10)
-            
-            // 表单
-            VStack(alignment: .leading, spacing: 15) {
-                // 用户名输入框
-                Group {
-                    HStack {
-                        Image(systemName: "person")
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 28) {
+                    // 1. 品牌区域
+                    VStack(spacing: 8) {
+                        Image(systemName: "globe.desk")
+                            .font(.system(size: 60))
                             .foregroundColor(.blue)
-                            .frame(width: 24)
-                        TextField("用户名", text: $username)
-                            .padding(.vertical, 8)
+                        Text("系统登录")
+                            .font(.title.bold())
+                        Text("请输入您的凭据及服务地址")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                     }
+                    .padding(.top, 40)
+                    
+                    // 2. 🚀 表单区域 (优化留白)
+                    VStack(spacing: 18) {
+                        FormInputIcon(
+                            text: $username,
+                            placeholder: "请输入用户名",
+                            icon: "person.fill",
+                            isSecure: false,
+                            isFocused: focusedField == .username
+                        )
+                        .focused($focusedField, equals: .username)
+                        
+                        FormInputIcon(
+                            text: $password,
+                            placeholder: "请输入密码",
+                            icon: "lock.fill",
+                            isSecure: true,
+                            isFocused: focusedField == .password
+                        )
+                        .focused($focusedField, equals: .password)
+                        
+                        Divider()
+                            .background(Color.gray.opacity(0.3))
+                        
+                        Text("网络设置")
+                            .font(.caption.bold())
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 4)
+                            .padding(.bottom, 4)
+                        
+                        FormInputIcon(
+                            text: $serviceAddress,
+                            placeholder: "http://api-server-address:port",
+                            icon: "network",
+                            isSecure: false,
+                            isFocused: focusedField == .address
+                        )
+                        .focused($focusedField, equals: .address)
+                    }
+                    // 核心优化：增加 24 的内部留白，解决顶部贴合问题
+                    .padding(24)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(20)
+                    .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
                     .padding(.horizontal, 16)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .overlay(alignment: .trailing) {
-                        if !isUsernameValid {
-                            Image(systemName: "exclamationmark.circle")
-                                .foregroundColor(.red)
-                                .padding(8)
+                    
+                    // 登录按钮
+                    VStack(spacing: 16) {
+                        Button(action: handleLogin) {
+                            ZStack {
+                                if isLoading {
+                                    // 优化：给 ProgressView 设置最小宽高，防止它在按钮中间乱跑
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .scaleEffect(1.2)
+                                } else {
+                                    Text("立即登录")
+                                        .font(.body)
+                                        .fontWeight(.semibold) // 🚀 增加字重，更专业
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 32) // 🚀 左右增加额外留白
+                                }
+                            }
+                            // 🚀 核心修正：显式定义按钮的高度 (Apple 标准大按钮高度 56pt)
+                            .frame(height: 56)
+                            .frame(maxWidth: .infinity) // 撑满父容器宽度
+                            
+                            .background(Color.blue)
+                            .cornerRadius(28) // 🚀 对应高度的一半，形成完美的胶囊形状
+                            
+                            // 🚀 增加柔和阴影，提升悬浮感
+                            .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 4)
                         }
+                        .disabled(isLoading || errorMessage != nil) // 加载中或有错误时禁用
+                        .opacity(isLoading ? 0.7 : 1.0) // 加载时略微变灰
                     }
-                    .onChange(of: username) { newValue in
-                        validateUsername(newValue)
-                    }
-                }
-                
-                // 密码输入框
-                Group {
-                    HStack {
-                        Image(systemName: "lock")
-                            .foregroundColor(.blue)
-                            .frame(width: 24)
-                        SecureField("密码", text: $password)
-                            .padding(.vertical, 10)
-                    }
-                    .padding(.horizontal, 16)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .overlay(alignment: .trailing) {
-                        if !isPasswordValid {
-                            Image(systemName: "exclamationmark.circle")
-                                .foregroundColor(.red)
-                                .padding(8)
-                        }
-                    }
-                    .onChange(of: password) { newValue in
-                        validatePassword(newValue)
+                    .padding(.horizontal, 16) // 按钮外部左右留出边距
+                    
+                    // 错误提示
+                    if let error = errorMessage {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.red.opacity(0.85))
+                            .cornerRadius(10)
+                            .padding(.horizontal, 24)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 }
+                .padding(.top, 20)
+                .padding(.bottom, 40)
             }
-            .padding()
-            
-            // 登录按钮
-            Button {
-                handleLogin()
-            } label: {
-                ZStack {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("登录")
-                            .font(.title2)
-                    }
-                }
-                .frame(width: 300, height: 50)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .padding()
-            }
-            .disabled(!isFormValid || isLoading)
-            .opacity(isFormValid ? 1 : 0.7)
-            
-            // 错误提示
-            if let error = error {
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(.body)
-            }
-            
-            // 登录成功后的界面
-            if isLoggedIn {
-                SuccessView()
-            }
+            .background(Color(.systemGroupedBackground))
+            .ignoresSafeArea()
         }
-        .padding()
-        .frame(width: 350, height: 380)
-        .background(Color(.systemBackground))
-        .cornerRadius(20)
-        .shadow(radius: 10)
-    }
-    
-    private var isFormValid: Bool {
-        isUsernameValid && isPasswordValid
-    }
-    
-    private func validateUsername(_ username: String) {
-        let isValid = !username.isEmpty && username.count >= 3
-        isUsernameValid = isValid
-    }
-    
-    private func validatePassword(_ password: String) {
-        let isValid = !password.isEmpty && password.count >= 6
-        isPasswordValid = isValid
-    }
-    
-    private func handleLoad() {
-        Task{
-            let result: DriverConfig? = await JSONLoader.shared.loadData(fromFile: "drivers")
-
+        .overlay {
+            if isLoggedIn {
+                ZStack {
+                    Color(.systemBackground).opacity(0.9).ignoresSafeArea()
+                    VStack(spacing: 16) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.title)
+                            .foregroundColor(.green)
+                        Text("认证成功")
+                            .font(.title2.bold())
+                    }
+                }
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: isLoggedIn)
+            }
         }
     }
     
     private func handleLogin() {
-        error = nil
+        guard !username.isEmpty && !password.isEmpty else {
+            errorMessage = "账号和密码不能为空"; return
+        }
+        
+        errorMessage = nil
         isLoading = true
         
-        // 模拟网络请求延迟
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//            // 模拟登录成功
-//            if username == "test" && password == "password" {
-//                isLoggedIn = true
-//            } else {
-//                self.error = "用户名或密码错误"
-//                isLoading = false
-//            }
-//        }
-        // web login()
-        loginToWebService()
+        Task {
+            do {
+                try await userData.login(username: username, password: password, customURL: serviceAddress)
+                isLoggedIn = true
+            } catch {
+                errorMessage = "登录失败: \(error)"
+                try await Task.sleep(nanoseconds: 3_000_000_000)
+                errorMessage = nil
+            }
+            isLoading = false
+        }
     }
 }
 
-struct SuccessView: View {
+// MARK: - 🚀 优化后的输入框组件 (增加垂直内边距)
+struct FormInputIcon: View {
+    @Binding var text: String
+    var placeholder: String
+    var icon: String
+    var isSecure: Bool
+    var isFocused: Bool
+    
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "checkmark.circle")
-                .font(.title)
-                .foregroundColor(.green)
-            Text("登录成功！")
-                .font(.title)
-            Text("正在跳转...")
-                .font(.body)
-                .foregroundColor(.secondary)
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(isFocused ? .blue : .gray)
+                .frame(width: 20)
+            
+            Group {
+                if isSecure {
+                    SecureField(placeholder, text: $text)
+                } else {
+                    TextField(placeholder, text: $text)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .textContentType(.username) // 提示系统输入法
+                }
+            }
         }
-        .padding()
+        // 核心优化：将 padding 设为 14，让输入框上下更饱满，不显局促
+        .padding(14)
+        .background(Color.gray.opacity(0.08))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isFocused ? Color.blue : Color.clear, lineWidth: 2)
+        )
     }
 }
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView()
-    }
-}
-
-extension LoginView {
-    private func loginToWebService() {
-        guard !username.isEmpty && !password.isEmpty else {
-            self.error = "请输入用户名和密码"
-            self.isLoading = false;
-            return
-        }
-
-        // DataBus API request
-        Task {
-            do {
-                try await userData.login(username: "goiot", password: "abc123")
-                self.isLoading = false
-                isLoggedIn = userData.isLoggedIn
-            
-            } catch let ex {
-                self.error = "错误：\(ex)"
-                self.isLoading = false
-            }
-        }
+            .environmentObject(UserData())
     }
 }

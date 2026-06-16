@@ -259,8 +259,8 @@ struct ControlDataInfoCard: View {
                         .foregroundColor(.primary)
                     
                     if style != .compact {
-                        Text(dataInfo.id)
-                            .font(.caption2)
+                        Text(dataInfo.displayName)
+                            .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
                 }
