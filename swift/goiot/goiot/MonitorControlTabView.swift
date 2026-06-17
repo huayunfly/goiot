@@ -35,18 +35,6 @@ struct MonitorControlTabView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    Button {
-                        isRefreshing = true
-                        dataManager.StartRefreshData(token: userData.token, withTimeInterval: 5)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            isRefreshing = false
-                        }
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                            .rotationEffect(.degrees(isRefreshing ? 360 : 0))
-                            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: isRefreshing), value: isRefreshing)
-                    }
-                    
                     ControlCollapsibleSection(
                         title: "实时监测数据",
                         icon: "chart.xyaxis.line",
@@ -94,7 +82,7 @@ struct MonitorControlTabView: View {
                 }
             }
         }
-    }
+    } // NavigationStack
 }
 
 // MARK: - 可折叠分组容器

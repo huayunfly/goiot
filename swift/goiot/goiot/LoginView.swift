@@ -42,7 +42,7 @@ struct LoginView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
-                    .padding(.top, 40)
+                    .padding(.top, 80)
                     
                     // 2. 🚀 表单区域 (优化留白)
                     VStack(spacing: 18) {
@@ -83,7 +83,7 @@ struct LoginView: View {
                         )
                         .focused($focusedField, equals: .address)
                     }
-                    // 核心优化：增加 24 的内部留白，解决顶部贴合问题
+                    // 增加 24 的内部留白，解决顶部贴合问题
                     .padding(24)
                     .background(Color(.systemBackground))
                     .cornerRadius(20)

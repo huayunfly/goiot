@@ -1,147 +1,176 @@
-//
-//  SettingTabView.swift
-//  goiot
-//
-//  Created by YUN HUA on 2023/8/10.
-//
+////
+////  SettingTabView.swift
+////  goiot
+////
+////  Created by YUN HUA on 2023/8/10.
+////
 
 import SwiftUI
+import os.log
 
-struct SettingItem : Identifiable {
-    var id = UUID()
-    var task: String
-    var imageName: String
-}
-
-struct DataInput: View {
-    var title: String
-    var imageName: String
-    @Binding var userInput: String
-    var body: some View {
-        HStack() {
-            Image(systemName: imageName)
-            Text(title)
-                .font(.headline)
-            TextField("输入 \(title)", text: $userInput)
-                .foregroundColor(.gray)
-                .font(.custom("HelveticaNeue", size: 15))
-        }
-    }
-}
-
-struct LogonStatus: View {
-    var username : String
-    @Binding var status: Bool
-    var body: some View {
-        HStack() {
-            Toggle(isOn: $status)
-            {
-                Text(username)
-            }
-        }
-    }
-}
-
-struct LogonButton: View {
-    @Binding var isConnected: Bool
-    
-    // Constants
-    static private let COLOR_LOGON = Color(red: 88 / 255, green: 224 / 255, blue: 133 / 255)
-    static private let COLOR_LOGOFF = Color(red: 255 / 255, green: 99 / 255, blue: 71 / 255)
-    static private let TXT_LOGON = "登录"
-    static private let TXT_LOGOFF = "退出登录"
-    
-    // Action
-    var logonAction: () -> Void
-    
-    var body: some View {
-        HStack() {
-            Button(action: logonAction) {
-                Text(isConnected ? LogonButton.TXT_LOGOFF : LogonButton.TXT_LOGON)
-                    .font(.system(size: 16))
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding(10)
-                    .foregroundColor(.white).background(isConnected ? LogonButton.COLOR_LOGOFF : LogonButton.COLOR_LOGON).cornerRadius(5)
-                    .padding(.horizontal, 20)
-            }
-        }
-    }
-}
+private let settingsLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.goiot", category: "Settings")
 
 struct SettingTabView: View {
-    
-    @State private var address: String = "http://192.168.2.177:6300/message"
-    @State private var username: String = "goiot"
-    @State private var password: String = "abc123"
-    @State private var refreshInSecond: String = "5"
-    @State private var isConnected : Bool = false
-    @State private var txtLogon = TXT_LOGON
-    @State private var colorLogon = COLOR_LOGON
-     
     @EnvironmentObject var userData: UserData
     
-    // Constants
-    static private let COLOR_LOGON = Color(red: 88 / 255, green: 224 / 255, blue: 133 / 255)
-    static private let COLOR_LOGOFF = Color(red: 255 / 255, green: 99 / 255, blue: 71 / 255)
-    static private let TXT_LOGON = "登录"
-    static private let TXT_LOGOFF = "退出登录"
+    @State private var serverAddress = NetworkConfig.baseURL
+    @State private var inputUsername = ""
+    @State private var inputPassword = ""
+    @State private var refreshInterval = 5
+    @State private var isShowPassword = false
+    @State private var isAuthenticating = false
+    
+    @FocusState private var focusedField: SettingsField?
+    enum SettingsField: Hashable { case address, username, password, interval }
     
     var body: some View {
-        List {
-            Section(header: Text("服务")) {
-                LogonStatus(username: username, status: $isConnected)
-                DataInput(title: "地址", imageName: "globe.asia.australia.fill", userInput: $address)
-                DataInput(title: "用户", imageName: "person.2.fill", userInput: $username)
-                DataInput(title: "密码", imageName: "character.textbox", userInput: $password)
-                LogonButton(isConnected: $isConnected, logonAction: logon)
-            }
-            Section(header: Text("设置")) {
-                HStack {
-                    DataInput(title: "刷新（秒）", imageName: "arrow.clockwise", userInput: $refreshInSecond)
+        NavigationStack {
+            Form {
+                // 1. 认证状态面板
+                Section {
+                    HStack {
+                        Circle()
+                            .fill(userData.isLoggedIn ? Color.green : Color.red)
+                            .frame(width: 8, height: 8)
+                        Text(userData.isLoggedIn ? "已连接服务端" : "未连接")
+                        Spacer()
+                        Text(userData.username.isEmpty ? "未登录" : userData.username)
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                    }
+                    .padding(.vertical, 4)
+                    
+                    authenticationButton
+                } header: {
+                    Label("认证状态", systemImage: "lock.shield")
                 }
+                
+                // 2. 服务地址配置
+                Section {
+                    TextField("API 基础路径", text: $serverAddress)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.URL)
+                        .focused($focusedField, equals: .address)
+                    Text("请输入完整的服务器地址，如 http://192.168.x.x:port" )
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 8)
+                    Button("保存并同步至全局配置") {
+                        saveServerAddress()
+                    }
+                } header: {
+                    Label("网络设置", systemImage: "globe.asia.australia.fill")
+                }
+                
+                // 3. 登录凭据管理
+                Section {
+                    TextField("用户名", text: $inputUsername)
+                        .focused($focusedField, equals: .username)
+                    
+                    HStack {
+                        if isShowPassword {
+                            TextField("密码", text: $inputPassword)
+                                .focused($focusedField, equals: .password)
+                        } else {
+                            SecureField("密码", text: $inputPassword)
+                                .focused($focusedField, equals: .password)
+                        }
+                        Button {
+                            isShowPassword.toggle()
+                        } label: {
+                            Image(systemName: isShowPassword ? "eye.slash.fill" : "eye.fill")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                } header: {
+                    Label("凭据管理", systemImage: "key.fill")
+                }
+                
+                // 4. 性能与同步策略
+                Section {
+                    Stepper("数据刷新间隔: \(refreshInterval) 秒", value: $refreshInterval, in: 1...60, step: 1)
+                } header: {
+                    Label("同步策略", systemImage: "arrow.clockwise")
+                }
+            }
+            .listStyle(.insetGrouped) // 推荐使用 InsetGrouped 样式更美观
+            .navigationTitle("用户设置")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        syncFromUserData()
+                    } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                }
+            }
+            .onAppear {
+                syncFromUserData()
             }
         }
     }
     
-    func logon()
-    {
-        Task {
-            let requestBody = ApiGeneralRequest(name: "tenant", operation: "Login", token: nil, condition: ["username": username, "password": password])
-            
-            do {
-                
-                if !isConnected {
-                    do {
-                        let response: ApiGeneralResponse = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
-                        userData.username = username
-                        userData.isLoggedIn = true
-                        userData.token = response.result?["token"] ?? "1-2-3-4-5-6"
-                        isConnected = true
-                        txtLogon = SettingTabView.TXT_LOGOFF
-                        colorLogon = SettingTabView.COLOR_LOGOFF
-                        print(userData.token)
-                    } catch {
-                        print("Login api call error: \(error)")
-                        throw WebServiceError.statusError
-                    }
-                }
-                else {
-                    userData.isLoggedIn = false
-                    userData.token = ""
-                    isConnected = false
-                    txtLogon = SettingTabView.TXT_LOGON
-                    colorLogon = SettingTabView.COLOR_LOGON
-                    print("Logoff")
-                }
-            } catch let ex {
-                print(ex)
+    // ... (以下的 handleAuthChange 等逻辑保持不变)
+    
+    private var authenticationButton: some View {
+        Button {
+            handleAuthChange()
+        } label: {
+            HStack {
+                Image(systemName: isAuthenticating ? "arrow.triangle.rotate.90.right" : (userData.isLoggedIn ? "rectangle.portrait.and.arrow.right" : "lock.open"))
+                Text(isAuthenticating ? "处理中..." : (userData.isLoggedIn ? "退出登录" : "立即登录"))
+                    .fontWeight(.semibold)
             }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(userData.isLoggedIn ? Color(.systemRed) : Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(12)
+        }
+        .disabled(isAuthenticating)
+        .opacity(isAuthenticating ? 0.7 : 1.0)
+    }
+    
+    private func handleAuthChange() {
+        isAuthenticating = true
+        Task {
+            do {
+                if userData.isLoggedIn {
+                    await userData.logout()
+                    settingsLogger.info("设置页退出登录")
+                } else {
+                    guard !inputUsername.isEmpty && !inputPassword.isEmpty else {
+                        throw WebServiceError.loginError
+                    }
+                    try await userData.login(username: inputUsername, password: inputPassword, customURL: serverAddress)
+                    inputPassword = ""
+                    settingsLogger.info("设置页登录成功")
+                }
+            } catch {
+                settingsLogger.error("认证失败: \(error)")
+            }
+            await MainActor.run {
+                isAuthenticating = false
+            }
+        }
+    }
+    
+    private func saveServerAddress() {
+        UserDefaults.standard.set(serverAddress, forKey: "app_global_server_url")
+        settingsLogger.info("已持久化地址")
+    }
+    
+    private func syncFromUserData() {
+        inputUsername = userData.username
+        if let saved = UserDefaults.standard.string(forKey: "app_global_server_url") {
+            serverAddress = saved
         }
     }
 }
 
 struct SettingTabView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingTabView()
+        SettingTabView().environmentObject(UserData())
     }
 }
+

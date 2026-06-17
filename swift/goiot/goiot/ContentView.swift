@@ -13,13 +13,16 @@ struct ContentView: View {
     @StateObject var dataManager: DataManager = DataManager()
     
     var body: some View {
-        NavigationStack {
+        Group {
             if userData.isLoggedIn {
                 MyTabView().environmentObject(userData).environmentObject(dataManager)
             } else {
                 LoginView().environmentObject(userData)
             }
-        }
+        }//在顶层注入一次 EnvironmentObject，所有子视图都会自动继承，
+        // 无需在下面每个 TabItem 重复注入。
+        .environmentObject(userData)
+        .environmentObject(dataManager)
     }
 }
 
@@ -33,20 +36,20 @@ struct MyTabView: View {
         TabView(selection: $selection) {
             MonitorControlTabView()
                 .tabItem {
-                    Image(systemName: "checkerboard.rectangle")
+                    AppIcon.monitor.tabIconStyle()
                     Text("监视")
-                }.tag(1).environmentObject(userData).environmentObject(dataManager)
+                }.tag(1)
             TrendTabView()
                 .tabItem {
-                    Image(systemName: "chart.line.flattrend.xyaxis")
+                    AppIcon.trend.tabIconStyle()
                     Text("趋势")
-                }.tag(2).environmentObject(userData)
+                }.tag(2)
             SettingTabView()
                 .tabItem {
-                    Image(systemName: "gear")
+                    AppIcon.settings.tabIconStyle()
                     Text("设置")
-                }.tag(3).environmentObject(userData)
-        }.font(.largeTitle)
+                }.tag(3)
+        }//FIX：移除 .font(.largeTitle) 修饰符是继承（Cascading）的。"大字体" 设置泄漏到了SettingTabView 的所有子组件中，导致排版崩溃。
     }
 }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C478A9B2FE2B17400486B71 /* AppIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C478A9A2FE2B17400486B71 /* AppIcons.swift */; };
 		6C4C25882A9C96EA0085F967 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4C25872A9C96EA0085F967 /* UserData.swift */; };
 		6C9625B62F3471F2001DA52C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9625B52F3471E8001DA52C /* LoginView.swift */; };
 		6C9D664F2FDACDD100732DC6 /* MonitorControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9D664E2FDACDD100732DC6 /* MonitorControlTabView.swift */; };
@@ -44,6 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6C478A9A2FE2B17400486B71 /* AppIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		6C4C25872A9C96EA0085F967 /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		6C9625B52F3471E8001DA52C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		6C9D664E2FDACDD100732DC6 /* MonitorControlTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorControlTabView.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				6C4C25872A9C96EA0085F967 /* UserData.swift */,
 				6CA117432F5FC3E3006F3C8E /* DataModel.xcdatamodeld */,
 				6C9D664E2FDACDD100732DC6 /* MonitorControlTabView.swift */,
+				6C478A9A2FE2B17400486B71 /* AppIcons.swift */,
 			);
 			path = goiot;
 			sourceTree = "<group>";
@@ -298,6 +301,7 @@
 				6CB407682A848A650093AEF7 /* TrendTabView.swift in Sources */,
 				6CB4073E2A8469580093AEF7 /* ContentView.swift in Sources */,
 				6CB4073C2A8469580093AEF7 /* goiotApp.swift in Sources */,
+				6C478A9B2FE2B17400486B71 /* AppIcons.swift in Sources */,
 				6CB407662A8489C10093AEF7 /* MonitorTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
