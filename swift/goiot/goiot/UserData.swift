@@ -6,38 +6,70 @@
 //
 
 import Foundation
-import Combine
+import SwiftUI
+import os.log
 
-class UserData : ObservableObject {
+private let userDataLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.goiot", category: "UserData")
+
+/// 集中管理 API 地址，彻底解决硬编码问题
+struct NetworkConfig {
+    #if DEBUG
+    static let baseURL = "http://192.168.2.177:6300/message"
+    #else
+    static let baseURL = "https://api.your-production-domain.com/message" // 替换为线上域名
+    #endif
+}
+
+/// @MainActor 确保 @Published 属性更新始终在主线程，避免 SwiftUI 警告与 UI 卡死
+@MainActor
+final class UserData: ObservableObject {
     @Published var token: String = ""
     @Published var username: String = ""
     @Published var isLoggedIn: Bool = false
     @Published var profileData: ProfileData? = nil
     
-    init() {
+    func login(username: String, password: String, customURL: String? = nil) async throws {
+        let request = ApiGeneralRequest(
+            name: "tenant",
+            operation: "login",
+            token: nil,
+            condition: ["username": username, "password": password]
+        )
         
-    }
-    
-    func login(username: String, password: String) async throws {
-        // DataBus API request
-        let requestBody = ApiRequestBody(name: "tenant", operation: "login", token: nil, condition: ["username": username, "password": password])
-        let address: String = "http://192.168.2.177:6300/message"
+        let targetURL = customURL?.isEmpty == true ? NetworkConfig.baseURL : (customURL ?? NetworkConfig.baseURL)
+        
         do {
-            let response: ApiResultBody = try await WebServiceCaller.PostJSON(to: address, with: requestBody, timeoutInterval: 5)
-            isLoggedIn = true
-            self.username = username
-            token = response.result?["token"] ?? "1-2-3-4-5-6"
+            let response: ApiGeneralResponse = try await WebServiceCaller.PostJSON(
+                to: targetURL,
+                with: request,
+                timeoutInterval: 5.0
+            )
+            
+            // 安全提取 token，移除危险的硬编码 fallback
+            if let validToken = response.result?["token"] as? String, !validToken.isEmpty {
+                self.token = validToken
+                self.isLoggedIn = true
+                self.username = username
+                userDataLogger.info("用户 \(username) 登录成功")
+            } else {
+                userDataLogger.error("登录响应缺失有效 token")
+                throw WebServiceError.loginError
+            }
         } catch {
-            print("WebServiceCaller.PostJSON error: \(error)")
-            isLoggedIn = false
-            throw WebServiceError.loginError
+            // 记录真实错误堆栈，状态置空后向上抛出，便于 UI 层统一提示
+            userDataLogger.error("登录失败: \(error.localizedDescription)")
+            self.isLoggedIn = false
+            self.token = ""
+            throw error
         }
     }
     
     func logout() {
         isLoggedIn = false
         username = ""
+        token = ""
         profileData = nil
+        userDataLogger.info("用户已退出登录")
     }
 }
 
@@ -46,3 +78,4 @@ struct ProfileData: Codable {
     var email: String
     var avatarUrl: String
 }
+

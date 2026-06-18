@@ -8,32 +8,6 @@
 import Foundation
 import CoreData
 
-struct ApiResultBody: Decodable {
-    let message: String
-    let result: [String: String]?
-}
-
-struct ApiRequestBody: Encodable {
-    let name: String
-    let operation: String
-    let token: String?
-    let condition: [String: String]
-}
-
-struct ApiGetDataBody {
-    let name: String
-    let operation: String
-    let token: String
-    let condition : [String: Any]
-}
-
-struct ApiSetDataBody {
-    let name: String
-    let operation: String
-    let token: String
-    let data: [String: Any]
-}
-
 // register: driver-specified, DF (float), WUB (16bits unsigned byte), WB (16bits signed byte), DUB (32bits unsigned byte), DB (32bits signed byte)
 // BB(byte), BT (bit), STR(string)
 enum DataType: Codable {
@@ -66,6 +40,7 @@ enum DataZone: Codable
 class DataInfo: Identifiable, ObservableObject {
     let id: String
     let name: String
+    let displayName: String
     let ratio: Double
     let dtype: DataType
     let readWriteType: DataReadWriteType
@@ -79,9 +54,10 @@ class DataInfo: Identifiable, ObservableObject {
     @Published var result: Int32
     @Published var timestamp: Double
     
-    init(id: String, name: String, ratio: Double, dtype: DataType, readWriteType: DataReadWriteType, dataZone: DataZone, regiterAddress: Int32, fValue: Double, intValue: Int64, byteValue: UInt8, boolValue: Bool, strValue: String, result: Int32, timestamp: Double) {
+    init(id: String, name: String, displayName: String, ratio: Double, dtype: DataType, readWriteType: DataReadWriteType, dataZone: DataZone, regiterAddress: Int32, fValue: Double, intValue: Int64, byteValue: UInt8, boolValue: Bool, strValue: String, result: Int32, timestamp: Double) {
         self.id = id
         self.name = name
+        self.displayName = displayName
         self.ratio = ratio
         self.dtype = dtype
         self.readWriteType = readWriteType
@@ -101,6 +77,7 @@ class DataInfo: Identifiable, ObservableObject {
 struct DriverDataItem: Decodable {
     let id: String
     let name: String
+    let displayName: String?
     let register: String
     let ratio: Double?
 }
@@ -129,16 +106,28 @@ struct DriverConfig: Decodable {
     let drivers: [DriverBody]
 }
 
-// Json request structure
+// ApiGeneralRequest
 struct ApiGeneralRequest: Encodable {
     let name: String
     let operation: String
-    let token: String
-    let condition: RequestConditionBody
+    let token: String?
+    let condition: [String: String]
 }
 
+struct ApiGeneralResponse: Decodable {
+    let message: String
+    let result: [String: String]?
+}
 
-struct RequestConditionBody: Codable {
+// ApiGetDataRequest
+struct ApiGetDataRequest: Encodable {
+    let name: String
+    let operation: String
+    let token: String
+    let condition: GetDataRequestCondition
+}
+
+struct GetDataRequestCondition: Codable {
     let groupName: String
     let idList: [String]
     let timeRange: [Double]
@@ -156,7 +145,18 @@ struct RequestConditionBody: Codable {
     }
 }
 
-struct ResultModelBody: Decodable {
+// ApiGetDataResponse
+struct ApiGetDataResponse: Decodable {
+    let message: String
+    let result: GetDataResult
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case result
+    }
+}
+
+struct GetDataResult: Decodable {
     let groupName: String
     let table: [String: [String]]
     
@@ -166,13 +166,40 @@ struct ResultModelBody: Decodable {
     }
 }
 
-struct ApiGetDataResponse: Decodable {
+// ApiSetDataRequest
+struct ApiSetDataRequest: Encodable {
+    let name: String
+    let operation: String
+    let token: String
+    let condition: SetDataRequestCondition
+}
+
+struct SetDataRequestCondition: Codable {
+    let groupName: String
+    let table: [String: [String]]
+    
+    enum CodingKeys: String, CodingKey {
+        case groupName = "groupName"
+        case table = "table"
+    }
+}
+
+// ApiSetDataResponse
+struct ApiSetDataResponse: Decodable {
     let message: String
-    let result: ResultModelBody
+    let result: [String: String]
     
     enum CodingKeys: String, CodingKey {
         case message
         case result
+    }
+}
+
+struct SetDataResult: Decodable {
+    let updated: Int32
+    
+    enum CodingKeys: String, CodingKey {
+        case updated
     }
 }
 
@@ -236,6 +263,7 @@ class DataManager: ObservableObject {
             let item = DataInfo(
                 id: String(i),
                 name: "数据 \(i)",
+                displayName: "显示数据 \(i)",
                 ratio: 1.0,
                 dtype: .DF,
                 readWriteType: .readOnly,
@@ -391,6 +419,7 @@ class DataManager: ObservableObject {
                     dataArray.append(DataInfo (
                         id: dataID,
                         name: dataItem.name,
+                        displayName: dataItem.displayName ?? "NULL",
                         ratio: dataRatio,
                         dtype: dataType,
                         readWriteType: readWriteType,
@@ -443,15 +472,15 @@ class DataManager: ObservableObject {
             return
         }
         let dataIDList = Array(nodeGroup.keys)
-        let requestCondition = RequestConditionBody(groupName: "goiot",
+        let getDataCondition = GetDataRequestCondition(groupName: "goiot",
                                                     idList: dataIDList,
                                                     timeRange: [1677154221, 2677154223],
                                                     properties: ["value", "result", "time"],
                                                     batchSize: 128, batchNum: 1)
-        let getDataRequest = ApiGeneralRequest(name: "service_name",
+        let getDataRequest = ApiGetDataRequest(name: "service_name",
                                                operation: "GETDATAR",
                                                token: tokenID,
-                                               condition: requestCondition)
+                                               condition: getDataCondition)
         
         let address: String = "http://192.168.2.177:6300/message"
         let response: ApiGetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: getDataRequest, timeoutInterval: 5)
@@ -497,6 +526,51 @@ class DataManager: ObservableObject {
             }
         }
     }
+    
+    // MARK: - 数据写入支持
+    func writeDataItem(_ dataInfo: DataInfo, token: String, writeValue: String) async {
+            let payloadValue: String
+            switch dataInfo.dtype {
+            case .DF:
+                // Double 直接转 String，也可以使用 String(format: "%.0f", dataInfo.fValue) 去除不必要的零
+                payloadValue = String(dataInfo.fValue)
+            case .WUB, .WB, .DUB, .DB:
+                payloadValue = String(dataInfo.intValue)
+            case .BB:
+                payloadValue = String(dataInfo.byteValue)
+            case .BT:
+                // 布尔值通常转换为 1 或 0
+                payloadValue = String(dataInfo.boolValue ? 1 : 0)
+            case .STR:
+                payloadValue = dataInfo.strValue
+            }
+            
+            let timestamp = Date().timeIntervalSince1970
+            let setDataCondition = SetDataRequestCondition(groupName: "goiot",
+                                                           table: ["id": [String(dataInfo.id)], "value": [writeValue], "result": [String(0)], "time": [String(timestamp)]])
+            
+            let body = ApiSetDataRequest(
+                name: "service_name",
+                operation: "SETDATAP", // 根据实际 API 文档确认操作码
+                token: token,
+                condition: setDataCondition
+            )
+            
+            do {
+                let address = "http://192.168.2.177:6300/message"
+                let response: ApiSetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: body, timeoutInterval: 5)
+                
+                DispatchQueue.main.async {
+                    dataInfo.result = 0 // 标记写操作成功
+                    dataInfo.timestamp = timestamp
+                }
+            } catch {
+                print("⚠️ 写入数据失败 \(dataInfo.id): \(error)")
+                DispatchQueue.main.async {
+                    dataInfo.result = -1
+                }
+            }
+        }
     
     func saveToCoreData() {
         let managedObjectContext = persistentContainer.viewContext

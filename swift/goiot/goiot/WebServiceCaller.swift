@@ -1,12 +1,18 @@
 //
-//  WebServiceCaller.swift
+//  WebServiceError.swift
 //  goiot
 //
-//  Created by YUN HUA on 2023/8/22.
+//  Created by YUN HUA on 2026/6/15.
 //
 
-import Foundation
 
+import Foundation
+import os.log
+
+// 统一网络日志管理器
+private let networkLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.goiot", category: "Network")
+
+// 保持您原有的枚举定义，避免 redeclaration 报错
 enum WebServiceError: Error {
     case invalidServerResponse
     case invalidJSONEncode
@@ -18,103 +24,62 @@ enum WebServiceError: Error {
     case GetDataError
 }
 
-class WebServiceCaller {
+final class WebServiceCaller {
     
-    /// Post Data
-    ///
-    /// - Parameter url: The URL
-    /// - Parameter reqContentType: content type
-    /// - Parameter sendData: json to send
-    /// - Returns: Data
-    class func Post(to url: String, contentType reqContentType: String, with sendData: Data, timeoutInterval timeout: TimeInterval) async throws -> Data {
-        guard let url = URL(string: url) else {
-            print("Invalide URL")
+    /// 基础 POST 请求
+    static func Post(to url: String, contentType reqContentType: String, with sendData: Data, timeoutInterval timeout: TimeInterval) async throws -> Data {
+        guard let urlObj = URL(string: url) else {
+            networkLogger.error("无效 URL: \(url)")
             throw WebServiceError.invalidURL
         }
-        var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeout)
-
-        // Change the URLRequest to a POST request
+        
+        var request = URLRequest(url: urlObj)
         request.httpMethod = "POST"
         request.httpBody = sendData
-        request.addValue(reqContentType, forHTTPHeaderField: "Content-Type")
-        request.addValue("utf-8", forHTTPHeaderField: "charset")
+        request.setValue(reqContentType, forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = timeout
         
-        do{
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse,
-                     httpResponse.statusCode == 200 else {
-                   throw WebServiceError.invalidServerResponse
-               }
-            
-            return data
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            networkLogger.error("非 HTTP 响应类型: \(String(describing: response))")
+            throw WebServiceError.invalidServerResponse
         }
-        catch
-        {
-            print("请求失败: \(error)")
-            return Data()
+        
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            networkLogger.error("HTTP 状态码异常: \(httpResponse.statusCode)")
+            throw WebServiceError.statusError
         }
+        
+        return data
     }
     
-    /// Post JSON object in [String: Any]
-    ///
-    /// - Parameter url: The URL
-    /// - Parameter objectJSON: json to send
-    /// - Returns: JSON object in [String: Any].
-    class func PostJSONDictionary(to url: String, with objectJSON: [String: Any], timeoutInterval timeout: TimeInterval) async throws -> [String: Any] {
-        guard let bodyData = try? JSONSerialization.data(
-            withJSONObject: objectJSON,
-            options: []
-        ) else {
-            throw WebServiceError.invalidJSONEncode
-        }
+    /// 字典型 JSON 请求
+    static func PostJSONDictionary(to url: String, with objectJSON: [String: Any], timeoutInterval timeout: TimeInterval) async throws -> [String: Any] {
+        let bodyData = try JSONSerialization.data(withJSONObject: objectJSON, options: [])
+        let responseData = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
         
-        let data = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
-        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
-            throw WebServiceError.invalidJSONDecode
-        }
-        
-        guard let converted = json as? [String: Any] else {
+        let jsonObject = try JSONSerialization.jsonObject(with: responseData, options: [])
+        guard let dict = jsonObject as? [String: Any] else {
             throw WebServiceError.invalidTypeConversion
         }
-        return converted
+        return dict
     }
     
-    /// Post JSON object in Encodable object
-    ///
-    /// - Parameter url: The URL
-    /// - Parameter objectJSON: Encodable object to send
-    /// - Returns: Decodable object.
-    class func PostJSON<T1: Encodable, T2: Decodable>(to url: String, with objectJSON: T1, timeoutInterval timeout: TimeInterval) async throws -> T2 {
-        let encoder = JSONEncoder()
-        guard let bodyData = try? encoder.encode(objectJSON) else {
-            throw WebServiceError.invalidJSONEncode
-        }
+    /// 泛型 Codable 请求
+    static func PostJSON<T1: Encodable, T2: Decodable>(to url: String, with objectJSON: T1, timeoutInterval timeout: TimeInterval) async throws -> T2 {
+        let bodyData = try JSONEncoder().encode(objectJSON)
+        let responseData = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
         
-        let data = try await Post(to: url, contentType: "application/json", with: bodyData, timeoutInterval: timeout)
-        print(String(data: data, encoding: .utf8))  // -------- LOG ----------
+        // 专业日志：仅 Debug 输出完整响应，Release 自动禁用，兼顾调试与性能
+        #if DEBUG
+        if let logStr = String(data: responseData, encoding: .utf8) {
+            networkLogger.debug("[API Response] \(logStr)")
+        }
+        #endif
+        
         let decoder = JSONDecoder()
-        guard let response = try? decoder.decode(T2.self, from: data) else {
-            throw WebServiceError.invalidJSONDecode
-        }
-        return response
-            
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-          
+        return try decoder.decode(T2.self, from: responseData)
     }
 }
+

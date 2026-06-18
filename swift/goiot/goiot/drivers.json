@@ -19,687 +19,837 @@
             {
               "id": "pi502_pv",
               "name": "pi502_pv",
-              "register": "R4DF600"
+              "register": "R4DF600",
+              "displayName": "反应腔尾端压力"
             },
             {
               "id": "pi614_pv",
               "name": "pi614_pv",
-              "register": "R4DF602"
+              "register": "R4DF602",
+              "displayName": "平衡腔尾端压力"
             },
             {
               "id": "xisa902",
               "name": "xisa902",
-              "register": "R4DF604"
+              "register": "R4DF604",
+              "displayName": "进料H2报警器读数"
             },
             {
               "id": "xisa903",
               "name": "xisa903",
-              "register": "R4DF606"
+              "register": "R4DF606",
+              "displayName": "出料CO报警器读数"
             },
             {
               "id": "fc102_pv",
               "name": "fc102_pv",
-              "register": "R4DF608"
+              "register": "R4DF608",
+              "displayName": "原料气流量PV"
             },
             {
               "id": "fc403_pv",
               "name": "fc403_pv",
-              "register": "R4DF610"
+              "register": "R4DF610",
+              "displayName": "补水泵流量PV"
             },
             {
               "id": "fc602_pv",
               "name": "fc602_pv",
-              "register": "R4DF612"
+              "register": "R4DF612",
+              "displayName": "平衡腔N2流量PV"
             },
             {
               "id": "fc701_pv",
               "name": "fc701_pv",
-              "register": "R4DF614"
+              "register": "R4DF614",
+              "displayName": "进料水泵流量PV"
             },
             {
               "id": "tc103_pv",
               "name": "tc103_pv",
-              "register": "R4DF616"
+              "register": "R4DF616",
+              "displayName": "原料气管路伴热PV"
             },
             {
-              "id": "ti201_pv",
-              "name": "ti201_pv",
-              "register": "R4DF618"
+              "id": "ti201",
+              "name": "ti201",
+              "register": "R4DF618",
+              "displayName": "煤粉燃烧室入口测温"
             },
             {
-              "id": "ti202_pv",
-              "name": "ti202_pv",
-              "register": "R4DF620"
+              "id": "ti202",
+              "name": "ti202",
+              "register": "R4DF620",
+              "displayName": "气体反应室出口测温"
             },
             {
-              "id": "ti204_pv",
-              "name": "ti204_pv",
-              "register": "R4DF622"
+              "id": "ti204",
+              "name": "ti204",
+              "register": "R4DF622",
+              "displayName": "耦合换热器冷流出口测温"
             },
             {
-              "id": "ti204a_pv",
-              "name": "ti204a_pv",
-              "register": "R4DF624"
+              "id": "ti204a",
+              "name": "ti204a",
+              "register": "R4DF624",
+              "displayName": "耦合换热器热流入口测温"
             },
             {
-              "id": "ti205_pv",
-              "name": "ti205_pv",
-              "register": "R4DF626"
+              "id": "ti205",
+              "name": "ti205",
+              "register": "R4DF626",
+              "displayName": "耦合换热器热流出口测温"
             },
             {
               "id": "tc206_pv",
               "name": "tc206_pv",
-              "register": "R4DF628"
+              "register": "R4DF628",
+              "displayName": "换热器间管路伴热PV"
             },
             {
               "id": "tc207_pv",
               "name": "tc207_pv",
-              "register": "R4DF630"
+              "register": "R4DF630",
+              "displayName": "换热器-气液分离器间管路伴热PV"
             },
             {
               "id": "tc208_pv",
               "name": "tc208_pv",
-              "register": "R4DF632"
+              "register": "R4DF632",
+              "displayName": "气液分离器控温PV"
             },
             {
               "id": "tc209_pv",
               "name": "tc209_pv",
-              "register": "R4DF634"
+              "register": "R4DF634",
+              "displayName": "气液分离器-除尘器间管路伴热PV"
             },
             {
               "id": "tc210_pv",
               "name": "tc210_pv",
-              "register": "R4DF636"
+              "register": "R4DF636",
+              "displayName": "除尘器控温APV"
             },
             {
               "id": "tc211_pv",
               "name": "tc211_pv",
-              "register": "R4DF638"
+              "register": "R4DF638",
+              "displayName": "除尘器控温BPV"
             },
             {
               "id": "ti221",
               "name": "ti221",
-              "register": "R4DF640"
+              "register": "R4DF640",
+              "displayName": "沸腾换热器热媒出口测温"
             },
             {
               "id": "pc223_pv",
               "name": "pc223_pv",
-              "register": "R4DF642"
+              "register": "R4DF642",
+              "displayName": "沸腾换热器热媒控压SV"
             },
             {
               "id": "ti225",
               "name": "ti225",
-              "register": "R4DF644"
+              "register": "R4DF644",
+              "displayName": "沸腾换热器外壁测温"
             },
             {
               "id": "tc303_pv",
               "name": "tc303_pv",
-              "register": "R4DF646"
+              "register": "R4DF646",
+              "displayName": "除尘器-气体循环器间管路伴热PV"
             },
             {
               "id": "tc304_pv",
               "name": "tc304_pv",
-              "register": "R4DF648"
+              "register": "R4DF648",
+              "displayName": "气体循环器控温PV"
             },
             {
               "id": "tc305_pv",
               "name": "tc305_pv",
-              "register": "R4DF650"
+              "register": "R4DF650",
+              "displayName": "气体循环器-换热器管路伴热PV"
             },
             {
               "id": "pi307",
               "name": "pi307",
-              "register": "R4DF652"
+              "register": "R4DF652",
+              "displayName": "气体循环器差压流量"
             },
             {
               "id": "tc404_pv",
               "name": "tc404_pv",
-              "register": "R4DF654"
+              "register": "R4DF654",
+              "displayName": "水蒸发器控温PV"
             },
             {
               "id": "tc405_pv",
               "name": "tc405_pv",
-              "register": "R4DF656"
+              "register": "R4DF656",
+              "displayName": "水蒸发器出口管路伴热PV"
             },
             {
-              "id": "tc503_pv",
-              "name": "tc503_pv",
-              "register": "R4DF658"
+              "id": "pc503_pv",
+              "name": "pc503_pv",
+              "register": "R4DF658",
+              "displayName": "反应腔PFC控压PV"
             },
             {
               "id": "tc801_pv",
               "name": "tc801_pv",
-              "register": "R4DF660"
+              "register": "R4DF660",
+              "displayName": "加热器前段控温PV"
             },
             {
               "id": "tc802_pv",
               "name": "tc802_pv",
-              "register": "R4DF662"
+              "register": "R4DF662",
+              "displayName": "加热器后段控温PV"
+            },
+            {
+              "id": "tc805_pv",
+              "name": "tc805_pv",
+              "register": "R4DF672",
+              "displayName": "反应腔内控温PV"
             },
             {
               "id": "ti803",
               "name": "ti803",
-              "register": "R4DF664"
+              "register": "R4DF664",
+              "displayName": "加热器入口测温"
             },
             {
               "id": "ti804",
               "name": "ti804",
-              "register": "R4DF666"
+              "register": "R4DF666",
+              "displayName": "加热器出口测温"
             },
             {
               "id": "hc201_pv",
               "name": "hc201_pv",
-              "register": "R4DF668"
+              "register": "R4DF668",
+              "displayName": "出料器电机位置PV"
             },
             {
               "id": "hc203_pv",
               "name": "hc203_pv",
-              "register": "R4DF670"
+              "register": "R4DF670",
+              "displayName": "刮料器电机位置PV"
             },
             {
               "id": "fc102_sv",
               "name": "fc102_sv",
-              "register": "RW4DF700"
+              "register": "RW4DF700",
+              "displayName": "原料气流量SV"
             },
             {
               "id": "fc403_sv",
               "name": "fc403_sv",
-              "register": "RW4DF702"
+              "register": "RW4DF702",
+              "displayName": "补水泵流量SV"
             },
             {
               "id": "fc602_sv",
               "name": "fc602_sv",
-              "register": "RW4DF704"
+              "register": "RW4DF704",
+              "displayName": "平衡腔N2流量SV"
             },
             {
               "id": "fc701_sv",
               "name": "fc701_sv",
-              "register": "RW4DF706"
+              "register": "RW4DF706",
+              "displayName": "进料水泵流量SV"
             },
             {
               "id": "tc103_sv",
               "name": "tc103_sv",
-              "register": "RW4DF708"
+              "register": "RW4DF708",
+              "displayName": "原料气管路伴热SV"
             },
             {
               "id": "tc206_sv",
               "name": "tc206_sv",
-              "register": "RW4DF710"
+              "register": "RW4DF710",
+              "displayName": "换热器间管路伴热SV"
             },
             {
               "id": "tc207_sv",
               "name": "tc207_sv",
-              "register": "RW4DF712"
+              "register": "RW4DF712",
+              "displayName": "换热器-气液分离器间管路伴热SV"
             },
             {
               "id": "tc208_sv",
               "name": "tc208_sv",
-              "register": "RW4DF714"
+              "register": "RW4DF714",
+              "displayName": "气液分离器控温SV"
             },
             {
               "id": "tc209_sv",
               "name": "tc209_sv",
-              "register": "RW4DF716"
+              "register": "RW4DF716",
+              "displayName": "气液分离器-除尘器间管路伴热SV"
             },
             {
               "id": "tc210_sv",
               "name": "tc210_sv",
-              "register": "RW4DF718"
+              "register": "RW4DF718",
+              "displayName": "除尘器控温ASV"
             },
             {
               "id": "tc211_sv",
               "name": "tc211_sv",
-              "register": "RW4DF720"
+              "register": "RW4DF720",
+              "displayName": "除尘器控温BSV"
             },
             {
               "id": "pc223_sv",
               "name": "pc223_sv",
-              "register": "RW4DF722"
+              "register": "RW4DF722",
+              "displayName": "反应腔PFC控压SV"
             },
             {
               "id": "tc303_sv",
               "name": "tc303_sv",
-              "register": "RW4DF724"
+              "register": "RW4DF724",
+              "displayName": "除尘器-气体循环器间管路伴热SV"
             },
             {
               "id": "tc304_sv",
               "name": "tc304_sv",
-              "register": "RW4DF726"
+              "register": "RW4DF726",
+              "displayName": "气体循环器控温SV"
             },
             {
               "id": "tc305_sv",
               "name": "tc305_sv",
-              "register": "RW4DF728"
+              "register": "RW4DF728",
+              "displayName": "气体循环器-换热器管路伴热SV"
             },
             {
               "id": "tc404_sv",
               "name": "tc404_sv",
-              "register": "RW4DF730"
+              "register": "RW4DF730",
+              "displayName": "水蒸发器控温SV"
             },
             {
               "id": "tc405_sv",
               "name": "tc405_sv",
-              "register": "RW4DF732"
-            },
-            {
-              "id": "pc503_sv",
-              "name": "pc503_sv",
-              "register": "RW4DF734"
+              "register": "RW4DF732",
+              "displayName": "水蒸发器出口管路伴热SV"
             },
             {
               "id": "tc801_sv",
               "name": "tc801_sv",
-              "register": "RW4DF736"
+              "register": "RW4DF736",
+              "displayName": "加热器前段控温SV"
             },
             {
               "id": "tc802_sv",
               "name": "tc802_sv",
-              "register": "RW4DF738"
+              "register": "RW4DF738",
+              "displayName": "加热器后段控温SV"
+            },
+            {
+              "id": "tc805_sv",
+              "name": "tc805_sv",
+              "register": "RW4DF734",
+              "displayName": "反应腔内控温SV"
             },
             {
               "id": "xisa902_hh",
               "name": "xisa902_hh",
-              "register": "RW4DF740"
+              "register": "RW4DF740",
+              "displayName": "进料H2报警器高报阈值"
             },
             {
               "id": "xisa903_hh",
               "name": "xisa903_hh",
-              "register": "RW4DF742"
+              "register": "RW4DF742",
+              "displayName": "出料CO报警器高报阈值"
             },
             {
               "id": "pi502_hh",
               "name": "pi502_hh",
-              "register": "RW4DF744"
+              "register": "RW4DF744",
+              "displayName": "反应腔尾端压力高报阈值"
             },
             {
               "id": "pi614_hh",
               "name": "pi614_hh",
-              "register": "RW4DF746"
+              "register": "RW4DF746",
+              "displayName": "平衡腔尾端压力高报阈值"
             },
             {
               "id": "tc103_hh",
               "name": "tc103_hh",
-              "register": "RW4DF748"
+              "register": "RW4DF748",
+              "displayName": "原料气管路伴热高报阈值"
             },
             {
               "id": "tc206_hh",
               "name": "tc206_hh",
-              "register": "RW4DF750"
+              "register": "RW4DF750",
+              "displayName": "换热器间管路伴热高报阈值"
             },
             {
               "id": "tc207_hh",
               "name": "tc207_hh",
-              "register": "RW4DF752"
+              "register": "RW4DF752",
+              "displayName": "换热器-气液分离器间管路伴热高报阈值"
             },
             {
               "id": "tc208_hh",
               "name": "tc208_hh",
-              "register": "RW4DF754"
+              "register": "RW4DF754",
+              "displayName": "气液分离器控温高报阈值"
             },
             {
               "id": "tc209_hh",
               "name": "tc209_hh",
-              "register": "RW4DF756"
+              "register": "RW4DF756",
+              "displayName": "气液分离器-除尘器间管路伴热高报阈值"
             },
             {
               "id": "tc210_hh",
               "name": "tc210_hh",
-              "register": "RW4DF758"
+              "register": "RW4DF758",
+              "displayName": "除尘器控温A高报阈值"
             },
             {
               "id": "tc211_hh",
               "name": "tc211_hh",
-              "register": "RW4DF760"
+              "register": "RW4DF760",
+              "displayName": "除尘器控温B高报阈值"
             },
             {
-              "id": "tc223_hh",
-              "name": "tc223_hh",
-              "register": "RW4DF762"
+              "id": "pc223_hh",
+              "name": "pc223_hh",
+              "register": "RW4DF762",
+              "displayName": "反应腔PFC控压高报阈值"
             },
             {
               "id": "tc303_hh",
               "name": "tc303_hh",
-              "register": "RW4DF764"
+              "register": "RW4DF764",
+              "displayName": "除尘器-气体循环器间管路伴热高报阈值"
             },
             {
               "id": "tc304_hh",
               "name": "tc304_hh",
-              "register": "RW4DF766"
+              "register": "RW4DF766",
+              "displayName": "气体循环器控温高报阈值"
             },
             {
               "id": "tc305_hh",
               "name": "tc305_hh",
-              "register": "RW4DF768"
+              "register": "RW4DF768",
+              "displayName": "气体循环器-换热器管路伴热高报阈值"
             },
             {
               "id": "pi307_hh",
               "name": "pi307_hh",
-              "register": "RW4DF770"
+              "register": "RW4DF770",
+              "displayName": "气体循环器差压流量高报阈值"
             },
             {
               "id": "tc404_hh",
               "name": "tc404_hh",
-              "register": "RW4DF772"
+              "register": "RW4DF772",
+              "displayName": "水蒸发器控温高报阈值"
             },
             {
               "id": "tc405_hh",
               "name": "tc405_hh",
-              "register": "RW4DF774"
+              "register": "RW4DF774",
+              "displayName": "水蒸发器出口管路伴热高报阈值"
             },
             {
               "id": "tc801_hh",
               "name": "tc801_hh",
-              "register": "RW4DF776"
+              "register": "RW4DF776",
+              "displayName": "加热器前段控温高报阈值"
             },
             {
               "id": "tc802_hh",
               "name": "tc802_hh",
-              "register": "RW4DF778"
+              "register": "RW4DF778",
+              "displayName": "加热器后段控温高报阈值"
+            },
+            {
+              "id": "tc805_hh",
+              "name": "tc805_hh",
+              "register": "RW4DF796",
+              "displayName": "反应腔内控温高报阈值"
             },
             {
               "id": "hc201a_rt",
               "name": "hc201a_rt",
-              "register": "RW4DF780"
+              "register": "RW4DF780",
+              "displayName": "出料器电机上升速度"
             },
             {
               "id": "hc201b_rt",
               "name": "hc201b_rt",
-              "register": "RW4DF782"
+              "register": "RW4DF782",
+              "displayName": "出料器电机下降速度"
             },
             {
               "id": "hc201_sv",
               "name": "hc201_sv",
-              "register": "RW4DF784"
+              "register": "RW4DF784",
+              "displayName": "出料器电机位置SV"
             },
             {
               "id": "hc202a_rt",
               "name": "hc202a_rt",
-              "register": "RW4DF786"
+              "register": "RW4DF786",
+              "displayName":"刮料器电机旋转速度"
             },
             {
               "id": "hc203a_rt",
               "name": "hc203a_rt",
-              "register": "RW4DF788"
+              "register": "RW4DF788",
+              "displayName":"刮料器电机上升速度"
             },
             {
               "id": "hc203b_rt",
               "name": "hc203b_rt",
-              "register": "RW4DF790"
+              "register": "RW4DF790",
+              "displayName":"刮料器电机下降速度"
             },
             {
               "id": "hc203_sv",
               "name": "hc203_sv",
-              "register": "RW4DF792"
+              "register": "RW4DF792",
+              "displayName":"刮料器电机位置SV"
             },
             {
               "id": "tc224_sv",
               "name": "tc224_sv",
-              "register": "RW4DF794"
+              "register": "RW4DF794",
+              "displayName":"沸腾换热器外壁控温SV"
             },
             {
               "id": "diw100",
               "name": "diw100",
-              "register": "R4WB580"
+              "register": "R4WB580",
+              "displayName": "数字输入状态字100"
             },
             {
               "id": "alm105",
               "name": "alm105",
-              "register": "R4WB585"
+              "register": "R4WB585",
+              "displayName": "报警状态字105"
             },
             {
               "id": "alm106",
               "name": "alm106",
-              "register": "R4WB586"
+              "register": "R4WB586",
+              "displayName": "报警状态字106"
             },
             {
               "id": "alm107",
               "name": "alm107",
-              "register": "R4WB587"
+              "register": "R4WB587",
+              "displayName": "报警状态字107"
             },
             {
               "id": "alm108",
               "name": "alm108",
-              "register": "R4WB588"
+              "register": "R4WB588",
+              "displayName": "报警状态字108"
             },
             {
               "id": "alm200",
               "name": "alm200",
-              "register": "RW4WB900"
+              "register": "RW4WB900",
+              "displayName": "报警读写状态字200"
             },
             {
               "id": "alm201",
               "name": "alm201",
-              "register": "RW4WB901"
+              "register": "RW4WB901",
+              "displayName": "报警读写状态字201"
             },
             {
               "id": "alm202",
               "name": "alm202",
-              "register": "RW4WB902"
+              "register": "RW4WB902",
+              "displayName": "报警读写状态字202"
             },
             {
               "id": "alm205",
               "name": "alm205",
-              "register": "RW4WB905"
+              "register": "RW4WB905",
+              "displayName": "报警读写状态字205"
             },
             {
               "id": "a_hic201_l",
               "name": "a_hic201_l",
-              "register": "R4BT1082"
+              "register": "R4BT1082",
+              "displayName": "出料器电机限位报警"
             },
             {
               "id": "a_hic201_h",
               "name": "a_hic201_h",
-              "register": "R4BT1083"
+              "register": "R4BT1083",
+              "displayName": "出料器电机正限位报警"
             },
             {
               "id": "a_hic203_l",
               "name": "a_hic203_l",
-              "register": "R4BT1084"
+              "register": "R4BT1084",
+              "displayName": "刮料器电机限位报警"
             },
             {
               "id": "a_hic203_h",
               "name": "a_hic203_h",
-              "register": "R4BT1085"
+              "register": "R4BT1085",
+              "displayName": "刮料器电机正限位报警"
             },
             {
               "id": "alm_reset",
               "name": "alm_reset",
-              "register": "RW4BT1100"
+              "register": "RW4BT1100",
+              "displayName": "报警复位设置"
             },
             {
               "id": "k_tc_on",
               "name": "k_tc_on",
-              "register": "RW4BT1101"
+              "register": "RW4BT1101",
+              "displayName": "总接触器KM0.1闭合"
             },
             {
               "id": "k_tc_off",
               "name": "k_tc_off",
-              "register": "RW4BT1102"
+              "register": "RW4BT1102",
+              "displayName": "总接触器KM0.1断开"
             },
             {
               "id": "k_tcg1_on",
               "name": "k_tcg1_on",
-              "register": "RW4BT1103"
+              "register": "RW4BT1103",
+              "displayName": "分接触器KM2.1闭合TC103-404"
             },
             {
               "id": "k_tcg1_off",
               "name": "k_tcg1_off",
-              "register": "RW4BT1104"
+              "register": "RW4BT1104",
+              "displayName": "分接触器KM2.1断开TC103-404"
             },
             {
               "id": "k_tcg2_on",
               "name": "k_tcg2_on",
-              "register": "RW4BT1105"
+              "register": "RW4BT1105",
+              "displayName": "分接触器KM2.2闭合TC210-211"
             },
             {
               "id": "k_tcg2_off",
               "name": "k_tcg2_off",
-              "register": "RW4BT1106"
+              "register": "RW4BT1106",
+              "displayName": "分接触器KM2.2断开TC210-211"
             },
             {
               "id": "k_tcg3_on",
               "name": "k_tcg3_on",
-              "register": "RW4BT1107"
+              "register": "RW4BT1107",
+              "displayName": "分接触器KM2.3闭合TC801"
             },
             {
               "id": "k_tcg3_off",
               "name": "k_tcg3_off",
-              "register": "RW4BT1108"
+              "register": "RW4BT1108",
+              "displayName": "分接触器KM2.3断开TC801"
             },
             {
               "id": "k_tcg4_on",
               "name": "k_tcg4_on",
-              "register": "RW4BT1109"
+              "register": "RW4BT1109",
+              "displayName": "分接触器KM2.4闭合TC802"
             },
             {
               "id": "k_tcg4_off",
               "name": "k_tcg4_off",
-              "register": "RW4BT110A"
+              "register": "RW4BT110A",
+              "displayName": "分接触器KM2.4断开TC802"
             },
             {
               "id": "k_tcg5_on",
               "name": "k_tcg5_on",
-              "register": "RW4BT110B"
+              "register": "RW4BT110B",
+              "displayName": "分接触器KM2.5闭合TC206-209"
             },
             {
               "id": "k_tcg5_off",
               "name": "k_tcg5_off",
-              "register": "RW4BT110C"
+              "register": "RW4BT110C",
+              "displayName": "分接触器KM2.5断开TC206-209"
             },
             {
               "id": "k_tcg6_on",
               "name": "k_tcg6_on",
-              "register": "RW4BT110D"
+              "register": "RW4BT110D",
+              "displayName": "分接触器KM2.6闭合TC303-305"
             },
             {
               "id": "k_tcg6_off",
               "name": "k_tcg6_off",
-              "register": "RW4BT110E"
+              "register": "RW4BT110E",
+              "displayName": "分接触器KM2.6断开TC303-305"
             },
             {
               "id": "k_jc224_on",
               "name": "k_jc224_on",
-              "register": "RW4BT110F"
+              "register": "RW4BT110F",
+              "displayName": "分接触器KM2.7闭合TC224"
             },
             {
               "id": "k_jc224_off",
               "name": "k_jc224_off",
-              "register": "RW4BT1110"
+              "register": "RW4BT1110",
+              "displayName": "分接触器KM2.7断开TC224"
             },
             {
               "id": "jc212",
               "name": "jc212",
-              "register": "RW4BT1111"
+              "register": "RW4BT1111",
+              "displayName": "除尘器A供电开关"
             },
             {
               "id": "jc213",
               "name": "jc213",
-              "register": "RW4BT1112"
+              "register": "RW4BT1112",
+              "displayName": "除尘器B供电开关"
             },
             {
               "id": "h201a",
               "name": "h201a",
-              "register": "RW4BT1113"
+              "register": "RW4BT1113",
+              "displayName": "出料器电机上升设置"
             },
             {
               "id": "h201b",
               "name": "h201b",
-              "register": "RW4BT1114"
+              "register": "RW4BT1114",
+              "displayName": "出料器电机下降设置"
             },
             {
               "id": "h201c",
               "name": "h201c",
-              "register": "RW4BT1115"
+              "register": "RW4BT1115",
+              "displayName": "出料器电机停止设置"
             },
             {
               "id": "h202a",
               "name": "h202a",
-              "register": "RW4BT1116"
+              "register": "RW4BT1116",
+              "displayName": "刮料器电机旋转设置"
             },
             {
               "id": "h202c",
               "name": "h202c",
-              "register": "RW4BT1117"
+              "register": "RW4BT1117",
+              "displayName": "刮料器电机停转设置"
             },
             {
               "id": "h203a",
               "name": "h203a",
-              "register": "RW4BT1118"
+              "register": "RW4BT1118",
+              "displayName": "刮料器电机上升设置"
             },
             {
               "id": "h203b",
               "name": "h203b",
-              "register": "RW4BT1119"
+              "register": "RW4BT1119",
+              "displayName": "刮料器电机下降设置"
             },
             {
               "id": "h203c",
               "name": "h203c",
-              "register": "RW4BT111A"
+              "register": "RW4BT111A",
+              "displayName": "刮料器电机停止设置"
             },
             {
               "id": "jc205",
               "name": "jc205",
-              "register": "RW4BT111B"
+              "register": "RW4BT111B",
+              "displayName": "出料器电机风扇开关"
             },
             {
               "id": "jc206",
               "name": "jc206",
-              "register": "RW4BT111C"
+              "register": "RW4BT111C",
+              "displayName": "刮料器旋转电机风扇开关"
             },
             {
               "id": "jc207",
               "name": "jc207",
-              "register": "RW4BT111D"
+              "register": "RW4BT111D",
+              "displayName": "刮料器直线电机风扇开关"
             },
             {
               "id": "h301a",
               "name": "h301a",
-              "register": "RW4BT111E"
+              "register": "RW4BT111E",
+              "displayName": "气体循环泵前进开关"
             },
             {
               "id": "h301b",
               "name": "h301b",
-              "register": "RW4BT111F"
+              "register": "RW4BT111F",
+              "displayName": "气体循环泵后退开关"
             },
             {
               "id": "h301c",
               "name": "h301c",
-              "register": "RW4BT1120"
+              "register": "RW4BT1120",
+              "displayName": "气体循环泵停止开关"
             },
             {
               "id": "h617",
               "name": "h617",
-              "register": "RW4BT1121"
+              "register": "RW4BT1121",
+              "displayName": "平衡腔紧急泄压阀开关"
             },
             {
               "id": "alm_sound",
               "name": "alm_sound",
-              "register": "RW4BT1122"
+              "register": "RW4BT1122",
+              "displayName": "启动声音报警"
             },
             {
               "id": "alm_lamp",
               "name": "alm_lamp",
-              "register": "RW4BT1123"
+              "register": "RW4BT1123",
+              "displayName": "启用灯光报警"
             },
             {
               "id": "h201d",
               "name": "h201d",
-              "register": "RW4BT1124"
+              "register": "RW4BT1124",
+              "displayName": "出料器电机回原点设置"
             },
             {
               "id": "h203d",
               "name": "h203d",
-              "register": "RW4BT1125"
+              "register": "RW4BT1125",
+              "displayName": "刮料器电机回原点设置"
+
             },
             {
               "id": "k_m301_on",
               "name": "k_m301_on",
-              "register": "RW4BT1126"
+              "register": "RW4BT1126",
+              "displayName": "接触器KM1.2M301启动"
             },
             {
               "id": "k_m301_off",
               "name": "k_m301_off",
-              "register": "RW4BT1127"
+              "register": "RW4BT1127",
+              "displayName": "接触器KM1.2M301停止"
             }
           ]
         }
