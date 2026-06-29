@@ -248,8 +248,10 @@ class RedisSyncManager {
               const time = Number(t.time[idx]);
               if (!Number.isNaN(time)) {
                 const key = `${D_NAMESPACE.NS_POLL}${id}`;
-                pipe.hmset(key, { value: t.value[idx], result: t.result[idx], time });
-                pipe.zadd(D_NAMESPACE.NS_POLL_TIME, time, key);
+                if (t.result[idx] === '0') {
+                  pipe.hmset(key, { value: t.value[idx], result: t.result[idx], time });
+                  pipe.zadd(D_NAMESPACE.NS_POLL_TIME, time, key);
+                }
               }
             });
             await pipe.exec();
