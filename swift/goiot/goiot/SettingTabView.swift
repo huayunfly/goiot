@@ -51,7 +51,7 @@ struct SettingTabView: View {
                         .textInputAutocapitalization(.never)
                         .keyboardType(.URL)
                         .focused($focusedField, equals: .address)
-                    Text("请输入完整的服务器地址，如 http://192.168.x.x:port" )
+                    Text("请输入完整的服务器地址，如 http://api.your-domain.com:port/message")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.top, 8)

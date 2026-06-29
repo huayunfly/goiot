@@ -24,11 +24,18 @@ struct MonitorControlTabView: View {
     @State private var isRefreshing = false
     @State private var isExpanded = true
     
-    private var monitorData: [DataInfo] {
-        guard let indices = dataManager.dataGroupIndexMap["goiot"]?["fp2"]?.values else { return [] }
-        return indices.compactMap { index in
-            dataManager.dataArray.indices.contains(index) ? dataManager.dataArray[index] : nil
-        }.sorted { $0.id < $1.id }
+    private var monitorData: [String: [DataInfo]] {
+        var dataInfoGroup : [String: [DataInfo]] = [:]
+        
+        if let selGroup = dataManager.dataGroupIndexMap["goiot"] {
+            for (key, _) in selGroup {
+                guard let indices = selGroup[key]?.values else { return [:] }
+                dataInfoGroup[key] = indices.compactMap { index in
+                    dataManager.dataArray.indices.contains(index) ? dataManager.dataArray[index] : nil
+                }.sorted { $0.id < $1.id }
+            }
+        }
+        return dataInfoGroup
     }
     
     var body: some View {
@@ -39,7 +46,7 @@ struct MonitorControlTabView: View {
                         title: "实时监测数据",
                         icon: "chart.xyaxis.line",
                         isExpanded: $isExpanded,
-                        items: monitorData
+                        items: monitorData["mfc"] ?? []
                     ) { dataInfo in
                         ControlDataInfoCard(dataInfo: dataInfo, style: selectedStyle)
                     }

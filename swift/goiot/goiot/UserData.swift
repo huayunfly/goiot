@@ -16,7 +16,7 @@ struct NetworkConfig {
     #if DEBUG
     static let baseURL = "http://192.168.2.177:6300/message"
     #else
-    static let baseURL = "https://api.your-production-domain.com/message" // 替换为线上域名
+    static let baseURL = "http://api.your-domain.com:port/message" // 替换为线上域名
     #endif
 }
 

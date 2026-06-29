@@ -468,7 +468,7 @@ class DataManager: ObservableObject {
         guard let dataGroup: [String: [String: Int]] = dataGroupIndexMap["goiot"] else {
             return
         }
-        guard let nodeGroup: [String: Int] = dataGroup["fp2"] else {
+        guard let nodeGroup: [String: Int] = dataGroup["mfc"] else {
             return
         }
         let dataIDList = Array(nodeGroup.keys)
@@ -482,7 +482,7 @@ class DataManager: ObservableObject {
                                                token: tokenID,
                                                condition: getDataCondition)
         
-        let address: String = "http://192.168.2.177:6300/message"
+        let address: String = NetworkConfig.baseURL
         let response: ApiGetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: getDataRequest, timeoutInterval: 5)
         let resultData = response.result
 
@@ -557,7 +557,7 @@ class DataManager: ObservableObject {
             )
             
             do {
-                let address = "http://192.168.2.177:6300/message"
+                let address = NetworkConfig.baseURL
                 let response: ApiSetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: body, timeoutInterval: 5)
                 
                 DispatchQueue.main.async {
