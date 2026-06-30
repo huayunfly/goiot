@@ -301,10 +301,6 @@ class DataManager: ObservableObject {
         
         var newDataGroupIndex: [String: [String: Int]] = [:]
         var startIndex = dataArray.count
-        //var items: [String: DataInfo] = [:]
-        
-
-        print("driver count: \(config.drivers.count)")
         
         for driver in config.drivers {
             let driverID = driver.id
@@ -442,14 +438,12 @@ class DataManager: ObservableObject {
     }
     
     // Start a timer to refresh data with 5 seconds interval.
-    func StartRefreshData(token tokenID: String, withTimeInterval timeInterval: Double) {
+    func StartRefreshData(token tokenID: String, withZoneGroups zoneGroups: [String], withTimeInterval timeInterval: Double) {
         timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
             DispatchQueue.global().async {
                 Task {
                     do {
-                        try await self.RefreshData(token: tokenID)
-//                        DispatchQueue.main.async { //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
-//                            self.count += 1           //                        }
+                        try await self.RefreshData(token: tokenID, withZoneGroups: zoneGroups)
                     } catch {
                         print("Error in RefreshData().")
                     }
@@ -464,65 +458,74 @@ class DataManager: ObservableObject {
         timer = nil
     }
     
-    func RefreshData(token tokenID: String) async throws {
-        guard let dataGroup: [String: [String: Int]] = dataGroupIndexMap["goiot"] else {
-            return
-        }
-        guard let nodeGroup: [String: Int] = dataGroup["mfc"] else {
-            return
-        }
-        let dataIDList = Array(nodeGroup.keys)
-        let getDataCondition = GetDataRequestCondition(groupName: "goiot",
-                                                    idList: dataIDList,
-                                                    timeRange: [1677154221, 2677154223],
-                                                    properties: ["value", "result", "time"],
-                                                    batchSize: 128, batchNum: 1)
-        let getDataRequest = ApiGetDataRequest(name: "service_name",
-                                               operation: "GETDATAR",
-                                               token: tokenID,
-                                               condition: getDataCondition)
-        
-        let address: String = NetworkConfig.baseURL
-        let response: ApiGetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: getDataRequest, timeoutInterval: 5)
-        let resultData = response.result
-
-        //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
-        DispatchQueue.main.async {
-            guard let dataGroup = self.dataGroupIndexMap[resultData.groupName] else { return }
-            guard let idList = resultData.table["id"] else { return }
-            guard let valueList = resultData.table["value"] else { return }
-            guard let resultList = resultData.table["result"] else { return }
-            guard let timeList = resultData.table["time"] else { return }
+    func RefreshData(token tokenID: String, withZoneGroups zoneGroups: [String]) async throws {
+        for zoneGroup in zoneGroups {
+            let words = zoneGroup.split(separator: ".", maxSplits: 2, omittingEmptySubsequences: true)
+            if words.count < 2 { continue }
+            let zone = words[0]
+            let group = words[1]
             
-            let counts = [idList.count, valueList.count, resultList.count, timeList.count]
-            if (counts.min() != counts.max()) {
+            guard let dataGroup: [String: [String: Int]] = dataGroupIndexMap[String(zone)] else {
                 return
             }
+            guard let nodeGroup: [String: Int] = dataGroup[String(group)] else {
+                return
+            }
+            let dataIDList = Array(nodeGroup.keys)
+            let endTime = Date().timeIntervalSince1970
+            let startTime = endTime - 15.0
+            let getDataCondition = GetDataRequestCondition(groupName: String(zone),
+                                                        idList: dataIDList,
+                                                        timeRange: [startTime, endTime],
+                                                        properties: ["value", "result", "time"],
+                                                        batchSize: 128, batchNum: 1)
+            let getDataRequest = ApiGetDataRequest(name: "service_name",
+                                                   operation: "GETDATAR",
+                                                   token: tokenID,
+                                                   condition: getDataCondition)
+            
+            let address: String = NetworkConfig.baseURL
+            let response: ApiGetDataResponse = try await WebServiceCaller.PostJSON(to: address, with: getDataRequest, timeoutInterval: 5)
+            let resultData = response.result
 
-            var num = 0
-            for dataID in idList {
-                if let dotIndex = dataID.firstIndex(of: ".") {
-                    let firstPart = String(dataID[..<dotIndex])
-                    if let dataIndex = dataGroup[firstPart]?[dataID] {
-                        var dataItem = self.dataArray[dataIndex]
-                        switch (dataItem.dtype) {
-                        case .DF:
-                            dataItem.fValue = Double(valueList[num]) ?? 0.0
-                        case .WB, .WUB, .DB, .DUB:
-                            dataItem.intValue = Int64(valueList[num]) ?? 0
-                        case .BB:
-                            dataItem.byteValue = UInt8(valueList[num]) ?? 0
-                        case .BT:
-                            dataItem.boolValue = (Int32(valueList[num]) ?? 0) > 0 ? true : false
-                        default:
-                            assert(false, "Match DataType \(dataItem.dtype) error.")
-                            continue
-                        }
-                        dataItem.result = Int32(resultList[num]) ?? -1
-                        dataItem.timestamp = Double(timeList[num]) ?? Date().timeIntervalSince1970
-                    }
+            //所有 UI 更新必须通过 DispatchQueue.main.async 回到主线程。
+            DispatchQueue.main.async {
+                guard let dataGroup = self.dataGroupIndexMap[resultData.groupName] else { return }
+                guard let idList = resultData.table["id"] else { return }
+                guard let valueList = resultData.table["value"] else { return }
+                guard let resultList = resultData.table["result"] else { return }
+                guard let timeList = resultData.table["time"] else { return }
+                
+                let counts = [idList.count, valueList.count, resultList.count, timeList.count]
+                if (counts.min() != counts.max()) {
+                    return
                 }
-                num+=1
+
+                var num = 0
+                for dataID in idList {
+                    if let dotIndex = dataID.firstIndex(of: ".") {
+                        let firstPart = String(dataID[..<dotIndex])
+                        if let dataIndex = dataGroup[firstPart]?[dataID] {
+                            let dataItem = self.dataArray[dataIndex]
+                            switch (dataItem.dtype) {
+                            case .DF:
+                                dataItem.fValue = Double(valueList[num]) ?? 0.0
+                            case .WB, .WUB, .DB, .DUB:
+                                dataItem.intValue = Int64(valueList[num]) ?? 0
+                            case .BB:
+                                dataItem.byteValue = UInt8(valueList[num]) ?? 0
+                            case .BT:
+                                dataItem.boolValue = (Int32(valueList[num]) ?? 0) > 0 ? true : false
+                            default:
+                                assert(false, "Match DataType \(dataItem.dtype) error.")
+                                continue
+                            }
+                            dataItem.result = Int32(resultList[num]) ?? -1
+                            dataItem.timestamp = Double(timeList[num]) ?? Date().timeIntervalSince1970
+                        }
+                    }
+                    num+=1
+                }
             }
         }
     }

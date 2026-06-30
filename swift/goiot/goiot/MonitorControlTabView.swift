@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+// MARK: - 分组数据模型
+struct MonitorGroupSection: Identifiable {
+    let id: String
+    let title: String
+    let items: [DataInfo]
+}
+
 // MARK: - 样式枚举
 enum ControlItemStyle: String, CaseIterable, Identifiable {
     case compact = "紧凑"
@@ -22,37 +29,62 @@ struct MonitorControlTabView: View {
     
     @State private var selectedStyle: ControlItemStyle = .standard
     @State private var isRefreshing = false
-    @State private var isExpanded = true
+    //@State private var isExpanded = true
+    // Manage multiple unfolding group status.
+    @State private var expandedSections: Set<String> = Set()
     
-    private var monitorData: [String: [DataInfo]] {
-        var dataInfoGroup : [String: [DataInfo]] = [:]
-        
-        if let selGroup = dataManager.dataGroupIndexMap["goiot"] {
-            for (key, _) in selGroup {
-                guard let indices = selGroup[key]?.values else { return [:] }
-                dataInfoGroup[key] = indices.compactMap { index in
+    // Zone -> group -> [DataInfo]
+    private var monitorSections: [MonitorGroupSection] {
+        var sections: [MonitorGroupSection] = []
+        print(dataManager.dataGroupIndexMap.count)
+        for (zoneKey, _) in dataManager.dataGroupIndexMap {
+            guard let selZone = dataManager.dataGroupIndexMap[zoneKey] else { continue }
+            for (groupKey, _) in selZone {
+                guard let indices = selZone[groupKey]?.values else { continue }
+                
+                let dataInfos = indices.compactMap { index in
                     dataManager.dataArray.indices.contains(index) ? dataManager.dataArray[index] : nil
                 }.sorted { $0.id < $1.id }
+                
+                guard !dataInfos.isEmpty else { continue }
+                let title = "\(zoneKey) - \(groupKey)"
+                sections.append(MonitorGroupSection(id: "\(zoneKey).\(groupKey)", title: title, items: dataInfos))
             }
         }
-        return dataInfoGroup
+        return sections
     }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    ControlCollapsibleSection(
-                        title: "实时监测数据",
-                        icon: "chart.xyaxis.line",
-                        isExpanded: $isExpanded,
-                        items: monitorData["mfc"] ?? []
-                    ) { dataInfo in
-                        ControlDataInfoCard(dataInfo: dataInfo, style: selectedStyle)
+                    ForEach(monitorSections) { section in
+                        // Binding：unfold the section according to the Set sign.
+                        let isExpanded = Binding<Bool>(
+                            get: { expandedSections.contains(section.id) },
+                            set: { newIsExpanded in
+                                withAnimation(.easeInOut) {
+                                    if newIsExpanded {
+                                        expandedSections.insert(section.id)
+                                    } else {
+                                        expandedSections.remove(section.id)
+                                    }
+                                }
+                            }
+                        )
+                        
+                        ControlCollapsibleSection(
+                            title: section.title,
+                            icon: "chart.xyaxis.line",
+                            isExpanded: isExpanded,
+                            items: section.items
+                        ) { dataInfo in
+                            ControlDataInfoCard(dataInfo: dataInfo, style: selectedStyle)
+                        }
                     }
                     
-                    if monitorData.isEmpty {
-                        EmptyStateView()
+                    if monitorSections.isEmpty {
+                        ControlEmptyStateView() // 修正原代码中的 EmptyStateView 拼写
                     }
                 }
                 .padding(.horizontal)
@@ -63,7 +95,7 @@ struct MonitorControlTabView: View {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
                         isRefreshing = true
-                        dataManager.StartRefreshData(token: userData.token, withTimeInterval: 5)
+                        dataManager.StartRefreshData(token: userData.token, withZoneGroups: monitorSections.compactMap {section in section.id}, withTimeInterval: 5)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             isRefreshing = false
                         }
