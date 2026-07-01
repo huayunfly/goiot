@@ -424,9 +424,9 @@ func controlFormatTimestamp(_ timestamp: Double) -> String {
 }
 
 // MARK: - 预览
-struct ControlMonitorTabView_Previews: PreviewProvider {
+struct MonitorControlTabView_Previews: PreviewProvider {
     static var previews: some View {
-        MonitorTabView()
+        MonitorControlTabView()
             .environmentObject(UserData())
             .environmentObject(DataManager())
     }

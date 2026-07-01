@@ -44,11 +44,17 @@ struct MyTabView: View {
                     AppIcon.trend.tabIconStyle()
                     Text("趋势")
                 }.tag(2)
+            HMIControlTabView()
+                .tabItem {
+                    Image(systemName: "rectangle.grid.1x2")
+                    Text("图形控制")
+                }
+                .tag(3)
             SettingTabView()
                 .tabItem {
                     AppIcon.settings.tabIconStyle()
                     Text("设置")
-                }.tag(3)
+                }.tag(4)
         }//FIX：移除 .font(.largeTitle) 修饰符是继承（Cascading）的。"大字体" 设置泄漏到了SettingTabView 的所有子组件中，导致排版崩溃。
     }
 }
