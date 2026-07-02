@@ -20,89 +20,110 @@ struct HMIControlTabView: View {
     @EnvironmentObject var userData: UserData
     @EnvironmentObject var dataManager: DataManager
     
+    @GestureState private var magnification: CGFloat = 1.0
+    @State private var zoom: CGFloat = 1.0
+    
     @State private var scale: CGFloat = 1.0
     @State private var selectedNode: HMIDeviceNode?
     @State private var livePV: [String: Double] = [:]
     
-    // 画布物理尺寸（建议按实际 PID 图比例设定）
+    // 画布物理尺寸
     private let canvasWidth: CGFloat = 1279
     private let canvasHeight: CGFloat = 1022
     
-    // 辅助函数：缩放限幅
-    private func clamp(_ value: CGFloat) -> CGFloat {
+    // 用于管理缩放时的位置偏移，防止位置乱跳
+    @State private var offset: CGSize = .zero
+    
+    // 缩放限幅
+    private func clampZoom(_ value: CGFloat) -> CGFloat {
         return min(max(value, 0.4), 2.5)
     }
     
     private var hmiNodes: [HMIDeviceNode] {
         [
-            HMIDeviceNode(id: UUID(), title: "反应釜 T-101", canvasPosition: CGPoint(x: 280, y: 380), pvInfoId: "T101_PV", svInfoId: "T101_SV", iconType: .image("temperature_controller")),
-            HMIDeviceNode(id: UUID(), title: "进料泵 F-202", canvasPosition: CGPoint(x: 280, y: 450), pvInfoId: "F202_PV", svInfoId: "F202_SV", iconType: .image("flow_controller")),
-            HMIDeviceNode(id: UUID(), title: "排气阀 V-303", canvasPosition: CGPoint(x: 200, y: 600), pvInfoId: "V303_PV", svInfoId: "V303_SV", iconType: .symbol("valve.fill")),
+            HMIDeviceNode(id: UUID(), title: "反应釜 T-101", canvasPosition: CGPoint(x: 180, y: 600), pvInfoId: "T101_PV", svInfoId: "T101_SV", iconType: .image("temperature_controller")),
+            HMIDeviceNode(id: UUID(), title: "进料泵 F-202", canvasPosition: CGPoint(x: 280, y: 600), pvInfoId: "F202_PV", svInfoId: "F202_SV", iconType: .image("flow_controller")),
+            HMIDeviceNode(id: UUID(), title: "排气阀 V-303", canvasPosition: CGPoint(x: 380, y: 600), pvInfoId: "V303_PV", svInfoId: "V303_SV", iconType: .image("flow_controller")),
         ]
     }
     
     var body: some View {
         NavigationStack {
-            GeometryReader { _ in
-                ScrollView([.horizontal, .vertical]) {
+            ScrollView([.horizontal, .vertical]) {
+                if #available(iOS 17.0, *) {
                     ZStack {
-                        // 1. PID 背景图（替换 placeholder 为实际 Assets 名称）
+                        // 1. PID 背景图
                         Rectangle()
                             .fill(Color(.systemGray6))
                             .frame(width: canvasWidth, height: canvasHeight)
                             .overlay {
                                 Image("pid_diagram")
-                                    .resizable()      // 取消图片原本的物理尺寸，允许按画布尺寸拉伸
-                                    .scaledToFit()    // 保持图片比例适应画布，不形变
-                                    // .renderingMode(.original) // 如果图带有颜色需要保留原色，加上这句
+                                    .resizable()
+                                    .scaledToFit()
                                     .frame(width: canvasWidth, height: canvasHeight)
+                                    .cornerRadius(12)
                             }
+                            // 双击重置
+                            .simultaneousGesture(
+                                TapGesture(count: 2).onEnded {
+                                    withAnimation(.spring(response: 0.35)) {
+                                        self.scale = 1.0
+                                        self.offset = .zero
+                                    }
+                                }
+                            )
                         
                         // 2. 设备节点层
                         ForEach(hmiNodes) { (node: HMIDeviceNode) in
-                            HMIDeviceNodeView(
-                                node: node,
-                                pvValue: livePV[node.pvInfoId] ?? 0.0,
-                                isEditing: selectedNode?.id == node.id
-                            )
-                            .position(node.canvasPosition)
-                            .onTapGesture {
-                                withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-                                    selectedNode = node
+                            HMIDeviceNodeView(node: node, pvValue: livePV[node.pvInfoId] ?? 0.0, isEditing: selectedNode?.id == node.id)
+                                .position(node.canvasPosition)
+                                .onTapGesture {
+                                    withAnimation {
+                                        selectedNode = node
+                                    }
                                 }
-                            }
                         }
                     }
+                    // 设定 ZStack 的物理尺寸
                     .frame(width: canvasWidth, height: canvasHeight)
+                    
+                    // 应用偏移和缩放
+                    .offset(offset)
                     .scaleEffect(scale)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        
-                // 使用 .gesture 兼容 iOS 15/16
-                // 双指捏合缩放：onChanged 处理缩放过程，onEnded 确保最终值准确
-                .gesture(
-                    MagnificationGesture()
-                        .onChanged { value in
-                            scale = clamp(scale * value) // 实时限幅
+                    
+                    // 性能优化
+                    .drawingGroup()
+                    .animation(nil, value: scale) // 关闭系统默认动画，实现跟手缩放
+                    
+                    .simultaneousGesture(MagnificationGesture()
+                        .updating($magnification) { value, state, transaction in
+                            state = value
                         }
                         .onEnded { value in
-                            scale = clamp(scale * value)
+                            zoom = clampZoom(zoom * value)
+                            scale = zoom * magnification
                         }
-                )
-                .ignoresSafeArea()
+                    )
+                } else {
+                    // Fallback on earlier versions
+                }
             }
+            // 占满全屏
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea()
             .navigationTitle("图形化监控")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("重置") {
-                        withAnimation { scale = 1.0 }
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            self.scale = 1.0;
+                            self.offset = .zero;
+                        }
                     }
                 }
             }
-            // 3. SV 编辑面板
             .sheet(item: $selectedNode) { node in
-                SVEditorSheet(node: node, token: userData.token ?? "")
-                    .environmentObject(dataManager)
+                SVEditorSheet(node: node, token: userData.token).environmentObject(dataManager)
             }
         }
         .onAppear { startPVListener() }
@@ -110,6 +131,7 @@ struct HMIControlTabView: View {
     
     private func startPVListener() {
         Task {
+            // 确保UI总是在主线程上更新
             let actor = await MainActor.run { self }
             while !Task.isCancelled {
                 for node in actor.hmiNodes {
@@ -118,8 +140,6 @@ struct HMIControlTabView: View {
                     }
                 }
                 try? await Task.sleep(for: .seconds(1.0))
-                
-                
             }
         }
     }
@@ -155,14 +175,12 @@ struct HMIDeviceNodeView: View {
                 .padding(6) // 保留少量透明点击区域，方便手指点击
                 .background(Color.clear)
                 // 增加选中时的黄色虚线边框/光晕作为交互反馈
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(isEditing ? Color.yellow : Color.clear, lineWidth: 2)
-                )
-                .shadow(color: isEditing ? .orange.opacity(0.6) : .black.opacity(0.1),
-                        radius: isEditing ? 10 : 2, y: 2)
-                .scaleEffect(isEditing ? 1.08 : 1.0)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(isEditing ? Color.yellow : Color.clear, lineWidth: 2))
+                .shadow(color: isEditing ? .orange.opacity(0.6) : .black.opacity(0.1), radius: isEditing ? 10 : 2, y: 2)
+                .scaleEffect(isEditing ? 1.1 : 1.0)
                 .animation(.spring(response: 0.25, dampingFraction: 0.8), value: isEditing)
+           
+            Label(node.title, systemImage: "house").labelStyle(.titleOnly).padding(2)       .font(.system(.caption, design: .rounded).bold())
             
             Text(String(format: "%.1f", pvValue))
                 .font(.system(.caption, design: .rounded).bold())
@@ -170,7 +188,7 @@ struct HMIDeviceNodeView: View {
                 .padding(8)
                 // PV 数值牌保留半透明灰底，确保在复杂 PID 背景图上依然清晰可读
                 .background(Color(.systemBackground).opacity(0.85))
-                .cornerRadius(8)
+                .cornerRadius(4)
                 .shadow(radius: 2)
         }
         // 节点整体外层透明化

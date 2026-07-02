@@ -238,8 +238,6 @@ class JSONLoader {
 
 
 class DataManager: ObservableObject {
-    //@Published var dataItems: [String: DataInfo] = [:]
-    //@Published var dataGroups: [String: [String: DataInfo]] = [:]
     var dataGroupIndexMap: [String: [String: [String: Int]]] = [:]
     @Published var dataArray: [DataInfo] = []
     
@@ -284,7 +282,6 @@ class DataManager: ObservableObject {
         Task {
             await loadJSONConfig(fromFile: "drivers")
         }
-        print("init datamanager()")
     }
 
     // Load JSON file
