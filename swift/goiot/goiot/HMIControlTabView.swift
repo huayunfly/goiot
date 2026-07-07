@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - 图形化节点模型
+// 图形化节点模型
 struct HMIDeviceNode: Identifiable, Hashable {
     let id: UUID
     let name: String
@@ -9,7 +9,8 @@ struct HMIDeviceNode: Identifiable, Hashable {
     let pvInfoId: String
     let svInfoId: String?
     let iconType: HMIIconModule
-    //let operationType: HMIOperationType
+    let operationUIType: HMIOperationUIType
+    let measurementUnit: HMIMeasurementUnit
 }
 
 enum HMIIconModule: Hashable {
@@ -17,14 +18,15 @@ enum HMIIconModule: Hashable {
     case image(String)
 }
 
-enum HMIOperationType: Hashable {
+enum HMIOperationUIType: Hashable {
     case text
-    case state
-    case processValue
-    case onOff
+    case state(UInt)
+    case processValue(UInt)
+    case onOff(UInt)
 }
 
 enum HMIMeasurementUnit: Hashable {
+        case LITER
         case ML
         case BARA
         case BARG
@@ -39,8 +41,10 @@ enum HMIMeasurementUnit: Hashable {
 }
 
 // Global image cache
-struct HMIImageCache {
+internal struct HMIImageCache {
     static var imageCache: [String: UIImage] = [:]
+    
+    private init() {}
 }
 
 // 主视图
@@ -77,7 +81,7 @@ struct HMIControlTabView: View {
                             .fill(Color(.systemGray6))
                             .frame(width: canvasSize.width, height: canvasSize.height)
                             .overlay {
-                                if let uiImage = UIImage.getImageCache(named: canvasName) {
+                                if let uiImage = UIImage.getImageCached(named: canvasName) {
                                     Image(uiImage: uiImage)
                                         .resizable()
                                         .scaledToFit()
@@ -85,7 +89,7 @@ struct HMIControlTabView: View {
                                         .cornerRadius(12)
                                 }
                                 else {
-                                    Image(systemName: "star.fill")
+                                    Image(systemName: "table")
                                 }
                             }
                             // 双击重置
@@ -178,10 +182,11 @@ struct HMIControlTabView: View {
     }
 }
 
+// UIImage methods to do with the cached images.
 extension UIImage {
     // Get UIImage size.
     static func getOriginalImageSize(named imageName: String, fallback: CGSize) -> CGSize {
-        guard let image = getImageCache(named: imageName) else {
+        guard let image = getImageCached(named: imageName) else {
             return fallback
         }
         
@@ -192,7 +197,7 @@ extension UIImage {
     }
     
     // Get UIImage in the cache or load an image from Assets.
-    static func getImageCache(named imageName: String) -> UIImage? {
+    static func getImageCached(named imageName: String) -> UIImage? {
         if let foundImage =  HMIImageCache.imageCache[imageName] {
             return foundImage
         } else {
@@ -203,6 +208,29 @@ extension UIImage {
             else {
                 return nil
             }
+        }
+    }
+    
+    // Crop an image
+    static func getCroppedImage(from uiImage: UIImage, cropArea cropRect: CGRect) -> UIImage? {
+        if let croppedImage = uiImage.cgImage?.cropping(to: cropRect) {
+            return UIImage(cgImage: croppedImage)
+        } else {
+            return nil
+        }
+    }
+    
+    // Divide an image into multiple equal pieces by width and get one.
+    static func getSplitImageByWidth(from uiImage: UIImage, number numSplit: UInt, index idxSplit: UInt) -> UIImage? {
+        let width = uiImage.size.width * uiImage.scale
+        let height = uiImage.size.height * uiImage.scale
+        if width > 0.0 && height > 0.0 && numSplit > 0 {
+            let splitWidth = width / Double(numSplit)
+            let rect = CGRect(x: Double(idxSplit) * splitWidth, y: 0, width: splitWidth, height: height)
+            return getCroppedImage(from: uiImage, cropArea: rect)
+        }
+        else {
+            return nil
         }
     }
 }
@@ -223,43 +251,54 @@ struct HMIDeviceNodeView: View {
                     .font(.system(size: 28))
                     .foregroundColor(isEditing ? .yellow : .primary)
             case .image(let name):
-                if let uiImage = UIImage.getImageCache(named: name) {
+                if let uiImage = UIImage.getImageCached(named: name) {
+                    
+                    
                     Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
                         .frame(width: canvasSize.width, height: canvasSize.height)
                         .onAppear {
-                            canvasSize = UIImage.getOriginalImageSize(named: name, fallback: CGSize(width: 30, height: 30))
+                            let imgSize = UIImage.getOriginalImageSize(named: name, fallback: CGSize(width: 30, height: 30))
+                            switch node.operationUIType {
+                            case .text:
+                                canvasSize = imgSize
+                            case .state(let upperLimit):
+                                canvasSize = CGSize(width: imgSize.width / (CGFloat(upperLimit) + 1/*alarm state*/), height: imgSize.height)
+                            case .processValue:
+                                canvasSize = CGSize(width: imgSize.width / 2/*alarm norm*/, height: imgSize.height)
+                            case .onOff:
+                                canvasSize = CGSize(width: imgSize.width / 3/*alarm norm active*/, height: imgSize.height)
+                            default:
+                                canvasSize = imgSize
+                            }
                         }
                 }
                 else {
-                    Image(systemName: "pencil.circle")
+                    Image(systemName: "table")
                 }
             }
         }
     }
 
-    
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 0) {
             Text(String(format: "%.1f", pvValue))
                 .font(.system(.caption, design: .rounded).bold())
                 .foregroundColor(.primary)
                 .padding(8)
-                // PV 数值牌保留半透明灰底，确保在复杂 PID 背景图上依然清晰可读
+                // Retain half transparent zone for PV
                 .background(Color(.systemBackground).opacity(0.85))
                 .cornerRadius(4)
                 .shadow(radius: 2)
-            
+   
             imageIcon
-                .padding(6) // 保留少量透明点击区域，方便手指点击
+                .padding(6) // Retain a few zone for the gesture click.
                 .background(Color.clear)
                 // 增加选中时的黄色虚线边框/光晕作为交互反馈
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(isEditing ? Color.yellow : Color.clear, lineWidth: 2))
                 .shadow(color: isEditing ? .orange.opacity(0.6) : .black.opacity(0.1), radius: isEditing ? 10 : 2, y: 2)
                 .scaleEffect(isEditing ? 1.1 : 1.0)
                 .animation(.spring(response: 0.25, dampingFraction: 0.8), value: isEditing)
-           
+            
             Label(node.name, systemImage: "house").labelStyle(.titleOnly).padding(2)       .font(.system(.caption, design: .rounded).bold())
         }
         // 节点整体外层透明化
@@ -338,21 +377,21 @@ struct SVEditorSheet: View {
 // 预览
 struct HMIControlTabView_Previews: PreviewProvider {
     static let hmiNodesDemo: [HMIDeviceNode] = [
-        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 285, y: 174), pvInfoId: "FICA1111_PV", svInfoId: "FICA1111_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 285, y: 275), pvInfoId: "FICA1121_PV", svInfoId: "FICA1121_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 285, y: 376), pvInfoId: "FICA1131_PV", svInfoId: "FICA1131_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 285, y: 477), pvInfoId: "FICA1141_PV", svInfoId: "FICA1141_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 285, y: 578), pvInfoId: "FICA1151_PV", svInfoId: "FICA1151_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 794, y: 219), pvInfoId: "FICA1511_PV", svInfoId: "FICA1511_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 794, y: 320), pvInfoId: "FICA1521_PV", svInfoId: "FICA1521_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 794, y: 421), pvInfoId: "FICA1531_PV", svInfoId: "FICA1531_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 794, y: 522), pvInfoId: "FICA1541_PV", svInfoId: "FICA1541_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 794, y: 623), pvInfoId: "FICA1551_PV", svInfoId: "FICA1551_SV", iconType: .image("mfc")),
-        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 100, y: 80), pvInfoId: "PIA1111", svInfoId: "", iconType: .image("pressure_measure")),
-        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 100, y: 180), pvInfoId: "PIA1121", svInfoId: "", iconType: .image("pressure_measure")),
-        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 100, y: 280), pvInfoId: "PIA1131", svInfoId: "", iconType: .image("pressure_measure")),
-        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 100, y: 380), pvInfoId: "PIA1141", svInfoId: "", iconType: .image("pressure_measure")),
-        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 488), pvInfoId: "PIA1151", svInfoId: "", iconType: .image("pressure_measure")),
+        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 320, y: 187), pvInfoId: "FICA1111_PV", svInfoId: "FICA1111_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 320, y: 288), pvInfoId: "FICA1121_PV", svInfoId: "FICA1121_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 320, y: 389), pvInfoId: "FICA1131_PV", svInfoId: "FICA1131_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 320, y: 490), pvInfoId: "FICA1141_PV", svInfoId: "FICA1141_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 320, y: 591), pvInfoId: "FICA1151_PV", svInfoId: "FICA1151_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 830, y: 232), pvInfoId: "FICA1511_PV", svInfoId: "FICA1511_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 830, y: 333), pvInfoId: "FICA1521_PV", svInfoId: "FICA1521_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 830, y: 434), pvInfoId: "FICA1531_PV", svInfoId: "FICA1531_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 830, y: 535), pvInfoId: "FICA1541_PV", svInfoId: "FICA1541_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 830, y: 636), pvInfoId: "FICA1551_PV", svInfoId: "FICA1551_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "PIA1111", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "PIA1121", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "PIA1131", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "PIA1141", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "PIA1151", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
     ]
     
     static var previews: some View {

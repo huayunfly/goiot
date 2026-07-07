@@ -86,6 +86,6 @@ fastlane/test_output
 iOSInjectionProject/
 
 # Ignore all PNG file
-Assets.xcassets/
+Assets.xcassets/*
 
 # End of https://www.toptal.com/developers/gitignore/api/swift
