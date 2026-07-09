@@ -15,9 +15,9 @@ struct ContentView: View {
     var body: some View {
         Group {
             if userData.isLoggedIn {
-                MyTabView().environmentObject(userData).environmentObject(dataManager)
+                MyTabView()//.environmentObject(userData).environmentObject(dataManager)
             } else {
-                LoginView().environmentObject(userData)
+                LoginView()//.environmentObject(userData)
             }
         }//在顶层注入一次 EnvironmentObject，所有子视图都会自动继承，
         // 无需在下面每个 TabItem 重复注入。

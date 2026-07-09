@@ -57,7 +57,8 @@ struct HMIControlTabView: View {
     
     @State private var scale: CGFloat = 1.0
     @State private var selectedNode: HMIDeviceNode?
-    @State private var livePV: [String: Double] = [:]
+    @State private var livePV: [String: String] = [:]
+    @State private var livePVStatus: [String: Int32] = [:]
     
     // Canvas
     @State private var canvasSize: CGSize = .zero
@@ -104,7 +105,7 @@ struct HMIControlTabView: View {
                         
                         // 2. 设备节点层
                         ForEach(hmiNodes) { (node: HMIDeviceNode) in
-                            HMIDeviceNodeView(node: node, pvValue: livePV[node.pvInfoId] ?? 0.0, isEditing: selectedNode?.id == node.id)
+                            HMIDeviceNodeView(node: node, pvValue: livePV[node.pvInfoId] ?? "0.x", isEditing: selectedNode?.id == node.id)
                                 // A view that fixes the center of this view at `position`.
                                 .position(node.canvasPosition)
                                 .onTapGesture {
@@ -168,9 +169,25 @@ struct HMIControlTabView: View {
             let actor = await MainActor.run { self }
             while !Task.isCancelled {
                 for node in actor.hmiNodes {
-                    if let dataInfo = actor.dataManager.dataArray.first(where: { $0.id == node.pvInfoId || $0.name == node.pvInfoId }) {
-                        actor.livePV[node.pvInfoId] = dataInfo.fValue
+                    // "goiot.mfc.1.pv".split() -> "goiot" "mfc.1.pv"
+                    let zoneNames = node.pvInfoId.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+                    if zoneNames.count < 2 { continue }
+                    let zone = String(zoneNames[0])
+                    let dataID = String(zoneNames[1])
+                    // "mfc.1.pv".split() -> "mfc" "mfc.1.pv"
+                    let groupNames = dataID.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+                    if groupNames.count < 2 { continue }
+                    let group = String(groupNames[0])
+
+                    guard let dataIndex = actor.dataManager.dataGroupIndexMap[zone]?[group]?[dataID] else {
+                        continue
                     }
+                    if dataIndex >= actor.dataManager.dataArray.count {
+                        continue
+                    }
+                    let dataInfo = actor.dataManager.dataArray[dataIndex]
+                    actor.livePV[node.pvInfoId] = String(dataInfo.intValue)
+                    actor.livePVStatus[node.pvInfoId] = dataInfo.result
                 }
                 try? await Task.sleep(for: .seconds(1.0))
             }
@@ -244,7 +261,7 @@ struct HMIDeviceNodeView: View {
     @State var isNormal: Bool = false
     
     let node: HMIDeviceNode
-    let pvValue: Double
+    let pvValue: String
     let isEditing: Bool
     
     private var imageIcon: some View {
@@ -289,7 +306,7 @@ struct HMIDeviceNodeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(String(format: "%.1f", pvValue))
+            Text(pvValue)
                 .font(.system(.caption, design: .rounded).bold())
                 .foregroundColor(.primary)
                 .padding(8)
@@ -307,7 +324,8 @@ struct HMIDeviceNodeView: View {
                 .scaleEffect(isEditing ? 1.1 : 1.0)
                 .animation(.spring(response: 0.25, dampingFraction: 0.8), value: isEditing)
             
-            Label(node.name, systemImage: "table").labelStyle(.titleOnly).padding(2)       .font(.system(.caption, design: .rounded).bold())
+            Label(node.name, systemImage: "table")
+                .labelStyle(.titleOnly).padding(2).font(.system(.caption, design: .rounded).bold())
         }
         // 节点整体外层透明化
         .background(Color.clear)
@@ -385,21 +403,21 @@ struct SVEditorSheet: View {
 // 预览
 struct HMIControlTabView_Previews: PreviewProvider {
     static let hmiNodesDemo: [HMIDeviceNode] = [
-        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 187), pvInfoId: "FICA1111_PV", svInfoId: "FICA1111_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 302, y: 288), pvInfoId: "FICA1121_PV", svInfoId: "FICA1121_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 389), pvInfoId: "FICA1131_PV", svInfoId: "FICA1131_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 490), pvInfoId: "FICA1141_PV", svInfoId: "FICA1141_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 302, y: 591), pvInfoId: "FICA1151_PV", svInfoId: "FICA1151_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 232), pvInfoId: "FICA1511_PV", svInfoId: "FICA1511_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 812, y: 333), pvInfoId: "FICA1521_PV", svInfoId: "FICA1521_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 434), pvInfoId: "FICA1531_PV", svInfoId: "FICA1531_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 535), pvInfoId: "FICA1541_PV", svInfoId: "FICA1541_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 812, y: 636), pvInfoId: "FICA1551_PV", svInfoId: "FICA1551_SV", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "PIA1111", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "PIA1121", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "PIA1131", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "PIA1141", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "PIA1151", svInfoId: "", iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 187), pvInfoId: "goiot.mfc.1.pv", svInfoId: "goiot.mfc.1.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 302, y: 288), pvInfoId: "goiot.mfc.2.pv", svInfoId: "goiot.mfc.2.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 389), pvInfoId: "goiot.mfc.3.pv", svInfoId: "goiot.mfc.3.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 490), pvInfoId: "goiot.mfc.4.pv", svInfoId: "goiot.mfc.4.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 302, y: 591), pvInfoId: "goiot.mfc.5.pv", svInfoId: "goiot.mfc.5.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 232), pvInfoId: "goiot.mfc.6.pv", svInfoId: "goiot.mfc.6.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 812, y: 333), pvInfoId: "goiot.mfc.7.pv", svInfoId: "goiot.mfc.7.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 434), pvInfoId: "goiot.mfc.8.pv", svInfoId: "goiot.mfc.8.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 535), pvInfoId: "goiot.mfc.9.pv", svInfoId: "goiot.mfc.9.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 812, y: 636), pvInfoId: "goiot.mfc.10.pv", svInfoId: "goiot.mfc.10.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
+        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "goiot.s7.1.pg_1", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "goiot.s7.1.pg_2", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "goiot.s7.1.pg_3", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "goiot.s7.1.pg_4", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "goiot.s7.1.pg_5", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
     ]
     
     static var previews: some View {
