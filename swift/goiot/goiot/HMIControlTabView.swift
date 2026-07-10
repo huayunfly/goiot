@@ -11,6 +11,7 @@ struct HMIDeviceNode: Identifiable, Hashable {
     let iconType: HMIIconModule
     let operationUIType: HMIOperationUIType
     let measurementUnit: HMIMeasurementUnit
+    let textFomat: String
 }
 
 enum HMIIconModule: Hashable {
@@ -26,18 +27,19 @@ enum HMIOperationUIType: Hashable {
 }
 
 enum HMIMeasurementUnit: Hashable {
-        case LITER
-        case ML
-        case BARA
-        case BARG
-        case SCCM
-        case DEGREE
-        case MM
-        case MLM
-        case MPA
-        case RPM
-        case LEL
-        case PPM
+    case L
+    case mL
+    case barA
+    case barG
+    case sccm
+    case C
+    case mm
+    case mLm
+    case Lm
+    case MPa
+    case rpm
+    case lel
+    case ppm
 }
 
 // Global image cache
@@ -105,7 +107,7 @@ struct HMIControlTabView: View {
                         
                         // 2. 设备节点层
                         ForEach(hmiNodes) { (node: HMIDeviceNode) in
-                            HMIDeviceNodeView(node: node, pvValue: livePV[node.pvInfoId] ?? "0.x", isEditing: selectedNode?.id == node.id)
+                            HMIDeviceNodeView(node: node, pvValue: livePV[node.pvInfoId] ?? "0.x", pvStatus: livePVStatus[node.pvInfoId] ?? -1, isEditing: selectedNode?.id == node.id)
                                 // A view that fixes the center of this view at `position`.
                                 .position(node.canvasPosition)
                                 .onTapGesture {
@@ -169,24 +171,11 @@ struct HMIControlTabView: View {
             let actor = await MainActor.run { self }
             while !Task.isCancelled {
                 for node in actor.hmiNodes {
-                    // "goiot.mfc.1.pv".split() -> "goiot" "mfc.1.pv"
-                    let zoneNames = node.pvInfoId.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
-                    if zoneNames.count < 2 { continue }
-                    let zone = String(zoneNames[0])
-                    let dataID = String(zoneNames[1])
-                    // "mfc.1.pv".split() -> "mfc" "mfc.1.pv"
-                    let groupNames = dataID.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
-                    if groupNames.count < 2 { continue }
-                    let group = String(groupNames[0])
-
-                    guard let dataIndex = actor.dataManager.dataGroupIndexMap[zone]?[group]?[dataID] else {
+                    guard let dataInfo = getDataInfo(byId: node.pvInfoId, from: actor.dataManager) else {
+                        actor.livePVStatus[node.pvInfoId] = -1 // Error
                         continue
                     }
-                    if dataIndex >= actor.dataManager.dataArray.count {
-                        continue
-                    }
-                    let dataInfo = actor.dataManager.dataArray[dataIndex]
-                    actor.livePV[node.pvInfoId] = String(dataInfo.intValue)
+                    actor.livePV[node.pvInfoId] = dataInfoValueToString(from: dataInfo, format: node.textFomat, unit: node.measurementUnit)
                     actor.livePVStatus[node.pvInfoId] = dataInfo.result
                 }
                 try? await Task.sleep(for: .seconds(1.0))
@@ -194,7 +183,51 @@ struct HMIControlTabView: View {
         }
     }
     
-    // Image zoom limiting
+    // Converts dataInfo value to String by the specified format and measurement unit.
+    private func dataInfoValueToString(from dataInfo: DataInfo, format fmt: String?, unit dataUnit: HMIMeasurementUnit) -> String {
+        let strValue: String
+        switch dataInfo.dtype {
+        case .DF:
+            strValue = String(format: fmt ?? "%.2f", dataInfo.fValue * dataInfo.ratio)
+        case .WB, .WUB, .DB, .DUB:
+            if abs(dataInfo.ratio - 1.0) < 1e-6 {
+                strValue = String(format: fmt ?? "%d", dataInfo.intValue)
+            }
+            // Rule: Integer value to float value conversion on some devices (MFC etc.)
+            else {
+                strValue = String(format: fmt ?? "%.2f", Double(dataInfo.intValue) * dataInfo.ratio)
+            }
+        case .BB:
+            strValue = String(format: fmt ?? "%d", dataInfo.byteValue)
+        case .BT:
+            strValue = dataInfo.boolValue ? "1" : "0"
+        default:
+            assert(false, "Match DataType \(dataInfo.dtype) error.")
+            return "0.x"
+        }
+        return "\(strValue) \(dataUnit)"
+    }
+    
+    // Gets dataInfo from dataMagager by dataId.
+    private func getDataInfo(byId dataId: String, from dataManager: DataManager) -> DataInfo? {
+        guard !dataId.isEmpty else { return nil }
+        
+        // "goiot.mfc.1.pv".split() -> "goiot" "mfc.1.pv"
+        let zoneNames = dataId.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+        if zoneNames.count < 2 { return nil }
+        let zone = String(zoneNames[0])
+        let dataID = String(zoneNames[1])
+        // "mfc.1.pv".split() -> "mfc" "mfc.1.pv"
+        let groupNames = dataID.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+        if groupNames.count < 2 { return nil }
+        let group = String(groupNames[0])
+        
+        guard let dataIndex = dataManager.dataGroupIndexMap[zone]?[group]?[dataID] else { return nil }
+        if dataIndex >= dataManager.dataArray.count { return nil }
+        return dataManager.dataArray[dataIndex]
+    }
+    
+    // Limits the zooming image size.
     private func clampZoom(_ value: CGFloat) -> CGFloat {
         return min(max(value, 0.4), 2.5)
     }
@@ -262,8 +295,10 @@ struct HMIDeviceNodeView: View {
     
     let node: HMIDeviceNode
     let pvValue: String
+    let pvStatus: Int32
     let isEditing: Bool
     
+    // Dynamically displaying image field
     private var imageIcon: some View {
         Group {
             switch node.iconType {
@@ -275,30 +310,11 @@ struct HMIDeviceNodeView: View {
                 Image(uiImage: uiImage)
                     .frame(width: canvasSize.width, height: canvasSize.height)
                     .onAppear {
-                        if let image = UIImage.getImageCached(named: name) {
-                            var splitNum: UInt
-                            var imgIndex: UInt
-                            switch node.operationUIType {
-                            case .text:
-                                splitNum = 1
-                                imgIndex = 0
-                            case .state(let upperLimit):
-                                splitNum = upperLimit + 1
-                                imgIndex = 0
-                            case .processValue(let statusNum):
-                                splitNum = statusNum
-                                imgIndex = 0
-                            case .onOff(let statusNum):
-                                splitNum = statusNum
-                                imgIndex = 0
-                            }
-                            let imgSize = UIImage.getOriginalImageSize(named: name, fallback: CGSize(width: 30, height: 30))
-                            canvasSize = CGSize(width: imgSize.width / Double(splitNum), height: imgSize.height)
-                            uiImage = UIImage.getSplitImageByWidth(from: image, number: splitNum, index: imgIndex) ?? image
-                        } else {
-                            canvasSize = CGSize(width: 30, height: 30)
-                            uiImage = UIImage()
-                        }
+                        updateNodeImage(name, pvStatus)
+                    }
+                    // Listens pvStatus and switches the node image state
+                    .onChange(of: pvStatus) { _, newState in
+                        updateNodeImage(name, newState)
                     }
             }
         }
@@ -330,6 +346,41 @@ struct HMIDeviceNodeView: View {
         // 节点整体外层透明化
         .background(Color.clear)
     }
+    
+    // Helper function: update the dynamic image according the PV status.
+    private func updateNodeImage(_ name: String, _ status: Int32) {
+        if let image = UIImage.getImageCached(named: name) {
+            var splitNum: UInt = 1
+            
+            // Get the splited part according the operation type.
+            switch node.operationUIType {
+            case .text:
+                splitNum = 1
+            case .state(let upperLimit):
+                splitNum = upperLimit + 1
+            case .processValue(let statusNum):
+                splitNum = statusNum
+            case .onOff(let statusNum):
+                splitNum = statusNum
+            }
+                                    
+            // Logic:
+            // IF pvStatus == 0 (device Normal state), index = 1 (Split sheet 2nd column)
+            // Otherwise index = 0 (Split sheet 1st column, default Abnormal/Alarming state)
+            let targetIndex: UInt = (status == 0) ? 1 : 0
+            
+            // Preventing array index out of bounds
+            let safeIndex = min(targetIndex, splitNum - 1)
+            
+            // Calculate the cropped image size and update UI
+            let imgSize = UIImage.getOriginalImageSize(named: name, fallback: CGSize(width: 30, height: 30))
+            canvasSize = CGSize(width: imgSize.width / Double(splitNum), height: imgSize.height)
+            uiImage = UIImage.getSplitImageByWidth(from: image, number: splitNum, index: safeIndex) ?? image
+        } else {
+            canvasSize = CGSize(width: 30, height: 30)
+            uiImage = UIImage()
+        }
+    }
 }
 
 // SV 编辑面板
@@ -337,18 +388,37 @@ struct SVEditorSheet: View {
     let node: HMIDeviceNode
     let token: String
     @EnvironmentObject var dataManager: DataManager
-    @State private var svInput: String = "0.00"
+    @State private var svInput: String = "0.0"
     @Environment(\.dismiss) var dismiss
     
     private var targetInfo: DataInfo? {
-        guard let sid = node.svInfoId else { return nil }
-        return dataManager.dataArray.first(where: { $0.id == sid || $0.name == sid })
+        guard let svId = node.svInfoId else { return nil }
+        return getDataInfo(byId: svId)
+    }
+    
+    // Gets dataInfo from dataMagager.
+    private func getDataInfo(byId dataId: String) -> DataInfo? {
+        guard !dataId.isEmpty else { return nil }
+        
+        // "goiot.mfc.1.sv".split() -> "goiot" "mfc.1.sv"
+        let zoneNames = dataId.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+        if zoneNames.count < 2 { return nil }
+        let zone = String(zoneNames[0])
+        let dataID = String(zoneNames[1])
+        // "mfc.1.sv".split() -> "mfc" "1.sv"
+        let groupNames = dataID.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+        if groupNames.count < 2 { return nil }
+        let group = String(groupNames[0])
+        
+        guard let dataIndex = dataManager.dataGroupIndexMap[zone]?[group]?[dataID] else { return nil }
+        if dataIndex >= dataManager.dataArray.count { return nil }
+        return dataManager.dataArray[dataIndex]
     }
     
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("当前设定值 (SV)")) {
+                Section(header: Text("当前设定值 (SV) \(node.measurementUnit)")) {
                     HStack {
                         Text("目标值:")
                         Spacer()
@@ -363,7 +433,7 @@ struct SVEditorSheet: View {
                         .textFieldStyle(.roundedBorder)
                 }
                 Section {
-                    Button("写入 PLC / 应用设定") {
+                    Button("写入设备 / 应用设定") {
                         submitSV()
                     }
                     .buttonStyle(.borderedProminent)
@@ -379,19 +449,77 @@ struct SVEditorSheet: View {
                 }
             }
             .onAppear {
-                if let info = targetInfo {
-                    svInput = String(format: "%.2f", info.fValue)
+                if let dataInfo = targetInfo {
+                    svInput = dataInfoValueToString(from: dataInfo, format: node.textFomat)
                 }
             }
         }
     }
     
+    // Converts dataInfo value to String by the specified format
+    private func dataInfoValueToString(from dataInfo: DataInfo, format fmt: String?) -> String {
+        let strValue: String
+        switch dataInfo.dtype {
+        case .DF:
+            strValue = String(format: fmt ?? "%.2f", dataInfo.fValue * dataInfo.ratio)
+        case .WB, .WUB, .DB, .DUB:
+            if abs(dataInfo.ratio - 1.0) < 1e-6 {
+                strValue = String(format: fmt ?? "%d", dataInfo.intValue)
+            }
+            // Rule: Integer value to float value conversion on some devices (MFC etc.)
+            else {
+                strValue = String(format: fmt ?? "%.2f", Double(dataInfo.intValue) * dataInfo.ratio)
+            }
+        case .BB:
+            strValue = String(format: fmt ?? "%d", dataInfo.byteValue)
+        case .BT:
+            strValue = dataInfo.boolValue ? "1" : "0"
+        default:
+            assert(false, "Match DataType \(dataInfo.dtype) error.")
+            return "0.x"
+        }
+        return strValue
+    }
+    
     private func submitSV() {
-        guard let target = targetInfo else { return }
+        guard let dataInfo = targetInfo else { return }
         Task {
             do {
-                try await dataManager.writeDataItem(target, token: token, writeValue: svInput)
-                print("✅ SV 写入成功: \(target.id) -> \(svInput)")
+                //
+                var parsedValue: String? = nil
+                switch dataInfo.dtype {
+                case .DF:
+                    parsedValue = String((Double(svInput) ?? dataInfo.fValue) / dataInfo.ratio)
+                case .WUB, .WB:
+                    if (abs(dataInfo.ratio - 1.0) < 1e-6) {
+                        parsedValue = String(Int16(svInput).flatMap(Int64.init) ?? dataInfo.intValue)
+                    } else {
+                        let convertValue: Double = (Double(svInput) ?? 0.0) / dataInfo.ratio
+                        parsedValue = String(format: "%.0f", ceil(convertValue))
+                    }
+                case .DUB, .DB:
+                    if (abs(dataInfo.ratio - 1.0) < 1e-6) {
+                        parsedValue = String(Int32(svInput).flatMap(Int64.init) ?? dataInfo.intValue)
+                    }
+                    else {
+                        let convertValue: Double = (Double(svInput) ?? 0.0) / dataInfo.ratio
+                        parsedValue = String(format: "%.0f", ceil(convertValue))
+                    }
+                case .BB:
+                    parsedValue = String(UInt8(svInput).flatMap(UInt8.init) ?? dataInfo.byteValue)
+                case .BT:
+                    parsedValue = String((Int(svInput) ?? 0) > 0 ? 1 : 0)
+                case .STR:
+                    parsedValue = svInput.isEmpty ? dataInfo.strValue : svInput
+                }
+                
+                if let val = parsedValue {
+                    try await dataManager.writeDataItem(dataInfo, token: token, writeValue: val)
+                    print("✅ SV 写入成功: \(dataInfo.id) -> \(svInput)")
+                } else {
+                    // 格式错误时保持编辑状态，方便用户修正
+                    print("格式错误")
+                }
                 dismiss()
             } catch {
                 print("❌ SV 写入失败: \(error)")
@@ -403,21 +531,21 @@ struct SVEditorSheet: View {
 // 预览
 struct HMIControlTabView_Previews: PreviewProvider {
     static let hmiNodesDemo: [HMIDeviceNode] = [
-        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 187), pvInfoId: "goiot.mfc.1.pv", svInfoId: "goiot.mfc.1.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 302, y: 288), pvInfoId: "goiot.mfc.2.pv", svInfoId: "goiot.mfc.2.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 389), pvInfoId: "goiot.mfc.3.pv", svInfoId: "goiot.mfc.3.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 490), pvInfoId: "goiot.mfc.4.pv", svInfoId: "goiot.mfc.4.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 302, y: 591), pvInfoId: "goiot.mfc.5.pv", svInfoId: "goiot.mfc.5.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 232), pvInfoId: "goiot.mfc.6.pv", svInfoId: "goiot.mfc.6.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 812, y: 333), pvInfoId: "goiot.mfc.7.pv", svInfoId: "goiot.mfc.7.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 434), pvInfoId: "goiot.mfc.8.pv", svInfoId: "goiot.mfc.8.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 535), pvInfoId: "goiot.mfc.9.pv", svInfoId: "goiot.mfc.9.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 812, y: 636), pvInfoId: "goiot.mfc.10.pv", svInfoId: "goiot.mfc.10.pv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .SCCM),
-        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "goiot.s7.1.pg_1", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "goiot.s7.1.pg_2", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "goiot.s7.1.pg_3", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "goiot.s7.1.pg_4", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
-        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "goiot.s7.1.pg_5", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .BARA),
+        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 187), pvInfoId: "goiot.mfc.1.pv", svInfoId: "goiot.mfc.1.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 302, y: 288), pvInfoId: "goiot.mfc.2.pv", svInfoId: "goiot.mfc.2.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 389), pvInfoId: "goiot.mfc.3.pv", svInfoId: "goiot.mfc.3.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 490), pvInfoId: "goiot.mfc.4.pv", svInfoId: "goiot.mfc.4.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 302, y: 591), pvInfoId: "goiot.mfc.5.pv", svInfoId: "goiot.mfc.5.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 232), pvInfoId: "goiot.mfc.6.pv", svInfoId: "goiot.mfc.6.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 812, y: 333), pvInfoId: "goiot.mfc.7.pv", svInfoId: "goiot.mfc.7.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 434), pvInfoId: "goiot.mfc.8.pv", svInfoId: "goiot.mfc.8.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 535), pvInfoId: "goiot.mfc.9.pv", svInfoId: "goiot.mfc.9.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 812, y: 636), pvInfoId: "goiot.mfc.10.pv", svInfoId: "goiot.mfc.10.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "goiot.s7.1.pg_1", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "goiot.s7.1.pg_2", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "goiot.s7.1.pg_3", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "goiot.s7.1.pg_4", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "goiot.s7.1.pg_5", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
     ]
     
     static var previews: some View {

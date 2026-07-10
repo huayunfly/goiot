@@ -260,7 +260,6 @@ struct ControlDataInfoCard: View {
         case .STR: parsedValue = draftValue.isEmpty ? dataInfo.strValue : draftValue
         }
         
-        print("SaveValue()")
         if let val = parsedValue {
             await dataManager.writeDataItem(dataInfo, token: userData.token, writeValue: val)
             isEditing = false
