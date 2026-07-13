@@ -12,6 +12,8 @@ struct HMIDeviceNode: Identifiable, Hashable {
     let operationUIType: HMIOperationUIType
     let measurementUnit: HMIMeasurementUnit
     let textFomat: String
+    let highLimit: Double?
+    let lowLimit: Double?
 }
 
 enum HMIIconModule: Hashable {
@@ -27,6 +29,7 @@ enum HMIOperationUIType: Hashable {
 }
 
 enum HMIMeasurementUnit: Hashable {
+    case none
     case L
     case mL
     case barA
@@ -356,8 +359,8 @@ struct HMIDeviceNodeView: View {
             switch node.operationUIType {
             case .text:
                 splitNum = 1
-            case .state(let upperLimit):
-                splitNum = upperLimit + 1
+            case .state(let statusNum):
+                splitNum = statusNum
             case .processValue(let statusNum):
                 splitNum = statusNum
             case .onOff(let statusNum):
@@ -391,9 +394,107 @@ struct SVEditorSheet: View {
     @State private var svInput: String = "0.0"
     @Environment(\.dismiss) var dismiss
     
+    // 临时编辑状态，避免未确认时直接修改绑定值
+    @State private var tempFloat: Double = 0
+    @State private var tempInt: Int = 0
+    @State private var tempBool: Bool = false
+    @State private var errorMessage: String = ""
+    
     private var targetInfo: DataInfo? {
         guard let svId = node.svInfoId else { return nil }
         return getDataInfo(byId: svId)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("当前设定值 (SV) \(String(describing: node.measurementUnit))")) {
+                    HStack {
+                        Text("目标值:")
+                        Spacer()
+                        Text(svInput)
+                            .font(.title2.monospaced())
+                            .foregroundColor(.blue)
+                    }
+                }
+                
+                switch node.operationUIType {
+                case .processValue: onOffEditor
+                case .state: stateEditor
+                case .onOff: onOffEditor
+                case .text: onOffEditor
+                }
+                
+                if !errorMessage.isEmpty {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                }
+
+                Section {
+                    Button("写入设备 / 应用设定") {
+                        if applyChanges() {
+                            submitSV()
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
+                    .disabled(svInput.isEmpty || targetInfo == nil)
+                }
+            }
+            .navigationTitle("\(node.title)")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("返回") { dismiss() }
+                }
+            }
+            .onAppear {
+                if let dataInfo = targetInfo {
+                    svInput = dataInfoValueToString(from: dataInfo, format: node.textFomat)
+                }
+                syncInitialValues()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var processValueEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("下限: \(formatLimit(node.lowLimit))")
+                Spacer()
+                Text("上限: \(formatLimit(node.highLimit))")
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
+            
+            TextField("输入设定值", value: $tempFloat, format: .number)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.decimalPad)
+                .disableAutocorrection(true)
+        }
+    }
+    
+    @ViewBuilder
+    private var stateEditor: some View {
+        Picker("选择状态", selection: $tempInt) {
+            let upperBound = max(0, min(Int.max, Int(node.highLimit ?? 0)))
+            ForEach(0...upperBound, id: \.self) { index in
+                Text("状态 \(index)")
+                    .tag(index)
+            }
+        }
+        .pickerStyle(.menu)
+    }
+    
+    @ViewBuilder
+    private var onOffEditor: some View {
+        Toggle(isOn: $tempBool) {
+            Text("运行状态 (ON / OFF)")
+        }
+        .toggleStyle(CustomOnOffToggleStyle())
     }
     
     // Gets dataInfo from dataMagager.
@@ -415,45 +516,43 @@ struct SVEditorSheet: View {
         return dataManager.dataArray[dataIndex]
     }
     
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("当前设定值 (SV) \(node.measurementUnit)")) {
-                    HStack {
-                        Text("目标值:")
-                        Spacer()
-                        Text(svInput)
-                            .font(.title2.monospaced())
-                            .foregroundColor(.blue)
-                    }
-                }
-                Section {
-                    TextField("输入新设定值", text: $svInput)
-                        .keyboardType(.decimalPad)
-                        .textFieldStyle(.roundedBorder)
-                }
-                Section {
-                    Button("写入设备 / 应用设定") {
-                        submitSV()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .disabled(svInput.isEmpty || targetInfo == nil)
-                }
-            }
-            .navigationTitle("\(node.title)")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("完成") { dismiss() }
-                }
-            }
-            .onAppear {
-                if let dataInfo = targetInfo {
-                    svInput = dataInfoValueToString(from: dataInfo, format: node.textFomat)
-                }
-            }
+    private func syncInitialValues() {
+        tempFloat = Double(svInput) ?? 0.0
+        tempInt = Int(svInput) ?? 0
+        tempBool = Bool(svInput) ?? false
+        errorMessage = ""
+    }
+    
+    private func applyChanges() -> Bool {
+        switch node.operationUIType {
+        case .text:
+            svInput = ""
+        case .state:
+            svInput = String(tempInt)
+        case .processValue:
+            guard validateRange(value: tempFloat) else { return false }
+            svInput = String(tempFloat)
+        case .onOff:
+            svInput = tempBool ? "1" : "0"
         }
+        return true
+    }
+    
+    private func validateRange(value: Double) -> Bool {
+        
+        let low: Double = node.lowLimit ?? -Double.greatestFiniteMagnitude
+        let high = node.highLimit ?? Double.greatestFiniteMagnitude
+        
+        if value < low || value > high {
+            errorMessage = "⚠️ 值超出允许范围：\(low)...\(high)"
+            return false
+        }
+        return true
+    }
+    
+    private func formatLimit(_ limit: Double?) -> String {
+        guard let limit = limit else { return "无限制" }
+        return String(format: "%.2f", limit)
     }
     
     // Converts dataInfo value to String by the specified format
@@ -474,9 +573,8 @@ struct SVEditorSheet: View {
             strValue = String(format: fmt ?? "%d", dataInfo.byteValue)
         case .BT:
             strValue = dataInfo.boolValue ? "1" : "0"
-        default:
-            assert(false, "Match DataType \(dataInfo.dtype) error.")
-            return "0.x"
+        case .STR:
+            strValue = dataInfo.strValue
         }
         return strValue
     }
@@ -528,24 +626,48 @@ struct SVEditorSheet: View {
     }
 }
 
+// MARK: - 自定义 ON/OFF 样式
+extension SVEditorSheet {
+    private struct CustomOnOffToggleStyle: ToggleStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            Button {
+                configuration.isOn.toggle()
+            } label: {
+                HStack {
+                    Text(configuration.isOn ? "ON" : "OFF")
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    Spacer()
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(configuration.isOn ? Color.green : Color.red.opacity(0.7))
+                .cornerRadius(10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
 // 预览
 struct HMIControlTabView_Previews: PreviewProvider {
     static let hmiNodesDemo: [HMIDeviceNode] = [
-        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 187), pvInfoId: "goiot.mfc.1.pv", svInfoId: "goiot.mfc.1.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 302, y: 288), pvInfoId: "goiot.mfc.2.pv", svInfoId: "goiot.mfc.2.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 389), pvInfoId: "goiot.mfc.3.pv", svInfoId: "goiot.mfc.3.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 490), pvInfoId: "goiot.mfc.4.pv", svInfoId: "goiot.mfc.4.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 302, y: 591), pvInfoId: "goiot.mfc.5.pv", svInfoId: "goiot.mfc.5.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 232), pvInfoId: "goiot.mfc.6.pv", svInfoId: "goiot.mfc.6.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 812, y: 333), pvInfoId: "goiot.mfc.7.pv", svInfoId: "goiot.mfc.7.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 434), pvInfoId: "goiot.mfc.8.pv", svInfoId: "goiot.mfc.8.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 535), pvInfoId: "goiot.mfc.9.pv", svInfoId: "goiot.mfc.9.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 812, y: 636), pvInfoId: "goiot.mfc.10.pv", svInfoId: "goiot.mfc.10.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "goiot.s7.1.pg_1", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "goiot.s7.1.pg_2", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "goiot.s7.1.pg_3", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "goiot.s7.1.pg_4", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
-        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "goiot.s7.1.pg_5", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f"),
+        HMIDeviceNode(id: UUID(), name: "FICA1111", title: "固定床H2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 187), pvInfoId: "goiot.mfc.1.pv", svInfoId: "goiot.mfc.1.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1121", title: "固定床CO质量流量控制器", canvasPosition: CGPoint(x: 302, y: 288), pvInfoId: "goiot.mfc.2.pv", svInfoId: "goiot.mfc.2.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1131", title: "固定床N2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 389), pvInfoId: "goiot.mfc.3.pv", svInfoId: "goiot.mfc.3.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1141", title: "固定床CO2质量流量控制器", canvasPosition: CGPoint(x: 302, y: 490), pvInfoId: "goiot.mfc.4.pv", svInfoId: "goiot.mfc.4.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1151", title: "固定床C2H4质量流量控制器", canvasPosition: CGPoint(x: 302, y: 591), pvInfoId: "goiot.mfc.5.pv", svInfoId: "goiot.mfc.5.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1511", title: "釜H2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 232), pvInfoId: "goiot.mfc.6.pv", svInfoId: "goiot.mfc.6.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1521", title: "釜CO质量流量控制器", canvasPosition: CGPoint(x: 812, y: 333), pvInfoId: "goiot.mfc.7.pv", svInfoId: "goiot.mfc.7.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1531", title: "釜N2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 434), pvInfoId: "goiot.mfc.8.pv", svInfoId: "goiot.mfc.8.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1541", title: "釜CO2质量流量控制器", canvasPosition: CGPoint(x: 812, y: 535), pvInfoId: "goiot.mfc.9.pv", svInfoId: "goiot.mfc.9.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "FICA1551", title: "釜C2H4质量流量控制器", canvasPosition: CGPoint(x: 812, y: 636), pvInfoId: "goiot.mfc.10.pv", svInfoId: "goiot.mfc.10.sv", iconType: .image("mfc"), operationUIType: .processValue(2), measurementUnit: .sccm, textFomat: "%0.1f", highLimit: 200, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "PIA1111", title: "H2气源压力", canvasPosition: CGPoint(x: 161, y: 184), pvInfoId: "goiot.s7.1.pg_1", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f", highLimit: 100, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "PIA1121", title: "CO气源压力", canvasPosition: CGPoint(x: 161, y: 285), pvInfoId: "goiot.s7.1.pg_2", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f", highLimit: 100, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "PIA1131", title: "N2气源压力", canvasPosition: CGPoint(x: 161, y: 386), pvInfoId: "goiot.s7.1.pg_3", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f", highLimit: 100, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "PIA1141", title: "CO2气源压力", canvasPosition: CGPoint(x: 161, y: 487), pvInfoId: "goiot.s7.1.pg_4", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f", highLimit: 100, lowLimit: 0),
+        HMIDeviceNode(id: UUID(), name: "PIA1151", title: "C2H4气源压力", canvasPosition: CGPoint(x: 161, y: 588), pvInfoId: "goiot.s7.1.pg_5", svInfoId: nil, iconType: .image("pressure_measure"), operationUIType: .processValue(2), measurementUnit: .barA, textFomat: "%0.1f", highLimit: 100, lowLimit: 0),
     ]
     
     static var previews: some View {
