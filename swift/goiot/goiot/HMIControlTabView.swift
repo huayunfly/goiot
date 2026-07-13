@@ -419,7 +419,7 @@ struct SVEditorSheet: View {
                 }
                 
                 switch node.operationUIType {
-                case .processValue: onOffEditor
+                case .processValue: processValueEditor
                 case .state: stateEditor
                 case .onOff: onOffEditor
                 case .text: onOffEditor
@@ -630,22 +630,26 @@ struct SVEditorSheet: View {
 extension SVEditorSheet {
     private struct CustomOnOffToggleStyle: ToggleStyle {
         func makeBody(configuration: Configuration) -> some View {
-            Button {
-                configuration.isOn.toggle()
-            } label: {
-                HStack {
-                    Text(configuration.isOn ? "ON" : "OFF")
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    Spacer()
+            HStack {
+                Text("开/关")
+                Spacer()
+                Button {
+                    configuration.isOn.toggle()
+                } label: {
+                    HStack {
+                        Text(configuration.isOn ? "ON" : "OFF")
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(configuration.isOn ? Color.green : Color.red.opacity(0.7))
+                    .cornerRadius(10)
+                    .contentShape(Rectangle())
                 }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(configuration.isOn ? Color.green : Color.red.opacity(0.7))
-                .cornerRadius(10)
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
     }
 }
