@@ -39,7 +39,7 @@ struct MonitorTabView: View {
                     
                     Button {
                         isRefreshing = true
-                        dataManager.StartRefreshData(token: userData.token, withZoneGroups: [], withTimeInterval: 5)
+                        dataManager.StartRefreshData(token: userData.token, withGroupSubGroup: [], withTimeInterval: 5)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             isRefreshing = false
                         }
@@ -71,7 +71,7 @@ struct MonitorTabView: View {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
                         isRefreshing = true
-                        dataManager.StartRefreshData(token: userData.token, withZoneGroups:  [], withTimeInterval: 5)
+                        dataManager.StartRefreshData(token: userData.token, withGroupSubGroup: [], withTimeInterval: 5)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             isRefreshing = false
                         }

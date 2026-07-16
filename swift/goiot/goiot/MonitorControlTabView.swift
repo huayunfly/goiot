@@ -95,7 +95,7 @@ struct MonitorControlTabView: View {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
                         isRefreshing = true
-                        dataManager.StartRefreshData(token: userData.token, withZoneGroups: monitorSections.compactMap {section in section.id}, withTimeInterval: 5)
+                        dataManager.StartRefreshData(token: userData.token, withGroupSubGroup: monitorSections.compactMap {section in section.id}, withTimeInterval: 5)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             isRefreshing = false
                         }

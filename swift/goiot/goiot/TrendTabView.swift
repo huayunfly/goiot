@@ -8,16 +8,27 @@
 import SwiftUI
 
 struct TrendTabView: View {
-    
-    @EnvironmentObject var userData: UserData
+    @EnvironmentObject var dataManager: DataManager
     
     var body: some View {
-        Text("Second Content View \(userData.token)")
+        NavigationStack {
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    Text("历史趋势面板")
+                        .font(.headline)
+                        .padding(.top, 8)
+                    HistoricalChartView()
+                        .padding(.horizontal)
+                }
+                .padding(.bottom)
+            }
+            .navigationTitle("历史曲线")
+        }
     }
 }
 
 struct TrendTabView_Previews: PreviewProvider {
     static var previews: some View {
-        TrendTabView().environmentObject(UserData())
+        TrendTabView().environmentObject(DataManager())
     }
 }
