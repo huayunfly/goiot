@@ -46,19 +46,21 @@ struct HistoricalChartView: View {
     var body: some View {
         VStack {
             VStack {
-//                Picker("选择数据", selection: $selectedMetric) {
-//                    ForEach(metrics.keys, id: \.self) { key in
-//                        Text(metrics[key] ?? key).tag(key)
-//                    }
-//                }
-//                .pickerStyle(.segmented)
-                
                 List(lineDefs) { line in
                     HStack {
                         Image(systemName: "item.imageName")
                         Text(line.name)
                     }
                 }
+                
+                Button(action: {
+                    Task {
+                        await reloadHistory()
+                    }
+                }) {
+                    Text("Tap me!")
+                }
+                
                 Spacer()
                 
                 // ✅ 核心：必须指定明确高度，否则 Chart 会坍塌为 0
@@ -70,53 +72,6 @@ struct HistoricalChartView: View {
             .background(Color.gray.opacity(0.05))
             .cornerRadius(12)
             .padding(.horizontal)
-            
-            // 2. 绘图区域
-//            ScrollView(.horizontal, showsIndicators: false) {
-//                Chart(historyData) { data in
-//                    // 面积图底色 (渐变)
-//                    AreaMark(
-//                        x: .value("", data.timestamp),
-//                        y: .value("", data.value)
-//                    )
-//                    .foregroundStyle(
-//                        .linearGradient(
-//                            colors: [.blue.opacity(0.3), .blue.opacity(0.05)],
-//                            startPoint: .bottom,
-//                            endPoint: .top
-//                        )
-//                    )
-//                    
-//                    // 曲线主体
-//                    LineMark(
-//                        x: .value("", data.timestamp),
-//                        y: .value("", data.value)
-//                    )
-//                    .foregroundStyle(.blue)
-//                    .interpolationMethod(.catmullRom) // 平滑曲线
-//                    
-//                    // 数据点 (可选，数据量大时建议隐藏)
-//                    PointMark(
-//                        x: .value("", data.timestamp),
-//                        y: .value("", data.value)
-//                    )
-//                    .foregroundStyle(.blue)
-//                    .symbolSize(10)
-//                }
-//                .chartOverlay { proxy in
-//                    // 添加交互：点击图表
-//                    GeometryReader { geo in
-//                        Rectangle().fill(.clear).contentShape(Rectangle())
-//                            .gesture(
-//                                DragGesture(minimumDistance: 0)
-//                                    .onChanged { value in
-//                                    // 这里可以添加十字光标逻辑
-//                                    }
-//                            )
-//                    }
-//                }
-//                .padding()
-//            }
         }
         .task {
             // 视图出现时加载数据

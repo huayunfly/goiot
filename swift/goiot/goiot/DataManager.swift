@@ -1,5 +1,8 @@
 import Foundation
 import CoreData
+import os.log
+
+private let dataManagerLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.goiot", category: "DataManager")
 
 class DataManager: ObservableObject {
     var dataGroupIndexMap: [String: [String: [String: Int]]] = [:]
@@ -33,44 +36,47 @@ class DataManager: ObservableObject {
         if dataArray.count > 10 { dataArray.removeFirst() } // 假设仅保留最近10条用于实时显示
         
         // 2. 保存到 Core Data
-        //saveToHistory
+        saveToHistory(dataValue: [(dataId: "mfc.1.pv", value: 9)], group: "goiot")
         
         // 3. 检查并删除过期数据
         purgeOldData(hours: storageWindowHours)
     }
     
-    /// MARK: - 存储逻辑
+    // MARK: - 存储逻辑
     private func saveToHistory(dataValue: [(dataId: String, value: Double)] , group: String) {
-        let context = persistenceController.container.newBackgroundContext()
+        let backgroundContext = persistenceController.container.newBackgroundContext()
         
-        context.perform {
-            for (dataId, value) in dataValue {
-                self.createRecord(context: context, id: dataId, group: group, value: value)
-                print("Save ok")
-            }
-            do {
-                try context.save()
-            } catch {
-                print("Save error: \(error)")
-            }
+        for (dataId, value) in dataValue {
+            let record = DataRecord(context: backgroundContext)
+            record.id = dataId
+            record.group = group
+            record.value = value
+            record.timestamp = Date()
+            print("Save ok")
+        }
+        do {
+            try backgroundContext.save()
+        } catch {
+            print("Save error: \(error)")
         }
     }
     
-    /// MARK: - 数据清理 (滑动窗口逻辑)
+    // MARK: - 数据清理 (滑动窗口逻辑)
     func purgeOldData(hours: Int) {
-        let context = persistenceController.container.newBackgroundContext()
+        let backgroundContext = persistenceController.container.newBackgroundContext()
         let cutoffDate = Date().addingTimeInterval(-Double(hours * 3600))
         
-        let fetchRequest: NSFetchRequest<DataRecordEntity> = DataRecordEntity.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "timestamp < %@", cutoffDate as CVarArg)
-        
-        context.perform {
+        backgroundContext.perform {
             do {
-                let oldData = try context.fetch(fetchRequest)
+                let fetchRequest: NSFetchRequest<DataRecord> = DataRecord.fetchRequest()
+                fetchRequest.entity = DataRecord.entity()
+                fetchRequest.predicate = NSPredicate(format: "timestamp < %@", cutoffDate as CVarArg)
+                
+                let oldData = try backgroundContext.fetch(fetchRequest)
                 for record in oldData {
-                    context.delete(record)
+                    backgroundContext.delete(record)
                 }
-                try context.save()
+                try backgroundContext.save()
             } catch {
                 print("Purge error: \(error)")
             }
@@ -79,8 +85,8 @@ class DataManager: ObservableObject {
     
     /// 创建单条记录
     private func createRecord(context: NSManagedObjectContext, id: String, group: String, value: Double) {
-        //let record = DataRecordEntity(id: id, group: group, val: value, date: Date())
-        let record = DataRecordEntity()
+        //let record = DataRecord(id: id, group: group, val: value, date: Date())
+        let record = DataRecord()
         record.id = id
         record.group = group
         record.value = value
@@ -91,22 +97,21 @@ class DataManager: ObservableObject {
     // MARK: - 提供给视图层读取数据的方法
     // Gets the history data with the given time range ( past 3 hours etc. )
     func fetchHistoryFor(key: String, group: String, lastHours: Int = 3) async -> [(timestamp: Date, value: Double)] {
-        let context = persistenceController.container.newBackgroundContext()
-        
+        let backgroundContext: NSManagedObjectContext = persistenceController.container.newBackgroundContext()
         let cutoffDate = Date().addingTimeInterval(-Double(lastHours * 3600))
         
-        let fetchRequest: NSFetchRequest<DataRecordEntity> = DataRecordEntity.fetchRequest()
-        
-        fetchRequest.predicate = NSPredicate(format: "id == %@ AND group == %@ AND timestamp >= %@", key, group, cutoffDate as CVarArg)
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-        
-        return await context.perform {
-            do {
-                let records = try fetchRequest.execute()
-                return records.map { (timestamp: $0.timestamp ?? cutoffDate, value: $0.value) }
-            } catch {
-                return []
-            }
+        do {
+            let fetchRequest: NSFetchRequest<DataRecord> = DataRecord.fetchRequest()
+            fetchRequest.entity = DataRecord.entity()
+            fetchRequest.predicate = NSPredicate(format: "id == %@ AND group == %@ AND timestamp >= %@", key, group, cutoffDate as CVarArg)
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+            
+            let records = try backgroundContext.fetch(fetchRequest)
+            dataManagerLogger.debug("✅ fetched \(records.count) records")
+            return records.map { (timestamp: $0.timestamp ?? cutoffDate, value: $0.value) }
+        } catch {
+            dataManagerLogger.error("❌ Core Data fetch failed: \(error.localizedDescription)")
+            return []
         }
     }
     
@@ -347,6 +352,11 @@ class DataManager: ObservableObject {
             guard let valueList = resultData.table["value"] else { return }
             guard let resultList = resultData.table["result"] else { return }
             guard let timeList = resultData.table["time"] else { return }
+            
+            // Debug info
+            if idList.count == 0 {
+                print("GetData is empty. group: \(components),  startTime: \(startTime), endTime: \(endTime), dataIDList: \(dataIDList)")
+            }
             
             let counts = [idList.count, valueList.count, resultList.count, timeList.count]
             if (counts.min() != counts.max()) {

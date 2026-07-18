@@ -12,7 +12,7 @@
 		6C5F5E532FF7841A00553055 /* HMICompoundTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5F5E522FF7841A00553055 /* HMICompoundTabView.swift */; };
 		6C9625B62F3471F2001DA52C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9625B52F3471E8001DA52C /* LoginView.swift */; };
 		6C9D664F2FDACDD100732DC6 /* MonitorControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9D664E2FDACDD100732DC6 /* MonitorControlTabView.swift */; };
-		6CA117452F5FC3E3006F3C8E /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6CA117432F5FC3E3006F3C8E /* DataModel.xcdatamodeld */; };
+		6CA117452F5FC3E3006F3C8E /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6CA117432F5FC3E3006F3C8E /* CoreData.xcdatamodeld */; };
 		6CB30BB92FF4DF7800E4074C /* HMIControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB30BB82FF4DF7800E4074C /* HMIControlTabView.swift */; };
 		6CB4073C2A8469580093AEF7 /* goiotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4073B2A8469580093AEF7 /* goiotApp.swift */; };
 		6CB4073E2A8469580093AEF7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB4073D2A8469580093AEF7 /* ContentView.swift */; };
@@ -55,7 +55,7 @@
 		6C5F5E522FF7841A00553055 /* HMICompoundTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HMICompoundTabView.swift; sourceTree = "<group>"; };
 		6C9625B52F3471E8001DA52C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		6C9D664E2FDACDD100732DC6 /* MonitorControlTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorControlTabView.swift; sourceTree = "<group>"; };
-		6CA117442F5FC3E3006F3C8E /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		6CA117442F5FC3E3006F3C8E /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
 		6CB30BB82FF4DF7800E4074C /* HMIControlTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HMIControlTabView.swift; sourceTree = "<group>"; };
 		6CB407382A8469580093AEF7 /* goiot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = goiot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB4073B2A8469580093AEF7 /* goiotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = goiotApp.swift; sourceTree = "<group>"; };
@@ -139,7 +139,7 @@
 				6CFAACE62A9435E70052ED7A /* ApiHelper.swift */,
 				6CFAACE82A945EFB0052ED7A /* WebServiceCaller.swift */,
 				6C4C25872A9C96EA0085F967 /* UserData.swift */,
-				6CA117432F5FC3E3006F3C8E /* DataModel.xcdatamodeld */,
+				6CA117432F5FC3E3006F3C8E /* CoreData.xcdatamodeld */,
 				6C9D664E2FDACDD100732DC6 /* MonitorControlTabView.swift */,
 				6C478A9A2FE2B17400486B71 /* AppIcons.swift */,
 				6CB30BB82FF4DF7800E4074C /* HMIControlTabView.swift */,
@@ -308,7 +308,7 @@
 			files = (
 				6CFAACE72A9435E70052ED7A /* ApiHelper.swift in Sources */,
 				6C9D664F2FDACDD100732DC6 /* MonitorControlTabView.swift in Sources */,
-				6CA117452F5FC3E3006F3C8E /* DataModel.xcdatamodeld in Sources */,
+				6CA117452F5FC3E3006F3C8E /* CoreData.xcdatamodeld in Sources */,
 				6CE8A9A430086CA300BA6A2D /* Persistence.swift in Sources */,
 				6CE6B7A6300712D9009E2D72 /* HistoricalChartView.swift in Sources */,
 				6CFAACE92A945EFB0052ED7A /* WebServiceCaller.swift in Sources */,
@@ -645,13 +645,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		6CA117432F5FC3E3006F3C8E /* DataModel.xcdatamodeld */ = {
+		6CA117432F5FC3E3006F3C8E /* CoreData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				6CA117442F5FC3E3006F3C8E /* DataModel.xcdatamodel */,
+				6CA117442F5FC3E3006F3C8E /* CoreData.xcdatamodel */,
 			);
-			currentVersion = 6CA117442F5FC3E3006F3C8E /* DataModel.xcdatamodel */;
-			path = DataModel.xcdatamodeld;
+			currentVersion = 6CA117442F5FC3E3006F3C8E /* CoreData.xcdatamodel */;
+			path = CoreData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
