@@ -52,12 +52,11 @@ class DataManager: ObservableObject {
             record.group = group
             record.value = value
             record.timestamp = Date()
-            print("Save ok")
         }
         do {
             try backgroundContext.save()
         } catch {
-            print("Save error: \(error)")
+            dataManagerLogger.error("❌Save error: \(error)")
         }
     }
     
@@ -83,38 +82,46 @@ class DataManager: ObservableObject {
         }
     }
     
-    /// 创建单条记录
-    private func createRecord(context: NSManagedObjectContext, id: String, group: String, value: Double) {
-        //let record = DataRecord(id: id, group: group, val: value, date: Date())
-        let record = DataRecord()
-        record.id = id
-        record.group = group
-        record.value = value
-        record.timestamp = Date()
-        context.insert(record)
-    }
-    
     // MARK: - 提供给视图层读取数据的方法
     // Gets the history data with the given time range ( past 3 hours etc. )
     func fetchHistoryFor(key: String, group: String, lastHours: Int = 3) async -> [(timestamp: Date, value: Double)] {
         let backgroundContext: NSManagedObjectContext = persistenceController.container.newBackgroundContext()
         let cutoffDate = Date().addingTimeInterval(-Double(lastHours * 3600))
+        var resultData: [(timestamp: Date, value: Double)] = []
         
-        do {
+        await backgroundContext.perform {
             let fetchRequest: NSFetchRequest<DataRecord> = DataRecord.fetchRequest()
-            fetchRequest.entity = DataRecord.entity()
             fetchRequest.predicate = NSPredicate(format: "id == %@ AND group == %@ AND timestamp >= %@", key, group, cutoffDate as CVarArg)
             fetchRequest.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
             
-            let records = try backgroundContext.fetch(fetchRequest)
-            dataManagerLogger.debug("✅ fetched \(records.count) records")
-            return records.map { (timestamp: $0.timestamp ?? cutoffDate, value: $0.value) }
-        } catch {
-            dataManagerLogger.error("❌ Core Data fetch failed: \(error.localizedDescription)")
-            return []
+            do {
+                let records = try fetchRequest.execute()
+                resultData = records.map { (timestamp: $0.timestamp ?? cutoffDate, value: $0.value) }
+                dataManagerLogger.debug("✅ fetched \(resultData.count) records")
+            } catch {
+                dataManagerLogger.error("❌ Core Data fetch failed: \(error.localizedDescription)")
+            }
         }
+        return resultData
+        
+        
+        //        do {
+        //            let resultData = try await backgroundContext.perform { () throws -> [(timestamp: Date, value: Double)] in
+        //                let fetchRequest: NSFetchRequest<DataRecord> = DataRecord.fetchRequest()
+        //                fetchRequest.predicate = NSPredicate(format: "id == %@ AND group == %@ AND timestamp >= %@", key, group, cutoffDate as CVarArg)
+        //                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+        //
+        //                let records = try fetchRequest.execute()
+        //                return records.map { (timestamp: $0.timestamp ?? cutoffDate, value: $0.value) }
+        //            }
+        //            dataManagerLogger.debug("✅ fetched \(resultData.count) records")
+        //            return resultData
+        //        } catch {
+        //            dataManagerLogger.error("❌ Core Data fetch failed: \(error.localizedDescription)")
+        //            return []
+        //        }
     }
-    
+
     // Loads JSON file
     func loadJSONConfig(fromFile named: String) async
     {
@@ -352,11 +359,6 @@ class DataManager: ObservableObject {
             guard let valueList = resultData.table["value"] else { return }
             guard let resultList = resultData.table["result"] else { return }
             guard let timeList = resultData.table["time"] else { return }
-            
-            // Debug info
-            if idList.count == 0 {
-                print("GetData is empty. group: \(components),  startTime: \(startTime), endTime: \(endTime), dataIDList: \(dataIDList)")
-            }
             
             let counts = [idList.count, valueList.count, resultList.count, timeList.count]
             if (counts.min() != counts.max()) {

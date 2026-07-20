@@ -6,13 +6,16 @@
 //
 
 import CoreData
+import os.log
+
+private let persistenceLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.goiot", category: "Persistence")
 
 struct PersistenceController {
     static let shared = PersistenceController()
     let container: NSPersistentContainer
     
     init() {
-        container = NSPersistentContainer(name: "DataRecord")
+        container = NSPersistentContainer(name: "CoreData")
         
         // 使用内存存储开发更快，部署时改为文件存储
         // container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("history.sqlite")
@@ -20,7 +23,7 @@ struct PersistenceController {
         
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
-                fatalError("Container load failed: \(error)")
+                persistenceLogger.error("❌ Persistence container load failed: \(error)")
             }
         }
     }

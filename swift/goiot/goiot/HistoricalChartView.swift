@@ -23,10 +23,10 @@ struct HistoricalChartView: View {
     // 可选的下拉列表选项，对应 DataRecord 中的 keyName
     let metrics = ["temperature": "温度 (Temperature)", "humidity": "湿度 (Humidity)"]
     
-    @State private var lineDefs: [HistoryLineDef] = [HistoryLineDef(dataId: "plc.1.temp1_pv", group: "goiot", name: "TC2102", displayName: "固定床预热"),
-                                      HistoryLineDef(dataId: "plc.1.temp2_pv", group: "goiot", name: "TC2103",  displayName: "固定床上热"),
-                                      HistoryLineDef(dataId: "plc.1.temp3_pv", group: "goiot", name: "TC2104",  displayName: "固定床中热"),
-                                      HistoryLineDef(dataId: "plc.1.temp4_pv", group: "goiot", name: "TC2105",  displayName: "固定床下热"),
+    @State private var lineDefs: [HistoryLineDef] = [HistoryLineDef(dataId: "s7.1.temp1_pv", group: "goiot", name: "TC2102", displayName: "固定床预热"),
+                                      HistoryLineDef(dataId: "s7.1.temp2_pv", group: "goiot", name: "TC2103",  displayName: "固定床上热"),
+                                      HistoryLineDef(dataId: "s7.1.temp3_pv", group: "goiot", name: "TC2104",  displayName: "固定床中热"),
+                                      HistoryLineDef(dataId: "s7.1.temp4_pv", group: "goiot", name: "TC2105",  displayName: "固定床下热"),
     ]
     
     // ✅ 抽离 Chart 容器，方便后续扩展滚动/缩放手势

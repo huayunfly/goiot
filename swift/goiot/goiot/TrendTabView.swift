@@ -20,7 +20,8 @@ struct TrendTabView: View {
                     HistoricalChartView()
                         .padding(.horizontal)
                 }
-                .padding(.bottom)
+                .padding(.horizontal)
+                .padding(.bottom, 30)
             }
             .navigationTitle("历史曲线")
         }
