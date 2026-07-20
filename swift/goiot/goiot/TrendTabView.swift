@@ -14,16 +14,14 @@ struct TrendTabView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    Text("历史趋势面板")
+                    Text("趋势面板")
                         .font(.headline)
                         .padding(.top, 8)
-                    HistoricalChartView()
-                        .padding(.horizontal)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             }
-            .navigationTitle("历史曲线")
+            .navigationTitle("趋势")
         }
     }
 }

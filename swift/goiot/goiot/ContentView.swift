@@ -50,6 +50,11 @@ struct MyTabView: View {
                     Text("图形控制")
                 }
                 .tag(3)
+            HistoricalChartView()
+                .tabItem{
+                    Image(systemName: "chart.xyaxis.line")
+                    Text("历史曲线")
+            }
             SettingTabView()
                 .tabItem {
                     AppIcon.settings.tabIconStyle()
