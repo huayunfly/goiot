@@ -60,7 +60,7 @@ struct TrendTabView: View {
                     Spacer()
                     HStack(spacing: 12) {
                         Label("最近刷新", systemImage: "clock.badge.dot")
-                        Text(lastRefresh, format: .dateTime.hour())
+                        Text(lastRefresh, format: Date.FormatStyle(date: .omitted, time: .standard))
                             .monospacedDigit()
                     }
                     .font(.caption)

@@ -44,7 +44,6 @@ class DataManager: ObservableObject {
         // Appends a demo group
         DemoDataInfoGroup()
         
-        // If loading and parsing the JSON file is computationally heavy or involves blocking disk I/O, you should keep that work on a background thread and only hop back to the main thread when you are ready to update the @Published property.
         Task {
             await loadJSONConfig(fromFile: "drivers")
         }
@@ -114,6 +113,7 @@ class DataManager: ObservableObject {
     }
 
     // Loads JSON file
+    // If loading and parsing the JSON file is computationally heavy or involves blocking disk I/O, you should keep that work on a background thread and only hop back to the main thread when you are ready to update the @Published property.
     func loadJSONConfig(fromFile named: String) async
     {
         // 1. Performs heavy work (File I/O, JSON parsing) on the background thread.
@@ -127,7 +127,11 @@ class DataManager: ObservableObject {
         }
         
         // 2. Hop back to the Main Actor to safely publish the update
+        // [weak self] makes self an optional (DataManager?) inside the closure. Swift requires you to safely unwrap it before accessing members like dataArray.
         await MainActor.run { [weak self] in
+            // [weak self] prevents retain cycles, but forces self to be optional inside the trailing closure.
+            guard let self else { return } // Safely unwrap `self`
+            
             var newDataGroupIndex: [String: [String: Int]] = [:]
             var startIndex = dataArray.count
             
@@ -263,8 +267,8 @@ class DataManager: ObservableObject {
                 }
                 newDataGroupIndex[driverID] = driverGroupIndex
             }
-            self?.dataGroupIndexMap[groupName] = newDataGroupIndex
-        } // MainActor.run
+            dataGroupIndexMap[groupName] = newDataGroupIndex
+        } // End of MainActor.run
     }
     
     // Starts a timer to refresh data with 5 seconds interval.
