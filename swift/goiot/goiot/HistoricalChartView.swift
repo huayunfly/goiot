@@ -253,8 +253,8 @@ private struct ChartContainer: View {
             Chart(data) { point in
                 // Draws mark point to further differentiate the data categories.
                 AreaMark(
-                    x: .value("", point.timestamp),
-                    y: .value("", point.value)
+                    x: .value("时间", point.timestamp),
+                    y: .value("数值", point.value)
                 )
                 .foregroundStyle(
                     .linearGradient(
@@ -270,8 +270,8 @@ private struct ChartContainer: View {
                 
                 // Draws line by filtering data into multiple graph lines.
                 LineMark(
-                    x: .value("", point.timestamp),
-                    y: .value("", point.value)
+                    x: .value("时间", point.timestamp),
+                    y: .value("数值", point.value)
                 )
                 .foregroundStyle(by: .value("Series", point.seriesId))
                 .interpolationMethod(.catmullRom)
@@ -280,8 +280,8 @@ private struct ChartContainer: View {
                 // 智能显示数据点（数据量适中时开启）
                 if data.count < 150 {
                     PointMark(
-                        x: .value("", point.timestamp),
-                        y: .value("", point.value)
+                        x: .value("时间", point.timestamp),
+                        y: .value("数值", point.value)
                     )
                     .foregroundStyle(by: .value("Series", point.seriesId))
                     .symbol(by: .value("Series", point.seriesId))
@@ -297,8 +297,7 @@ private struct ChartContainer: View {
                 AxisMarks { value in
                     AxisValueLabel(format: Decimal.FormatStyle.number.precision(.fractionLength(1)))
                     // Background grid line
-                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color.gray.opacity(0.3))
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5)).foregroundStyle(Color.gray.opacity(0.3))
                 }
             }
         }

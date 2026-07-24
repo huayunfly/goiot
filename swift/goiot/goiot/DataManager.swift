@@ -4,13 +4,33 @@ import os.log
 
 private let dataManagerLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.goiot", category: "DataManager")
 
+
+// Runtime data for the trend displaying etc.
+struct RealTimeDataPoint: Identifiable, Comparable {
+    var id = UUID()
+    var timestamp: Date
+    var value: Double
+    var dataId: String
+    var group: String
+    
+    static func < (lhs: RealTimeDataPoint, rhs: RealTimeDataPoint) -> Bool { lhs.timestamp < rhs.timestamp }
+}
+
 class DataManager: ObservableObject {
+    // Core: DataInfo structure
     var dataGroupIndexMap: [String: [String: [String: Int]]] = [:]
     @Published var dataArray: [DataInfo] = []
     
+    // Timer for pulling data for the webservice
     private var timer: Timer?
+    
+    // Data persistence controller
     let persistenceController = PersistenceController.shared
     
+    // Realtime data store with max upper storage limit.
+    private let realtimeDataStoreLock = NSLock()
+    private var realtimeDataStore: [String: [RealTimeDataPoint]] = initRealTimeGroupData  // Combined query key: groupName.dataID
+    private let realtimeMaxPoints = 1440 // 2小时 * 12点/小时 (5秒/点)
     
     // 设置历史存储窗口（单位：小时），默认 3 小时
     var storageWindowHours: Int = 3 {
@@ -24,22 +44,10 @@ class DataManager: ObservableObject {
         // Appends a demo group
         DemoDataInfoGroup()
         
+        // If loading and parsing the JSON file is computationally heavy or involves blocking disk I/O, you should keep that work on a background thread and only hop back to the main thread when you are ready to update the @Published property.
         Task {
             await loadJSONConfig(fromFile: "drivers")
         }
-    }
-    
-    /// MARK: - 模拟接收数据并存储 (调用此函数更新你的业务)
-    func handleDataUpdate(_ newInfo: DataInfo) {
-        // 1. 更新内存中的实时数据 (原有逻辑)
-        dataArray.append(newInfo)
-        if dataArray.count > 10 { dataArray.removeFirst() } // 假设仅保留最近10条用于实时显示
-        
-        // 2. 保存到 Core Data
-        saveToHistory(dataValue: [(dataId: "mfc.1.pv", value: 9)], group: "goiot")
-        
-        // 3. 检查并删除过期数据
-        purgeOldData(hours: storageWindowHours)
     }
     
     // MARK: - 存储逻辑
@@ -103,28 +111,12 @@ class DataManager: ObservableObject {
             }
         }
         return resultData
-        
-        
-        //        do {
-        //            let resultData = try await backgroundContext.perform { () throws -> [(timestamp: Date, value: Double)] in
-        //                let fetchRequest: NSFetchRequest<DataRecord> = DataRecord.fetchRequest()
-        //                fetchRequest.predicate = NSPredicate(format: "id == %@ AND group == %@ AND timestamp >= %@", key, group, cutoffDate as CVarArg)
-        //                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-        //
-        //                let records = try fetchRequest.execute()
-        //                return records.map { (timestamp: $0.timestamp ?? cutoffDate, value: $0.value) }
-        //            }
-        //            dataManagerLogger.debug("✅ fetched \(resultData.count) records")
-        //            return resultData
-        //        } catch {
-        //            dataManagerLogger.error("❌ Core Data fetch failed: \(error.localizedDescription)")
-        //            return []
-        //        }
     }
 
     // Loads JSON file
     func loadJSONConfig(fromFile named: String) async
     {
+        // 1. Performs heavy work (File I/O, JSON parsing) on the background thread.
         guard let config: DriverConfig = await JSONLoader.shared.loadData(fromFile: named) else {
             return
         }
@@ -134,142 +126,145 @@ class DataManager: ObservableObject {
             return
         }
         
-        var newDataGroupIndex: [String: [String: Int]] = [:]
-        var startIndex = dataArray.count
-        
-        for driver in config.drivers {
-            let driverID = driver.id
-            var driverGroupIndex: [String: Int] = [:]
-            for node in driver.nodes {
-                for dataItem in node.data {
-                    guard dataItem.register.count > 5 && !dataItem.id.isEmpty else {
-                        continue
-                    }
-                    let dataID = [driver.id, node.address, dataItem.id].joined(separator: ".")
-                    let dataRatio = dataItem.ratio ?? 1.0
-                    
-                    // Parse data type
-                    let readWriteType: DataReadWriteType
-                    var start = dataItem.register.startIndex
-                    var end = dataItem.register.index(start, offsetBy: 2)
-                    var str = dataItem.register[start..<end]
-                    
-                    if str.contains("R") && str.contains("W") {
-                        readWriteType = DataReadWriteType.readWrite
-                        start = dataItem.register.index(start, offsetBy: 2)
-                    }
-                    else if str.contains("R") {
-                        readWriteType = DataReadWriteType.readOnly
-                        start = dataItem.register.index(start, offsetBy: 1)
-                    }
-                    else if str.contains("W") {
-                        readWriteType = DataReadWriteType.writeOnly
-                        start = dataItem.register.index(start, offsetBy: 1)
-                    }
-                    else {
-                        continue
-                    }
-                    
-                    end = dataItem.register.index(start, offsetBy: 1)
-                    str = dataItem.register[start..<end]
-                    guard let intZone = Int32(str) else {
-                        continue
-                    }
-                    let dataZone: DataZone
-                    switch (intZone) {
-                    case 0:
-                        dataZone = .OUTPUT_RELAY
-                    case 1:
-                        dataZone = .INPUT_RELAY
-                    case 3:
-                        dataZone = .INPUT_REGISTER
-                    case 4:
-                        dataZone = .OUTPUT_REGISTER
-                    case 5:
-                        dataZone = .PLC_DB
-                    case 6:
-                        dataZone = .DB
-                    default:
-                        assert(false, "Parse DataZone \(intZone) error.")
-                        continue
-                    }
-                    
-                    var dataType: DataType
-                    if dataZone == .INPUT_REGISTER || dataZone == .OUTPUT_REGISTER ||
-                        dataZone == .INPUT_REGISTER || dataZone == .OUTPUT_REGISTER ||
-                        dataZone == .PLC_DB || dataZone == .DB {
-                        start = dataItem.register.index(start, offsetBy: 1)
-                        end = dataItem.register.index(start, offsetBy: 3)
+        // 2. Hop back to the Main Actor to safely publish the update
+        await MainActor.run { [weak self] in
+            var newDataGroupIndex: [String: [String: Int]] = [:]
+            var startIndex = dataArray.count
+            
+            for driver in config.drivers {
+                let driverID = driver.id
+                var driverGroupIndex: [String: Int] = [:]
+                for node in driver.nodes {
+                    for dataItem in node.data {
+                        guard dataItem.register.count > 5 && !dataItem.id.isEmpty else {
+                            continue
+                        }
+                        let dataID = [driver.id, node.address, dataItem.id].joined(separator: ".")
+                        let dataRatio = dataItem.ratio ?? 1.0
+                        
+                        // Parse data type
+                        let readWriteType: DataReadWriteType
+                        var start = dataItem.register.startIndex
+                        var end = dataItem.register.index(start, offsetBy: 2)
+                        var str = dataItem.register[start..<end]
+                        
+                        if str.contains("R") && str.contains("W") {
+                            readWriteType = DataReadWriteType.readWrite
+                            start = dataItem.register.index(start, offsetBy: 2)
+                        }
+                        else if str.contains("R") {
+                            readWriteType = DataReadWriteType.readOnly
+                            start = dataItem.register.index(start, offsetBy: 1)
+                        }
+                        else if str.contains("W") {
+                            readWriteType = DataReadWriteType.writeOnly
+                            start = dataItem.register.index(start, offsetBy: 1)
+                        }
+                        else {
+                            continue
+                        }
+                        
+                        end = dataItem.register.index(start, offsetBy: 1)
                         str = dataItem.register[start..<end]
-                        if str.contains("DF") {
+                        guard let intZone = Int32(str) else {
+                            continue
+                        }
+                        let dataZone: DataZone
+                        switch (intZone) {
+                        case 0:
+                            dataZone = .OUTPUT_RELAY
+                        case 1:
+                            dataZone = .INPUT_RELAY
+                        case 3:
+                            dataZone = .INPUT_REGISTER
+                        case 4:
+                            dataZone = .OUTPUT_REGISTER
+                        case 5:
+                            dataZone = .PLC_DB
+                        case 6:
+                            dataZone = .DB
+                        default:
+                            assert(false, "Parse DataZone \(intZone) error.")
+                            continue
+                        }
+                        
+                        var dataType: DataType
+                        if dataZone == .INPUT_REGISTER || dataZone == .OUTPUT_REGISTER ||
+                            dataZone == .INPUT_REGISTER || dataZone == .OUTPUT_REGISTER ||
+                            dataZone == .PLC_DB || dataZone == .DB {
+                            start = dataItem.register.index(start, offsetBy: 1)
+                            end = dataItem.register.index(start, offsetBy: 3)
+                            str = dataItem.register[start..<end]
+                            if str.contains("DF") {
+                                dataType = DataType.DF
+                                start = dataItem.register.index(start, offsetBy: 2)
+                            }
+                            else if str.contains("WUB") {
+                                dataType = DataType.WUB
+                                start = dataItem.register.index(start, offsetBy: 3)
+                            }
+                            else if str.contains("WB") {
+                                dataType = DataType.WB
+                                start = dataItem.register.index(start, offsetBy: 2)
+                            }
+                            else if str.contains("DUB") {
+                                dataType = DataType.DUB
+                                start = dataItem.register.index(start, offsetBy: 3)
+                            }
+                            else if str.contains("DB") {
+                                dataType = DataType.DB
+                                start = dataItem.register.index(start, offsetBy: 2)
+                            }
+                            else if str.contains("BT") {
+                                dataType = DataType.BT
+                                start = dataItem.register.index(start, offsetBy: 2)
+                            }
+                            else if str.contains("BB") {
+                                dataType = DataType.BB
+                                start = dataItem.register.index(start, offsetBy: 2)
+                            }
+                            else if str.contains("STR") {
+                                dataType = DataType.STR
+                                start = dataItem.register.index(start, offsetBy: 3)
+                            }
+                            else {
+                                assert(false, "Parse DataType \(str) error.")
+                                continue
+                            }
+                        }
+                        else
+                        {
                             dataType = DataType.DF
                             start = dataItem.register.index(start, offsetBy: 2)
                         }
-                        else if str.contains("WUB") {
-                            dataType = DataType.WUB
-                            start = dataItem.register.index(start, offsetBy: 3)
-                        }
-                        else if str.contains("WB") {
-                            dataType = DataType.WB
-                            start = dataItem.register.index(start, offsetBy: 2)
-                        }
-                        else if str.contains("DUB") {
-                            dataType = DataType.DUB
-                            start = dataItem.register.index(start, offsetBy: 3)
-                        }
-                        else if str.contains("DB") {
-                            dataType = DataType.DB
-                            start = dataItem.register.index(start, offsetBy: 2)
-                        }
-                        else if str.contains("BT") {
-                            dataType = DataType.BT
-                            start = dataItem.register.index(start, offsetBy: 2)
-                        }
-                        else if str.contains("BB") {
-                            dataType = DataType.BB
-                            start = dataItem.register.index(start, offsetBy: 2)
-                        }
-                        else if str.contains("STR") {
-                            dataType = DataType.STR
-                            start = dataItem.register.index(start, offsetBy: 3)
-                        }
-                        else {
-                            assert(false, "Parse DataType \(str) error.")
+                        guard let registerAddress = Int32(dataItem.register[start..<dataItem.register.endIndex]) else {
                             continue
                         }
+                        driverGroupIndex[dataID] = startIndex
+                        dataArray.append(DataInfo (
+                            id: dataID,
+                            name: dataItem.name,
+                            displayName: dataItem.displayName ?? "NULL",
+                            ratio: dataRatio,
+                            dtype: dataType,
+                            readWriteType: readWriteType,
+                            dataZone: dataZone,
+                            regiterAddress: registerAddress,
+                            fValue: 0.0,
+                            intValue: 0,
+                            byteValue: 0,
+                            boolValue: false,
+                            strValue: "",
+                            result: -1,
+                            timestamp: Date().timeIntervalSince1970
+                        ))
+                        startIndex+=1
                     }
-                    else
-                    {
-                        dataType = DataType.DF
-                        start = dataItem.register.index(start, offsetBy: 2)
-                    }
-                    guard let registerAddress = Int32(dataItem.register[start..<dataItem.register.endIndex]) else {
-                        continue
-                    }
-                    driverGroupIndex[dataID] = startIndex
-                    dataArray.append(DataInfo (
-                        id: dataID,
-                        name: dataItem.name,
-                        displayName: dataItem.displayName ?? "NULL",
-                        ratio: dataRatio,
-                        dtype: dataType,
-                        readWriteType: readWriteType,
-                        dataZone: dataZone,
-                        regiterAddress: registerAddress,
-                        fValue: 0.0,
-                        intValue: 0,
-                        byteValue: 0,
-                        boolValue: false,
-                        strValue: "",
-                        result: -1,
-                        timestamp: Date().timeIntervalSince1970
-                    ))
-                    startIndex+=1
                 }
+                newDataGroupIndex[driverID] = driverGroupIndex
             }
-            newDataGroupIndex[driverID] = driverGroupIndex
-        }
-        dataGroupIndexMap[groupName] = newDataGroupIndex
+            self?.dataGroupIndexMap[groupName] = newDataGroupIndex
+        } // MainActor.run
     }
     
     // Starts a timer to refresh data with 5 seconds interval.
@@ -403,9 +398,13 @@ class DataManager: ObservableObject {
                             let dataItem = self.dataArray[dataIndex]
                             switch (dataItem.dtype) {
                             case .DF:
-                                dataValue.append((dataId: dataID, value: Double(valueList[index]) ?? 0.0))
+                                var newValue = Double(valueList[index]) ?? 0.0
+                                newValue *= dataItem.ratio
+                                dataValue.append((dataId: dataID, value: newValue))
                             case .WB, .WUB, .DB, .DUB:
-                                dataValue.append((dataId: dataID, value: Double(valueList[index]) ?? 0.0))
+                                var newValue = Double(valueList[index]) ?? 0.0
+                                newValue *= dataItem.ratio
+                                dataValue.append((dataId: dataID, value: newValue))
                             case .BB:
                                 continue
                             case .BT:
@@ -420,7 +419,66 @@ class DataManager: ObservableObject {
             if dataValue.count > 0 {
                 saveToHistory(dataValue: dataValue, group: String(groupName))
             }
+            
+            // Save to the runtime list with the max capacity limit.
+            for (index, dataID) in idList.enumerated() {
+                let key = "\(groupName).\(dataID)"
+                if realtimeDataStore.keys.contains(key) {
+                    if let dotIndex = dataID.firstIndex(of: ".") {
+                        let firstPart = String(dataID[..<dotIndex])
+                        if let dataIndex = dataGroup[firstPart]?[dataID] {
+                            // Checks the result.
+                            let result = Int32(resultList[index]) ?? -1
+                            if result == 0 {
+                                let dataItem = self.dataArray[dataIndex]
+                                let timestamp = Date(timeIntervalSince1970: Double(timeList[index]) ?? 0.0)
+                                switch (dataItem.dtype) {
+                                case .DF:
+                                    var newValue = Double(valueList[index]) ?? 0.0
+                                    newValue *= dataItem.ratio
+                                    pushRealTimeData(RealTimeDataPoint(timestamp: timestamp, value: newValue, dataId: dataID, group: String(groupName)))
+                                case .WB, .WUB, .DB, .DUB:
+                                    var newValue = Double(valueList[index]) ?? 0.0
+                                    newValue *= dataItem.ratio
+                                    pushRealTimeData(RealTimeDataPoint(timestamp: timestamp, value: newValue, dataId: dataID, group: String(groupName)))
+                                case .BB:
+                                    continue
+                                case .BT:
+                                    continue
+                                case .STR:
+                                    continue
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+    }
+        
+    // Appends the real time data and maintains a FIFO queue.
+    func pushRealTimeData(_ point: RealTimeDataPoint) {
+        // Locks and acquires the exclusive previlege
+        realtimeDataStoreLock.lock()
+        defer { realtimeDataStoreLock.unlock() }
+        
+        let key = "\(point.group).\(point.dataId)"
+        var points = realtimeDataStore[key] ?? []
+        points.append(point)
+        if points.count > realtimeMaxPoints {
+            points.removeFirst(points.count - realtimeMaxPoints)
+        }
+        realtimeDataStore[key] = points
+    }
+    
+    // Computes the real time data series. This implementation querys the data directly.
+    func computeRealtimeData(_ dataId: String, _ group: String) -> [RealTimeDataPoint] {
+        // Locks
+        realtimeDataStoreLock.lock()
+        defer { realtimeDataStoreLock.unlock() }
+        
+        let key = "\(group).\(dataId)"
+        return realtimeDataStore[key] ?? []
     }
     
     // MARK: - 数据写入支持
@@ -468,3 +526,18 @@ class DataManager: ObservableObject {
         }
     }
 }
+
+
+// MARKS: initialized data definition
+var initRealTimeGroupData: [String: [RealTimeDataPoint]] = ["goiot.s7.1.temp1_pv": [],
+                                                            "goiot.s7.1.temp2_pv": [],
+                                                            "goiot.s7.1.temp3_pv": [],
+                                                            "goiot.s7.1.temp4_pv": [],
+                                                            "goiot.s7.1.pg_1": [],
+                                                            "goiot.s7.1.pg_2": [],
+                                                            "goiot.s7.1.pg_3": [],
+                                                            "goiot.mfc.1.pv": [],
+                                                            "goiot.mfc.2.pv": [],
+                                                            "goiot.mfc.3.pv": []
+                                                            
+]
