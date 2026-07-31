@@ -16,8 +16,9 @@ struct AlarmDataInfo: Identifiable, Hashable {
     let displayName: String
     var value: Double
     let unit: HMIMeasurementUnit
-    let lowerLimit: Double
-    let upperLimit: Double
+    var lowerLimit: Double
+    var upperLimit: Double
+    var lastUpdateTimestamp: Date? = nil
     
     var isAlarm: Bool {
         return value < lowerLimit || value > upperLimit
@@ -44,6 +45,7 @@ struct HMIAlarmView: View {
     @State private var alarmLog: [AlarmNotification] = []
     @State private var currentToast: AlarmNotification?
     @State private var showAlarmHistory = false
+    @State private var selectedForEdit: AlarmDataInfo?
     
     @EnvironmentObject var dataManager: DataManager
     
@@ -66,7 +68,10 @@ struct HMIAlarmView: View {
     private func updateDataPoint(id: UUID, newValue: Double, timestamp: Date) {
         guard let index = dataPoints.firstIndex(where: { $0.id == id }) else { return }
         let oldInfo = dataPoints[index]
+        
         dataPoints[index].value = newValue
+        dataPoints[index].lastUpdateTimestamp = timestamp
+        
         let newInfo = dataPoints[index]
         
         // 仅在状态从正常变为报警时触发提示，避免重复提示
@@ -84,12 +89,20 @@ struct HMIAlarmView: View {
         }
     }
     
+    private func saveEditedLimits(_ updatedInfo: AlarmDataInfo) {
+        if let index = dataPoints.firstIndex(where: { $0.id == updatedInfo.id }) {
+            dataPoints[index] = updatedInfo
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(dataPoints) { info in
-                        AlarmDataPointCard(info: info)
+                        AlarmDataPointCard(info: info) { selectedInfo in
+                            selectedForEdit = selectedInfo
+                        }
                     }
                 }
                 .padding()
@@ -109,6 +122,9 @@ struct HMIAlarmView: View {
                     alarmLog.removeAll()
                     activeAlarmIds.removeAll()
                 })
+            }
+            .sheet(item: $selectedForEdit) { selectedItem in
+                LimitEditSheet(info: selectedItem, onSave: saveEditedLimits)
             }
             .task {
                 startMonitoring()
@@ -133,6 +149,7 @@ struct HMIAlarmView: View {
 // MARK: - 数据点卡片
 struct AlarmDataPointCard: View {
     let info: AlarmDataInfo
+    var onEditLimits: (AlarmDataInfo) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -140,6 +157,13 @@ struct AlarmDataPointCard: View {
                 Text(info.name)
                     .font(.headline)
                 Spacer()
+                Button(action: { onEditLimits(info) }) {
+                    Image(systemName: "slider.horizontal.3")
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.secondary.opacity(0.1), in: Capsule())
+                }
                 Text("\((String(format: "%.2f", info.value))) \(String(describing: info.unit))")
                     .font(.title2.monospacedDigit())
                     .foregroundStyle(info.isAlarm ? .red : .primary)
@@ -157,6 +181,26 @@ struct AlarmDataPointCard: View {
                 Text("上限: \(String(format: "%.2f", info.upperLimit))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+            
+            if let ts = info.lastUpdateTimestamp {
+                HStack {
+                    Image(systemName: "clock")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    Text(ts, style: .time)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    Spacer()
+                    Text("数据刷新中")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+            } else {
+                Text("等待数据回传...")
+                    .font(.caption2)
+                    .foregroundStyle(.quaternary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding()
@@ -226,6 +270,68 @@ struct AlarmHistoryView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("完成") { dismiss() }
                 }
+            }
+        }
+    }
+}
+
+// MARK: - 阈值编辑 Sheet
+struct LimitEditSheet: View {
+    var info: AlarmDataInfo
+    var onSave: (AlarmDataInfo) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var lowerTemp: String = ""
+    @State private var upperTemp: String = ""
+    
+    private var isValid: Bool {
+        let lower = Double(lowerTemp) ?? Double.infinity
+        let upper = Double(upperTemp) ?? -Double.infinity
+        return lower < upper
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("数据点: \(info.name)") {
+                    Text(info.dataId)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Section("报警阈值设置") {
+                    TextField("下限值", text: $lowerTemp)
+                        .keyboardType(.decimalPad)
+                    TextField("上限值", text: $upperTemp)
+                        .keyboardType(.decimalPad)
+                    
+                    if !isValid {
+                        Text("下限必须小于上限")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
+            .navigationTitle("编辑阈值")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("取消") { dismiss() }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("保存") {
+                        if let l = Double(lowerTemp), let u = Double(upperTemp), l < u {
+                            var mutableInfo = info // Self is immutalbel, so creating a mutable local copy
+                            mutableInfo.lowerLimit = l
+                            mutableInfo.upperLimit = u
+                            onSave(mutableInfo)
+                            dismiss()
+                        }
+                    }
+                    .disabled(!isValid)
+                }
+            }
+            .onAppear {
+                lowerTemp = String(format: "%.2f", info.lowerLimit)
+                upperTemp = String(format: "%.2f", info.upperLimit)
             }
         }
     }
