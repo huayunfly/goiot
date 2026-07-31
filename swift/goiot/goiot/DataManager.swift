@@ -485,6 +485,34 @@ class DataManager: ObservableObject {
         return realtimeDataStore[key] ?? []
     }
     
+    //  Gets the data point real value and timestamp.
+    func getDataPointValue(_ dataId: String, _ group: String) -> (timestamp: Date, value: Double) {
+        if let dotIndex = dataId.firstIndex(of: ".") {
+            let firstPart = String(dataId[..<dotIndex])
+            if let dataIndex = dataGroupIndexMap[group]?[firstPart]?[dataId] {
+                let dataItem = self.dataArray[dataIndex]
+                // Guards the result == 0
+                if dataItem.result == 0 {
+                    var value: Double
+                    switch (dataItem.dtype) {
+                    case .DF:
+                        value = dataItem.fValue * dataItem.ratio
+                    case .WB, .WUB, .DB, .DUB:
+                        value = Double(dataItem.intValue) * dataItem.ratio
+                    case .BB:
+                        value = Double.infinity
+                    case .BT:
+                        value = Double.infinity
+                    case .STR:
+                        value = Double.infinity
+                    }
+                    return (Date.init(timeIntervalSince1970: dataItem.timestamp), value)
+                }
+            }
+        }
+        return (Date.now, Double.infinity)
+    }
+    
     // MARK: - 数据写入支持
     func writeDataItem(_ dataInfo: DataInfo, token: String, writeValue: String) async {
         let payloadValue: String

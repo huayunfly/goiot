@@ -48,18 +48,22 @@ struct MyTabView: View {
                 .tabItem {
                     Image(systemName: "rectangle.grid.1x2")
                     Text("图形控制")
-                }
-                .tag(3)
+                }.tag(3)
             HistoricalChartView()
                 .tabItem{
                     Image(systemName: "chart.xyaxis.line")
                     Text("历史曲线")
-            }
+                }.tag(4)
+            HMIAlarmView()
+                .tabItem{
+                    Image(systemName: "chart.xyaxis.line")
+                    Text("报警")
+                }.tag(5)
             SettingTabView()
                 .tabItem {
                     AppIcon.settings.tabIconStyle()
                     Text("设置")
-                }.tag(4)
+                }.tag(6)
         }
     }
 }
